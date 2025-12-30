@@ -1,6 +1,7 @@
 name: "Pull Request Labeler"
 on:
   pull_request_target:
+    types: [opened, synchronize, reopened]
 
 jobs:
   labeler:
@@ -10,3 +11,5 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/labeler@v6
+        with:
+          configuration-path: .github/labeler.yml
