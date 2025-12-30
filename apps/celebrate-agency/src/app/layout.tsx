@@ -7,7 +7,7 @@ import Providers from "@/app/providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
 import { ReactNode } from "react";
-// import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
@@ -45,7 +45,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <Providers>
             {children}
-            {/* <Analytics /> */}
+            <Analytics />
             {/* <SpeedInsights /> */}
             {/* <Cursor /> */}
           </Providers>

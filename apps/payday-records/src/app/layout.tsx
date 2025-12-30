@@ -7,7 +7,7 @@ import { metadata as meta } from "@/app/config";
 import Providers from "@/app/providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
-// import { Analytics } from "@vercel/analytics/next";
+import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer, Header } from "./sections";
 
@@ -48,7 +48,7 @@ export default function RootLayout({
             <div className="flex min-h-[100dvh] flex-col">
               <Header />
               {children}
-              {/* <Analytics /> */}
+              <Analytics />
               {/* <SpeedInsights /> */}
               {/* <Cursor /> */}
               <footer>
