@@ -1,0 +1,11 @@
+payday-records:
+  - changed-files:
+      - any-glob-to-any-file: "apps/payday-records/**"
+
+celebrate-agency:
+  - changed-files:
+      - any-glob-to-any-file: "apps/celebrate-agency/**"
+
+vague-frequency-labs:
+  - changed-files:
+      - any-glob-to-any-file: "apps/vague-frequency-labs/**"
