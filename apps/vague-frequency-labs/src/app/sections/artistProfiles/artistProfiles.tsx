@@ -11,7 +11,9 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@repo/ui/common/Carousel";
-import ArtistCard from "./artistCard";
+import ArtistSimpleCard from "./ArtistSimpleCard";
+import Link from "next/link";
+import ArtistImage from "./ArtistImage";
 
 const firstRow = [...artistProfiles];
 
@@ -53,20 +55,17 @@ function ArtistProfiles() {
               {firstRow.map((artist, index) => (
                 <CarouselItem
                   key={`artist_${index}`}
-                  className="basis-1/2 xl:basis-1/4"
+                  className="basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
-                  <div className="h-full p-1">
-                    <ArtistCard
-                      logoImage={artist.logoImage}
-                      key={`artist_${index}`}
-                      index={index + 1}
-                      name={artist.name}
-                      shortDescription={artist.shortDescription}
-                      fullDescription={artist.fullDescription}
-                      nickname={artist.nickname}
-                      image={artist.image}
-                      imagePlaceholder={artist.imagePlaceholder}
-                    />
+                  <div className="h-full p-1 relative">
+                    <Link href={`/artist/${artist.name}`}>
+                      <ArtistImage artist={artist} backgroundLogo={true} />
+                    </Link>
+                    <div className="md:hidden absolute w-full bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-16 pb-4 px-4">
+                      <span className="text-white text-xl font-bold drop-shadow-lg">
+                        {artist.name}
+                      </span>
+                    </div>
                   </div>
                 </CarouselItem>
               ))}
