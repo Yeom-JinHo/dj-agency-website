@@ -5,6 +5,10 @@ import NumberTicker from "@repo/ui/common/NumberTicker";
 import TextReveal from "@repo/ui/common/TextReveal";
 import { Preloader } from "@repo/ui/common/Preloader";
 import { AnimatePresence } from "motion/react";
+import { Teko } from 'next/font/google';
+import { cn } from "@repo/ui";
+
+const teko = Teko({ weight: "400", subsets: ["latin"] });
 
 export default function Loader() {
   const [isVisible, setIsVisible] = useState(true);
@@ -40,6 +44,7 @@ export default function Loader() {
         <Preloader>
           {!isReady ? (
             <NumberTicker
+              className={cn(teko.className)}
               from={10}
               target={100}
               autoStart={true}
@@ -48,13 +53,13 @@ export default function Loader() {
             />
           ) : (
             <>
-              <TextReveal className="text-6xl font-bold xl:text-[12rem]">
+              <TextReveal className={cn("text-6xl font-bold xl:text-[12rem]", teko.className)}>
                 Are
               </TextReveal>
-              <TextReveal className="ml-2 text-6xl font-bold xl:ml-10 xl:text-[12rem]">
+              <TextReveal className={cn("ml-2 text-6xl font-bold xl:ml-10 xl:text-[12rem]", teko.className)}>
                 you
               </TextReveal>
-              <TextReveal className="ml-2 text-6xl font-bold xl:ml-10 xl:text-[12rem]">
+              <TextReveal className={cn("ml-2 text-6xl font-bold xl:ml-10 xl:text-[12rem]", teko.className)}>
                 ready?
               </TextReveal>
             </>

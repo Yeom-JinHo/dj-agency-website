@@ -60,7 +60,7 @@ export function Preloader({ children }: PreloaderProps) {
     >
       {dimension.width > 0 && (
         <>
-          <motion.p
+          <motion.div
             variants={opacity}
             initial="initial"
             animate="enter"
@@ -69,7 +69,7 @@ export function Preloader({ children }: PreloaderProps) {
             )}
           >
             {children}
-          </motion.p>
+          </motion.div>
           <svg className="absolute top-0 h-[calc(100%+300px)] w-full">
             <motion.path
               variants={curve}
