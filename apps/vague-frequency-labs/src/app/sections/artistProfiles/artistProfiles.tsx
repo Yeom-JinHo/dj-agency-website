@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { artistProfiles } from "./config";
 import TextReveal from "@repo/ui/common/TextReveal";
 import Autoplay, { type AutoScrollType } from "embla-carousel-auto-scroll";
@@ -20,21 +20,49 @@ const VISIBILITY_THRESHOLD = 0.05;
 
 function ArtistProfiles() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-  const [isVisible, setIsVisible] = useState(false);
+  const carouselApiRef = useRef<CarouselApi | null>(null);
+  const isVisibleRef = useRef(false);
   const autoplayPlugin = useMemo(
     () =>
       Autoplay({
         speed: 600 / 1000,
-        startDelay: 100,
+        startDelay: 0,
         playOnInit: false,
         stopOnInteraction: false,
       }),
     [],
   );
-  const handleSetApi = useCallback((api: CarouselApi) => {
-    setCarouselApi(api);
-  }, []);
+  const carouselPlugins = useMemo(() => [autoplayPlugin], [autoplayPlugin]);
+  const syncAutoplay = useCallback(
+    (shouldPlay: boolean, api = carouselApiRef.current) => {
+      const autoScroll = api?.plugins()?.autoScroll as
+        | AutoScrollType
+        | undefined;
+
+      if (!autoScroll) {
+        return;
+      }
+
+      if (shouldPlay) {
+        if (!autoScroll.isPlaying()) {
+          autoScroll.play();
+        }
+        return;
+      }
+
+      if (autoScroll.isPlaying()) {
+        autoScroll.stop();
+      }
+    },
+    [],
+  );
+  const handleSetApi = useCallback(
+    (api: CarouselApi) => {
+      carouselApiRef.current = api;
+      syncAutoplay(isVisibleRef.current, api);
+    },
+    [syncAutoplay],
+  );
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -44,7 +72,9 @@ function ArtistProfiles() {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsVisible(entry?.isIntersecting ?? false);
+        const nextIsVisible = entry?.isIntersecting ?? false;
+        isVisibleRef.current = nextIsVisible;
+        syncAutoplay(nextIsVisible);
       },
       {
         rootMargin: VISIBILITY_ROOT_MARGIN,
@@ -56,25 +86,9 @@ function ArtistProfiles() {
 
     return () => {
       observer.disconnect();
+      syncAutoplay(false);
     };
-  }, []);
-
-  useEffect(() => {
-    const autoScroll = carouselApi?.plugins()?.autoScroll as
-      | AutoScrollType
-      | undefined;
-
-    if (!autoScroll) {
-      return;
-    }
-
-    if (isVisible) {
-      autoScroll.play();
-      return;
-    }
-
-    autoScroll.stop();
-  }, [carouselApi, isVisible]);
+  }, [syncAutoplay]);
 
   return (
     <section
@@ -105,7 +119,7 @@ function ArtistProfiles() {
               loop: true,
             }}
             setApi={handleSetApi}
-            plugins={[autoplayPlugin]}
+            plugins={carouselPlugins}
             className="w-full"
           >
             <CarouselContent>
