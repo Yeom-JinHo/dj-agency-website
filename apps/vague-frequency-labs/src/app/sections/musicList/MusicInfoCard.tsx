@@ -19,7 +19,15 @@ type MusicInfoCardDialogComponent = ComponentType<{
 let musicInfoCardDialogPromise: Promise<MusicInfoCardDialogModule> | null = null;
 
 function loadMusicInfoCardDialog() {
-  musicInfoCardDialogPromise ??= import("./MusicInfoCardDialog");
+  if (!musicInfoCardDialogPromise) {
+    musicInfoCardDialogPromise = import("./MusicInfoCardDialog").catch(
+      (error) => {
+        musicInfoCardDialogPromise = null;
+        throw error;
+      },
+    );
+  }
+
   return musicInfoCardDialogPromise;
 }
 
@@ -37,14 +45,21 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   }, [musicInfo.name]);
 
   const preloadDialog = useCallback(() => {
-    void loadMusicInfoCardDialog();
+    void loadMusicInfoCardDialog().catch(() => {
+      // Retry on the next interaction if the chunk load fails.
+    });
   }, []);
 
   const activateDialog = useCallback(() => {
-    setDefaultOpen(true);
-    void loadMusicInfoCardDialog().then((module) => {
-      setDialogComponent(() => module.default);
-    });
+    void loadMusicInfoCardDialog()
+      .then((module) => {
+        setDialogComponent(() => module.default);
+        setDefaultOpen(true);
+      })
+      .catch((error: unknown) => {
+        setDefaultOpen(false);
+        console.error("Failed to load MusicInfoCardDialog", error);
+      });
   }, []);
 
   useEffect(() => {
