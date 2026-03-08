@@ -64,14 +64,16 @@ function useMorphingDialog() {
 
 export interface MorphingDialogProviderProps {
   children: ReactNode;
+  defaultOpen?: boolean;
   transition?: Transition;
 }
 
 function MorphingDialogProvider({
   children,
+  defaultOpen = false,
   transition,
 }: MorphingDialogProviderProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const uniqueId = useId();
   const triggerRef = useRef<HTMLDivElement>(null);
 
@@ -103,14 +105,19 @@ function MorphingDialogProvider({
 
 export interface MorphingDialogProps {
   children: ReactNode;
+  defaultOpen?: boolean;
   transition?: Transition;
 }
 
-function MorphingDialog({ children, transition }: MorphingDialogProps) {
+function MorphingDialog({
+  children,
+  defaultOpen = false,
+  transition,
+}: MorphingDialogProps) {
   const groupId = useId();
 
   return (
-    <MorphingDialogProvider transition={transition}>
+    <MorphingDialogProvider defaultOpen={defaultOpen} transition={transition}>
       <LayoutGroup id={`dialog-container-${groupId}`}>{children}</LayoutGroup>
     </MorphingDialogProvider>
   );
