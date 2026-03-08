@@ -8,6 +8,12 @@ import { useMotionValue, useSpring } from "motion/react";
 import { cn } from "@repo/ui";
 
 const MOVEMENT_DAMPING = 1400;
+const MOBILE_BREAKPOINT = 768;
+const LARGE_DESKTOP_BREAKPOINT = 1920;
+const MAX_DEVICE_PIXEL_RATIO = 1.5;
+const MOBILE_MAP_SAMPLES = 4000;
+const DESKTOP_MAP_SAMPLES = 6000;
+const LARGE_DESKTOP_MAP_SAMPLES = 8000;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -69,6 +75,21 @@ export default function Globe({
   };
 
   useEffect(() => {
+    const viewportWidth = window.innerWidth;
+    const devicePixelRatio =
+      viewportWidth < MOBILE_BREAKPOINT
+        ? 1
+        : Math.min(window.devicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO);
+    const mapSamples =
+      viewportWidth < MOBILE_BREAKPOINT
+        ? MOBILE_MAP_SAMPLES
+        : viewportWidth > LARGE_DESKTOP_BREAKPOINT
+          ? LARGE_DESKTOP_MAP_SAMPLES
+          : DESKTOP_MAP_SAMPLES;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
     const onResize = () => {
       if (canvasRef.current) {
         width = canvasRef.current.offsetWidth;
@@ -80,13 +101,21 @@ export default function Globe({
 
     const globe = createGlobe(canvasRef.current!, {
       ...config,
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio,
+      mapSamples,
+      width: width * devicePixelRatio,
+      height: width * devicePixelRatio,
       onRender: (state) => {
-        if (!pointerInteracting.current) phi += 0.005;
+        if (
+          !pointerInteracting.current &&
+          !document.hidden &&
+          !prefersReducedMotion
+        ) {
+          phi += 0.005;
+        }
         state.phi = phi + rs.get();
-        state.width = width * 2;
-        state.height = width * 2;
+        state.width = width * devicePixelRatio;
+        state.height = width * devicePixelRatio;
       },
     });
 
