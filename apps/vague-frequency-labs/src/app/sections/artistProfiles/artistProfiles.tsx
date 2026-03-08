@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { artistProfiles } from "./config";
 import TextReveal from "@repo/ui/common/TextReveal";
-import Autoplay from "embla-carousel-auto-scroll";
+import Autoplay, { type AutoScrollType } from "embla-carousel-auto-scroll";
 
 import {
+  type CarouselApi,
   Carousel,
   CarouselContent,
   CarouselItem,
@@ -14,20 +15,73 @@ import Link from "next/link";
 import ArtistImage from "./ArtistImage";
 
 const firstRow = [...artistProfiles];
+const VISIBILITY_ROOT_MARGIN = "200px 0px";
+const VISIBILITY_THRESHOLD = 0.05;
 
 function ArtistProfiles() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [isVisible, setIsVisible] = useState(false);
   const autoplayPlugin = useMemo(
     () =>
       Autoplay({
         speed: 600 / 1000,
         startDelay: 100,
+        playOnInit: false,
         stopOnInteraction: false,
       }),
     [],
   );
+  const handleSetApi = useCallback((api: CarouselApi) => {
+    setCarouselApi(api);
+  }, []);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry?.isIntersecting ?? false);
+      },
+      {
+        rootMargin: VISIBILITY_ROOT_MARGIN,
+        threshold: VISIBILITY_THRESHOLD,
+      },
+    );
+
+    observer.observe(section);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const autoScroll = carouselApi?.plugins()?.autoScroll as
+      | AutoScrollType
+      | undefined;
+
+    if (!autoScroll) {
+      return;
+    }
+
+    if (isVisible) {
+      autoScroll.play();
+      return;
+    }
+
+    autoScroll.stop();
+  }, [carouselApi, isVisible]);
 
   return (
-    <section className="w-full py-24 lg:py-32" id="artist-profiles">
+    <section
+      ref={sectionRef}
+      className="w-full py-24 lg:py-32"
+      id="artist-profiles"
+    >
       <div className="grid gap-10">
         <div className="flex w-full flex-col items-center justify-center px-4 text-center md:px-6 lg:flex-row lg:justify-between lg:text-left">
           <div className="flex flex-col items-center lg:items-start">
@@ -50,6 +104,7 @@ function ArtistProfiles() {
               dragFree: true,
               loop: true,
             }}
+            setApi={handleSetApi}
             plugins={[autoplayPlugin]}
             className="w-full"
           >
