@@ -17,6 +17,34 @@ const LARGE_DESKTOP_MAP_SAMPLES = 8000;
 const VISIBILITY_ROOT_MARGIN = "200px 0px";
 const VISIBILITY_THRESHOLD = 0.05;
 
+type GlobeRenderProfile = {
+  devicePixelRatio: number;
+  mapSamples: number;
+};
+
+const DEFAULT_RENDER_PROFILE: GlobeRenderProfile = {
+  devicePixelRatio: 1,
+  mapSamples: DESKTOP_MAP_SAMPLES,
+};
+
+function getGlobeRenderProfile(
+  viewportWidth: number,
+  currentDevicePixelRatio: number,
+): GlobeRenderProfile {
+  return {
+    devicePixelRatio:
+      viewportWidth < MOBILE_BREAKPOINT
+        ? 1
+        : Math.min(currentDevicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO),
+    mapSamples:
+      viewportWidth < MOBILE_BREAKPOINT
+        ? MOBILE_MAP_SAMPLES
+        : viewportWidth > LARGE_DESKTOP_BREAKPOINT
+          ? LARGE_DESKTOP_MAP_SAMPLES
+          : DESKTOP_MAP_SAMPLES,
+  };
+}
+
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
@@ -54,6 +82,11 @@ export default function Globe({
   const phiRef = useRef(0);
   const widthRef = useRef(0);
   const [isVisible, setIsVisible] = useState(true);
+  const [renderProfile, setRenderProfile] = useState<GlobeRenderProfile>(() =>
+    typeof window === "undefined"
+      ? DEFAULT_RENDER_PROFILE
+      : getGlobeRenderProfile(window.innerWidth, window.devicePixelRatio || 1),
+  );
 
   const r = useMotionValue(0);
   const rs = useSpring(r, {
@@ -100,21 +133,35 @@ export default function Globe({
   }, []);
 
   useEffect(() => {
+    const updateRenderProfile = () => {
+      const nextRenderProfile = getGlobeRenderProfile(
+        window.innerWidth,
+        window.devicePixelRatio || 1,
+      );
+
+      setRenderProfile((currentRenderProfile) =>
+        currentRenderProfile.devicePixelRatio ===
+          nextRenderProfile.devicePixelRatio &&
+        currentRenderProfile.mapSamples === nextRenderProfile.mapSamples
+          ? currentRenderProfile
+          : nextRenderProfile,
+      );
+    };
+
+    window.addEventListener("resize", updateRenderProfile);
+    updateRenderProfile();
+
+    return () => {
+      window.removeEventListener("resize", updateRenderProfile);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isVisible || !canvasRef.current) {
       return;
     }
 
-    const viewportWidth = window.innerWidth;
-    const devicePixelRatio =
-      viewportWidth < MOBILE_BREAKPOINT
-        ? 1
-        : Math.min(window.devicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO);
-    const mapSamples =
-      viewportWidth < MOBILE_BREAKPOINT
-        ? MOBILE_MAP_SAMPLES
-        : viewportWidth > LARGE_DESKTOP_BREAKPOINT
-          ? LARGE_DESKTOP_MAP_SAMPLES
-          : DESKTOP_MAP_SAMPLES;
+    const { devicePixelRatio, mapSamples } = renderProfile;
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -151,7 +198,7 @@ export default function Globe({
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, [config, isVisible, rs]);
+  }, [config, isVisible, renderProfile, rs]);
 
   return (
     <div
