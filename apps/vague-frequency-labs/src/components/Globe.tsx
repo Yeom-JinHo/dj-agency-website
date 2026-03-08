@@ -1,13 +1,49 @@
 "use client";
 
 import type { COBEOptions } from "cobe";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import createGlobe from "cobe";
 import { useMotionValue, useSpring } from "motion/react";
 
 import { cn } from "@repo/ui";
 
 const MOVEMENT_DAMPING = 1400;
+const MOBILE_BREAKPOINT = 768;
+const LARGE_DESKTOP_BREAKPOINT = 1920;
+const MAX_DEVICE_PIXEL_RATIO = 1.5;
+const MOBILE_MAP_SAMPLES = 4000;
+const DESKTOP_MAP_SAMPLES = 6000;
+const LARGE_DESKTOP_MAP_SAMPLES = 8000;
+const VISIBILITY_ROOT_MARGIN = "200px 0px";
+const VISIBILITY_THRESHOLD = 0.05;
+
+type GlobeRenderProfile = {
+  devicePixelRatio: number;
+  mapSamples: number;
+};
+
+const DEFAULT_RENDER_PROFILE: GlobeRenderProfile = {
+  devicePixelRatio: 1,
+  mapSamples: DESKTOP_MAP_SAMPLES,
+};
+
+function getGlobeRenderProfile(
+  viewportWidth: number,
+  currentDevicePixelRatio: number,
+): GlobeRenderProfile {
+  return {
+    devicePixelRatio:
+      viewportWidth < MOBILE_BREAKPOINT
+        ? 1
+        : Math.min(currentDevicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO),
+    mapSamples:
+      viewportWidth < MOBILE_BREAKPOINT
+        ? MOBILE_MAP_SAMPLES
+        : viewportWidth > LARGE_DESKTOP_BREAKPOINT
+          ? LARGE_DESKTOP_MAP_SAMPLES
+          : DESKTOP_MAP_SAMPLES,
+  };
+}
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -40,11 +76,17 @@ export default function Globe({
   className?: string;
   config?: COBEOptions;
 }) {
-  let phi = 0;
-  let width = 0;
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionMovement = useRef(0);
+  const phiRef = useRef(0);
+  const widthRef = useRef(0);
+  const [isVisible, setIsVisible] = useState(true);
+  const [renderProfile, setRenderProfile] = useState<GlobeRenderProfile>(() =>
+    typeof window === "undefined"
+      ? DEFAULT_RENDER_PROFILE
+      : getGlobeRenderProfile(window.innerWidth, window.devicePixelRatio || 1),
+  );
 
   const r = useMotionValue(0);
   const rs = useSpring(r, {
@@ -63,30 +105,91 @@ export default function Globe({
   const updateMovement = (clientX: number) => {
     if (pointerInteracting.current !== null) {
       const delta = clientX - pointerInteracting.current;
-      pointerInteractionMovement.current = delta;
       r.set(r.get() + delta / MOVEMENT_DAMPING);
     }
   };
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry?.isIntersecting ?? true);
+      },
+      {
+        rootMargin: VISIBILITY_ROOT_MARGIN,
+        threshold: VISIBILITY_THRESHOLD,
+      },
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateRenderProfile = () => {
+      const nextRenderProfile = getGlobeRenderProfile(
+        window.innerWidth,
+        window.devicePixelRatio || 1,
+      );
+
+      setRenderProfile((currentRenderProfile) =>
+        currentRenderProfile.devicePixelRatio ===
+          nextRenderProfile.devicePixelRatio &&
+        currentRenderProfile.mapSamples === nextRenderProfile.mapSamples
+          ? currentRenderProfile
+          : nextRenderProfile,
+      );
+    };
+
+    window.addEventListener("resize", updateRenderProfile);
+    updateRenderProfile();
+
+    return () => {
+      window.removeEventListener("resize", updateRenderProfile);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || !canvasRef.current) {
+      return;
+    }
+
+    const { devicePixelRatio, mapSamples } = renderProfile;
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
     const onResize = () => {
-      if (canvasRef.current) {
-        width = canvasRef.current.offsetWidth;
-      }
+      widthRef.current = canvasRef.current?.offsetWidth ?? 0;
     };
 
     window.addEventListener("resize", onResize);
     onResize();
 
-    const globe = createGlobe(canvasRef.current!, {
+    const globe = createGlobe(canvasRef.current, {
       ...config,
-      width: width * 2,
-      height: width * 2,
+      devicePixelRatio,
+      mapSamples,
+      width: widthRef.current * devicePixelRatio,
+      height: widthRef.current * devicePixelRatio,
       onRender: (state) => {
-        if (!pointerInteracting.current) phi += 0.005;
-        state.phi = phi + rs.get();
-        state.width = width * 2;
-        state.height = width * 2;
+        if (
+          !pointerInteracting.current &&
+          !document.hidden &&
+          !prefersReducedMotion
+        ) {
+          phiRef.current += 0.005;
+        }
+        state.phi = phiRef.current + rs.get();
+        state.width = widthRef.current * devicePixelRatio;
+        state.height = widthRef.current * devicePixelRatio;
       },
     });
 
@@ -95,10 +198,11 @@ export default function Globe({
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, [rs, config]);
+  }, [config, isVisible, renderProfile, rs]);
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "inset-0 mx-auto aspect-[1/1] h-[400px] w-[400px] md:h-[600px] md:w-[600px] lg:h-[800px] lg:w-[800px] 2xl:h-[1000px] 2xl:w-[1000px]",
         className,
