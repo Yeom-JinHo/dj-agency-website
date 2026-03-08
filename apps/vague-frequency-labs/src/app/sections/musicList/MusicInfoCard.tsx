@@ -35,6 +35,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   const [DialogComponent, setDialogComponent] =
     useState<MusicInfoCardDialogComponent | null>(null);
   const [defaultOpen, setDefaultOpen] = useState(false);
+  const [pendingOpen, setPendingOpen] = useState(false);
   const texture = useMemo(() => {
     // musicInfo.name을 기반으로 결정적 랜덤 생성
     const hash = musicInfo.name.split("").reduce((acc, char) => {
@@ -54,13 +55,21 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
     void loadMusicInfoCardDialog()
       .then((module) => {
         setDialogComponent(() => module.default);
-        setDefaultOpen(true);
+        setPendingOpen(true);
       })
       .catch((error: unknown) => {
+        setPendingOpen(false);
         setDefaultOpen(false);
         console.error("Failed to load MusicInfoCardDialog", error);
       });
   }, []);
+
+  useEffect(() => {
+    if (DialogComponent && pendingOpen) {
+      setDefaultOpen(true);
+      setPendingOpen(false);
+    }
+  }, [DialogComponent, pendingOpen]);
 
   useEffect(() => {
     if (DialogComponent && defaultOpen) {

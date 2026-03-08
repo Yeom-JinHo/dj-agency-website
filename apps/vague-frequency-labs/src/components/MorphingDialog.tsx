@@ -78,6 +78,12 @@ function MorphingDialogProvider({
   const uniqueId = useId();
   const triggerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (defaultOpen) {
+      setIsOpen(true);
+    }
+  }, [defaultOpen]);
+
   const contextValue = useMemo(
     () => ({
       isOpen,
