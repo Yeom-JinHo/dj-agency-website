@@ -5,8 +5,9 @@ import type {
   CSSProperties,
   Dispatch,
   KeyboardEvent,
+  MutableRefObject,
+  Ref,
   ReactNode,
-  RefObject,
   SetStateAction,
 } from "react";
 import {
@@ -38,7 +39,7 @@ export interface MorphingDialogContextType {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   uniqueId: string;
-  triggerRef: RefObject<HTMLDivElement | null>;
+  triggerRef: MutableRefObject<HTMLDivElement | null>;
 }
 
 const MorphingDialogContext = createContext<MorphingDialogContextType | null>(
@@ -56,7 +57,7 @@ function useMorphingDialog() {
       isOpen: false,
       setIsOpen: () => {},
       uniqueId: "fallback-id",
-      triggerRef: { current: null },
+      triggerRef: { current: null } as MutableRefObject<HTMLDivElement | null>,
     };
   }
   return context;
@@ -127,7 +128,20 @@ export interface MorphingDialogTriggerProps {
   children: ReactNode;
   className?: string;
   style?: CSSProperties;
-  triggerRef?: RefObject<HTMLDivElement | null>;
+  triggerRef?: Ref<HTMLDivElement>;
+}
+
+function assignRef<T>(ref: Ref<T> | undefined, value: T | null) {
+  if (!ref) {
+    return;
+  }
+
+  if (typeof ref === "function") {
+    ref(value);
+    return;
+  }
+
+  (ref as MutableRefObject<T | null>).current = value;
 }
 
 function MorphingDialogTrigger({
@@ -136,7 +150,8 @@ function MorphingDialogTrigger({
   style,
   triggerRef,
 }: MorphingDialogTriggerProps) {
-  const { setIsOpen, isOpen, uniqueId } = useMorphingDialog();
+  const { setIsOpen, isOpen, uniqueId, triggerRef: contextTriggerRef } =
+    useMorphingDialog();
 
   const handleClick = useCallback(() => {
     setIsOpen(!isOpen);
@@ -151,10 +166,17 @@ function MorphingDialogTrigger({
     },
     [isOpen, setIsOpen]
   );
+  const handleTriggerRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      contextTriggerRef.current = node;
+      assignRef(triggerRef, node);
+    },
+    [contextTriggerRef, triggerRef],
+  );
 
   return (
     <motion.div
-      ref={triggerRef}
+      ref={handleTriggerRef}
       layout="position"
       layoutId={`dialog-${uniqueId}`}
       className={cn("relative cursor-pointer", className)}
@@ -162,6 +184,7 @@ function MorphingDialogTrigger({
       onKeyDown={handleKeyDown}
       style={style}
       role="button"
+      tabIndex={0}
       aria-haspopup="dialog"
       aria-expanded={isOpen}
       aria-controls={`motion-ui-morphing-dialog-content-${uniqueId}`}
@@ -185,6 +208,7 @@ function MorphingDialogContent({
 }: MorphingDialogContentProps) {
   const { setIsOpen, isOpen, uniqueId, triggerRef } = useMorphingDialog();
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const wasOpenRef = useRef(isOpen);
   const [firstFocusableElement, setFirstFocusableElement] =
     useState<HTMLElement | null>(null);
   const [lastFocusableElement, setLastFocusableElement] =
@@ -220,6 +244,8 @@ function MorphingDialogContent({
   }, [setIsOpen, firstFocusableElement, lastFocusableElement]);
 
   useEffect(() => {
+    const wasOpen = wasOpenRef.current;
+
     if (isOpen) {
       document.body.classList.add("overflow-hidden");
 
@@ -235,11 +261,23 @@ function MorphingDialogContent({
 
         setFirstFocusableElement(first);
         setLastFocusableElement(last);
+        first.focus();
+      } else if (containerRef.current) {
+        setFirstFocusableElement(containerRef.current);
+        setLastFocusableElement(containerRef.current);
+        containerRef.current.focus();
       }
     } else {
+      setFirstFocusableElement(null);
+      setLastFocusableElement(null);
       document.body.classList.remove("overflow-hidden");
-      triggerRef.current?.focus();
+
+      if (wasOpen) {
+        triggerRef.current?.focus();
+      }
     }
+
+    wasOpenRef.current = isOpen;
 
     return () => {
       if (isOpen) {
@@ -269,6 +307,7 @@ function MorphingDialogContent({
         backfaceVisibility: "hidden",
       }}
       role="dialog"
+      tabIndex={-1}
       aria-modal="true"
       aria-labelledby={`motion-ui-morphing-dialog-title-${uniqueId}`}
       aria-describedby={`motion-ui-morphing-dialog-description-${uniqueId}`}
