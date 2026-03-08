@@ -1,7 +1,7 @@
 "use client";
 
 import type { COBEOptions } from "cobe";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import createGlobe from "cobe";
 import { useMotionValue, useSpring } from "motion/react";
 
@@ -14,6 +14,8 @@ const MAX_DEVICE_PIXEL_RATIO = 1.5;
 const MOBILE_MAP_SAMPLES = 4000;
 const DESKTOP_MAP_SAMPLES = 6000;
 const LARGE_DESKTOP_MAP_SAMPLES = 8000;
+const VISIBILITY_ROOT_MARGIN = "200px 0px";
+const VISIBILITY_THRESHOLD = 0.05;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -46,11 +48,12 @@ export default function Globe({
   className?: string;
   config?: COBEOptions;
 }) {
-  let phi = 0;
-  let width = 0;
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
-  const pointerInteractionMovement = useRef(0);
+  const phiRef = useRef(0);
+  const widthRef = useRef(0);
+  const [isVisible, setIsVisible] = useState(true);
 
   const r = useMotionValue(0);
   const rs = useSpring(r, {
@@ -69,12 +72,38 @@ export default function Globe({
   const updateMovement = (clientX: number) => {
     if (pointerInteracting.current !== null) {
       const delta = clientX - pointerInteracting.current;
-      pointerInteractionMovement.current = delta;
       r.set(r.get() + delta / MOVEMENT_DAMPING);
     }
   };
 
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry?.isIntersecting ?? true);
+      },
+      {
+        rootMargin: VISIBILITY_ROOT_MARGIN,
+        threshold: VISIBILITY_THRESHOLD,
+      },
+    );
+
+    observer.observe(container);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || !canvasRef.current) {
+      return;
+    }
+
     const viewportWidth = window.innerWidth;
     const devicePixelRatio =
       viewportWidth < MOBILE_BREAKPOINT
@@ -91,31 +120,29 @@ export default function Globe({
     ).matches;
 
     const onResize = () => {
-      if (canvasRef.current) {
-        width = canvasRef.current.offsetWidth;
-      }
+      widthRef.current = canvasRef.current?.offsetWidth ?? 0;
     };
 
     window.addEventListener("resize", onResize);
     onResize();
 
-    const globe = createGlobe(canvasRef.current!, {
+    const globe = createGlobe(canvasRef.current, {
       ...config,
       devicePixelRatio,
       mapSamples,
-      width: width * devicePixelRatio,
-      height: width * devicePixelRatio,
+      width: widthRef.current * devicePixelRatio,
+      height: widthRef.current * devicePixelRatio,
       onRender: (state) => {
         if (
           !pointerInteracting.current &&
           !document.hidden &&
           !prefersReducedMotion
         ) {
-          phi += 0.005;
+          phiRef.current += 0.005;
         }
-        state.phi = phi + rs.get();
-        state.width = width * devicePixelRatio;
-        state.height = width * devicePixelRatio;
+        state.phi = phiRef.current + rs.get();
+        state.width = widthRef.current * devicePixelRatio;
+        state.height = widthRef.current * devicePixelRatio;
       },
     });
 
@@ -124,10 +151,11 @@ export default function Globe({
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, [rs, config]);
+  }, [config, isVisible, rs]);
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         "inset-0 mx-auto aspect-[1/1] h-[400px] w-[400px] md:h-[600px] md:w-[600px] lg:h-[800px] lg:w-[800px] 2xl:h-[1000px] 2xl:w-[1000px]",
         className,
