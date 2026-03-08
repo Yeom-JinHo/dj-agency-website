@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import { useMemo } from "react";
 import { artistProfiles } from "./config";
 import TextReveal from "@repo/ui/common/TextReveal";
-import MotionWrap from "@repo/ui/common/MotionWrap";
 import Autoplay from "embla-carousel-auto-scroll";
 
 import {
@@ -11,15 +10,24 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@repo/ui/common/Carousel";
-import ArtistSimpleCard from "./ArtistSimpleCard";
 import Link from "next/link";
 import ArtistImage from "./ArtistImage";
 
 const firstRow = [...artistProfiles];
 
 function ArtistProfiles() {
+  const autoplayPlugin = useMemo(
+    () =>
+      Autoplay({
+        speed: 600 / 1000,
+        startDelay: 100,
+        stopOnInteraction: false,
+      }),
+    [],
+  );
+
   return (
-    <MotionWrap className="w-full py-24 lg:py-32" id="artist-profiles">
+    <section className="w-full py-24 lg:py-32" id="artist-profiles">
       <div className="grid gap-10">
         <div className="flex w-full flex-col items-center justify-center px-4 text-center md:px-6 lg:flex-row lg:justify-between lg:text-left">
           <div className="flex flex-col items-center lg:items-start">
@@ -42,13 +50,7 @@ function ArtistProfiles() {
               dragFree: true,
               loop: true,
             }}
-            plugins={[
-              Autoplay({
-                speed: 600 / 1000,
-                startDelay: 100,
-                stopOnInteraction: false,
-              }),
-            ]}
+            plugins={[autoplayPlugin]}
             className="w-full"
           >
             <CarouselContent>
@@ -59,7 +61,11 @@ function ArtistProfiles() {
                 >
                   <div className="h-full p-1 relative">
                     <Link href={`/artist/${artist.name}`}>
-                      <ArtistImage artist={artist} backgroundLogo={true} />
+                      <ArtistImage
+                        artist={artist}
+                        backgroundLogo={true}
+                        priority={index < 2}
+                      />
                     </Link>
                     <div className="md:hidden absolute w-full bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-16 pb-4 px-4">
                       <span className="text-white text-xl font-bold drop-shadow-lg">
@@ -75,7 +81,7 @@ function ArtistProfiles() {
           <div className="md:dark:from-background pointer-events-none absolute inset-y-0 right-0 w-1/4 md:bg-gradient-to-l md:from-white"></div>
         </div>
       </div>
-    </MotionWrap>
+    </section>
   );
 }
 
