@@ -1,21 +1,19 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "motion/react";
 import { ArtistProfile } from "@/types/artist";
 
 const ArtistImage = ({
   artist,
   backgroundLogo,
+  priority = false,
 }: {
   artist: ArtistProfile;
   backgroundLogo: boolean;
+  priority?: boolean;
 }) => {
   return (
-    <motion.div
-      layoutId={`profile-image-${artist.name}`}
-      className="group relative h-full w-full overflow-hidden object-cover"
-    >
+    <div className="group relative h-full w-full overflow-hidden object-cover">
       {/* 기본 이미지 */}
       <Image
         src={artist.image}
@@ -23,8 +21,8 @@ const ArtistImage = ({
         height={600}
         alt={`Image of ${artist.name}`}
         className={`h-full w-full object-cover object-center transition-all duration-300 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
-        priority
-        sizes="(max-width: 768px) 400px, 520px"
+        priority={priority}
+        sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
         placeholder="blur"
         blurDataURL={artist.imagePlaceholder}
       />
@@ -34,14 +32,13 @@ const ArtistImage = ({
             src={artist.logoImage}
             width={320}
             height={150}
-            sizes="(max-width: 768px) 320px, 150px"
+            sizes="(max-width: 768px) 50vw, 20vw"
             alt={`Hover image of ${artist.name}`}
             className="h-auto w-full object-contain brightness-75"
-            priority
           />
         </div>
       )}
-    </motion.div>
+    </div>
   );
 };
 

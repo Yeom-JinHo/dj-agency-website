@@ -1,10 +1,8 @@
-import React from "react";
 import TextReveal from "@repo/ui/common/TextReveal";
-import MotionWrap from "@repo/ui/common/MotionWrap";
 
 function About() {
   return (
-    <MotionWrap className="w-full py-24 lg:py-32" id="about">
+    <section className="w-full py-24 lg:py-32" id="about">
       <div className="px-4 md:px-6">
         <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2">
           <div className="space-y-4">
@@ -28,7 +26,7 @@ function About() {
           </div>
         </div>
       </div>
-    </MotionWrap>
+    </section>
   );
 }
 
