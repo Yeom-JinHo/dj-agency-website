@@ -1,30 +1,23 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
 import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import MusicInfoCard from "./MusicInfoCard";
 import TextReveal from "@repo/ui/common/TextReveal";
-import MotionWrap from "@repo/ui/common/MotionWrap";
 
 import { Button } from "@repo/ui/common/Button";
 import { Icon } from "@repo/ui/common/Icon";
 
+const baseMusicInfos = musicInfo.getInfos();
+const musicInfos =
+  baseMusicInfos.length === 0
+    ? []
+    : Array.from({ length: 9 }, (_, index) => {
+        return baseMusicInfos[index % baseMusicInfos.length]!;
+      });
+
 function MusicList() {
-  const dummyMusicInfos = [
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-  ];
-
-  const musicInfos = dummyMusicInfos.slice(0, 9);
-
   return (
-    <MotionWrap className="w-full py-24 lg:py-32" id="music-list">
+    <section className="w-full py-24 lg:py-32" id="music-list">
       <div className="grid gap-10">
         <div className="flex w-full flex-col items-center justify-center px-4 text-center md:px-6 lg:flex-row lg:justify-between lg:text-left">
           <div className="flex flex-col items-center lg:items-start">
@@ -53,7 +46,7 @@ function MusicList() {
           </Link>
         </div>
       </div>
-    </MotionWrap>
+    </section>
   );
 }
 

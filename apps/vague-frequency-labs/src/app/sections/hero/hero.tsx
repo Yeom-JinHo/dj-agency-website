@@ -8,7 +8,7 @@ function Hero() {
           We are
         </h1>
         <div className="w-full scale-100 md:scale-90 lg:scale-80">
-          <Globe></Globe>
+          <Globe />
         </div>
         <h1 className="absolute bottom-[15vh] text-3xl font-bold md:bottom-[10vh]">
           Vague Frequency Labs
