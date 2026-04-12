@@ -1,3 +1,26 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+catalog:
+  # Runtime
+  next: 15.5.9
+  react: ^19.2.0
+  react-dom: ^19.2.0
+  "@vercel/analytics": ^1.6.1
+  next-themes: ^0.4.6
+  tailwind-merge: ^3.3.1
+  motion: ^12.23.24
+  class-variance-authority: ^0.7.1
+  "@tabler/icons-react": ^3.35.0
+
+  # Dev
+  typescript: 5.9.2
+  eslint: ^9.38.0
+  "@types/node": ^22.15.3
+  "@types/react": 19.2.0
+  "@types/react-dom": 19.2.0
+  tailwindcss: ^4.1.16
+  "@tailwindcss/postcss": ^4.1.16
+  postcss: ^8.5.6
+  tailwindcss-animate: ^1.0.7
