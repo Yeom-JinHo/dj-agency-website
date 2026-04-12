@@ -1,0 +1,44 @@
+# v.f.labs
+
+Turborepo monorepo with three Next.js 15 apps and shared packages. pnpm workspaces, Node 18+, TypeScript 5.9, React 19.
+
+## Commands
+
+Run from repo root via Turbo; `pnpm <task>` fans out to all workspaces.
+
+- `pnpm dev` — run all apps in dev (persistent, not cached)
+- `pnpm build` — build all apps/packages
+- `pnpm lint` — eslint across workspaces (`--max-warnings 0`)
+- `pnpm check-types` — `next typegen && tsc --noEmit` per app
+- `pnpm format` — prettier on `**/*.{ts,tsx,md}`
+
+Scope to one workspace with `--filter`, e.g. `pnpm build --filter=vague-frequency-labs`.
+
+## Layout
+
+```
+apps/
+  vague-frequency-labs/  Next.js app, port 3004 (main brand site)
+  payday-records/        Next.js app, port 3002
+  celebrate-agency/      Next.js app, port 3003
+packages/
+  ui/                    @repo/ui — shared React components (exports ./fancy/link, ./common/*, ./*)
+  utils/                 shared utilities
+  types/                 shared TS types
+  eslint-config/         @repo/eslint-config
+  typescript-config/     @repo/typescript-config
+```
+
+Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `app/` (App Router), `components/`, `styles/`, `types/`, `utils/`; `vague-frequency-labs` also has `hooks/`, `lib/`, `consts/`.
+
+## Stack conventions
+
+- **Next.js 15.5** App Router + React 19. Dev ports are fixed per app (see `package.json`).
+- **Styling**: Tailwind CSS v4 (`@tailwindcss/postcss`), `tailwind-merge`, `tailwindcss-animate`, `class-variance-authority`.
+- **Animation/icons**: `motion`, `@tabler/icons-react`.
+- **Catalog versions** pinned in `pnpm-workspace.yaml` — add shared deps there rather than per-app to keep versions in sync.
+- **Turbo**: `build` depends on `^build`, caches `.next/**` (excl. cache); `dev` is `cache: false, persistent: true`.
+
+## Git
+
+Default branch: `master`. Active work on `dev`. PRs target `master`.
