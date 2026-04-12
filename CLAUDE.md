@@ -23,6 +23,7 @@ apps/
   celebrate-agency/      Next.js app, port 3003
 packages/
   ui/                    @repo/ui — shared React components (exports ./fancy/link, ./common/*, ./*)
+  next-config/           @repo/next-config — shared Next.js base config (createNextConfig)
   utils/                 shared utilities
   types/                 shared TS types
   eslint-config/         @repo/eslint-config

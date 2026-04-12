@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {};
+import { createNextConfig } from "@repo/next-config";
 
-export default nextConfig;
+export default createNextConfig();
