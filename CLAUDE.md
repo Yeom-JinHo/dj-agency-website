@@ -29,7 +29,7 @@ packages/
   typescript-config/     @repo/typescript-config
 ```
 
-Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `app/` (App Router), `components/`, `styles/`, `types/`, `utils/`; `vague-frequency-labs` also has `hooks/`, `lib/`, `consts/`.
+Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `app/` (App Router), `components/`, `styles/`, `types/`, `utils/`; `vague-frequency-labs` also has `hooks/`, `consts/`.
 
 ## Stack conventions
 
