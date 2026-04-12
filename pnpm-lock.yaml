@@ -77,6 +77,9 @@ importers:
 
   apps/celebrate-agency:
     dependencies:
+      '@repo/next-config':
+        specifier: workspace:*
+        version: link:../../packages/next-config
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -135,6 +138,9 @@ importers:
 
   apps/payday-records:
     dependencies:
+      '@repo/next-config':
+        specifier: workspace:*
+        version: link:../../packages/next-config
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -202,6 +208,9 @@ importers:
 
   apps/vague-frequency-labs:
     dependencies:
+      '@repo/next-config':
+        specifier: workspace:*
+        version: link:../../packages/next-config
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -314,6 +323,8 @@ importers:
       typescript-eslint:
         specifier: ^8.40.0
         version: 8.40.0(eslint@9.38.0(jiti@2.6.1))(typescript@5.9.2)
+
+  packages/next-config: {}
 
   packages/typescript-config: {}
 
