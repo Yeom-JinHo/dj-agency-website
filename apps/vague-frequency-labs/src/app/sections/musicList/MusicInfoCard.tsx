@@ -57,7 +57,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             borderRadius: "12px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
-          className="pointer-events-auto relative flex h-auto w-full basis-3/4 flex-col overflow-hidden p-8 md:basis-1/4"
+          className="pointer-events-auto relative flex h-auto w-full basis-[90%] flex-col overflow-hidden p-4 sm:basis-3/4 sm:p-6 md:basis-1/4 md:p-8"
         >
           <motion.div
             animate={{
