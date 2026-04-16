@@ -3,7 +3,9 @@
 import type { ReactElement } from "react";
 import { useRef } from "react";
 import Image from "next/image";
-import Globe from "./Globe";
+import dynamic from "next/dynamic";
+
+const Globe = dynamic(() => import("./Globe"), { ssr: false });
 import { COMPANY_SHORT_NAME } from "@/consts/company";
 import { useDebounce } from "@/hooks/useDebounce";
 import { motion, useScroll, useTransform } from "motion/react";

@@ -5,12 +5,21 @@ import { artistProfiles } from "./config";
 import TextReveal from "@repo/ui/common/TextReveal";
 import Autoplay, { type AutoScrollType } from "embla-carousel-auto-scroll";
 
-import {
-  type CarouselApi,
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@repo/ui/common/Carousel";
+import dynamic from "next/dynamic";
+import type { CarouselApi } from "@repo/ui/common/Carousel";
+
+const Carousel = dynamic(
+  () => import("@repo/ui/common/Carousel").then((mod) => mod.Carousel),
+  { ssr: false }
+);
+const CarouselContent = dynamic(
+  () => import("@repo/ui/common/Carousel").then((mod) => mod.CarouselContent),
+  { ssr: false }
+);
+const CarouselItem = dynamic(
+  () => import("@repo/ui/common/Carousel").then((mod) => mod.CarouselItem),
+  { ssr: false }
+);
 import Link from "next/link";
 import ArtistImage from "./ArtistImage";
 

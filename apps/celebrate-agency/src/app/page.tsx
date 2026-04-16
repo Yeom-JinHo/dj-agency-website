@@ -1,5 +1,10 @@
 import Link from "next/link";
-import GalaxyBackground from "@repo/ui/common/GalaxyBackground";
+import dynamic from "next/dynamic";
+
+const GalaxyBackground = dynamic(
+  () => import("@repo/ui/common/GalaxyBackground"),
+  { ssr: false }
+);
 
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";

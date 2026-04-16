@@ -1,4 +1,6 @@
-import Globe from "@/components/Globe";
+import dynamic from "next/dynamic";
+
+const Globe = dynamic(() => import("@/components/Globe"), { ssr: false });
 
 function Hero() {
   return (

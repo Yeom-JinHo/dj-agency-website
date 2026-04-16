@@ -10,7 +10,9 @@ import { createMetadata } from "@/utils";
 import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Footer, Header } from "./sections";
-import Loader from './loader';
+import dynamic from "next/dynamic";
+
+const Loader = dynamic(() => import("./loader"), { ssr: false });
 
 // https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
 const bricolage_grotesque = Bricolage_Grotesque({ subsets: ["latin"] });
