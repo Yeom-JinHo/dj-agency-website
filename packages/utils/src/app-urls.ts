@@ -9,11 +9,14 @@ const DEV_FALLBACK: Record<AppId, string> = {
 export function getAppUrls(): Record<AppId, string> {
   return {
     "vague-frequency-labs":
-      process.env.NEXT_PUBLIC_VFL_URL ?? DEV_FALLBACK["vague-frequency-labs"],
+      process.env.NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL ??
+      DEV_FALLBACK["vague-frequency-labs"],
     "payday-records":
-      process.env.NEXT_PUBLIC_PR_URL ?? DEV_FALLBACK["payday-records"],
+      process.env.NEXT_PUBLIC_PAYDAY_RECORDS_URL ??
+      DEV_FALLBACK["payday-records"],
     "celebrate-agency":
-      process.env.NEXT_PUBLIC_CA_URL ?? DEV_FALLBACK["celebrate-agency"],
+      process.env.NEXT_PUBLIC_CELEBRATE_AGENCY_URL ??
+      DEV_FALLBACK["celebrate-agency"],
   };
 }
 
