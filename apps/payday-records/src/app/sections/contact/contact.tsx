@@ -21,14 +21,14 @@ function Contact() {
           badge={
             <a href="https://www.instagram.com/samkor.br/">
               <Image
-                src="/images/artist/sam/logo.png"
+                src="/images/artist/sam/logo.webp"
                 alt="SAM"
                 width={100}
                 height={100}
               />
             </a>
           }
-          src={"/images/mac/image.png"}
+          src={"/images/mac/image.webp"}
           showGradient={false}
         />
         <div
