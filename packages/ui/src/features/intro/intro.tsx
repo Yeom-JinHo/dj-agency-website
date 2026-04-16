@@ -23,9 +23,21 @@ export function Intro({ currentApp, appUrls }: IntroProps) {
     label: string;
     image: typeof vflLogo;
   }> = [
-    { id: "VFL", label: COMPANY_NAME.VAGUE_FREQUENCY_LABS, image: vflLogo },
-    { id: "CA", label: COMPANY_NAME.CELEBRATE_AGENCY, image: caLogo },
-    { id: "PR", label: COMPANY_NAME.PAYDAY_RECORDS, image: prLogo },
+    {
+      id: "vague-frequency-labs",
+      label: COMPANY_NAME.VAGUE_FREQUENCY_LABS,
+      image: vflLogo,
+    },
+    {
+      id: "celebrate-agency",
+      label: COMPANY_NAME.CELEBRATE_AGENCY,
+      image: caLogo,
+    },
+    {
+      id: "payday-records",
+      label: COMPANY_NAME.PAYDAY_RECORDS,
+      image: prLogo,
+    },
   ];
 
   return (

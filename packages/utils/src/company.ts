@@ -10,4 +10,7 @@ export const COMPANY_SHORT_NAME = {
   PAYDAY_RECORDS: "PAYDAY",
 } as const;
 
-export type AppId = "VFL" | "PR" | "CA";
+export type AppId =
+  | "vague-frequency-labs"
+  | "payday-records"
+  | "celebrate-agency";
