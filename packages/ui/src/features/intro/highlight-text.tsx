@@ -16,7 +16,6 @@ interface HighlightTextProps {
   onHover: (text: string) => void;
 }
 
-const NAVIGATE_DELAY_MS = 500;
 
 export function HighlightText({
   children,
@@ -43,13 +42,11 @@ export function HighlightText({
     if (pendingRef.current) return;
     pendingRef.current = true;
     onHover(label);
-    window.setTimeout(() => {
-      if (isSelf) {
-        router.push("/");
-      } else {
-        window.location.href = targetUrl;
-      }
-    }, NAVIGATE_DELAY_MS);
+    if (isSelf) {
+      router.push("/");
+    } else {
+      window.location.href = targetUrl;
+    }
   };
 
   return (
