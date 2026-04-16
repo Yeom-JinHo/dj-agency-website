@@ -6,7 +6,7 @@ import { Icon } from "@repo/ui/common/Icon";
 
 export default function Content() {
   return (
-    <div className="bg-muted/30 flex h-full w-full flex-col justify-between px-12 py-8">
+    <div className="bg-muted/30 flex h-full w-full flex-col justify-between px-4 py-6 sm:px-8 md:px-12 md:py-8">
       <Nav />
       <Copyright />
     </div>
@@ -16,7 +16,7 @@ export default function Content() {
 const Copyright = () => {
   return (
     <div className="flex flex-col items-start justify-between sm:flex-row sm:items-end">
-      <h1 className="mt-10 text-[18vw] leading-[0.8] md:text-[16vw] lg:text-[18vw] xl:text-[20vw] 2xl:text-[22vw]">
+      <h1 className="mt-10 text-[14vw] leading-[0.8] sm:text-[16vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] 2xl:text-[18vw]">
         v.f.labs
       </h1>
       <p className="mt-4 text-xs sm:mt-0 sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">
@@ -28,7 +28,7 @@ const Copyright = () => {
 
 const Nav = () => {
   return (
-    <div className="flex shrink-0 gap-20">
+    <div className="flex shrink-0 gap-8 sm:gap-12 md:gap-20">
       {/* <div className="flex flex-col gap-2">
         <h3 className="mb-2 text-zinc-500 uppercase dark:text-zinc-400">
           About
@@ -48,7 +48,7 @@ const Nav = () => {
         })}
       </div> */}
       <div className="flex flex-col gap-2">
-        <h3 className="mb-2 text-zinc-500 uppercase dark:text-zinc-400">
+        <h3 className="mb-2 text-lg text-zinc-500 uppercase md:text-xl lg:text-2xl dark:text-zinc-400">
           Socials
         </h3>
         {contact.socials.map((link, index) => {
@@ -56,7 +56,7 @@ const Nav = () => {
 
           return (
             <Link
-              className="underline-offset-4 hover:underline"
+              className="text-base underline-offset-4 hover:underline md:text-lg lg:text-xl"
               href={href}
               target="_blank"
               rel="noopener noreferrer"
