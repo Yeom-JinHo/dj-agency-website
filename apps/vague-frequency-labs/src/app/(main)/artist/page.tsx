@@ -7,7 +7,7 @@ import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import { createMetadata } from "@/utils/index";
 
-import ArtistSimpleCard from "../sections/artistProfiles/ArtistSimpleCard";
+import ArtistSimpleCard from "../../sections/artistProfiles/ArtistSimpleCard";
 
 const title = "Artist";
 const description = "Here are some artist I have worked on.";

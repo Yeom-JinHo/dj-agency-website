@@ -13,6 +13,7 @@
   "dependencies": {
     "@repo/next-config": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@repo/utils": "workspace:*",
     "@vercel/analytics": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
