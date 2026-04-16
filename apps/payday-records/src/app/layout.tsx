@@ -9,7 +9,6 @@ import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
 import { Analytics } from "@vercel/analytics/next";
 // import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Footer, Header } from "./sections";
 
 // https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
 const bricolage_grotesque = Bricolage_Grotesque({ subsets: ["latin"] });
@@ -45,16 +44,10 @@ export default function RootLayout({
       <body className={`${bricolage_grotesque.className} antialiased`}>
         <ErrorBoundary>
           <Providers>
-            <div className="flex min-h-[100dvh] flex-col">
-              <Header />
-              {children}
-              <Analytics />
-              {/* <SpeedInsights /> */}
-              {/* <Cursor /> */}
-              <footer>
-                <Footer />
-              </footer>
-            </div>
+            {children}
+            <Analytics />
+            {/* <SpeedInsights /> */}
+            {/* <Cursor /> */}
           </Providers>
         </ErrorBoundary>
       </body>
