@@ -10,6 +10,7 @@ function Hero() {
           alt="Payday Records"
           width={900}
           height={600}
+          priority
         />
       </BlurFade>
     </section>
