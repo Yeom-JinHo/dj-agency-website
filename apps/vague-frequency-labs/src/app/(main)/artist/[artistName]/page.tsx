@@ -32,7 +32,7 @@ export async function generateMetadata(props: {
       type: "article",
       images: [
         {
-          alt: "banner",
+          alt: artist.name,
           width: 1200,
           height: 630,
           url: artist.image,
