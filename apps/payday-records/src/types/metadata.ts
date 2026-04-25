@@ -1,17 +1,3 @@
-export interface Metadata {
-  author: {
-    name: string;
-    username: string;
-    label: string;
-    twitterHandle?: string;
-  };
-  site: {
-    title: string;
-    description: string;
-    url: string;
-    keywords: string[];
-    language: string;
-    charset: string;
-    ogLocale?: string;
-  };
-}
+import type { AppMetaConfig } from "@repo/utils/metadata";
+
+export type Metadata = AppMetaConfig;

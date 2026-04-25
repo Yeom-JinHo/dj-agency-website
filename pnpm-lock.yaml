@@ -406,6 +406,9 @@ importers:
       eslint:
         specifier: 'catalog:'
         version: 9.38.0(jiti@2.6.1)
+      next:
+        specifier: 'catalog:'
+        version: 15.5.9(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       typescript:
         specifier: 'catalog:'
         version: 5.9.2
