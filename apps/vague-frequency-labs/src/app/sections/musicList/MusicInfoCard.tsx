@@ -2,6 +2,7 @@
 
 import type { MusicInfo } from "@/types/music";
 import { useMemo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   MorphingDialog as Dialog,
@@ -42,9 +43,13 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             sizes="(max-width: 768px) 150px, 360px"
             className="h-full w-full object-cover"
           />
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 hover:opacity-0"
-            style={{ backgroundImage: `url("${texture}")` }}
+          <Image
+            src={texture}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes="(max-width: 768px) 150px, 360px"
+            className="pointer-events-none object-cover transition-opacity duration-500 hover:opacity-0"
           />
         </motion.div>
       </DialogTrigger>
