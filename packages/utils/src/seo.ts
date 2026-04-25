@@ -7,11 +7,16 @@ type ChangeFrequency =
   | "yearly"
   | "never";
 
+export interface SitemapAlternates {
+  languages?: { [language: string]: string };
+}
+
 export interface SitemapEntry {
   url: string;
   lastModified?: string | Date;
   changeFrequency?: ChangeFrequency;
   priority?: number;
+  alternates?: SitemapAlternates;
 }
 
 export interface SitemapRouteInput {
@@ -19,6 +24,7 @@ export interface SitemapRouteInput {
   changeFrequency?: ChangeFrequency;
   priority?: number;
   lastModified?: string | Date;
+  alternates?: SitemapAlternates;
 }
 
 export interface CreateSitemapOptions {
@@ -44,13 +50,15 @@ export function createSitemap({
     changeFrequency: route.changeFrequency ?? "monthly",
     priority:
       route.priority ?? (route.path === "/" || route.path === "" ? 1 : 0.7),
+    ...(route.alternates ? { alternates: route.alternates } : {}),
   }));
 }
 
 export interface RobotsRule {
-  userAgent: string | string[];
+  userAgent?: string | string[];
   allow?: string | string[];
   disallow?: string | string[];
+  crawlDelay?: number;
 }
 
 export interface RobotsOutput {
