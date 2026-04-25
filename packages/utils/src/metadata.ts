@@ -24,12 +24,20 @@ function deriveImageAlt(
   title: Metadata["title"],
   fallback: string,
 ): string {
-  if (typeof title === "string") return title;
+  if (typeof title === "string" && title) return title;
   if (title && typeof title === "object") {
-    if ("absolute" in title && typeof title.absolute === "string") {
+    if (
+      "absolute" in title &&
+      typeof title.absolute === "string" &&
+      title.absolute
+    ) {
       return title.absolute;
     }
-    if ("default" in title && typeof title.default === "string") {
+    if (
+      "default" in title &&
+      typeof title.default === "string" &&
+      title.default
+    ) {
       return title.default;
     }
   }
