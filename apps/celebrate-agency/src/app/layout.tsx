@@ -1,4 +1,6 @@
 import { Bricolage_Grotesque } from "next/font/google";
+import type { ReactNode } from "react";
+import type { Viewport } from "next";
 
 import "@/styles/globals.css";
 
@@ -6,12 +8,15 @@ import { metadata as meta } from "@/app/config";
 import Providers from "@/app/providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
-import { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
-// import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ReactScan } from "@/components/ReactScan";
 
 // https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
-const bricolage_grotesque = Bricolage_Grotesque({ subsets: ["latin"] });
+const bricolage_grotesque = Bricolage_Grotesque({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata = createMetadata({
   title: {
@@ -25,6 +30,15 @@ export const metadata = createMetadata({
   },
 });
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,21 +46,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {process.env.NODE_ENV === "development" && (
-          // eslint-disable-next-line @next/next/no-sync-scripts
-          <script
-            crossOrigin="anonymous"
-            src="https://unpkg.com/react-scan/dist/auto.global.js"
-          />
-        )}
-      </head>
       <body className={`${bricolage_grotesque.className} antialiased`}>
+        <ReactScan />
         <ErrorBoundary>
           <Providers>
             {children}
             <Analytics />
-            {/* <SpeedInsights /> */}
+            <SpeedInsights />
             {/* <Cursor /> */}
           </Providers>
         </ErrorBoundary>
