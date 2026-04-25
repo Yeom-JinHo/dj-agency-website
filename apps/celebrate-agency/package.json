@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev --port 3003",
     "build": "next build",
+    "analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit"
