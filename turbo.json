@@ -4,7 +4,9 @@
   "globalEnv": [
     "NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL",
     "NEXT_PUBLIC_PAYDAY_RECORDS_URL",
-    "NEXT_PUBLIC_CELEBRATE_AGENCY_URL"
+    "NEXT_PUBLIC_CELEBRATE_AGENCY_URL",
+    "NODE_ENV",
+    "VERCEL_ENV"
   ],
   "tasks": {
     "build": {

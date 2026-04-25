@@ -4,7 +4,8 @@
   "private": true,
   "exports": {
     "./app-urls": "./src/app-urls.ts",
-    "./company": "./src/company.ts"
+    "./company": "./src/company.ts",
+    "./seo": "./src/seo.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
