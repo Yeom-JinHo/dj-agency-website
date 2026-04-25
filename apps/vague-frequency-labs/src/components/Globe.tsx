@@ -48,7 +48,6 @@ function getGlobeRenderProfile(
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
-  onRender: () => {},
   devicePixelRatio: 2,
   phi: 0,
   theta: 0.3,
@@ -179,22 +178,29 @@ export default function Globe({
       mapSamples,
       width: widthRef.current * devicePixelRatio,
       height: widthRef.current * devicePixelRatio,
-      onRender: (state) => {
-        if (
-          !pointerInteracting.current &&
-          !document.hidden &&
-          !prefersReducedMotion
-        ) {
-          phiRef.current += 0.005;
-        }
-        state.phi = phiRef.current + rs.get();
-        state.width = widthRef.current * devicePixelRatio;
-        state.height = widthRef.current * devicePixelRatio;
-      },
     });
+
+    let rafId = 0;
+    const tick = () => {
+      if (
+        !pointerInteracting.current &&
+        !document.hidden &&
+        !prefersReducedMotion
+      ) {
+        phiRef.current += 0.005;
+      }
+      globe.update({
+        phi: phiRef.current + rs.get(),
+        width: widthRef.current * devicePixelRatio,
+        height: widthRef.current * devicePixelRatio,
+      });
+      rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
 
     setTimeout(() => (canvasRef.current!.style.opacity = "1"), 0);
     return () => {
+      cancelAnimationFrame(rafId);
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
