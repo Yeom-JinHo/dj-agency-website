@@ -15,6 +15,7 @@
     "@repo/ui": "workspace:*",
     "@repo/utils": "workspace:*",
     "@vercel/analytics": "catalog:",
+    "@vercel/speed-insights": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",
@@ -32,6 +33,7 @@
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "tailwindcss-animate": "catalog:",
+    "react-scan": "catalog:",
     "typescript": "catalog:"
   }
 }
