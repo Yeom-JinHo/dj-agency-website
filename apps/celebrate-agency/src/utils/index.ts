@@ -3,7 +3,26 @@ import { metadata as meta } from "@/app/config";
 
 export const baseUrl = meta.site.url;
 
+const DEFAULT_OG_LOCALE = "en_US";
+
+function deriveImageAlt(title: Metadata["title"]): string {
+  if (typeof title === "string") return title;
+  if (title && typeof title === "object") {
+    if ("absolute" in title && typeof title.absolute === "string") {
+      return title.absolute;
+    }
+    if ("default" in title && typeof title.default === "string") {
+      return title.default;
+    }
+  }
+  return meta.site.title;
+}
+
 export function createMetadata(override: Metadata): Metadata {
+  const imageAlt = deriveImageAlt(override.title);
+  const ogLocale = meta.site.ogLocale ?? DEFAULT_OG_LOCALE;
+  const twitterHandle = meta.author.twitterHandle;
+
   return {
     ...override,
     robots: {
@@ -22,10 +41,10 @@ export function createMetadata(override: Metadata): Metadata {
       title: override.title ?? undefined,
       description: override.description ?? undefined,
       url: baseUrl,
-      locale: "en-US",
+      locale: ogLocale,
       images: [
         {
-          alt: "banner",
+          alt: imageAlt,
           width: 1200,
           height: 630,
           url: "/og",
@@ -39,9 +58,12 @@ export function createMetadata(override: Metadata): Metadata {
       card: "summary_large_image",
       title: override.title ?? undefined,
       description: override.description ?? undefined,
+      ...(twitterHandle
+        ? { creator: twitterHandle, site: twitterHandle }
+        : {}),
       images: [
         {
-          alt: "banner",
+          alt: imageAlt,
           width: 1200,
           height: 630,
           url: "/og",

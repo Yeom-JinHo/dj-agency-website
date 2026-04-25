@@ -3,6 +3,7 @@ export interface Metadata {
     name: string;
     username: string;
     label: string;
+    twitterHandle?: string;
   };
   site: {
     title: string;
@@ -11,5 +12,6 @@ export interface Metadata {
     keywords: string[];
     language: string;
     charset: string;
+    ogLocale?: string;
   };
 }
