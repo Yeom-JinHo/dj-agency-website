@@ -53,7 +53,6 @@ export default function RootLayout({
             {children}
             <Analytics />
             <SpeedInsights />
-            {/* <Cursor /> */}
           </Providers>
         </ErrorBoundary>
       </body>
