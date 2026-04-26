@@ -101,9 +101,6 @@ importers:
       next:
         specifier: 'catalog:'
         version: 15.5.9(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      next-themes:
-        specifier: 'catalog:'
-        version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -177,9 +174,6 @@ importers:
       next:
         specifier: 'catalog:'
         version: 15.5.9(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      next-themes:
-        specifier: 'catalog:'
-        version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -259,9 +253,6 @@ importers:
       next:
         specifier: 'catalog:'
         version: 15.5.9(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      next-themes:
-        specifier: 'catalog:'
-        version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -369,6 +360,9 @@ importers:
       next:
         specifier: 'catalog:'
         version: 15.5.9(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next-themes:
+        specifier: 'catalog:'
+        version: 0.4.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       ogl:
         specifier: ^1.0.11
         version: 1.0.11
