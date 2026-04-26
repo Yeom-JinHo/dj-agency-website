@@ -75,6 +75,7 @@ export default function Header() {
                     {hoveredLink === href ? (
                       <motion.div
                         layoutId="underline"
+                        initial={false}
                         className="absolute bottom-0 left-0 h-0.5 w-full bg-primary"
                       />
                     ) : null}
