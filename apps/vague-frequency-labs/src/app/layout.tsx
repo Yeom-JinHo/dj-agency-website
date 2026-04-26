@@ -10,7 +10,7 @@ import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { ReactScan } from "@/components/ReactScan";
+import { ReactScan } from "@repo/ui/common/ReactScan";
 
 // https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
 const bricolage_grotesque = Bricolage_Grotesque({
@@ -53,7 +53,6 @@ export default function RootLayout({
             {children}
             <Analytics />
             <SpeedInsights />
-            {/* <Cursor /> */}
           </Providers>
         </ErrorBoundary>
       </body>
