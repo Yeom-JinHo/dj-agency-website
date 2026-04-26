@@ -5,7 +5,7 @@
   "exports": {
     "./app-urls": "./src/app-urls.ts",
     "./company": "./src/company.ts",
-    "./seo": "./src/seo.ts"
+    "./seo": "./src/seo.ts",
     "./metadata": "./src/metadata.ts"
   },
   "scripts": {
