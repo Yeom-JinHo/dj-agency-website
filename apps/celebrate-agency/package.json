@@ -17,7 +17,6 @@
     "@vercel/analytics": "catalog:",
     "@vercel/speed-insights": "catalog:",
     "next": "catalog:",
-    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwind-merge": "catalog:"

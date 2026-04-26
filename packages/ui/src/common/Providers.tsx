@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import { ThemeProvider } from "./ThemeProvider";
 
-export default function Providers({ children }: { children: ReactNode }) {
+export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"

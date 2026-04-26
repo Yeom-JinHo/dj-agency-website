@@ -5,7 +5,7 @@ import type { Viewport } from "next";
 import "@/styles/globals.css";
 
 import { metadata as meta } from "@/app/config";
-import Providers from "@/app/providers";
+import { Providers } from "@repo/ui/common/Providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
 import { Analytics } from "@vercel/analytics/next";
