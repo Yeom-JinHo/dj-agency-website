@@ -33,7 +33,6 @@
     "postcss": "catalog:",
     "tailwindcss": "catalog:",
     "tailwindcss-animate": "catalog:",
-    "react-scan": "catalog:",
     "typescript": "catalog:"
   }
 }
