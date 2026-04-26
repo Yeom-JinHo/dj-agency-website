@@ -60,11 +60,11 @@ const GLOBE_CONFIG: COBEOptions = {
   markerColor: [251 / 255, 100 / 255, 21 / 255],
   glowColor: [1, 1, 1],
   markers: [
-    { location: [37.5665, 126.978], size: 0.1 }, // 서울
-    { location: [35.1796, 129.0756], size: 0.08 }, // 부산
-    { location: [35.8714, 128.6014], size: 0.07 }, // 대구
-    { location: [37.4563, 126.7052], size: 0.07 }, // 인천
-    { location: [13.7563, 100.5018], size: 0.07 }, // 방콕
+    { location: [37.5665, 126.978], size: 0.05 }, // 서울
+    { location: [35.1796, 129.0756], size: 0.04 }, // 부산
+    { location: [35.8714, 128.6014], size: 0.035 }, // 대구
+    { location: [37.4563, 126.7052], size: 0.035 }, // 인천
+    { location: [13.7563, 100.5018], size: 0.035 }, // 방콕
   ],
 };
 
