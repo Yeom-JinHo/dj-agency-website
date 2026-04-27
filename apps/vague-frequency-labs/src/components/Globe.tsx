@@ -60,22 +60,27 @@ function haversine(
   return 2 * Math.asin(Math.sqrt(a));
 }
 
-type FlightDestination = { location: [number, number]; size: number };
+type FlightDestination = {
+  id: string;
+  name: string;
+  location: [number, number];
+  size: number;
+};
 
 // 서울에서 가까운 순으로 정렬해 wave가 안에서 밖으로 발산되도록 한다.
 const FLIGHT_DESTINATIONS: FlightDestination[] = (
   [
-    { location: [35.6762, 139.6503], size: 0.02 }, // 도쿄
-    { location: [39.9042, 116.4074], size: 0.02 }, // 베이징
-    { location: [13.7563, 100.5018], size: 0.018 }, // 방콕
-    { location: [1.3521, 103.8198], size: 0.018 }, // 싱가포르
-    { location: [-33.8688, 151.2093], size: 0.02 }, // 시드니
-    { location: [25.2048, 55.2708], size: 0.018 }, // 두바이
-    { location: [51.5074, -0.1278], size: 0.02 }, // 런던
-    { location: [48.8566, 2.3522], size: 0.018 }, // 파리
-    { location: [40.7128, -74.006], size: 0.022 }, // 뉴욕
-    { location: [34.0522, -118.2437], size: 0.02 }, // 로스앤젤레스
-    { location: [-23.5505, -46.6333], size: 0.02 }, // 상파울루
+    { id: "tokyo", name: "Tokyo", location: [35.6762, 139.6503], size: 0.02 },
+    { id: "beijing", name: "Beijing", location: [39.9042, 116.4074], size: 0.02 },
+    { id: "bangkok", name: "Bangkok", location: [13.7563, 100.5018], size: 0.018 },
+    { id: "singapore", name: "Singapore", location: [1.3521, 103.8198], size: 0.018 },
+    { id: "sydney", name: "Sydney", location: [-33.8688, 151.2093], size: 0.02 },
+    { id: "dubai", name: "Dubai", location: [25.2048, 55.2708], size: 0.018 },
+    { id: "london", name: "London", location: [51.5074, -0.1278], size: 0.02 },
+    { id: "paris", name: "Paris", location: [48.8566, 2.3522], size: 0.018 },
+    { id: "newyork", name: "New York", location: [40.7128, -74.006], size: 0.022 },
+    { id: "la", name: "Los Angeles", location: [34.0522, -118.2437], size: 0.02 },
+    { id: "saopaulo", name: "São Paulo", location: [-23.5505, -46.6333], size: 0.02 },
   ] satisfies FlightDestination[]
 ).sort((a, b) => haversine(SEOUL, a.location) - haversine(SEOUL, b.location));
 
@@ -97,7 +102,11 @@ const GLOBE_CONFIG: COBEOptions = {
   glowColor: [0.78, 0.86, 0.97],
   markers: [
     { id: "seoul", location: SEOUL, size: 0 }, // 서울 (CSS 펄스로 대체)
-    ...FLIGHT_DESTINATIONS,
+    ...FLIGHT_DESTINATIONS.map(({ id, location, size }) => ({
+      id,
+      location,
+      size,
+    })),
   ],
   arcs: FLIGHT_DESTINATIONS.map(({ location }) => ({
     from: SEOUL,
@@ -283,6 +292,52 @@ export default function Globe({
       >
         <span className="seoul-pulse__ring seoul-pulse__ring--late" />
       </span>
+      <span
+        className="city-label city-label--seoul"
+        style={
+          {
+            positionAnchor: "--cobe-seoul",
+            opacity: "var(--cobe-visible-seoul, 0)",
+          } as React.CSSProperties
+        }
+      >
+        Seoul
+      </span>
+      {FLIGHT_DESTINATIONS.map((d) => (
+        <span
+          key={d.id}
+          className="city-label"
+          style={
+            {
+              positionAnchor: `--cobe-${d.id}`,
+              opacity: `var(--cobe-visible-${d.id}, 0)`,
+            } as React.CSSProperties
+          }
+        >
+          {d.name}
+        </span>
+      ))}
+      <svg className="globe-band" viewBox="0 0 100 100" aria-hidden>
+        <defs>
+          <path
+            id="globe-equator"
+            d="M 5,50 A 45,13 0 1,1 95,50 A 45,13 0 1,1 5,50"
+            fill="none"
+          />
+        </defs>
+        <text className="globe-band__text">
+          <textPath href="#globe-equator" startOffset="0%">
+            VAGUE · FREQUENCY · LABS · EST · 2025 · VAGUE · FREQUENCY · LABS · EST · 2025 ·
+            <animate
+              attributeName="startOffset"
+              from="0%"
+              to="100%"
+              dur="40s"
+              repeatCount="indefinite"
+            />
+          </textPath>
+        </text>
+      </svg>
     </div>
   );
 }
