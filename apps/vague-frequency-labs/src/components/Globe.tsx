@@ -7,6 +7,11 @@ import { useMotionValue, useSpring } from "motion/react";
 
 import { cn } from "@repo/ui";
 
+import { ARTIST_NAME } from "@/consts/artist";
+
+const ORBIT_TEXT = `${Object.values(ARTIST_NAME).join(" · ")} · `;
+const ORBIT_TEXT_REPEAT = 4;
+
 const MOVEMENT_DAMPING = 1400;
 const MOBILE_BREAKPOINT = 768;
 const LARGE_DESKTOP_BREAKPOINT = 1920;
@@ -255,7 +260,7 @@ export default function Globe({
           </defs>
           <text className="orbit-text">
             <textPath href={`#${orbitPathId}`}>
-              {"Vague Frequency Labs · ".repeat(10)}
+              {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT)}
             </textPath>
           </text>
         </svg>
