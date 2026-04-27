@@ -200,26 +200,15 @@ export default function Globe({
       return;
     }
 
+    const canvas = canvasRef.current;
     const { devicePixelRatio, mapSamples, showMarkers } = renderProfile;
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    let globe: ReturnType<typeof createGlobe> | null = null;
+    widthRef.current = canvas.offsetWidth;
 
-    const onResize = () => {
-      const next = canvasRef.current?.offsetWidth ?? 0;
-      if (next === widthRef.current) {
-        return;
-      }
-      widthRef.current = next;
-      globe?.update({ width: next, height: next });
-    };
-
-    widthRef.current = canvasRef.current?.offsetWidth ?? 0;
-    window.addEventListener("resize", onResize);
-
-    globe = createGlobe(canvasRef.current, {
+    const globe = createGlobe(canvas, {
       ...config,
       devicePixelRatio,
       mapSamples,
@@ -227,6 +216,16 @@ export default function Globe({
       height: widthRef.current,
       markers: showMarkers ? config.markers : [],
     });
+
+    const onResize = () => {
+      const next = canvas.offsetWidth;
+      if (next === widthRef.current) {
+        return;
+      }
+      widthRef.current = next;
+      globe.update({ width: next, height: next });
+    };
+    window.addEventListener("resize", onResize);
 
     let rafId = 0;
     let lastPhi = Number.NaN;
@@ -250,8 +249,13 @@ export default function Globe({
     };
     rafId = requestAnimationFrame(tick);
 
-    setTimeout(() => (canvasRef.current!.style.opacity = "1"), 0);
+    const fadeInId = window.setTimeout(() => {
+      if (canvasRef.current) {
+        canvasRef.current.style.opacity = "1";
+      }
+    }, 0);
     return () => {
+      clearTimeout(fadeInId);
       cancelAnimationFrame(rafId);
       globe.destroy();
       window.removeEventListener("resize", onResize);
@@ -274,20 +278,22 @@ export default function Globe({
               d="M 150,150 m -130,0 a 130,130 0 1,0 260,0 a 130,130 0 1,0 -260,0"
             />
           </defs>
-          <text className="orbit-text orbit-text--mobile">
-            <textPath
-              href={`#${orbitPathId}`}
-              textLength="816"
-              lengthAdjust="spacing"
-            >
-              {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT_MOBILE)}
-            </textPath>
-          </text>
-          <text className="orbit-text orbit-text--desktop">
-            <textPath href={`#${orbitPathId}`}>
-              {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT_DESKTOP)}
-            </textPath>
-          </text>
+          <g className="orbit-rotor">
+            <text className="orbit-text orbit-text--mobile">
+              <textPath
+                href={`#${orbitPathId}`}
+                textLength="816"
+                lengthAdjust="spacing"
+              >
+                {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT_MOBILE)}
+              </textPath>
+            </text>
+            <text className="orbit-text orbit-text--desktop">
+              <textPath href={`#${orbitPathId}`}>
+                {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT_DESKTOP)}
+              </textPath>
+            </text>
+          </g>
         </svg>
       </div>
       <canvas
@@ -295,10 +301,7 @@ export default function Globe({
           "size-full opacity-0 transition-opacity duration-500 [contain:layout_paint_size]",
         )}
         ref={canvasRef}
-        onPointerDown={(e) => {
-          pointerInteracting.current = e.clientX;
-          updatePointerInteraction(e.clientX);
-        }}
+        onPointerDown={(e) => updatePointerInteraction(e.clientX)}
         onPointerUp={() => updatePointerInteraction(null)}
         onPointerOut={() => updatePointerInteraction(null)}
         onMouseMove={(e) => updateMovement(e.clientX)}
