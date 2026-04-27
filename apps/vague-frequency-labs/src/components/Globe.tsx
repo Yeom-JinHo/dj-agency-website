@@ -45,6 +45,24 @@ function getGlobeRenderProfile(
   };
 }
 
+const SEOUL: [number, number] = [37.5665, 126.978];
+
+const FLIGHT_DESTINATIONS: { location: [number, number]; size: number }[] = [
+  { location: [35.6762, 139.6503], size: 0.02 }, // 도쿄
+  { location: [39.9042, 116.4074], size: 0.02 }, // 베이징
+  { location: [13.7563, 100.5018], size: 0.018 }, // 방콕
+  { location: [1.3521, 103.8198], size: 0.018 }, // 싱가포르
+  { location: [-33.8688, 151.2093], size: 0.02 }, // 시드니
+  { location: [25.2048, 55.2708], size: 0.018 }, // 두바이
+  { location: [51.5074, -0.1278], size: 0.02 }, // 런던
+  { location: [48.8566, 2.3522], size: 0.018 }, // 파리
+  { location: [40.7128, -74.006], size: 0.022 }, // 뉴욕
+  { location: [34.0522, -118.2437], size: 0.02 }, // 로스앤젤레스
+  { location: [-23.5505, -46.6333], size: 0.02 }, // 상파울루
+];
+
+const ACCENT: [number, number, number] = [0.32, 0.5, 0.88]; // 모던 블루
+
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
@@ -52,20 +70,25 @@ const GLOBE_CONFIG: COBEOptions = {
   phi: 0,
   theta: 0.3,
   dark: 0,
-  diffuse: 0.4,
+  diffuse: 0.55,
   mapSamples:
     typeof window !== "undefined" && window.innerWidth > 1920 ? 15000 : 10000,
-  mapBrightness: 1.2,
+  mapBrightness: 1.3,
   baseColor: [1, 1, 1],
-  markerColor: [251 / 255, 100 / 255, 21 / 255],
-  glowColor: [1, 1, 1],
+  markerColor: ACCENT,
+  glowColor: [0.78, 0.86, 0.97],
   markers: [
-    { location: [37.5665, 126.978], size: 0.05 }, // 서울
-    { location: [35.1796, 129.0756], size: 0.04 }, // 부산
-    { location: [35.8714, 128.6014], size: 0.035 }, // 대구
-    { location: [37.4563, 126.7052], size: 0.035 }, // 인천
-    { location: [13.7563, 100.5018], size: 0.035 }, // 방콕
+    { id: "seoul", location: SEOUL, size: 0 }, // 서울 (CSS 펄스로 대체)
+    ...FLIGHT_DESTINATIONS,
   ],
+  arcs: FLIGHT_DESTINATIONS.map(({ location }) => ({
+    from: SEOUL,
+    to: location,
+  })),
+  arcColor: ACCENT,
+  arcWidth: 0.4,
+  arcHeight: 0.3,
+  markerElevation: 0.005,
 };
 
 export default function Globe({
@@ -210,7 +233,7 @@ export default function Globe({
     <div
       ref={containerRef}
       className={cn(
-        "inset-0 mx-auto aspect-[1/1] h-[400px] w-[400px] md:h-[600px] md:w-[600px] lg:h-[800px] lg:w-[800px] 2xl:h-[1000px] 2xl:w-[1000px]",
+        "globe-pulse relative inset-0 mx-auto aspect-[1/1] h-[400px] w-[400px] md:h-[600px] md:w-[600px] lg:h-[800px] lg:w-[800px] 2xl:h-[1000px] 2xl:w-[1000px]",
         className,
       )}
     >
@@ -229,6 +252,16 @@ export default function Globe({
         onTouchMove={(e) =>
           e.touches[0] && updateMovement(e.touches[0].clientX)
         }
+      />
+      <span
+        className="seoul-pulse"
+        style={
+          {
+            positionAnchor: "--cobe-seoul",
+            opacity: "var(--cobe-visible-seoul, 0)",
+          } as React.CSSProperties
+        }
+        aria-hidden
       />
     </div>
   );

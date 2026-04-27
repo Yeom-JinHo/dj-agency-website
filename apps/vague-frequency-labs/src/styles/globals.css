@@ -205,3 +205,87 @@
     }
   }
 }
+
+.globe-pulse::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(82, 128, 224, 0.4) 0%,
+    rgba(82, 128, 224, 0.16) 38%,
+    transparent 68%
+  );
+  filter: blur(36px);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: -1;
+  animation: globe-pulse 4.2s ease-in-out infinite;
+}
+
+@keyframes globe-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.75;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .globe-pulse::before {
+    animation: none;
+  }
+}
+
+.seoul-pulse {
+  position: absolute;
+  top: anchor(center);
+  left: anchor(center);
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: rgb(30, 80, 200);
+  box-shadow:
+    0 0 0 1.5px rgba(20, 30, 80, 0.6),
+    0 0 10px rgba(30, 80, 200, 0.9);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.seoul-pulse::before,
+.seoul-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 2px solid rgba(30, 80, 200, 1);
+  animation: seoul-pulse-ring 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.seoul-pulse::after {
+  animation-delay: 1.1s;
+}
+
+@keyframes seoul-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(4.5);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seoul-pulse::before,
+  .seoul-pulse::after {
+    animation: none;
+  }
+}
