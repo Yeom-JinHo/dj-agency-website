@@ -76,7 +76,7 @@ const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 
 // cobe `showcase: default` 색·치수에 맞춘 globe config
 const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
-const MARKER_SIZE = 0.025;
+const MARKER_SIZE = 0.04;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -86,8 +86,7 @@ const GLOBE_CONFIG: COBEOptions = {
   theta: 0.3,
   dark: 0,
   diffuse: 1.5,
-  mapSamples:
-    typeof window !== "undefined" && window.innerWidth > 1920 ? 16000 : 12000,
+  mapSamples: DESKTOP_MAP_SAMPLES,
   mapBrightness: 10,
   baseColor: [1, 1, 1],
   markerColor: ACCENT,
@@ -201,35 +200,46 @@ export default function Globe({
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
+    let globe: ReturnType<typeof createGlobe> | null = null;
+
     const onResize = () => {
-      widthRef.current = canvasRef.current?.offsetWidth ?? 0;
+      const next = canvasRef.current?.offsetWidth ?? 0;
+      if (next === widthRef.current) {
+        return;
+      }
+      widthRef.current = next;
+      globe?.update({ width: next, height: next });
     };
 
+    widthRef.current = canvasRef.current?.offsetWidth ?? 0;
     window.addEventListener("resize", onResize);
-    onResize();
 
-    const globe = createGlobe(canvasRef.current, {
+    globe = createGlobe(canvasRef.current, {
       ...config,
       devicePixelRatio,
       mapSamples,
-      width: widthRef.current * devicePixelRatio,
-      height: widthRef.current * devicePixelRatio,
+      width: widthRef.current,
+      height: widthRef.current,
     });
 
     let rafId = 0;
+    let lastPhi = Number.NaN;
     const tick = () => {
+      if (document.hidden) {
+        rafId = requestAnimationFrame(tick);
+        return;
+      }
       if (
         !pointerInteracting.current &&
-        !document.hidden &&
         !prefersReducedMotion
       ) {
         phiRef.current += 0.003;
       }
-      globe.update({
-        phi: phiRef.current + rs.get(),
-        width: widthRef.current * devicePixelRatio,
-        height: widthRef.current * devicePixelRatio,
-      });
+      const nextPhi = phiRef.current + rs.get();
+      if (nextPhi !== lastPhi) {
+        lastPhi = nextPhi;
+        globe.update({ phi: nextPhi });
+      }
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
