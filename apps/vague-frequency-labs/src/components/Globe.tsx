@@ -10,7 +10,8 @@ import { cn } from "@repo/ui";
 import { ARTIST_NAME } from "@/consts/artist";
 
 const ORBIT_TEXT = `${Object.values(ARTIST_NAME).join(" · ")} · `;
-const ORBIT_TEXT_REPEAT = 4;
+const ORBIT_TEXT_REPEAT_MOBILE = 2;
+const ORBIT_TEXT_REPEAT_DESKTOP = 4;
 
 const MOVEMENT_DAMPING = 1400;
 const MOBILE_BREAKPOINT = 768;
@@ -268,9 +269,18 @@ export default function Globe({
               d="M 150,150 m -130,0 a 130,130 0 1,0 260,0 a 130,130 0 1,0 -260,0"
             />
           </defs>
-          <text className="orbit-text">
+          <text className="orbit-text orbit-text--mobile">
+            <textPath
+              href={`#${orbitPathId}`}
+              textLength="816"
+              lengthAdjust="spacing"
+            >
+              {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT_MOBILE)}
+            </textPath>
+          </text>
+          <text className="orbit-text orbit-text--desktop">
             <textPath href={`#${orbitPathId}`}>
-              {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT)}
+              {ORBIT_TEXT.repeat(ORBIT_TEXT_REPEAT_DESKTOP)}
             </textPath>
           </text>
         </svg>

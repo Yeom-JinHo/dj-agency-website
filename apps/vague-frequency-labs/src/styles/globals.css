@@ -251,6 +251,24 @@
   stroke-width: 0.6px;
 }
 
+.orbit-text--desktop {
+  display: none;
+}
+
+.orbit-text--mobile {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+@media (min-width: 768px) {
+  .orbit-text--mobile {
+    display: none;
+  }
+  .orbit-text--desktop {
+    display: inline;
+  }
+}
+
 @keyframes orbit-spin {
   from {
     transform: rotateX(62deg) rotateZ(0deg);
