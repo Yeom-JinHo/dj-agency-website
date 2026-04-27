@@ -47,19 +47,33 @@ function getGlobeRenderProfile(
 
 const SEOUL: [number, number] = [37.5665, 126.978];
 
-const CITY_LOCATIONS: [number, number][] = [
-  [35.6762, 139.6503], // 도쿄
-  [39.9042, 116.4074], // 베이징
-  [13.7563, 100.5018], // 방콕
-  [1.3521, 103.8198], // 싱가포르
-  [-33.8688, 151.2093], // 시드니
-  [25.2048, 55.2708], // 두바이
-  [51.5074, -0.1278], // 런던
-  [48.8566, 2.3522], // 파리
-  [40.7128, -74.006], // 뉴욕
-  [34.0522, -118.2437], // 로스앤젤레스
-  [-23.5505, -46.6333], // 상파울루
+type CityMarker = {
+  id: string;
+  name: string;
+  location: [number, number];
+};
+
+const SEOUL_MARKER: CityMarker = {
+  id: "seoul",
+  name: "Seoul",
+  location: SEOUL,
+};
+
+const FLIGHT_DESTINATIONS: CityMarker[] = [
+  { id: "tokyo", name: "Tokyo", location: [35.6762, 139.6503] },
+  { id: "beijing", name: "Beijing", location: [39.9042, 116.4074] },
+  { id: "bangkok", name: "Bangkok", location: [13.7563, 100.5018] },
+  { id: "singapore", name: "Singapore", location: [1.3521, 103.8198] },
+  { id: "sydney", name: "Sydney", location: [-33.8688, 151.2093] },
+  { id: "dubai", name: "Dubai", location: [25.2048, 55.2708] },
+  { id: "london", name: "London", location: [51.5074, -0.1278] },
+  { id: "paris", name: "Paris", location: [48.8566, 2.3522] },
+  { id: "newyork", name: "New York", location: [40.7128, -74.006] },
+  { id: "la", name: "Los Angeles", location: [34.0522, -118.2437] },
+  { id: "saopaulo", name: "São Paulo", location: [-23.5505, -46.6333] },
 ];
+
+const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 
 // cobe `showcase: default` 색·치수에 맞춘 globe config
 const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
@@ -70,7 +84,7 @@ const GLOBE_CONFIG: COBEOptions = {
   height: 800,
   devicePixelRatio: 2,
   phi: 0,
-  theta: 0.2,
+  theta: 0.3,
   dark: 0,
   diffuse: 1.5,
   mapSamples:
@@ -79,8 +93,9 @@ const GLOBE_CONFIG: COBEOptions = {
   baseColor: [1, 1, 1],
   markerColor: ACCENT,
   glowColor: [0.94, 0.93, 0.91],
-  opacity: 0.7,
-  markers: [SEOUL, ...CITY_LOCATIONS].map((location) => ({
+  opacity: 0.9,
+  markers: ALL_MARKERS.map(({ id, location }) => ({
+    id,
     location,
     size: MARKER_SIZE,
   })),
@@ -267,6 +282,33 @@ export default function Globe({
           e.touches[0] && updateMovement(e.touches[0].clientX)
         }
       />
+      <span
+        className="seoul-pulse"
+        style={
+          {
+            positionAnchor: "--cobe-seoul",
+            opacity: "var(--cobe-visible-seoul, 0)",
+          } as React.CSSProperties
+        }
+        aria-hidden
+      >
+        <span className="seoul-pulse__ring seoul-pulse__ring--late" />
+      </span>
+      {ALL_MARKERS.map((m) => (
+        <div
+          key={m.id}
+          className="showcase-default-label"
+          style={
+            {
+              positionAnchor: `--cobe-${m.id}`,
+              opacity: `var(--cobe-visible-${m.id}, 0)`,
+              filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+            } as React.CSSProperties
+          }
+        >
+          {m.name}
+        </div>
+      ))}
     </div>
   );
 }

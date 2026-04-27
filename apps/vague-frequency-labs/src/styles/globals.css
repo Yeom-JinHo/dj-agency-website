@@ -262,3 +262,115 @@
   }
 }
 
+/* ── Seoul radar pulse ───────────────────────── */
+
+.seoul-pulse {
+  position: absolute;
+  top: anchor(center);
+  left: anchor(center);
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: rgb(30, 80, 200);
+  box-shadow:
+    0 0 0 1.5px rgba(20, 30, 80, 0.6),
+    0 0 12px rgba(30, 80, 200, 0.9);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.seoul-pulse::before,
+.seoul-pulse::after,
+.seoul-pulse__ring {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 2px solid rgba(30, 80, 200, 0.85);
+  animation: seoul-pulse-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+.seoul-pulse::after {
+  animation-delay: 0.87s;
+}
+
+.seoul-pulse__ring--late {
+  animation-delay: 1.74s;
+}
+
+@keyframes seoul-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.95;
+    border-width: 2px;
+  }
+  60% {
+    opacity: 0.4;
+    border-width: 1.5px;
+  }
+  100% {
+    transform: scale(7);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seoul-pulse::before,
+  .seoul-pulse::after,
+  .seoul-pulse__ring {
+    animation: none;
+  }
+}
+
+/* ── Globe city label (default showcase) ─────────────── */
+
+.showcase-default-label {
+  position: absolute;
+  bottom: anchor(top);
+  left: anchor(center);
+  translate: -50% 0;
+  margin-bottom: 8px;
+  padding: 0.15rem 0.35rem;
+  background: rgb(20, 30, 80);
+  color: #fff;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity 0.8s, filter 0.8s;
+  pointer-events: none;
+}
+
+.showcase-default-label::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate3d(-50%, -1px, 0);
+  border: 5px solid transparent;
+  border-top-color: rgb(20, 30, 80);
+}
+
+@supports not (anchor-name: --x) {
+  .seoul-pulse,
+  .showcase-default-label {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .showcase-default-label {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
+    margin-bottom: 6px;
+  }
+  .showcase-default-label::after {
+    border-width: 4px;
+  }
+}
+
