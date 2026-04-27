@@ -117,11 +117,14 @@ export default function Globe({
   const phiRef = useRef(0);
   const widthRef = useRef(0);
   const [isVisible, setIsVisible] = useState(true);
-  const [renderProfile, setRenderProfile] = useState<GlobeRenderProfile>(() =>
-    typeof window === "undefined"
-      ? DEFAULT_RENDER_PROFILE
-      : getGlobeRenderProfile(window.innerWidth, window.devicePixelRatio || 1),
+  const [mounted, setMounted] = useState(false);
+  const [renderProfile, setRenderProfile] = useState<GlobeRenderProfile>(
+    DEFAULT_RENDER_PROFILE,
   );
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const r = useMotionValue(0);
   const rs = useSpring(r, {
@@ -309,7 +312,7 @@ export default function Globe({
           e.touches[0] && updateMovement(e.touches[0].clientX)
         }
       />
-      {renderProfile.showMarkers && (
+      {mounted && renderProfile.showMarkers && (
         <span
           className="seoul-pulse"
           style={
@@ -323,7 +326,8 @@ export default function Globe({
           <span className="seoul-pulse__ring seoul-pulse__ring--late" />
         </span>
       )}
-      {renderProfile.showMarkers &&
+      {mounted &&
+        renderProfile.showMarkers &&
         ALL_MARKERS.map((m) => (
           <div
             key={m.id}
