@@ -3,7 +3,7 @@ import Globe from "@/components/Globe";
 function Hero() {
   return (
     <section className="relative h-[100svh] overflow-x-hidden">
-      <div className="flex h-full flex-col items-center justify-center gap-6 md:gap-12">
+      <div className="flex h-full flex-col items-center justify-center gap-6 pt-8 md:gap-12 md:pt-0">
         <h1 className="w-full text-center text-4xl font-bold md:text-5xl lg:text-6xl 2xl:text-7xl">
           We are
         </h1>
