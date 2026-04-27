@@ -16,7 +16,7 @@ const MOVEMENT_DAMPING = 1400;
 const MOBILE_BREAKPOINT = 768;
 const LARGE_DESKTOP_BREAKPOINT = 1920;
 const MAX_DEVICE_PIXEL_RATIO = 1.5;
-const MOBILE_MAP_SAMPLES = 4000;
+const MOBILE_MAP_SAMPLES = 6000;
 const DESKTOP_MAP_SAMPLES = 6000;
 const LARGE_DESKTOP_MAP_SAMPLES = 8000;
 const VISIBILITY_ROOT_MARGIN = "200px 0px";
@@ -37,10 +37,10 @@ function getGlobeRenderProfile(
   currentDevicePixelRatio: number,
 ): GlobeRenderProfile {
   return {
-    devicePixelRatio:
-      viewportWidth < MOBILE_BREAKPOINT
-        ? 1
-        : Math.min(currentDevicePixelRatio || 1, MAX_DEVICE_PIXEL_RATIO),
+    devicePixelRatio: Math.min(
+      currentDevicePixelRatio || 1,
+      MAX_DEVICE_PIXEL_RATIO,
+    ),
     mapSamples:
       viewportWidth < MOBILE_BREAKPOINT
         ? MOBILE_MAP_SAMPLES
@@ -87,7 +87,7 @@ const GLOBE_CONFIG: COBEOptions = {
   dark: 0,
   diffuse: 1.5,
   mapSamples: DESKTOP_MAP_SAMPLES,
-  mapBrightness: 10,
+  mapBrightness: 6,
   baseColor: [1, 1, 1],
   markerColor: ACCENT,
   glowColor: [0.94, 0.93, 0.91],
