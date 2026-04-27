@@ -253,39 +253,52 @@
   background: rgb(30, 80, 200);
   box-shadow:
     0 0 0 1.5px rgba(20, 30, 80, 0.6),
-    0 0 10px rgba(30, 80, 200, 0.9);
+    0 0 12px rgba(30, 80, 200, 0.9);
   pointer-events: none;
   transition: opacity 0.3s;
 }
 
 .seoul-pulse::before,
-.seoul-pulse::after {
+.seoul-pulse::after,
+.seoul-pulse__ring {
   content: "";
   position: absolute;
   inset: -1px;
   border-radius: 50%;
-  border: 2px solid rgba(30, 80, 200, 1);
-  animation: seoul-pulse-ring 2.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  border: 2px solid rgba(30, 80, 200, 0.85);
+  animation: seoul-pulse-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
 }
 
 .seoul-pulse::after {
-  animation-delay: 1.1s;
+  animation-delay: 0.87s;
+}
+
+.seoul-pulse__ring--late {
+  animation-delay: 1.74s;
 }
 
 @keyframes seoul-pulse-ring {
   0% {
     transform: scale(1);
-    opacity: 0.9;
+    opacity: 0.95;
+    border-width: 2px;
+  }
+  60% {
+    opacity: 0.4;
+    border-width: 1.5px;
   }
   100% {
-    transform: scale(4.5);
+    transform: scale(7);
     opacity: 0;
+    border-width: 1px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .seoul-pulse::before,
-  .seoul-pulse::after {
+  .seoul-pulse::after,
+  .seoul-pulse__ring {
     animation: none;
   }
 }
