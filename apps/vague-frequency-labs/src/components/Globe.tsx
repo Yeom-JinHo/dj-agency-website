@@ -112,6 +112,8 @@ export default function Globe({
   const pointerInteracting = useRef<number | null>(null);
   const phiRef = useRef(0);
   const widthRef = useRef(0);
+  const labelRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const seoulPulseRef = useRef<HTMLSpanElement | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [renderProfile, setRenderProfile] = useState<GlobeRenderProfile>(() =>
     typeof window === "undefined"
@@ -222,6 +224,49 @@ export default function Globe({
       height: widthRef.current,
     });
 
+    const supportsAnchor =
+      typeof CSS !== "undefined" && CSS.supports("anchor-name", "--x");
+    const cobeWrapper = canvasRef.current.parentElement;
+    const cobeAnchors: Record<string, HTMLDivElement> = {};
+
+    const findAnchorEl = (id: string): HTMLDivElement | null => {
+      if (cobeAnchors[id]) {
+        return cobeAnchors[id];
+      }
+      if (!cobeWrapper) {
+        return null;
+      }
+      const found = cobeWrapper.querySelector<HTMLDivElement>(
+        `div[style*="anchor-name:--cobe-${id}"]`,
+      );
+      if (found) {
+        cobeAnchors[id] = found;
+      }
+      return found;
+    };
+
+    const syncLabels = () => {
+      if (supportsAnchor || !cobeWrapper) {
+        return;
+      }
+      for (const m of ALL_MARKERS) {
+        const anchor = findAnchorEl(m.id);
+        if (!anchor) {
+          continue;
+        }
+        const { left, top } = anchor.style;
+        const label = labelRefs.current[m.id];
+        if (label) {
+          label.style.left = left;
+          label.style.top = top;
+        }
+        if (m.id === "seoul" && seoulPulseRef.current) {
+          seoulPulseRef.current.style.left = left;
+          seoulPulseRef.current.style.top = top;
+        }
+      }
+    };
+
     let rafId = 0;
     let lastPhi = Number.NaN;
     const tick = () => {
@@ -239,6 +284,7 @@ export default function Globe({
       if (nextPhi !== lastPhi) {
         lastPhi = nextPhi;
         globe.update({ phi: nextPhi });
+        syncLabels();
       }
       rafId = requestAnimationFrame(tick);
     };
@@ -292,6 +338,7 @@ export default function Globe({
         }
       />
       <span
+        ref={seoulPulseRef}
         className="seoul-pulse"
         style={
           {
@@ -306,6 +353,9 @@ export default function Globe({
       {ALL_MARKERS.map((m) => (
         <div
           key={m.id}
+          ref={(el) => {
+            labelRefs.current[m.id] = el;
+          }}
           className="showcase-default-label"
           style={
             {
