@@ -47,39 +47,19 @@ function getGlobeRenderProfile(
 
 const SEOUL: [number, number] = [37.5665, 126.978];
 
-function haversine(
-  [lat1, lon1]: [number, number],
-  [lat2, lon2]: [number, number],
-) {
-  const toRad = (x: number) => (x * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * Math.asin(Math.sqrt(a));
-}
-
-type CityMarker = {
-  location: [number, number];
-};
-
-// 서울에서 가까운 순으로 정렬한다.
-const FLIGHT_DESTINATIONS: CityMarker[] = (
-  [
-    { location: [35.6762, 139.6503] }, // 도쿄
-    { location: [39.9042, 116.4074] }, // 베이징
-    { location: [13.7563, 100.5018] }, // 방콕
-    { location: [1.3521, 103.8198] }, // 싱가포르
-    { location: [-33.8688, 151.2093] }, // 시드니
-    { location: [25.2048, 55.2708] }, // 두바이
-    { location: [51.5074, -0.1278] }, // 런던
-    { location: [48.8566, 2.3522] }, // 파리
-    { location: [40.7128, -74.006] }, // 뉴욕
-    { location: [34.0522, -118.2437] }, // 로스앤젤레스
-    { location: [-23.5505, -46.6333] }, // 상파울루
-  ] satisfies CityMarker[]
-).sort((a, b) => haversine(SEOUL, a.location) - haversine(SEOUL, b.location));
+const CITY_LOCATIONS: [number, number][] = [
+  [35.6762, 139.6503], // 도쿄
+  [39.9042, 116.4074], // 베이징
+  [13.7563, 100.5018], // 방콕
+  [1.3521, 103.8198], // 싱가포르
+  [-33.8688, 151.2093], // 시드니
+  [25.2048, 55.2708], // 두바이
+  [51.5074, -0.1278], // 런던
+  [48.8566, 2.3522], // 파리
+  [40.7128, -74.006], // 뉴욕
+  [34.0522, -118.2437], // 로스앤젤레스
+  [-23.5505, -46.6333], // 상파울루
+];
 
 // cobe `showcase: default` 색·치수에 맞춘 globe config
 const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
@@ -100,20 +80,10 @@ const GLOBE_CONFIG: COBEOptions = {
   markerColor: ACCENT,
   glowColor: [0.94, 0.93, 0.91],
   opacity: 0.7,
-  markers: [
-    { location: SEOUL, size: MARKER_SIZE },
-    ...FLIGHT_DESTINATIONS.map(({ location }) => ({
-      location,
-      size: MARKER_SIZE,
-    })),
-  ],
-  arcs: FLIGHT_DESTINATIONS.map(({ location }) => ({
-    from: SEOUL,
-    to: location,
+  markers: [SEOUL, ...CITY_LOCATIONS].map((location) => ({
+    location,
+    size: MARKER_SIZE,
   })),
-  arcColor: ACCENT,
-  arcWidth: 0.5,
-  arcHeight: 0.25,
   markerElevation: 0.01,
 };
 
