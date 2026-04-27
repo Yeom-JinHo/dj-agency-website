@@ -61,16 +61,10 @@ const SEOUL_MARKER: CityMarker = {
 
 const FLIGHT_DESTINATIONS: CityMarker[] = [
   { id: "tokyo", name: "Tokyo", location: [35.6762, 139.6503] },
-  { id: "beijing", name: "Beijing", location: [39.9042, 116.4074] },
   { id: "bangkok", name: "Bangkok", location: [13.7563, 100.5018] },
-  { id: "singapore", name: "Singapore", location: [1.3521, 103.8198] },
   { id: "sydney", name: "Sydney", location: [-33.8688, 151.2093] },
-  { id: "dubai", name: "Dubai", location: [25.2048, 55.2708] },
-  { id: "london", name: "London", location: [51.5074, -0.1278] },
   { id: "paris", name: "Paris", location: [48.8566, 2.3522] },
-  { id: "newyork", name: "New York", location: [40.7128, -74.006] },
   { id: "la", name: "Los Angeles", location: [34.0522, -118.2437] },
-  { id: "saopaulo", name: "São Paulo", location: [-23.5505, -46.6333] },
 ];
 
 const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
