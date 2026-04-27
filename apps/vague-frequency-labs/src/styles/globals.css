@@ -213,6 +213,7 @@
   inset: -2%;
   pointer-events: none;
   z-index: 1;
+  contain: layout paint;
   -webkit-mask-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.1) 40%,
@@ -231,7 +232,13 @@
   width: 100%;
   height: 100%;
   transform: rotateX(62deg);
+}
+
+.orbit-rotor {
+  transform-origin: 150px 150px;
+  transform: translateZ(0);
   animation: orbit-spin 30s linear infinite;
+  will-change: transform;
 }
 
 .orbit-svg path {
@@ -271,15 +278,15 @@
 
 @keyframes orbit-spin {
   from {
-    transform: rotateX(62deg) rotateZ(0deg);
+    transform: rotateZ(0deg) translateZ(0);
   }
   to {
-    transform: rotateX(62deg) rotateZ(-360deg);
+    transform: rotateZ(-360deg) translateZ(0);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .orbit-svg {
+  .orbit-rotor {
     animation: none;
   }
 }
