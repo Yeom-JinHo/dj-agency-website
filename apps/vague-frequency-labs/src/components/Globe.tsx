@@ -26,28 +26,31 @@ const VISIBILITY_THRESHOLD = 0.05;
 type GlobeRenderProfile = {
   devicePixelRatio: number;
   mapSamples: number;
+  showMarkers: boolean;
 };
 
 const DEFAULT_RENDER_PROFILE: GlobeRenderProfile = {
   devicePixelRatio: 1,
   mapSamples: DESKTOP_MAP_SAMPLES,
+  showMarkers: true,
 };
 
 function getGlobeRenderProfile(
   viewportWidth: number,
   currentDevicePixelRatio: number,
 ): GlobeRenderProfile {
+  const isMobile = viewportWidth < MOBILE_BREAKPOINT;
   return {
     devicePixelRatio: Math.min(
       currentDevicePixelRatio || 1,
       MAX_DEVICE_PIXEL_RATIO,
     ),
-    mapSamples:
-      viewportWidth < MOBILE_BREAKPOINT
-        ? MOBILE_MAP_SAMPLES
-        : viewportWidth > LARGE_DESKTOP_BREAKPOINT
-          ? LARGE_DESKTOP_MAP_SAMPLES
-          : DESKTOP_MAP_SAMPLES,
+    mapSamples: isMobile
+      ? MOBILE_MAP_SAMPLES
+      : viewportWidth > LARGE_DESKTOP_BREAKPOINT
+        ? LARGE_DESKTOP_MAP_SAMPLES
+        : DESKTOP_MAP_SAMPLES,
+    showMarkers: !isMobile,
   };
 }
 
@@ -177,7 +180,8 @@ export default function Globe({
       setRenderProfile((currentRenderProfile) =>
         currentRenderProfile.devicePixelRatio ===
           nextRenderProfile.devicePixelRatio &&
-        currentRenderProfile.mapSamples === nextRenderProfile.mapSamples
+        currentRenderProfile.mapSamples === nextRenderProfile.mapSamples &&
+        currentRenderProfile.showMarkers === nextRenderProfile.showMarkers
           ? currentRenderProfile
           : nextRenderProfile,
       );
@@ -196,7 +200,7 @@ export default function Globe({
       return;
     }
 
-    const { devicePixelRatio, mapSamples } = renderProfile;
+    const { devicePixelRatio, mapSamples, showMarkers } = renderProfile;
     const prefersReducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
@@ -221,6 +225,7 @@ export default function Globe({
       mapSamples,
       width: widthRef.current,
       height: widthRef.current,
+      markers: showMarkers ? config.markers : [],
     });
 
     let rafId = 0;
@@ -301,33 +306,36 @@ export default function Globe({
           e.touches[0] && updateMovement(e.touches[0].clientX)
         }
       />
-      <span
-        className="seoul-pulse"
-        style={
-          {
-            positionAnchor: "--cobe-seoul",
-            opacity: "var(--cobe-visible-seoul, 0)",
-          } as React.CSSProperties
-        }
-        aria-hidden
-      >
-        <span className="seoul-pulse__ring seoul-pulse__ring--late" />
-      </span>
-      {ALL_MARKERS.map((m) => (
-        <div
-          key={m.id}
-          className="showcase-default-label"
+      {renderProfile.showMarkers && (
+        <span
+          className="seoul-pulse"
           style={
             {
-              positionAnchor: `--cobe-${m.id}`,
-              opacity: `var(--cobe-visible-${m.id}, 0)`,
-              filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+              positionAnchor: "--cobe-seoul",
+              opacity: "var(--cobe-visible-seoul, 0)",
             } as React.CSSProperties
           }
+          aria-hidden
         >
-          {m.name}
-        </div>
-      ))}
+          <span className="seoul-pulse__ring seoul-pulse__ring--late" />
+        </span>
+      )}
+      {renderProfile.showMarkers &&
+        ALL_MARKERS.map((m) => (
+          <div
+            key={m.id}
+            className="showcase-default-label"
+            style={
+              {
+                positionAnchor: `--cobe-${m.id}`,
+                opacity: `var(--cobe-visible-${m.id}, 0)`,
+                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+              } as React.CSSProperties
+            }
+          >
+            {m.name}
+          </div>
+        ))}
     </div>
   );
 }
