@@ -206,155 +206,59 @@
   }
 }
 
-.globe-pulse::before {
-  content: "";
+/* ── Globe orbit ring (default showcase) ─────────────── */
+
+.orbit-ring {
   position: absolute;
-  inset: -8%;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(82, 128, 224, 0.4) 0%,
-    rgba(82, 128, 224, 0.16) 38%,
-    transparent 68%
+  inset: -2%;
+  pointer-events: none;
+  z-index: 1;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 40%,
+    black 48%,
+    black 100%
   );
-  filter: blur(36px);
-  opacity: 0.6;
-  pointer-events: none;
-  z-index: -1;
-  animation: globe-pulse 4.2s ease-in-out infinite;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 40%,
+    black 48%,
+    black 100%
+  );
 }
 
-@keyframes globe-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.5;
-  }
-  50% {
-    transform: scale(1.04);
-    opacity: 0.75;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .globe-pulse::before {
-    animation: none;
-  }
-}
-
-.seoul-pulse {
-  position: absolute;
-  top: anchor(center);
-  left: anchor(center);
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  background: rgb(30, 80, 200);
-  box-shadow:
-    0 0 0 1.5px rgba(20, 30, 80, 0.6),
-    0 0 12px rgba(30, 80, 200, 0.9);
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-.seoul-pulse::before,
-.seoul-pulse::after,
-.seoul-pulse__ring {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 50%;
-  border: 2px solid rgba(30, 80, 200, 0.85);
-  animation: seoul-pulse-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
-  pointer-events: none;
-}
-
-.seoul-pulse::after {
-  animation-delay: 0.87s;
-}
-
-.seoul-pulse__ring--late {
-  animation-delay: 1.74s;
-}
-
-@keyframes seoul-pulse-ring {
-  0% {
-    transform: scale(1);
-    opacity: 0.95;
-    border-width: 2px;
-  }
-  60% {
-    opacity: 0.4;
-    border-width: 1.5px;
-  }
-  100% {
-    transform: scale(7);
-    opacity: 0;
-    border-width: 1px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .seoul-pulse::before,
-  .seoul-pulse::after,
-  .seoul-pulse__ring {
-    animation: none;
-  }
-}
-
-.city-label {
-  position: absolute;
-  bottom: anchor(top);
-  left: anchor(center);
-  translate: -50% -6px;
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: rgba(20, 30, 80, 0.85);
-  background: rgba(255, 255, 255, 0.78);
-  padding: 2px 7px;
-  border-radius: 999px;
-  border: 1px solid rgba(30, 80, 200, 0.25);
-  box-shadow: 0 2px 6px rgba(20, 30, 80, 0.15);
-  white-space: nowrap;
-  pointer-events: none;
-  transition: opacity 0.3s;
-  text-transform: uppercase;
-}
-
-.city-label--seoul {
-  background: rgb(30, 80, 200);
-  color: #fff;
-  border-color: rgba(30, 80, 200, 0.6);
-  box-shadow: 0 2px 8px rgba(30, 80, 200, 0.5);
-  translate: -50% -14px;
-}
-
-@supports not (anchor-name: --x) {
-  .city-label,
-  .seoul-pulse {
-    display: none;
-  }
-}
-
-.globe-band {
-  position: absolute;
-  inset: 0;
+.orbit-svg {
   width: 100%;
   height: 100%;
-  pointer-events: none;
-  overflow: visible;
+  transform: rotateX(62deg);
+  animation: orbit-spin 30s linear infinite;
 }
 
-.globe-band__text {
+.orbit-svg path {
+  fill: none;
+}
+
+.orbit-text {
   font-family:
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 3.4px;
-  font-weight: 600;
-  letter-spacing: 0.4em;
-  fill: rgba(30, 80, 200, 0.7);
+  font-size: 6px;
+  fill: rgb(20, 30, 80);
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
+
+@keyframes orbit-spin {
+  from {
+    transform: rotateX(62deg) rotateZ(0deg);
+  }
+  to {
+    transform: rotateX(62deg) rotateZ(-360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-svg {
+    animation: none;
+  }
+}
+
