@@ -236,7 +236,7 @@ export default function Globe({
         return;
       }
       if (
-        !pointerInteracting.current &&
+        pointerInteracting.current === null &&
         !prefersReducedMotion
       ) {
         phiRef.current += 0.003;
