@@ -239,7 +239,7 @@ export default function Globe({
         pointerInteracting.current === null &&
         !prefersReducedMotion
       ) {
-        phiRef.current += 0.003;
+        phiRef.current += 0.005;
       }
       const nextPhi = phiRef.current + rs.get();
       if (nextPhi !== lastPhi) {
