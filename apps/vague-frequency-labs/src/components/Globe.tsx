@@ -250,6 +250,7 @@ export default function Globe({
       cancelAnimationFrame(rafId);
       globe.destroy();
       window.removeEventListener("resize", onResize);
+      canvas.style.opacity = "0";
     };
   }, [config, isVisible, mounted, renderProfile, rs]);
 
