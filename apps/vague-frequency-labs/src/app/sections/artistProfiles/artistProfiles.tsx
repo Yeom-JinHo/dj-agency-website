@@ -138,7 +138,6 @@ function ArtistProfiles() {
                       onMouseEnter={() =>
                         router.prefetch(`/artist/${artist.name}`)
                       }
-                      className="block transition-opacity active:opacity-70"
                     >
                       <ArtistImage
                         artist={artist}
