@@ -199,7 +199,7 @@ export default function Globe({
   }, []);
 
   useEffect(() => {
-    if (!isVisible || !canvasRef.current) {
+    if (!mounted || !isVisible || !canvasRef.current) {
       return;
     }
 
@@ -263,7 +263,7 @@ export default function Globe({
       globe.destroy();
       window.removeEventListener("resize", onResize);
     };
-  }, [config, isVisible, renderProfile, rs]);
+  }, [config, isVisible, mounted, renderProfile, rs]);
 
   return (
     <div
