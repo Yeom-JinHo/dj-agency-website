@@ -124,6 +124,9 @@ export default function Globe({
 
   useEffect(() => {
     setMounted(true);
+    setRenderProfile(
+      getGlobeRenderProfile(window.innerWidth, window.devicePixelRatio || 1),
+    );
   }, []);
 
   const r = useMotionValue(0);
@@ -174,31 +177,6 @@ export default function Globe({
   }, []);
 
   useEffect(() => {
-    const updateRenderProfile = () => {
-      const nextRenderProfile = getGlobeRenderProfile(
-        window.innerWidth,
-        window.devicePixelRatio || 1,
-      );
-
-      setRenderProfile((currentRenderProfile) =>
-        currentRenderProfile.devicePixelRatio ===
-          nextRenderProfile.devicePixelRatio &&
-        currentRenderProfile.mapSamples === nextRenderProfile.mapSamples &&
-        currentRenderProfile.showMarkers === nextRenderProfile.showMarkers
-          ? currentRenderProfile
-          : nextRenderProfile,
-      );
-    };
-
-    window.addEventListener("resize", updateRenderProfile);
-    updateRenderProfile();
-
-    return () => {
-      window.removeEventListener("resize", updateRenderProfile);
-    };
-  }, []);
-
-  useEffect(() => {
     if (!mounted || !isVisible || !canvasRef.current) {
       return;
     }
@@ -221,12 +199,22 @@ export default function Globe({
     });
 
     const onResize = () => {
-      const next = canvas.offsetWidth;
-      if (next === widthRef.current) {
-        return;
+      const nextWidth = canvas.offsetWidth;
+      if (nextWidth !== widthRef.current) {
+        widthRef.current = nextWidth;
+        globe.update({ width: nextWidth, height: nextWidth });
       }
-      widthRef.current = next;
-      globe.update({ width: next, height: next });
+      const nextProfile = getGlobeRenderProfile(
+        window.innerWidth,
+        window.devicePixelRatio || 1,
+      );
+      setRenderProfile((current) =>
+        current.devicePixelRatio === nextProfile.devicePixelRatio &&
+        current.mapSamples === nextProfile.mapSamples &&
+        current.showMarkers === nextProfile.showMarkers
+          ? current
+          : nextProfile,
+      );
     };
     window.addEventListener("resize", onResize);
 
