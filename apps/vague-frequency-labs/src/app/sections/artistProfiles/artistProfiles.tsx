@@ -135,7 +135,7 @@ function ArtistProfiles() {
                     <Link
                       href={`/artist/${artist.name}`}
                       prefetch
-                      className="block touch-manipulation transition-transform duration-150 active:scale-[0.97]"
+                      className="block touch-manipulation transition-transform duration-150 active:scale-[0.97 h-full"
                       onMouseEnter={() =>
                         router.prefetch(`/artist/${artist.name}`)
                       }
