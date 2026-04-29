@@ -342,7 +342,7 @@ function MorphingDialogContainer({ children }: MorphingDialogContainerProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center pt-[calc(env(safe-area-inset-top)+4rem)] md:pt-0">
             {children}
           </div>
         </>

@@ -62,7 +62,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             borderRadius: "12px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
-          className="pointer-events-auto relative flex h-auto w-full basis-[90%] flex-col overflow-hidden p-4 sm:basis-3/4 sm:p-6 md:basis-1/4 md:p-8"
+          className="pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto p-4 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
         >
           <motion.div
             animate={{
@@ -80,7 +80,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
               scale: { duration: 0.4 },
             }}
             style={{ borderRadius: "50%" }}
-            className="overflow-hidden"
+            className="aspect-square w-full max-w-[360px] shrink-0 self-center overflow-hidden"
           >
             <DialogImage
               width={360}
