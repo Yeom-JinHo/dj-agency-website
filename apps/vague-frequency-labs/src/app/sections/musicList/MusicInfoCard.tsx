@@ -52,6 +52,16 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
         </motion.div>
+        <div className="mt-3 w-[150px] text-left md:w-[360px]">
+          <h4 className="truncate text-sm font-semibold md:text-base">
+            {musicInfo.name}
+          </h4>
+          {musicInfo.label && (
+            <p className="text-muted-foreground truncate text-xs md:text-sm">
+              {musicInfo.label}
+            </p>
+          )}
+        </div>
       </DialogTrigger>
       <DialogContainer>
         <DialogContent
@@ -93,10 +103,17 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
           </motion.div>
 
           <div className="mt-8">
-            <h3 className="text-2xl font-bold">{musicInfo.name}</h3>
-            <h3 className="text-muted-foreground text-sm">
-              {musicInfo.artist}
-            </h3>
+            <h3 className="truncate text-2xl font-bold">{musicInfo.name}</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-muted-foreground truncate text-sm">
+                {musicInfo.artist}
+              </h3>
+              {musicInfo.label && (
+                <p className="text-muted-foreground shrink-0 text-xs">
+                  {musicInfo.label}
+                </p>
+              )}
+            </div>
             <div className="mt-4 flex flex-col gap-2 border-t border-zinc-200 pt-2">
               {musicInfo.socials?.map((social, index) => {
                 return (
