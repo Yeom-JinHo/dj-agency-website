@@ -1,5 +1,4 @@
 import Link from "next/link";
-import GalaxyBackground from "@repo/ui/common/GalaxyBackground";
 
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";
@@ -19,10 +18,6 @@ export default function CelebrateAgencyPage() {
           >
             Home
           </Link>
-        </div>
-
-        <div className="absolute inset-0">
-          <GalaxyBackground mouseInteraction={false} />
         </div>
       </main>
     </div>
