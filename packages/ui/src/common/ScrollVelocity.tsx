@@ -113,7 +113,9 @@ function VelocityText({
   );
 
   const copyRef = useRef<HTMLSpanElement>(null);
+  const parallaxRef = useRef<HTMLDivElement>(null);
   const copyWidth = useElementWidth(copyRef);
+  const parallaxWidth = useElementWidth(parallaxRef);
 
   const x = useTransform(baseX, (v) => {
     if (copyWidth === 0) return "0px";
@@ -134,7 +136,10 @@ function VelocityText({
     baseX.set(baseX.get() + moveBy);
   });
 
-  const copies = numCopies ?? 6;
+  const requestedCopies = numCopies ?? 6;
+  const neededCopies =
+    copyWidth > 0 ? Math.ceil(parallaxWidth / copyWidth) + 2 : requestedCopies;
+  const copies = Math.max(requestedCopies, neededCopies);
   const spans = [];
   for (let i = 0; i < copies; i++) {
     spans.push(
@@ -150,6 +155,7 @@ function VelocityText({
 
   return (
     <div
+      ref={parallaxRef}
       className={cn(parallaxClassName, "relative overflow-hidden")}
       style={parallaxStyle}
     >
