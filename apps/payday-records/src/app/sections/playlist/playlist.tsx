@@ -22,11 +22,22 @@ function Playlist() {
         </TextReveal>
         <div className="mt-12 w-full max-w-[760px]">
           <iframe
-            src={playlist.embedSrc}
-            title="Payday Records curated playlist"
+            src={playlist.spotify.embedSrc}
+            title="Payday Records curated playlist on Spotify"
             width="100%"
             height={380}
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            style={{ border: 0, borderRadius: 12 }}
+          />
+        </div>
+        <div className="mt-6 w-full max-w-[760px]">
+          <iframe
+            src={playlist.soundcloud.embedSrc}
+            title="Payday Records curated playlist on SoundCloud"
+            width="100%"
+            height={450}
+            allow="autoplay"
             loading="lazy"
             style={{ border: 0, borderRadius: 12 }}
           />
