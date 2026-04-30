@@ -288,6 +288,7 @@ export const musicInfoDatas: MusicInfo[] = [
   {
     name: "Floating",
     artist: ARTIST_NAME.JUNTARO,
+    label: "Payday Records",
     image: "/images/music/1.webp",
     shortDescription: "test",
     fullDescription: "test",
@@ -322,6 +323,7 @@ export const musicInfoDatas: MusicInfo[] = [
   {
     name: "Baby",
     artist: ARTIST_NAME.SIELO,
+    label: "Payday Records",
     image: "/images/music/2.jpg",
     shortDescription: "test",
     fullDescription: "test",
@@ -346,6 +348,7 @@ export const musicInfoDatas: MusicInfo[] = [
   {
     name: "Demolish",
     artist: ARTIST_NAME.SIELO,
+    label: "Payday Records",
     image: "/images/music/3.webp",
     shortDescription: "test",
     fullDescription: "test",
@@ -360,6 +363,7 @@ export const musicInfoDatas: MusicInfo[] = [
   {
     name: "Esto Ta Duro",
     artist: ARTIST_NAME.JUNTARO,
+    label: "Payday Records",
     image: "/images/music/4.webp",
     shortDescription: "test",
     fullDescription: "test",
@@ -374,6 +378,7 @@ export const musicInfoDatas: MusicInfo[] = [
   {
     name: "Selecta",
     artist: ARTIST_NAME.JUNTARO,
+    label: "Payday Records",
     image: "/images/music/5.webp",
     shortDescription: "test",
     fullDescription: "test",
