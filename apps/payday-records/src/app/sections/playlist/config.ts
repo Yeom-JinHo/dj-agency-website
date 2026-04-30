@@ -1,5 +1,4 @@
-// TODO: payday-records 공식 Spotify 플레이리스트 ID로 교체. 이 한 곳만 바꾸면 섹션이 갱신된다.
-const PLAYLIST_ID = "37i9dQZF1DXcBWIGoYBM5M";
+const PLAYLIST_ID = "5tdvU4HjA0pxO5Qv3qC4As";
 
 const playlist = {
   url: `https://open.spotify.com/playlist/${PLAYLIST_ID}`,
