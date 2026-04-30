@@ -34,7 +34,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   return (
     <Dialog>
       <DialogTrigger>
-        <motion.div className="relative h-[150px] w-[150px] overflow-hidden md:h-[360px] md:w-[360px]">
+        <motion.div className="group relative h-[150px] w-[150px] overflow-hidden md:h-[360px] md:w-[360px]">
           <DialogImage
             width={360}
             height={360}
@@ -49,7 +49,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             aria-hidden="true"
             fill
             sizes="(max-width: 768px) 150px, 360px"
-            className="pointer-events-none object-cover transition-opacity duration-500 hover:opacity-0"
+            className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
         </motion.div>
       </DialogTrigger>
