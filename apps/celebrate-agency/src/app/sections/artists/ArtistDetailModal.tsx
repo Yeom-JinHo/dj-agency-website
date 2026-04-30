@@ -44,13 +44,13 @@ export function ArtistDetailModal({
             exit={{ y: 20, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-square">
+            <div className="relative aspect-[3/4]">
               <Image
                 src={artist.image}
                 alt={artist.name}
                 fill
                 sizes="(max-width: 768px) 100vw, 480px"
-                className="object-cover"
+                className="object-cover object-top"
                 unoptimized
               />
             </div>

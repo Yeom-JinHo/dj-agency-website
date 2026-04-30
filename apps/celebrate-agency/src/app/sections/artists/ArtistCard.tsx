@@ -16,13 +16,13 @@ export function ArtistCard({ artist, onSelect }: ArtistCardProps) {
       onClick={() => onSelect(artist)}
       className="group relative block w-full overflow-hidden rounded-2xl bg-neutral-900/60 transition-transform hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
     >
-      <div className="relative aspect-square">
+      <div className="relative aspect-[2/3]">
         <Image
           src={artist.image}
           alt={artist.name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
           unoptimized
         />
       </div>
