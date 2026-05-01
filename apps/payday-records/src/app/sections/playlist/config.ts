@@ -20,25 +20,19 @@ const playlist = {
     variants: [
       {
         label: "Visual",
-        meta: "visual=true (현재 기본)",
+        meta: "visual=true",
         height: 450,
         embedSrc: buildSoundcloudSrc(`visual=true&${baseSoundcloudParams}`),
+        darkFilter: false,
       },
       {
-        label: "Classic",
-        meta: "visual=false, SoundCloud 시그니처 파형",
+        label: "Classic (dark)",
+        meta: "visual=false, CSS invert로 흰 배경 → 다크 강제",
         height: 300,
         embedSrc: buildSoundcloudSrc(
           `visual=false&show_artwork=true&${baseSoundcloudParams}`,
         ),
-      },
-      {
-        label: "Mini",
-        meta: "visual=false, height=20",
-        height: 20,
-        embedSrc: buildSoundcloudSrc(
-          "visual=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&show_artwork=false&auto_play=false&hide_related=false",
-        ),
+        darkFilter: true,
       },
     ],
   },

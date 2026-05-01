@@ -47,7 +47,13 @@ function Playlist() {
               height={variant.height}
               allow="autoplay"
               loading="lazy"
-              style={{ border: 0, borderRadius: 12 }}
+              style={{
+                border: 0,
+                borderRadius: 12,
+                ...(variant.darkFilter
+                  ? { filter: "invert(1) hue-rotate(180deg)" }
+                  : {}),
+              }}
             />
           </div>
         ))}
