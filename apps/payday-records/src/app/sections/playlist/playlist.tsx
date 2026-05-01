@@ -16,7 +16,7 @@ function Playlist() {
         </TextReveal>
         <TextReveal
           as="p"
-          className="mt-4 max-w-[700px] text-center text-base/relaxed text-gray-500 md:text-lg/relaxed lg:text-xl/relaxed dark:text-gray-400"
+          className="mt-4 max-w-[700px] text-center text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
         >
           Curated by Payday Records
         </TextReveal>

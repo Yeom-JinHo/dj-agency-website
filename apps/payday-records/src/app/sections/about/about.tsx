@@ -6,8 +6,11 @@ import MotionWrap from "@repo/ui/common/MotionWrap";
 function About() {
   return (
     <MotionWrap className="w-full py-24 lg:py-32" id="about">
-      <ScrollVelocity texts={["Payday", "Records"]} />
-      <div className="mt-16 flex items-center justify-center md:mt-40">
+      <ScrollVelocity
+        texts={["Payday", "Records"]}
+        className="custom-scroll-text"
+      />
+      <div className="mt-40 flex items-center justify-center">
         <div className="space-y-4 px-4">
           <TextReveal
             as="h2"
@@ -18,7 +21,7 @@ function About() {
           <div className="space-y-4">
             <TextReveal
               as="p"
-              className="max-w-[700px] text-base/relaxed text-gray-500 md:text-lg/relaxed lg:text-xl/relaxed dark:text-gray-400"
+              className="max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
             >
               payday records의 소개 payday records payday records payday records
               payday records payday records payday records payday records payday
