@@ -40,22 +40,6 @@ const playlist = {
           "visual=false&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&show_artwork=false&auto_play=false&hide_related=false",
         ),
       },
-      {
-        label: "Visual + #A07CFE",
-        meta: "visual=true, color=A07CFE (사이트 톤 매칭)",
-        height: 450,
-        embedSrc: buildSoundcloudSrc(
-          `visual=true&color=%23A07CFE&${baseSoundcloudParams}`,
-        ),
-      },
-      {
-        label: "Classic + #A07CFE",
-        meta: "visual=false, color=A07CFE",
-        height: 300,
-        embedSrc: buildSoundcloudSrc(
-          `visual=false&color=%23A07CFE&show_artwork=true&${baseSoundcloudParams}`,
-        ),
-      },
     ],
   },
 };
