@@ -7,7 +7,7 @@ export default function MainLayout({
   children: ReactNode;
 }>) {
   return (
-    <div className="flex min-h-[100dvh] flex-col">
+    <div className="flex min-h-[100dvh] flex-col overflow-x-hidden">
       <Header />
       {children}
       <footer>

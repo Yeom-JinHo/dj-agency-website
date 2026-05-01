@@ -10,7 +10,7 @@ import { Icon } from "@repo/ui/common/Icon";
 
 function Contact() {
   return (
-    <div className="w-full" id="contact">
+    <div className="w-full overflow-x-hidden" id="contact">
       <div className="flex flex-col items-center justify-center">
         <MacBookScroll
           title={
@@ -39,7 +39,7 @@ function Contact() {
             borderRadius: "12px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
-          className="pointer-events-auto relative mb-[200px] flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] [@media(max-width:375px)]:mb-40"
+          className="pointer-events-auto relative mb-24 flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] sm:max-w-md md:mb-[200px] [@media(max-width:375px)]:mb-20"
         >
           <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
           <h3 className="mb-8 text-center text-3xl font-bold">Contact</h3>
