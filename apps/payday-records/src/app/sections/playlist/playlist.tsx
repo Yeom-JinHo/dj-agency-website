@@ -31,17 +31,26 @@ function Playlist() {
             style={{ border: 0, borderRadius: 12 }}
           />
         </div>
-        <div className="mt-6 w-full max-w-[760px]">
-          <iframe
-            src={playlist.soundcloud.embedSrc}
-            title="Payday Records curated playlist on SoundCloud"
-            width="100%"
-            height={450}
-            allow="autoplay"
-            loading="lazy"
-            style={{ border: 0, borderRadius: 12 }}
-          />
-        </div>
+        {playlist.soundcloud.variants.map((variant) => (
+          <div
+            key={variant.label}
+            className="mt-8 w-full max-w-[760px]"
+          >
+            <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+              {variant.label}
+              <span className="ml-2 opacity-60">— {variant.meta}</span>
+            </p>
+            <iframe
+              src={variant.embedSrc}
+              title={`Payday Records on SoundCloud — ${variant.label}`}
+              width="100%"
+              height={variant.height}
+              allow="autoplay"
+              loading="lazy"
+              style={{ border: 0, borderRadius: 12 }}
+            />
+          </div>
+        ))}
       </div>
     </MotionWrap>
   );
