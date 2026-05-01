@@ -1,7 +1,7 @@
 const PLAYLIST_ID = "5tdvU4HjA0pxO5Qv3qC4As";
 
-// TODO: payday-records 공식 SoundCloud URL로 교체. 트랙/셋/사용자 페이지 어떤 URL이든 그대로 넣으면 된다.
-const SOUNDCLOUD_URL = "https://soundcloud.com/soundcloud";
+const SOUNDCLOUD_URL =
+  "https://soundcloud.com/juntaromusic/sets/no-time-to-talk";
 
 const playlist = {
   spotify: {
