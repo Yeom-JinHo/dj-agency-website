@@ -69,7 +69,7 @@ const SEOUL_MARKER: CityMarker = {
   id: "seoul",
   name: "Seoul",
   location: SEOUL,
-  image: "/images/logo/VFLABS.png",
+  image: "/images/hero/1.jpg",
   rotate: -4,
 };
 
