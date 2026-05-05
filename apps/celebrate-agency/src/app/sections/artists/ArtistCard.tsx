@@ -23,7 +23,6 @@ export function ArtistCard({ artist, onSelect }: ArtistCardProps) {
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-          unoptimized
         />
       </div>
       <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/70 to-transparent p-3">

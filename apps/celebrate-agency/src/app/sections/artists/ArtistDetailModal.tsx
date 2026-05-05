@@ -93,7 +93,6 @@ export function ArtistDetailModal({
                 fill
                 sizes="(max-width: 768px) 100vw, 480px"
                 className="object-cover object-top"
-                unoptimized
               />
             </div>
             <div className="space-y-3 p-5">
