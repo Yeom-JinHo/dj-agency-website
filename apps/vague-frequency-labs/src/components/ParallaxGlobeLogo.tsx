@@ -50,20 +50,6 @@ export default function ParallaxGlobeLogo(): ReactElement {
 
   return (
     <div ref={containerRef} className="bg-red relative h-[400vh] w-full">
-      <div className="absolute flex w-full flex-col items-center justify-center pt-20">
-        <span
-          className="pointer-events-none inset-0 text-center text-4xl whitespace-nowrap"
-          style={{
-            width: "100%",
-            color: "white",
-            WebkitTextStroke: "1px white",
-            overflow: "hidden",
-            filter: "drop-shadow(0 0 3px white)",
-          }}
-        >
-          We play worldwide
-        </span>
-      </div>
       <div
         className="sticky top-0 h-[100vh] overflow-hidden pt-64 md:h-[100vh] md:pt-20"
         // style={{ backgroundColor: "beige" }}
@@ -128,7 +114,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
             y: globeTranslateY,
           }}
         >
-          <Globe />
+          <Globe className="h-[260px] w-[260px] md:h-[360px] md:w-[360px] lg:h-[480px] lg:w-[480px] 2xl:h-[560px] 2xl:w-[560px]" />
         </motion.div>
       </div>
     </div>
