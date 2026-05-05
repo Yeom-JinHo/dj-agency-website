@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
-import { Bricolage_Grotesque } from "next/font/google";
+import { Fraunces, Geist } from "next/font/google";
 
 import "@/styles/globals.css";
 
@@ -12,10 +12,16 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
 
-// https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
-const bricolage_grotesque = Bricolage_Grotesque({
+const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-fraunces",
+});
+
+const geist = Geist({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-geist",
 });
 
 export const metadata = createMetadata({
@@ -46,7 +52,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage_grotesque.className} antialiased`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
+      <body
+        className={`${fraunces.variable} ${geist.variable} font-sans antialiased`}
+      >
         <ReactScan />
         <ErrorBoundary>
           <Providers>
