@@ -42,7 +42,6 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 
 ## Git
 
-- Default branch: `master` (production).
-- Active integration branch: `dev`.
-- Feature/fix branches MUST branch out from `dev` (not `master`).
-- PRs MUST target `dev`. `dev` → `master` is reserved for releases.
+- Default branch: `master` (production, deployed).
+- Feature/fix branches MUST branch out from `master`.
+- PRs MUST target `master`.
