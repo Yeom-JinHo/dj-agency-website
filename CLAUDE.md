@@ -45,3 +45,4 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 - Default branch: `master` (production, deployed).
 - Feature/fix branches MUST branch out from `master`.
 - PRs MUST target `master`.
+- Before any `git push` (including `-u`, `--force`, `--force-with-lease`), run `git rev-parse --abbrev-ref HEAD` and show the user the current branch + remote target; proceed only after explicit confirmation. Never push directly to `master`.
