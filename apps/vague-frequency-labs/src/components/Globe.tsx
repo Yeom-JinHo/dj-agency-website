@@ -60,38 +60,72 @@ type CityMarker = {
   id: string;
   name: string;
   location: [number, number];
+  image: string;
+  rotate: number;
 };
 
 const SEOUL_MARKER: CityMarker = {
   id: "seoul",
   name: "Seoul",
   location: SEOUL,
+  image: "/images/logo/VFLABS.png",
+  rotate: -4,
 };
 
 const FLIGHT_DESTINATIONS: CityMarker[] = [
-  { id: "tokyo", name: "Tokyo", location: [35.6762, 139.6503] },
-  { id: "bangkok", name: "Bangkok", location: [13.7563, 100.5018] },
-  { id: "sydney", name: "Sydney", location: [-33.8688, 151.2093] },
-  { id: "paris", name: "Paris", location: [48.8566, 2.3522] },
-  { id: "la", name: "Los Angeles", location: [34.0522, -118.2437] },
+  {
+    id: "tokyo",
+    name: "Tokyo",
+    location: [35.6762, 139.6503],
+    image: "/images/hero/1.jpg",
+    rotate: -3,
+  },
+  {
+    id: "bangkok",
+    name: "Bangkok",
+    location: [13.7563, 100.5018],
+    image: "/images/hero/2.webp",
+    rotate: 5,
+  },
+  {
+    id: "sydney",
+    name: "Sydney",
+    location: [-33.8688, 151.2093],
+    image: "/images/hero/3.jpg",
+    rotate: 6,
+  },
+  {
+    id: "paris",
+    name: "Paris",
+    location: [48.8566, 2.3522],
+    image: "/images/hero/4.jpg",
+    rotate: -6,
+  },
+  {
+    id: "la",
+    name: "Los Angeles",
+    location: [34.0522, -118.2437],
+    image: "/images/hero/5.webp",
+    rotate: 4,
+  },
 ];
 
 const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 
-// cobe `showcase: default` 색·치수에 맞춘 globe config
-const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
-const MARKER_SIZE = 0.04;
+// cobe `showcase: polaroids` 색·치수에 맞춘 globe config
+const ACCENT: [number, number, number] = [0.4, 0.6, 0.9];
+const MARKER_SIZE = 0.02;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
   devicePixelRatio: 2,
   phi: 0,
-  theta: 0.3,
+  theta: 0.2,
   dark: 0,
   diffuse: 1.5,
   mapSamples: DESKTOP_MAP_SAMPLES,
-  mapBrightness: 6,
+  mapBrightness: 9,
   baseColor: [1, 1, 1],
   markerColor: ACCENT,
   glowColor: [0.94, 0.93, 0.91],
@@ -101,7 +135,7 @@ const GLOBE_CONFIG: COBEOptions = {
     location,
     size: MARKER_SIZE,
   })),
-  markerElevation: 0.01,
+  markerElevation: 0,
 };
 
 export default function Globe({
@@ -331,16 +365,27 @@ export default function Globe({
         ALL_MARKERS.map((m) => (
           <div
             key={m.id}
-            className="showcase-default-label"
+            className="polaroid-marker"
             style={
               {
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
                 filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
+                ["--polaroid-rotate" as string]: `${m.rotate}deg`,
               } as React.CSSProperties
             }
           >
-            {m.name}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="polaroid-marker__image"
+              src={m.image}
+              alt={m.name}
+              width={60}
+              height={60}
+              loading="lazy"
+              decoding="async"
+            />
+            <span className="polaroid-marker__caption">{m.name}</span>
           </div>
         ))}
     </div>
