@@ -381,6 +381,8 @@ export default function Globe({
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
                 visibility: `var(--cobe-visible-${m.id}, hidden)`,
                 ["--polaroid-rotate" as string]: `${m.rotate}deg`,
+                // 홈베이스 Seoul은 인접 마커(Tokyo 등)와 겹치면 항상 위에 보이도록 z-index 한 단계 올림.
+                zIndex: m.id === "seoul" ? 1 : undefined,
               } as unknown as React.CSSProperties
             }
           >
