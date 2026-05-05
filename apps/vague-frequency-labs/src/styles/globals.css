@@ -7,6 +7,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
+  --font-sans:
+    var(--font-geist), "Pretendard Variable", Pretendard, system-ui,
+    -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif:
+    var(--font-fraunces), "Pretendard Variable", Pretendard, ui-serif, Georgia,
+    serif;
+  --font-display:
+    var(--font-fraunces), "Pretendard Variable", Pretendard, ui-serif, Georgia,
+    serif;
+
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -152,7 +162,14 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
   }
 }
 
