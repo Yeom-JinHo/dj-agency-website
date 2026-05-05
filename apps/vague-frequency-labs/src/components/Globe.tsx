@@ -62,7 +62,6 @@ type CityMarker = {
   name: string;
   location: [number, number];
   image: string;
-  region: string;
   code: string;
 };
 
@@ -71,7 +70,6 @@ const SEOUL_MARKER: CityMarker = {
   name: "Seoul",
   location: SEOUL,
   image: "/images/hero/1.jpg",
-  region: "Asia",
   code: "KR",
 };
 
@@ -81,7 +79,6 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
     name: "Tokyo",
     location: [35.6762, 139.6503],
     image: "/images/hero/1.jpg",
-    region: "Asia",
     code: "JP",
   },
   {
@@ -89,7 +86,6 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
     name: "Bangkok",
     location: [13.7563, 100.5018],
     image: "/images/hero/2.webp",
-    region: "Asia",
     code: "TH",
   },
   {
@@ -97,7 +93,6 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
     name: "Sydney",
     location: [-33.8688, 151.2093],
     image: "/images/hero/3.jpg",
-    region: "Oceania",
     code: "AU",
   },
   {
@@ -105,7 +100,6 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
     name: "Paris",
     location: [48.8566, 2.3522],
     image: "/images/hero/4.jpg",
-    region: "Europe",
     code: "FR",
   },
   {
@@ -113,7 +107,6 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
     name: "Los Angeles",
     location: [34.0522, -118.2437],
     image: "/images/hero/5.webp",
-    region: "Americas",
     code: "US",
   },
 ];
@@ -401,10 +394,6 @@ export default function Globe({
               zIndex: m.id === "seoul" ? 1 : undefined,
             })}
           >
-            <div className="polaroid-marker__top">
-              <span className="polaroid-marker__block" aria-hidden />
-              <span className="polaroid-marker__region">{m.region}</span>
-            </div>
             <Image
               className="polaroid-marker__image"
               src={m.image}

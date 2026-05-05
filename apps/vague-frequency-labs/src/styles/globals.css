@@ -376,34 +376,11 @@
   pointer-events: none;
 }
 
-.polaroid-marker__top {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.polaroid-marker__block {
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  background: rgb(30, 80, 200);
-}
-
-.polaroid-marker__region {
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.4rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #555;
-}
-
 .polaroid-marker__image {
   display: block;
   width: 50px;
   height: 50px;
   object-fit: cover;
-  filter: grayscale(1) contrast(1.05);
 }
 
 .polaroid-marker__meta {
@@ -444,13 +421,6 @@
     gap: 5px;
     margin-bottom: 10px;
   }
-  .polaroid-marker__block {
-    width: 8px;
-    height: 8px;
-  }
-  .polaroid-marker__region {
-    font-size: 0.5rem;
-  }
   .polaroid-marker__image {
     width: 64px;
     height: 64px;
@@ -468,13 +438,6 @@
     padding: 10px 10px 12px;
     gap: 6px;
     margin-bottom: 12px;
-  }
-  .polaroid-marker__block {
-    width: 10px;
-    height: 10px;
-  }
-  .polaroid-marker__region {
-    font-size: 0.55rem;
   }
   .polaroid-marker__image {
     width: 78px;
