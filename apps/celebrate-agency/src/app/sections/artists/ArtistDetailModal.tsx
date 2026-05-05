@@ -4,7 +4,18 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect } from "react";
 
-import type { Artist } from "@/types/artist";
+import { Icon, type IconName } from "@repo/ui/common/Icon";
+
+import type { Artist, ArtistSocialPlatform } from "@/types/artist";
+
+const PLATFORM_ICON: Record<ArtistSocialPlatform, IconName | null> = {
+  instagram: "SiInstagram",
+  spotify: "SiSpotify",
+  youtube: "SiYoutube",
+  x: "SiX",
+  soundcloud: "SiSoundcloud",
+  etc: null,
+};
 
 interface ArtistDetailModalProps {
   artist: Artist | null;
@@ -63,18 +74,28 @@ export function ArtistDetailModal({
               </p>
               {artist.socials.length > 0 && (
                 <ul className="flex flex-wrap gap-2 pt-2">
-                  {artist.socials.map((s) => (
-                    <li key={`${s.platform}-${s.url}`}>
-                      <a
-                        href={s.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="rounded-full border border-white/20 px-3 py-1 text-xs hover:bg-white/10"
-                      >
-                        {s.label ?? s.platform}
-                      </a>
-                    </li>
-                  ))}
+                  {artist.socials.map((s) => {
+                    const iconName = PLATFORM_ICON[s.platform];
+                    return (
+                      <li key={`${s.platform}-${s.url}`}>
+                        <a
+                          href={s.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={s.label ?? s.platform}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white transition-colors hover:bg-white/10"
+                        >
+                          {iconName ? (
+                            <Icon name={iconName} size={16} />
+                          ) : (
+                            <span className="px-2 text-xs">
+                              {s.label ?? s.platform}
+                            </span>
+                          )}
+                        </a>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>
