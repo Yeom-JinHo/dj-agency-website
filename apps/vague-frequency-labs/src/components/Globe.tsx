@@ -372,9 +372,13 @@ export default function Globe({
             style={
               {
                 positionAnchor: `--cobe-${m.id}`,
+                // cobe는 마커가 보일 때만 --cobe-visible-{id}를 정의함.
+                // 정의됨: IACVT → opacity·visibility의 initial 값(1, visible) 사용.
+                // 정의 안 됨: fallback 0/hidden → 합성 레이어에서 완전히 제외.
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
+                visibility: `var(--cobe-visible-${m.id}, hidden)`,
                 ["--polaroid-rotate" as string]: `${m.rotate}deg`,
-              } as React.CSSProperties
+              } as unknown as React.CSSProperties
             }
           >
             <Image
@@ -383,7 +387,7 @@ export default function Globe({
               alt={m.name}
               width={POLAROID_IMAGE_SIZE}
               height={POLAROID_IMAGE_SIZE}
-              sizes={`${POLAROID_IMAGE_SIZE}px`}
+              sizes="(max-width: 767px) 50px, (max-width: 1279px) 64px, 78px"
               quality={70}
             />
             <span className="polaroid-marker__caption">{m.name}</span>
