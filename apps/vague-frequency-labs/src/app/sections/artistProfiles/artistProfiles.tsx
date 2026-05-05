@@ -133,6 +133,7 @@ function ArtistProfiles() {
               align: "start",
               dragFree: true,
               loop: true,
+              dragThreshold: 20,
             }}
             setApi={handleSetApi}
             plugins={carouselPlugins}
@@ -148,7 +149,7 @@ function ArtistProfiles() {
                     <Link
                       href={`/artist/${artist.name}`}
                       prefetch
-                      className="block h-full touch-manipulation transition-transform duration-150 active:scale-[0.97]"
+                      className="block h-full touch-manipulation"
                       onMouseEnter={() =>
                         router.prefetch(`/artist/${artist.name}`)
                       }
@@ -158,17 +159,19 @@ function ArtistProfiles() {
                         }
                       }}
                     >
-                      <ArtistImage
-                        artist={artist}
-                        backgroundLogo={true}
-                        priority={index < 2}
-                      />
+                      <div className="h-full transition-transform duration-150 active:scale-[0.95]">
+                        <ArtistImage
+                          artist={artist}
+                          backgroundLogo={true}
+                          priority={index < 2}
+                        />
+                      </div>
+                      <div className="md:hidden absolute w-full bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-16 pb-4 px-4">
+                        <span className="text-white text-xl font-bold drop-shadow-lg">
+                          {artist.name}
+                        </span>
+                      </div>
                     </Link>
-                    <div className="md:hidden absolute w-full bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-16 pb-4 px-4">
-                      <span className="text-white text-xl font-bold drop-shadow-lg">
-                        {artist.name}
-                      </span>
-                    </div>
                   </div>
                 </CarouselItem>
               ))}
