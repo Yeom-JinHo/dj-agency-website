@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { ARTISTS } from "@/consts/artists";
 import type { Artist } from "@/types/artist";
@@ -10,6 +10,7 @@ import { ArtistDetailModal } from "./ArtistDetailModal";
 
 export default function Artists() {
   const [selected, setSelected] = useState<Artist | null>(null);
+  const handleClose = useCallback(() => setSelected(null), []);
 
   return (
     <section className="w-full px-6 py-16 md:px-12 md:py-20">
@@ -20,10 +21,7 @@ export default function Artists() {
           </li>
         ))}
       </ul>
-      <ArtistDetailModal
-        artist={selected}
-        onClose={() => setSelected(null)}
-      />
+      <ArtistDetailModal artist={selected} onClose={handleClose} />
     </section>
   );
 }
