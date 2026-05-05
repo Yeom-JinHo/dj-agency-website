@@ -7,6 +7,7 @@ import {
   SiInstagram,
   SiSoundcloud,
   SiSpotify,
+  SiX,
   SiYoutube,
 } from "react-icons/si";
 
@@ -16,6 +17,7 @@ export type IconName =
   | "SiInstagram"
   | "SiSoundcloud"
   | "SiSpotify"
+  | "SiX"
   | "SiYoutube"
   | "LuPlus"
   | "LuMenu"
@@ -29,6 +31,7 @@ const iconMap: Record<IconName, IconType> = {
   SiInstagram: SiInstagram,
   SiSoundcloud: SiSoundcloud,
   SiSpotify: SiSpotify,
+  SiX: SiX,
   SiYoutube: SiYoutube,
   LuPlus: LuPlus,
   LuMenu: LuMenu,
