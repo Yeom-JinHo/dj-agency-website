@@ -18,6 +18,7 @@ import ArtistImage from "./ArtistImage";
 const firstRow = [...artistProfiles];
 const VISIBILITY_ROOT_MARGIN = "200px 0px";
 const VISIBILITY_THRESHOLD = 0.05;
+let lastSlideIndex: number | null = null;
 
 function ArtistProfiles() {
   const router = useRouter();
@@ -63,9 +64,21 @@ function ArtistProfiles() {
     (api: CarouselApi) => {
       carouselApiRef.current = api;
       syncAutoplay(isVisibleRef.current, api);
+      if (api && lastSlideIndex !== null) {
+        api.scrollTo(lastSlideIndex, true);
+      }
     },
     [syncAutoplay],
   );
+
+  useEffect(() => {
+    return () => {
+      const api = carouselApiRef.current;
+      if (api) {
+        lastSlideIndex = api.selectedScrollSnap();
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const section = sectionRef.current;
