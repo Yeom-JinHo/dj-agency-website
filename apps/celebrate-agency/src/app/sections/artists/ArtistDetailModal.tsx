@@ -39,7 +39,7 @@ export function ArtistDetailModal({
     <AnimatePresence>
       {artist && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm sm:p-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -50,7 +50,7 @@ export function ArtistDetailModal({
             role="dialog"
             aria-modal="true"
             aria-label={artist.name}
-            className="relative w-full max-w-md overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl"
+            className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl"
             initial={{ scale: 0.92, opacity: 0, y: 8 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.96, opacity: 0, y: 4 }}
