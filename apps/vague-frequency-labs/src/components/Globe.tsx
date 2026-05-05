@@ -118,12 +118,15 @@ const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
 const MARKER_SIZE = 0.04;
 // next/image가 디바이스 해상도에 맞춰 ~78px(또는 ×2 dpr=156px) 썸네일을 서빙하도록 폴라로이드 이미지 최대 픽셀 크기
 const POLAROID_IMAGE_SIZE = 78;
+// cobe 좌표계에서 lat=0, lon=L 지점이 정면(l.z=1)에 오는 phi 값: -π/2 - L(rad).
+// 첫 프레임에서 Seoul이 카메라 정면에 보이도록 phi 초기값을 Seoul 경도에 맞춰 둠.
+const SEOUL_FRONT_PHI = -Math.PI / 2 - (SEOUL[1] * Math.PI) / 180;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
   devicePixelRatio: 2,
-  phi: 0,
+  phi: SEOUL_FRONT_PHI,
   theta: 0.3,
   dark: 0,
   diffuse: 1.5,
@@ -151,7 +154,7 @@ export default function Globe({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
-  const phiRef = useRef(0);
+  const phiRef = useRef(SEOUL_FRONT_PHI);
   const widthRef = useRef(0);
   const [isVisible, setIsVisible] = useState(true);
   const [mounted, setMounted] = useState(false);
