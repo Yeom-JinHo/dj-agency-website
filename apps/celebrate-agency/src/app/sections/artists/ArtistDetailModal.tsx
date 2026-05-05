@@ -50,7 +50,7 @@ export function ArtistDetailModal({
             role="dialog"
             aria-modal="true"
             aria-label={artist.name}
-            className="relative w-full max-w-sm overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl"
+            className="relative w-full max-w-xs overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl sm:max-w-sm"
             initial={{ scale: 0.92, opacity: 0, y: 8 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.96, opacity: 0, y: 4 }}
