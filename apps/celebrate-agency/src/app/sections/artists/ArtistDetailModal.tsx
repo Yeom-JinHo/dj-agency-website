@@ -91,7 +91,7 @@ export function ArtistDetailModal({
                 src={artist.image}
                 alt={artist.name}
                 fill
-                sizes="(max-width: 768px) 100vw, 480px"
+                sizes="(max-width: 640px) 288px, 384px"
                 className="object-cover object-top"
               />
             </div>
