@@ -10,10 +10,26 @@ import { cn } from "@repo/ui";
 
 const teko = Teko({ weight: "400", subsets: ["latin"] });
 
+const LOADER_SEEN_KEY = "vfl-loader-shown";
+
 export default function Loader() {
   const [isVisible, setIsVisible] = useState(true);
   const [isReady, setIsReady] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        if (sessionStorage.getItem(LOADER_SEEN_KEY)) {
+          setIsVisible(false);
+          return;
+        }
+        sessionStorage.setItem(LOADER_SEEN_KEY, "1");
+      } catch {
+        // sessionStorage 접근 실패 시 정상 흐름 유지
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // 이전 timer가 있다면 항상 정리

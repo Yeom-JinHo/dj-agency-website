@@ -133,6 +133,7 @@ function ArtistProfiles() {
               align: "start",
               dragFree: true,
               loop: true,
+              dragThreshold: 20,
             }}
             setApi={handleSetApi}
             plugins={carouselPlugins}
