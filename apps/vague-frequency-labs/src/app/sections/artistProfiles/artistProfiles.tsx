@@ -12,6 +12,7 @@ import {
   CarouselItem,
 } from "@repo/ui/common/Carousel";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ArtistImage from "./ArtistImage";
 
 const firstRow = [...artistProfiles];
@@ -19,6 +20,7 @@ const VISIBILITY_ROOT_MARGIN = "200px 0px";
 const VISIBILITY_THRESHOLD = 0.05;
 
 function ArtistProfiles() {
+  const router = useRouter();
   const sectionRef = useRef<HTMLElement>(null);
   const carouselApiRef = useRef<CarouselApi | null>(null);
   const isVisibleRef = useRef(false);
@@ -28,7 +30,8 @@ function ArtistProfiles() {
         speed: 600 / 1000,
         startDelay: 0,
         playOnInit: false,
-        stopOnInteraction: false,
+        stopOnInteraction: true,
+        stopOnMouseEnter: true,
       }),
     [],
   );
@@ -129,7 +132,19 @@ function ArtistProfiles() {
                   className="basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
                   <div className="h-full p-1 relative">
-                    <Link href={`/artist/${artist.name}`}>
+                    <Link
+                      href={`/artist/${artist.name}`}
+                      prefetch
+                      className="block h-full touch-manipulation transition-transform duration-150 active:scale-[0.97]"
+                      onMouseEnter={() =>
+                        router.prefetch(`/artist/${artist.name}`)
+                      }
+                      onPointerDown={(e) => {
+                        if (e.pointerType !== "mouse") {
+                          router.prefetch(`/artist/${artist.name}`);
+                        }
+                      }}
+                    >
                       <ArtistImage
                         artist={artist}
                         backgroundLogo={true}

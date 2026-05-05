@@ -65,24 +65,16 @@ function useMorphingDialog() {
 
 export interface MorphingDialogProviderProps {
   children: ReactNode;
-  defaultOpen?: boolean;
   transition?: Transition;
 }
 
 function MorphingDialogProvider({
   children,
-  defaultOpen = false,
   transition,
 }: MorphingDialogProviderProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
+  const [isOpen, setIsOpen] = useState(false);
   const uniqueId = useId();
   const triggerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (defaultOpen) {
-      setIsOpen(true);
-    }
-  }, [defaultOpen]);
 
   const contextValue = useMemo(
     () => ({
@@ -112,19 +104,17 @@ function MorphingDialogProvider({
 
 export interface MorphingDialogProps {
   children: ReactNode;
-  defaultOpen?: boolean;
   transition?: Transition;
 }
 
 function MorphingDialog({
   children,
-  defaultOpen = false,
   transition,
 }: MorphingDialogProps) {
   const groupId = useId();
 
   return (
-    <MorphingDialogProvider defaultOpen={defaultOpen} transition={transition}>
+    <MorphingDialogProvider transition={transition}>
       <LayoutGroup id={`dialog-container-${groupId}`}>{children}</LayoutGroup>
     </MorphingDialogProvider>
   );
@@ -352,7 +342,7 @@ function MorphingDialogContainer({ children }: MorphingDialogContainerProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center pt-[calc(env(safe-area-inset-top)+4rem)] md:pt-0">
             {children}
           </div>
         </>

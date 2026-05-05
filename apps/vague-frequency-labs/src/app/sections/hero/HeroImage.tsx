@@ -56,7 +56,7 @@ function HeroImage({
         translateY: "-50%",
       }}
     >
-      <Image src={src} alt="hero" className="aspect-[4/3] object-cover" fill />
+      <Image src={src} alt="hero" className="aspect-[4/3] object-cover" fill sizes="100vw" priority />
     </motion.div>
   );
 }

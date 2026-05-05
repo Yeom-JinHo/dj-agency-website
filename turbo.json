@@ -1,6 +1,12 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL",
+    "NEXT_PUBLIC_PAYDAY_RECORDS_URL",
+    "NEXT_PUBLIC_CELEBRATE_AGENCY_URL",
+    "NODE_ENV"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -8,10 +14,12 @@
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "inputs": ["$TURBO_DEFAULT$", "**/*.ts", "**/*.tsx", ".eslintrc.*"],
+      "outputs": []
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "inputs": ["$TURBO_DEFAULT$", "**/*.ts", "**/*.tsx", "tsconfig.json"],
+      "outputs": []
     },
     "dev": {
       "cache": false,

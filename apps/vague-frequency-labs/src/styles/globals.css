@@ -205,3 +205,224 @@
     }
   }
 }
+
+/* ── Globe orbit ring (default showcase) ─────────────── */
+
+.orbit-ring {
+  position: absolute;
+  inset: -2%;
+  pointer-events: none;
+  z-index: 1;
+  contain: layout paint;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 40%,
+    black 48%,
+    black 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 40%,
+    black 48%,
+    black 100%
+  );
+}
+
+.orbit-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotateX(62deg);
+}
+
+.orbit-rotor {
+  transform-origin: 150px 150px;
+  transform: translateZ(0);
+  animation: orbit-spin 30s linear infinite;
+  will-change: transform;
+}
+
+.orbit-svg path {
+  fill: none;
+}
+
+.orbit-text {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 6px;
+  fill: rgb(76, 115, 230);
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  paint-order: stroke fill;
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 0.6px;
+}
+
+.orbit-text--desktop {
+  display: none;
+}
+
+.orbit-text--mobile {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+@media (min-width: 768px) {
+  .orbit-text--mobile {
+    display: none;
+  }
+  .orbit-text--desktop {
+    display: inline;
+  }
+}
+
+@keyframes orbit-spin {
+  from {
+    transform: rotateZ(0deg) translateZ(0);
+  }
+  to {
+    transform: rotateZ(-360deg) translateZ(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orbit-rotor {
+    animation: none;
+  }
+}
+
+/* ── Seoul radar pulse ───────────────────────── */
+
+.seoul-pulse {
+  position: absolute;
+  top: anchor(center);
+  left: anchor(center);
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: rgb(30, 80, 200);
+  box-shadow:
+    0 0 0 1.5px rgba(20, 30, 80, 0.6),
+    0 0 12px rgba(30, 80, 200, 0.9);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.seoul-pulse::before,
+.seoul-pulse::after,
+.seoul-pulse__ring {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  border: 2px solid rgba(30, 80, 200, 0.85);
+  animation: seoul-pulse-ring 2.6s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+.seoul-pulse::after {
+  animation-delay: 0.87s;
+}
+
+.seoul-pulse__ring--late {
+  animation-delay: 1.74s;
+}
+
+@keyframes seoul-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.95;
+    border-width: 2px;
+  }
+  60% {
+    opacity: 0.4;
+    border-width: 1.5px;
+  }
+  100% {
+    transform: scale(7);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seoul-pulse::before,
+  .seoul-pulse::after,
+  .seoul-pulse__ring {
+    animation: none;
+  }
+}
+
+/* ── Globe city label (default showcase) ─────────────── */
+
+.showcase-default-label {
+  position: absolute;
+  bottom: anchor(top);
+  left: anchor(center);
+  translate: -50% 0;
+  margin-bottom: 8px;
+  padding: 0.15rem 0.35rem;
+  background: rgb(20, 30, 80);
+  color: #fff;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: opacity 0.8s, filter 0.8s;
+  pointer-events: none;
+}
+
+.showcase-default-label::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate3d(-50%, -1px, 0);
+  border: 5px solid transparent;
+  border-top-color: rgb(20, 30, 80);
+}
+
+@supports not (anchor-name: --x) {
+  .seoul-pulse,
+  .showcase-default-label {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .showcase-default-label {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
+    margin-bottom: 6px;
+  }
+  .showcase-default-label::after {
+    border-width: 4px;
+  }
+}
+
+@media (min-width: 768px) {
+  .showcase-default-label {
+    font-size: 0.78rem;
+    padding: 0.22rem 0.5rem;
+    margin-bottom: 11px;
+    letter-spacing: 0.09em;
+  }
+  .showcase-default-label::after {
+    border-width: 6px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .showcase-default-label {
+    font-size: 0.9rem;
+    padding: 0.28rem 0.6rem;
+    margin-bottom: 13px;
+  }
+  .showcase-default-label::after {
+    border-width: 7px;
+  }
+}
+
