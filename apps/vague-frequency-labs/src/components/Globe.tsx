@@ -113,9 +113,9 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
 
 const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 
-// cobe `showcase: polaroids` 색·치수에 맞춘 globe config
-const ACCENT: [number, number, number] = [0.4, 0.6, 0.9];
-const MARKER_SIZE = 0.02;
+// cobe `showcase: default` 색·치수에 맞춘 globe config
+const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
+const MARKER_SIZE = 0.04;
 // next/image가 디바이스 해상도에 맞춰 ~78px(또는 ×2 dpr=156px) 썸네일을 서빙하도록 폴라로이드 이미지 최대 픽셀 크기
 const POLAROID_IMAGE_SIZE = 78;
 
@@ -124,11 +124,11 @@ const GLOBE_CONFIG: COBEOptions = {
   height: 800,
   devicePixelRatio: 2,
   phi: 0,
-  theta: 0.2,
+  theta: 0.3,
   dark: 0,
   diffuse: 1.5,
   mapSamples: DESKTOP_MAP_SAMPLES,
-  mapBrightness: 9,
+  mapBrightness: 6,
   baseColor: [1, 1, 1],
   markerColor: ACCENT,
   glowColor: [0.94, 0.93, 0.91],
@@ -138,7 +138,7 @@ const GLOBE_CONFIG: COBEOptions = {
     location,
     size: MARKER_SIZE,
   })),
-  markerElevation: 0,
+  markerElevation: 0.01,
 };
 
 export default function Globe({
