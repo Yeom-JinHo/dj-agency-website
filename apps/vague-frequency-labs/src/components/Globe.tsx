@@ -2,6 +2,7 @@
 
 import type { COBEOptions } from "cobe";
 import { useEffect, useId, useRef, useState } from "react";
+import Image from "next/image";
 import createGlobe from "cobe";
 import { useMotionValue, useSpring } from "motion/react";
 
@@ -115,6 +116,8 @@ const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 // cobe `showcase: polaroids` 색·치수에 맞춘 globe config
 const ACCENT: [number, number, number] = [0.4, 0.6, 0.9];
 const MARKER_SIZE = 0.02;
+// next/image가 디바이스 해상도에 맞춰 ~78px(또는 ×2 dpr=156px) 썸네일을 서빙하도록 폴라로이드 이미지 최대 픽셀 크기
+const POLAROID_IMAGE_SIZE = 78;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -370,20 +373,18 @@ export default function Globe({
               {
                 positionAnchor: `--cobe-${m.id}`,
                 opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
                 ["--polaroid-rotate" as string]: `${m.rotate}deg`,
               } as React.CSSProperties
             }
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               className="polaroid-marker__image"
               src={m.image}
               alt={m.name}
-              width={60}
-              height={60}
-              loading="lazy"
-              decoding="async"
+              width={POLAROID_IMAGE_SIZE}
+              height={POLAROID_IMAGE_SIZE}
+              sizes={`${POLAROID_IMAGE_SIZE}px`}
+              quality={70}
             />
             <span className="polaroid-marker__caption">{m.name}</span>
           </div>
