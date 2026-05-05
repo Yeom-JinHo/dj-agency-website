@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { linkLimit, links } from "./config";
 import Link from "next/link";
 
 import { Icon } from "@repo/ui/common/Icon";
 import { motion } from "motion/react";
 export default function Header() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+
+  const activeHref =
+    hoveredLink ?? (links.some((link) => link.href === pathname) ? pathname : null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -36,18 +41,13 @@ export default function Header() {
         mounted ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0",
         "motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none",
       ].join(" ")}
-      onMouseLeave={() => {
-        const pathname = window.location.pathname;
-        const matchingLink = links.find((link) => link.href === pathname);
-        setHoveredLink(matchingLink ? pathname : null);
-      }}
+      onMouseLeave={() => setHoveredLink(null)}
     >
       <div className="flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex w-full justify-between">
           <Link
             href="/"
             className="inline-flex items-center justify-center text-2xl font-semibold"
-            onClick={() => setHoveredLink(null)}
           >
             v.f.labs
           </Link>
@@ -69,10 +69,9 @@ export default function Header() {
                     href={href}
                     key={`header-desktop-link_${index}`}
                     onMouseEnter={() => setHoveredLink(href)}
-                    onClick={() => setHoveredLink(href)}
                   >
                     {title}
-                    {hoveredLink === href ? (
+                    {activeHref === href ? (
                       <motion.div
                         layoutId="underline"
                         initial={false}
