@@ -164,12 +164,12 @@ function ArtistProfiles() {
                         backgroundLogo={true}
                         priority={index < 2}
                       />
+                      <div className="md:hidden absolute w-full bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-16 pb-4 px-4">
+                        <span className="text-white text-xl font-bold drop-shadow-lg">
+                          {artist.name}
+                        </span>
+                      </div>
                     </Link>
-                    <div className="md:hidden absolute w-full bottom-0 left-0 bg-gradient-to-t from-black/70 via-black/50 to-transparent pt-16 pb-4 px-4">
-                      <span className="text-white text-xl font-bold drop-shadow-lg">
-                        {artist.name}
-                      </span>
-                    </div>
                   </div>
                 </CarouselItem>
               ))}
