@@ -32,6 +32,7 @@ export function ArtistDetailModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
           onClick={onClose}
         >
           <motion.div
@@ -39,9 +40,10 @@ export function ArtistDetailModal({
             aria-modal="true"
             aria-label={artist.name}
             className="relative w-full max-w-md overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 20, opacity: 0 }}
+            initial={{ scale: 0.92, opacity: 0, y: 8 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.96, opacity: 0, y: 4 }}
+            transition={{ type: "spring", stiffness: 320, damping: 28, mass: 0.7 }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative aspect-[3/4]">
