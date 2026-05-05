@@ -159,7 +159,7 @@ function ArtistProfiles() {
                         }
                       }}
                     >
-                      <div className="h-full transition-transform duration-150 active:scale-[0.90]">
+                      <div className="h-full transition-transform duration-150 active:scale-[0.95]">
                         <ArtistImage
                           artist={artist}
                           backgroundLogo={true}
