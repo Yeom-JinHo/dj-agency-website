@@ -113,7 +113,6 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
 
 const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 
-// cobe `showcase: default` 색·치수에 맞춘 globe config
 const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
 const MARKER_SIZE = 0.04;
 // next/image가 디바이스 해상도에 맞춰 ~78px(또는 ×2 dpr=156px) 썸네일을 서빙하도록 폴라로이드 이미지 최대 픽셀 크기
@@ -121,6 +120,18 @@ const POLAROID_IMAGE_SIZE = 78;
 // cobe 좌표계에서 lat=0, lon=L 지점이 정면(l.z=1)에 오는 phi 값: -π/2 - L(rad).
 // 첫 프레임에서 Seoul이 카메라 정면에 보이도록 phi 초기값을 Seoul 경도에 맞춰 둠.
 const SEOUL_FRONT_PHI = -Math.PI / 2 - (SEOUL[1] * Math.PI) / 180;
+
+// 폴라로이드 카드 인라인 style용. CSS 변수 키와 anchor positioning prop을
+// 안전하게 받으면서 표준 prop 오타는 잡아내도록 표준 타입을 베이스로 확장.
+// React.CSSProperties와 직접 호환되지 않는 멤버(visibility를 var() 식으로 사용,
+// positionAnchor 미수록 등)가 있어 toCSSProperties로 경계에서 한 번만 캐스트.
+type PolaroidStyle = Omit<React.CSSProperties, "visibility"> & {
+  visibility?: string;
+  positionAnchor?: string;
+} & Record<`--${string}`, string>;
+
+const toCSSProperties = (s: PolaroidStyle): React.CSSProperties =>
+  s as unknown as React.CSSProperties;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
@@ -372,19 +383,17 @@ export default function Globe({
           <div
             key={m.id}
             className="polaroid-marker"
-            style={
-              {
-                positionAnchor: `--cobe-${m.id}`,
-                // cobe는 마커가 보일 때만 --cobe-visible-{id}를 정의함.
-                // 정의됨: IACVT → opacity·visibility의 initial 값(1, visible) 사용.
-                // 정의 안 됨: fallback 0/hidden → 합성 레이어에서 완전히 제외.
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                visibility: `var(--cobe-visible-${m.id}, hidden)`,
-                ["--polaroid-rotate" as string]: `${m.rotate}deg`,
-                // 홈베이스 Seoul은 인접 마커(Tokyo 등)와 겹치면 항상 위에 보이도록 z-index 한 단계 올림.
-                zIndex: m.id === "seoul" ? 1 : undefined,
-              } as unknown as React.CSSProperties
-            }
+            style={toCSSProperties({
+              positionAnchor: `--cobe-${m.id}`,
+              // cobe는 마커가 보일 때만 --cobe-visible-{id}를 정의함.
+              // 정의됨: IACVT → opacity·visibility의 initial 값(1, visible) 사용.
+              // 정의 안 됨: fallback 0/hidden → 합성 레이어에서 완전히 제외.
+              opacity: `var(--cobe-visible-${m.id}, 0)`,
+              visibility: `var(--cobe-visible-${m.id}, hidden)`,
+              "--polaroid-rotate": `${m.rotate}deg`,
+              // 홈베이스 Seoul은 인접 마커(Tokyo 등)와 겹치면 항상 위에 보이도록 z-index 한 단계 올림.
+              zIndex: m.id === "seoul" ? 1 : undefined,
+            })}
           >
             <Image
               className="polaroid-marker__image"
