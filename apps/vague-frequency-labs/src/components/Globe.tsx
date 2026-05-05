@@ -62,7 +62,8 @@ type CityMarker = {
   name: string;
   location: [number, number];
   image: string;
-  rotate: number;
+  region: string;
+  code: string;
 };
 
 const SEOUL_MARKER: CityMarker = {
@@ -70,7 +71,8 @@ const SEOUL_MARKER: CityMarker = {
   name: "Seoul",
   location: SEOUL,
   image: "/images/hero/1.jpg",
-  rotate: -4,
+  region: "Asia",
+  code: "KR",
 };
 
 const FLIGHT_DESTINATIONS: CityMarker[] = [
@@ -79,35 +81,40 @@ const FLIGHT_DESTINATIONS: CityMarker[] = [
     name: "Tokyo",
     location: [35.6762, 139.6503],
     image: "/images/hero/1.jpg",
-    rotate: -3,
+    region: "Asia",
+    code: "JP",
   },
   {
     id: "bangkok",
     name: "Bangkok",
     location: [13.7563, 100.5018],
     image: "/images/hero/2.webp",
-    rotate: 5,
+    region: "Asia",
+    code: "TH",
   },
   {
     id: "sydney",
     name: "Sydney",
     location: [-33.8688, 151.2093],
     image: "/images/hero/3.jpg",
-    rotate: 6,
+    region: "Oceania",
+    code: "AU",
   },
   {
     id: "paris",
     name: "Paris",
     location: [48.8566, 2.3522],
     image: "/images/hero/4.jpg",
-    rotate: -6,
+    region: "Europe",
+    code: "FR",
   },
   {
     id: "la",
     name: "Los Angeles",
     location: [34.0522, -118.2437],
     image: "/images/hero/5.webp",
-    rotate: 4,
+    region: "Americas",
+    code: "US",
   },
 ];
 
@@ -379,7 +386,7 @@ export default function Globe({
       )}
       {mounted &&
         renderProfile.showMarkers &&
-        ALL_MARKERS.map((m) => (
+        ALL_MARKERS.map((m, idx) => (
           <div
             key={m.id}
             className="polaroid-marker"
@@ -390,11 +397,14 @@ export default function Globe({
               // 정의 안 됨: fallback 0/hidden → 합성 레이어에서 완전히 제외.
               opacity: `var(--cobe-visible-${m.id}, 0)`,
               visibility: `var(--cobe-visible-${m.id}, hidden)`,
-              "--polaroid-rotate": `${m.rotate}deg`,
               // 홈베이스 Seoul은 인접 마커(Tokyo 등)와 겹치면 항상 위에 보이도록 z-index 한 단계 올림.
               zIndex: m.id === "seoul" ? 1 : undefined,
             })}
           >
+            <div className="polaroid-marker__top">
+              <span className="polaroid-marker__block" aria-hidden />
+              <span className="polaroid-marker__region">{m.region}</span>
+            </div>
             <Image
               className="polaroid-marker__image"
               src={m.image}
@@ -404,7 +414,12 @@ export default function Globe({
               sizes="(max-width: 767px) 50px, (max-width: 1279px) 64px, 78px"
               quality={70}
             />
-            <span className="polaroid-marker__caption">{m.name}</span>
+            <div className="polaroid-marker__meta">
+              <span className="polaroid-marker__name">{m.name}</span>
+              <span className="polaroid-marker__sub">
+                {`${String(idx + 1).padStart(2, "0")} ─ ${m.code}`}
+              </span>
+            </div>
           </div>
         ))}
     </div>
