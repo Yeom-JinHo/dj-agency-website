@@ -16,6 +16,9 @@ const KOREA_ASPECT = 761 / 1243; // SVG width / height
 const SEOUL_PCT = { x: 42.6, y: 54.3 };
 
 const SCRIPT_TIMEOUT_MS = 5000;
+// pulse 단계가 cinematic의 일부로 자동 진행되는 시간 (사용자 click 부담 제거)
+const PULSE_AUTO_MS = 1400;
+const PULSE_AUTO_REDUCE_MS = 500;
 const FALLBACK_HREF =
   "https://map.naver.com/p/search/V.F.LABS%20%EC%84%9C%EC%9A%B8%20%EC%8B%9C%EC%B2%AD";
 
@@ -31,6 +34,19 @@ export default function KoreaCinematic() {
   const mapRef = useRef<unknown>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // pulse 진입 후 자동으로 mapping으로 진행 (사용자 click 부담 제거).
+  // 사용자가 SVG/컨테이너를 클릭하면 즉시 mapping으로 skip 가능.
+  useEffect(() => {
+    if (state !== "pulse") return;
+    const id = setTimeout(
+      () => {
+        setState((prev) => (prev === "pulse" ? "mapping" : prev));
+      },
+      reduce ? PULSE_AUTO_REDUCE_MS : PULSE_AUTO_MS,
+    );
+    return () => clearTimeout(id);
+  }, [state, reduce]);
 
   // mapping 상태 진입 시 timeout 등록
   useEffect(() => {
@@ -156,6 +172,7 @@ export default function KoreaCinematic() {
   const showSvgLayer =
     state === "idle" || state === "zooming" || state === "pulse";
   const mapMounted = state === "mapping" || state === "mapped";
+  const wrapperClickable = state === "idle" || state === "pulse";
 
   return (
     <div
@@ -182,15 +199,34 @@ export default function KoreaCinematic() {
             exit={{ opacity: 0 }}
             transition={{ duration: fadeDuration }}
           >
-            {/* 한반도 SVG wrapper — aspect-ratio가 SVG와 1:1이라 Seoul %좌표가 정확히 일치 */}
+            {/* 한반도 SVG wrapper — aspect-ratio가 SVG와 1:1이라 Seoul %좌표가 정확히 일치.
+                idle: click 1로 cinematic 시작. pulse: click하면 자동 진행을 skip하고 즉시 mapping. */}
             <motion.div
-              role={state === "idle" ? "button" : undefined}
-              aria-label={state === "idle" ? "한반도 지도 열기" : undefined}
-              tabIndex={state === "idle" ? 0 : -1}
-              onClick={state === "idle" ? handleClick1 : undefined}
-              onKeyDown={state === "idle" ? onIdleKey : undefined}
-              className={`group relative h-full ${
+              role={wrapperClickable ? "button" : undefined}
+              aria-label={
                 state === "idle"
+                  ? "한반도 지도 열기"
+                  : state === "pulse"
+                    ? "지도 바로 보기"
+                    : undefined
+              }
+              tabIndex={wrapperClickable ? 0 : -1}
+              onClick={
+                state === "idle"
+                  ? handleClick1
+                  : state === "pulse"
+                    ? handleClick2
+                    : undefined
+              }
+              onKeyDown={
+                state === "idle"
+                  ? onIdleKey
+                  : state === "pulse"
+                    ? onPulseKey
+                    : undefined
+              }
+              className={`group relative h-full ${
+                wrapperClickable
                   ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
                   : ""
               }`}
@@ -320,18 +356,8 @@ export default function KoreaCinematic() {
               )}
             </motion.div>
 
-            {/* pulse 상태 click 2 button — wrapper 바깥 화면 좌표에 두지 않고 컨테이너 하단 중앙 */}
-            {state === "pulse" && (
-              <button
-                type="button"
-                onClick={handleClick2}
-                onKeyDown={onPulseKey}
-                aria-label="서울 인터랙티브 지도 열기"
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-neutral-300 bg-white/80 px-4 py-1.5 text-sm font-medium text-neutral-800 backdrop-blur transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-100 dark:hover:bg-neutral-900"
-              >
-                서울 ▸ 지도 열기
-              </button>
-            )}
+            {/* pulse 상태에서는 별도 button 없이 SVG wrapper 자체가 skip 액션 영역.
+                cinematic은 PULSE_AUTO_MS 후 자동으로 mapping으로 진행됨. */}
           </motion.div>
         )}
 
