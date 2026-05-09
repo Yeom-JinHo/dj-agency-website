@@ -8,10 +8,12 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 const SEOUL_COORDS = { lat: 37.5665, lng: 126.978 };
 
-// Korea SVG 좌표계 (viewBox 0 0 400 500)
-const SVG_VIEWBOX = { width: 400, height: 500 };
-// Seoul ≈ { x: 73%, y: 35% } of viewBox
-const SEOUL_SVG = { x: 292, y: 175 };
+// public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom)
+const KOREA_SVG_SRC = "/korea-peninsula.svg";
+const KOREA_ASPECT = 761 / 1243; // SVG width / height
+// Seoul 위치 (SVG viewBox 비율). 위도 37.566 / 경도 126.978의 한반도 외곽 추정값.
+// 첫 cinematic frame에서 어색하면 0.5pt 단위로 미세 조정.
+const SEOUL_PCT = { x: 42.6, y: 54.3 };
 
 const SCRIPT_TIMEOUT_MS = 5000;
 const FALLBACK_HREF =
@@ -19,11 +21,6 @@ const FALLBACK_HREF =
 
 const NCP_KEY = process.env.NEXT_PUBLIC_NAVER_CLIENT_ID;
 const SCRIPT_SRC = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NCP_KEY ?? ""}`;
-
-// 자체 작성 단순화 path (≤ 2KB, ≤ 50 commands). 미니멀 line art 톤.
-// 한반도의 대략적 윤곽선을 따라 그린 장식적 path.
-const KOREA_PATH =
-  "M 200 50 L 215 65 L 230 80 L 250 70 L 270 85 L 290 110 L 305 135 L 315 160 L 320 185 L 318 215 L 310 240 L 300 265 L 290 290 L 285 315 L 280 345 L 270 375 L 255 405 L 240 435 L 220 455 L 200 470 L 180 460 L 165 440 L 155 415 L 150 385 L 152 355 L 158 325 L 162 300 L 158 275 L 148 250 L 138 225 L 128 200 L 122 175 L 125 150 L 135 125 L 150 100 L 170 80 L 185 65 Z";
 
 type State = "idle" | "zooming" | "pulse" | "mapping" | "mapped" | "fallback";
 
@@ -35,7 +32,6 @@ export default function KoreaCinematic() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 빌드 타임 fallback: env 부재 시 click 1에서 즉시 fallback으로 분기 (handleClick1)
   // mapping 상태 진입 시 timeout 등록
   useEffect(() => {
     if (state !== "mapping") return;
@@ -99,12 +95,12 @@ export default function KoreaCinematic() {
     setState("mapped");
   }, [state, scriptReady, initMap]);
 
-  // unmount cleanup — Naver Maps v3는 destroy() 없음 → ref null + container clear
+  // unmount cleanup — Naver Maps v3는 destroy() 없음 → ref null + map container clear
   useEffect(() => {
-    const container = containerRef.current;
     return () => {
       mapRef.current = null;
-      if (container) container.innerHTML = "";
+      const mapEl = document.getElementById("vfl-map");
+      if (mapEl) mapEl.replaceChildren();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -130,19 +126,25 @@ export default function KoreaCinematic() {
     setState("mapping");
   }, [state]);
 
-  const onIdleKey = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleClick1();
-    }
-  };
+  const onIdleKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleClick1();
+      }
+    },
+    [handleClick1],
+  );
 
-  const onPulseKey = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      handleClick2();
-    }
-  };
+  const onPulseKey = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleClick2();
+      }
+    },
+    [handleClick2],
+  );
 
   // 반응형 zoom scale: viewport 기반 (Tailwind 기준 md=768px). 320px ≤ 3.5, 768px+ ≤ 5.
   const getZoomScale = () => {
@@ -180,28 +182,26 @@ export default function KoreaCinematic() {
             exit={{ opacity: 0 }}
             transition={{ duration: fadeDuration }}
           >
-            <motion.svg
-              viewBox={`0 0 ${SVG_VIEWBOX.width} ${SVG_VIEWBOX.height}`}
-              role="button"
-              aria-label="한반도 지도 열기"
+            {/* 한반도 SVG wrapper — aspect-ratio가 SVG와 1:1이라 Seoul %좌표가 정확히 일치 */}
+            <motion.div
+              role={state === "idle" ? "button" : undefined}
+              aria-label={state === "idle" ? "한반도 지도 열기" : undefined}
               tabIndex={state === "idle" ? 0 : -1}
               onClick={state === "idle" ? handleClick1 : undefined}
               onKeyDown={state === "idle" ? onIdleKey : undefined}
-              className={`h-full w-full text-neutral-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current dark:text-neutral-200 ${
-                state === "idle" ? "cursor-pointer" : ""
+              className={`relative h-full ${
+                state === "idle"
+                  ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
+                  : ""
               }`}
               style={{
-                transformOrigin: `${SEOUL_SVG.x}px ${SEOUL_SVG.y}px`,
+                aspectRatio: `${KOREA_ASPECT}`,
+                transformOrigin: `${SEOUL_PCT.x}% ${SEOUL_PCT.y}%`,
                 willChange: "transform",
               }}
               initial={{ scale: 1 }}
               animate={{
-                scale:
-                  state === "zooming"
-                    ? getZoomScale()
-                    : state === "pulse"
-                      ? getZoomScale()
-                      : 1,
+                scale: state === "idle" ? 1 : getZoomScale(),
               }}
               transition={{
                 duration: state === "zooming" ? 0.8 : 0,
@@ -211,32 +211,28 @@ export default function KoreaCinematic() {
                 state === "zooming" ? handleZoomDone : undefined
               }
             >
-              <path
-                d={KOREA_PATH}
-                stroke="currentColor"
-                strokeWidth={2}
-                fill="none"
-                strokeLinejoin="round"
-                strokeLinecap="round"
+              {/* Wikimedia Commons / Public Domain (Ksiom, 2008). public/korea-peninsula.svg */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={KOREA_SVG_SRC}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                className="pointer-events-none h-full w-full select-none opacity-80 dark:opacity-70"
               />
-              {state === "idle" && (
-                <text
-                  x={SEOUL_SVG.x + 12}
-                  y={SEOUL_SVG.y + 4}
-                  fontSize={14}
-                  fill="currentColor"
-                  className="pointer-events-none select-none opacity-60"
-                >
-                  서울 ▸ 지도 보기
-                </text>
-              )}
+
+              {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
               {(state === "pulse" || state === "zooming") && (
-                <>
-                  <motion.circle
-                    cx={SEOUL_SVG.x}
-                    cy={SEOUL_SVG.y}
-                    r={4}
-                    fill="currentColor"
+                <div
+                  className="pointer-events-none absolute"
+                  style={{
+                    left: `${SEOUL_PCT.x}%`,
+                    top: `${SEOUL_PCT.y}%`,
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  <motion.div
+                    className="relative h-2 w-2 rounded-full bg-neutral-900 dark:bg-neutral-100"
                     initial={{ scale: 1, opacity: 0.9 }}
                     animate={
                       state === "pulse"
@@ -251,41 +247,44 @@ export default function KoreaCinematic() {
                       ease: "easeInOut",
                     }}
                   />
-                  <motion.circle
-                    cx={SEOUL_SVG.x}
-                    cy={SEOUL_SVG.y}
-                    r={10}
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1}
-                    initial={{ scale: 1, opacity: 0.6 }}
-                    animate={
-                      state === "pulse" && !reduce
-                        ? { scale: [1, 2.2, 1], opacity: [0.6, 0, 0.6] }
-                        : { scale: 1, opacity: 0 }
-                    }
-                    transition={{
-                      repeat: state === "pulse" ? Infinity : 0,
-                      duration: 1.6,
-                      ease: "easeOut",
-                    }}
-                  />
-                </>
+                  {state === "pulse" && !reduce && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full border border-neutral-900 dark:border-neutral-100"
+                      initial={{ scale: 1, opacity: 0.6 }}
+                      animate={{ scale: [1, 3, 1], opacity: [0.6, 0, 0.6] }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 1.6,
+                        ease: "easeOut",
+                      }}
+                    />
+                  )}
+                </div>
               )}
-            </motion.svg>
 
+              {/* idle 상태 hover hint label */}
+              {state === "idle" && (
+                <div
+                  className="pointer-events-none absolute text-xs font-medium whitespace-nowrap text-neutral-600 opacity-70 dark:text-neutral-400"
+                  style={{
+                    left: `${SEOUL_PCT.x}%`,
+                    top: `calc(${SEOUL_PCT.y}% + 14px)`,
+                    transform: "translate(-50%, 0)",
+                  }}
+                >
+                  서울 ▸ 지도 보기
+                </div>
+              )}
+            </motion.div>
+
+            {/* pulse 상태 click 2 button — wrapper 바깥 화면 좌표에 두지 않고 컨테이너 하단 중앙 */}
             {state === "pulse" && (
               <button
                 type="button"
                 onClick={handleClick2}
                 onKeyDown={onPulseKey}
                 aria-label="서울 인터랙티브 지도 열기"
-                className="absolute rounded-full px-3 py-1 text-xs font-medium text-neutral-800 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current dark:text-neutral-100"
-                style={{
-                  left: `${(SEOUL_SVG.x / SVG_VIEWBOX.width) * 100}%`,
-                  top: `calc(${(SEOUL_SVG.y / SVG_VIEWBOX.height) * 100}% + 24px)`,
-                  transform: "translate(-50%, 0)",
-                }}
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-neutral-300 bg-white/80 px-4 py-1.5 text-sm font-medium text-neutral-800 backdrop-blur transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-100 dark:hover:bg-neutral-900"
               >
                 서울 ▸ 지도 열기
               </button>
