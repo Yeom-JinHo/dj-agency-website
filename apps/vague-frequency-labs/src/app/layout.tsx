@@ -11,7 +11,6 @@ import { createMetadata } from "@/utils";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
-import { ViewTransitions } from "next-view-transitions";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -52,27 +51,25 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <ViewTransitions>
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <link
-            rel="stylesheet"
-            href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-          />
-        </head>
-        <body
-          className={`${fraunces.variable} ${geist.variable} font-sans antialiased`}
-        >
-          <ReactScan />
-          <ErrorBoundary>
-            <Providers>
-              {children}
-              <Analytics />
-              <SpeedInsights />
-            </Providers>
-          </ErrorBoundary>
-        </body>
-      </html>
-    </ViewTransitions>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
+      <body
+        className={`${fraunces.variable} ${geist.variable} font-sans antialiased`}
+      >
+        <ReactScan />
+        <ErrorBoundary>
+          <Providers>
+            {children}
+            <Analytics />
+            <SpeedInsights />
+          </Providers>
+        </ErrorBoundary>
+      </body>
+    </html>
   );
 }

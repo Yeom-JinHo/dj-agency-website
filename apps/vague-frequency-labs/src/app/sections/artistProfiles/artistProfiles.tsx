@@ -11,7 +11,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@repo/ui/common/Carousel";
-import { Link } from "next-view-transitions";
+import { TransitionLink } from "@/components/TransitionLink";
 import { useRouter } from "next/navigation";
 import ArtistImage from "./ArtistImage";
 
@@ -146,7 +146,7 @@ function ArtistProfiles() {
                   className="basis-1/2 lg:basis-1/3 xl:basis-1/4"
                 >
                   <div className="h-full p-1 relative">
-                    <Link
+                    <TransitionLink
                       href={`/artist/${artist.name}`}
                       prefetch
                       className="block h-full touch-manipulation"
@@ -176,7 +176,7 @@ function ArtistProfiles() {
                           {artist.name}
                         </span>
                       </div>
-                    </Link>
+                    </TransitionLink>
                   </div>
                 </CarouselItem>
               ))}
