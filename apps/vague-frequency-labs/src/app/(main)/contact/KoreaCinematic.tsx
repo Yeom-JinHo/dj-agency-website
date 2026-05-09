@@ -189,7 +189,7 @@ export default function KoreaCinematic() {
               tabIndex={state === "idle" ? 0 : -1}
               onClick={state === "idle" ? handleClick1 : undefined}
               onKeyDown={state === "idle" ? onIdleKey : undefined}
-              className={`relative h-full ${
+              className={`group relative h-full ${
                 state === "idle"
                   ? "cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current"
                   : ""
@@ -218,7 +218,7 @@ export default function KoreaCinematic() {
                 alt=""
                 aria-hidden="true"
                 draggable={false}
-                className="pointer-events-none h-full w-full select-none opacity-80 dark:opacity-70"
+                className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100 dark:opacity-70 dark:group-hover:opacity-95"
               />
 
               {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
@@ -262,18 +262,61 @@ export default function KoreaCinematic() {
                 </div>
               )}
 
-              {/* idle 상태 hover hint label */}
+              {/* idle 상태: Seoul attention dot + 명확한 CTA chip */}
               {state === "idle" && (
-                <div
-                  className="pointer-events-none absolute text-xs font-medium whitespace-nowrap text-neutral-600 opacity-70 dark:text-neutral-400"
-                  style={{
-                    left: `${SEOUL_PCT.x}%`,
-                    top: `calc(${SEOUL_PCT.y}% + 14px)`,
-                    transform: "translate(-50%, 0)",
-                  }}
-                >
-                  서울 ▸ 지도 보기
-                </div>
+                <>
+                  <div
+                    className="pointer-events-none absolute"
+                    style={{
+                      left: `${SEOUL_PCT.x}%`,
+                      top: `${SEOUL_PCT.y}%`,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <motion.div
+                      className="h-2.5 w-2.5 rounded-full bg-neutral-900 shadow-[0_0_0_2px_rgba(255,255,255,0.85)] dark:bg-neutral-100 dark:shadow-[0_0_0_2px_rgba(0,0,0,0.6)]"
+                      animate={
+                        reduce
+                          ? { opacity: 1 }
+                          : { scale: [1, 1.25, 1], opacity: [1, 0.7, 1] }
+                      }
+                      transition={{
+                        repeat: reduce ? 0 : Infinity,
+                        duration: 1.8,
+                        ease: "easeInOut",
+                      }}
+                    />
+                    {!reduce && (
+                      <motion.div
+                        className="absolute inset-0 rounded-full border border-neutral-900 dark:border-neutral-100"
+                        animate={{
+                          scale: [1, 2.6, 1],
+                          opacity: [0.55, 0, 0.55],
+                        }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1.8,
+                          ease: "easeOut",
+                        }}
+                      />
+                    )}
+                  </div>
+
+                  <motion.div
+                    className="pointer-events-none absolute flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white/95 px-3 py-1.5 text-sm font-medium whitespace-nowrap text-neutral-900 shadow-md backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95 dark:text-neutral-100"
+                    style={{
+                      left: `${SEOUL_PCT.x}%`,
+                      top: `calc(${SEOUL_PCT.y}% + 22px)`,
+                      transform: "translate(-50%, 0)",
+                    }}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                  >
+                    <span aria-hidden="true">📍</span>
+                    Seoul · 클릭해서 지도 열기
+                  </motion.div>
+                </>
               )}
             </motion.div>
 
