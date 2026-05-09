@@ -16,7 +16,7 @@ export default function Content() {
 const Copyright = () => {
   return (
     <div className="flex flex-col items-start justify-between sm:flex-row sm:items-end">
-      <h1 className="mt-10 text-[14vw] leading-[0.8] sm:text-[16vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] 2xl:text-[18vw]">
+      <h1 className="mt-10 text-[14vw] leading-[0.8] sm:text-[16vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] 2xl:text-[min(18vw,28rem)]">
         v.f.labs
       </h1>
       <p className="mt-4 text-xs sm:mt-0 sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">
