@@ -11,7 +11,7 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@repo/ui/common/Carousel";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 import { useRouter } from "next/navigation";
 import ArtistImage from "./ArtistImage";
 
@@ -159,7 +159,12 @@ function ArtistProfiles() {
                         }
                       }}
                     >
-                      <div className="h-full transition-transform duration-150 active:scale-[0.95]">
+                      <div
+                        className="h-full transition-transform duration-150 active:scale-[0.95]"
+                        style={{
+                          viewTransitionName: `artist-card-${artist.name}`,
+                        }}
+                      >
                         <ArtistImage
                           artist={artist}
                           backgroundLogo={true}

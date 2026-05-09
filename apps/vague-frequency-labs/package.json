@@ -22,6 +22,7 @@
     "embla-carousel-auto-scroll": "^8.6.0",
     "motion": "catalog:",
     "next": "catalog:",
+    "next-view-transitions": "^0.3.5",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-lite-youtube-embed": "^2.5.6",
