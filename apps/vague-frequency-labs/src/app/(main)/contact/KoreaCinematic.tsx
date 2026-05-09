@@ -388,11 +388,14 @@ export default function KoreaCinematic() {
         {mapMounted && scriptReady && (
           <motion.div
             key="map-layer"
-            className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
+            className="absolute inset-0 origin-center"
+            initial={{ opacity: 0, scale: reduce ? 1 : 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: fadeDuration }}
+            transition={{
+              duration: reduce ? 0.05 : 0.7,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
             <div id="vfl-map" className="h-full w-full" />
           </motion.div>
