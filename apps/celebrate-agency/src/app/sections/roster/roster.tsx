@@ -29,7 +29,7 @@ export default function Roster() {
                 alt={artist.name}
                 fill
                 sizes="(max-width: 1024px) 50vw, 25vw"
-                className="transform-gpu object-cover transition-[transform,filter] duration-700 ease-out will-change-transform group-hover:scale-[1.06] group-hover:brightness-110"
+                className="transform-gpu object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-[1.06]"
               />
               <Corner pos="tl" />
               <Corner pos="tr" />
