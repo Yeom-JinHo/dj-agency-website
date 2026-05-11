@@ -261,7 +261,7 @@ export default function KoreaCinematic() {
                 alt=""
                 aria-hidden="true"
                 draggable={false}
-                className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100 dark:opacity-70 dark:group-hover:opacity-95"
+                className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100"
               />
 
               {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
