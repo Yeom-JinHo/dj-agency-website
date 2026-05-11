@@ -2,7 +2,10 @@ import { Bracket } from "@/components/Bracket";
 
 export default function Hero() {
   return (
-    <section id="top" className="relative pt-[140px] pb-[100px]">
+    <section
+      id="top"
+      className="relative flex min-h-[100dvh] flex-col justify-between pt-[140px] pb-16"
+    >
       <h1 className="px-10 font-display text-[clamp(72px,15vw,224px)] uppercase leading-[0.86] tracking-[-0.005em]">
         <span className="block">
           <Bracket>Celebrate</Bracket>
