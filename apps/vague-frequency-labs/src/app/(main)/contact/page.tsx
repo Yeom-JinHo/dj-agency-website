@@ -68,22 +68,6 @@ export default function ContactPage(): ReactElement {
                   as="h2"
                   className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
                 >
-                  Address
-                </TextReveal>
-                <div className="space-y-4">
-                  <TextReveal
-                    as="p"
-                    className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
-                  >
-                    서울특별시 중구 세종대로 110(수정)
-                  </TextReveal>
-                </div>
-              </div>
-              <div className="space-y-4 p-8">
-                <TextReveal
-                  as="h2"
-                  className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-                >
                   Email
                 </TextReveal>
                 <div className="space-y-4">
@@ -92,6 +76,22 @@ export default function ContactPage(): ReactElement {
                     className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
                   >
                     vaguefrequencylabs@gmail.com
+                  </TextReveal>
+                </div>
+              </div>
+              <div className="space-y-4 p-8">
+                <TextReveal
+                  as="h2"
+                  className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
+                >
+                  Address
+                </TextReveal>
+                <div className="space-y-4">
+                  <TextReveal
+                    as="p"
+                    className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+                  >
+                    서울특별시 중구 세종대로 110(수정)
                   </TextReveal>
                 </div>
               </div>
