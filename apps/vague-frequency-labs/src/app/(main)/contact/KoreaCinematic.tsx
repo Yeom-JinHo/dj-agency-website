@@ -212,9 +212,9 @@ export default function KoreaCinematic() {
               role={wrapperClickable ? "button" : undefined}
               aria-label={
                 state === "idle"
-                  ? "한반도 지도 열기"
+                  ? "Open the Seoul map"
                   : state === "pulse"
-                    ? "지도 바로 보기"
+                    ? "Skip to the map"
                     : undefined
               }
               tabIndex={wrapperClickable ? 0 : -1}
@@ -346,23 +346,33 @@ export default function KoreaCinematic() {
                   </div>
 
                   <motion.div
-                    className="pointer-events-none absolute flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white/95 px-3 py-1.5 text-sm font-medium whitespace-nowrap text-neutral-900 shadow-md backdrop-blur dark:border-neutral-700 dark:bg-neutral-900/95 dark:text-neutral-100"
+                    className="pointer-events-none absolute flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold tracking-tight whitespace-nowrap text-white shadow-xl shadow-black/20 ring-1 ring-black/5 dark:bg-white dark:text-neutral-900 dark:shadow-white/10 dark:ring-white/10"
                     style={{
                       left: `${SEOUL_PCT.x}%`,
-                      top: `calc(${SEOUL_PCT.y}% + 22px)`,
+                      top: `calc(${SEOUL_PCT.y}% + 28px)`,
                       transform: "translate(-50%, 0)",
                     }}
-                    initial={{ opacity: 0, y: -4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
+                    initial={{ opacity: 0, scale: 0.85, y: -6 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{
+                      duration: reduce ? 0.05 : 0.5,
+                      delay: reduce ? 0 : 0.3,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
                   >
                     <IconMapPin
-                      size={14}
-                      stroke={1.6}
+                      size={15}
+                      stroke={1.8}
                       aria-hidden="true"
-                      className="-mt-px shrink-0"
+                      className="-mt-0.5 shrink-0"
                     />
-                    Seoul · 클릭해서 지도 열기
+                    Find us in Seoul
+                    <span
+                      aria-hidden="true"
+                      className="ml-0.5 text-base leading-none opacity-70"
+                    >
+                      ↗
+                    </span>
                   </motion.div>
                 </>
               )}
