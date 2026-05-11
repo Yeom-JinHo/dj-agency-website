@@ -3,9 +3,9 @@ import Image from "next/image";
 import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
 import { ARTISTS } from "@/consts/artists";
+import { BOOKING_EMAIL } from "@/consts/brand";
 
 const ROSTER_CAP = 8;
-const BOOKING_EMAIL = "book@celebrate.agency";
 
 export default function Roster() {
   return (

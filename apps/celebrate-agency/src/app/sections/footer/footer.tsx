@@ -2,8 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 
 import icon from "@/app/icon.png";
-
-const BOOKING_EMAIL = "book@celebrate.agency";
+import { BOOKING_EMAIL } from "@/consts/brand";
 
 export default function Footer() {
   return (

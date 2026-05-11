@@ -236,36 +236,6 @@
 }
 
 @layer components {
-  .ca-br {
-    position: relative;
-    display: inline-block;
-    padding: 0 0.18em;
-  }
-  .ca-br::before,
-  .ca-br::after {
-    content: "";
-    position: absolute;
-    top: 8%;
-    bottom: 8%;
-    width: 0.18em;
-    background: var(--color-ca-red);
-  }
-  .ca-br::before {
-    left: 0;
-    border-top: 0.18em solid var(--color-ca-red);
-    border-bottom: 0.18em solid var(--color-ca-red);
-  }
-  .ca-br::after {
-    right: 0;
-    border-top: 0.18em solid var(--color-ca-red);
-    border-bottom: 0.18em solid var(--color-ca-red);
-  }
-  .ca-br-thin::before,
-  .ca-br-thin::after {
-    width: 0.1em;
-    border-width: 0.1em;
-  }
-
   .ca-stripe-ph {
     background: repeating-linear-gradient(
       45deg,

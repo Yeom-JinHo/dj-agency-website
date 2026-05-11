@@ -8,7 +8,7 @@ const metadata: Metadata = {
   },
   site: {
     title: "Celebrate Agency",
-    description: "Talent · Production · Direction. Seoul — Los Angeles.",
+    description: "Talent · Production · Direction. Seoul, Korea.",
     url: "https://celebrate-agency.com",
     keywords: [
       "Celebrate Agency",
@@ -16,7 +16,6 @@ const metadata: Metadata = {
       "Production",
       "Direction",
       "Seoul",
-      "Los Angeles",
     ],
     language: "en",
     charset: "UTF-8",
