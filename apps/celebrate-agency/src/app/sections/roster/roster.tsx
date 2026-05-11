@@ -41,7 +41,7 @@ export default function Roster() {
             </div>
             <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
               <span>DJ</span>
-              <span className="text-ca-red">SEL ↗</span>
+              <span className="text-ca-red">SEOUL ↗</span>
             </div>
           </a>
         ))}
