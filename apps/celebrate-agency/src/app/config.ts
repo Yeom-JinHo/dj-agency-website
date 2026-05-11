@@ -18,7 +18,7 @@ const metadata: Metadata = {
       "Seoul",
       "Los Angeles",
     ],
-    language: "ko",
+    language: "en",
     charset: "UTF-8",
   },
 };

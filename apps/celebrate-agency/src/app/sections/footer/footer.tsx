@@ -67,15 +67,25 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-wrap gap-6 font-mono text-[11px] uppercase tracking-[0.14em]">
-          <a href="#" className="transition-colors hover:text-ca-red">
-            Instagram ↗
+          <a
+            href="https://www.instagram.com/ye0m_2/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-ca-red"
+          >
+            Instagram <span aria-hidden="true">↗</span>
           </a>
-          <a href="#" className="transition-colors hover:text-ca-red">
-            Youtube ↗
+          <a
+            href="https://www.youtube.com/@ye0m_2"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-ca-red"
+          >
+            Youtube <span aria-hidden="true">↗</span>
           </a>
-          <a href="#" className="transition-colors hover:text-ca-red">
-            TikTok ↗
-          </a>
+          <span className="text-ca-muted">
+            TikTok <span aria-hidden="true">—</span>
+          </span>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted">
           © 2026 ye0m2 · All rights reserved
