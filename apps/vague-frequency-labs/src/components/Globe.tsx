@@ -121,16 +121,15 @@ const POLAROID_IMAGE_SIZE = 78;
 // 첫 프레임에서 Seoul이 카메라 정면에 보이도록 phi 초기값을 Seoul 경도에 맞춰 둠.
 const SEOUL_FRONT_PHI = -Math.PI / 2 - (SEOUL[1] * Math.PI) / 180;
 
-// 폴라로이드 카드 인라인 style용. CSS 변수 키와 anchor positioning prop을
-// 안전하게 받으면서 표준 prop 오타는 잡아내도록 표준 타입을 베이스로 확장.
-// React.CSSProperties와 직접 호환되지 않는 멤버(visibility를 var() 식으로 사용,
-// positionAnchor 미수록 등)가 있어 toCSSProperties로 경계에서 한 번만 캐스트.
-type PolaroidStyle = Omit<React.CSSProperties, "visibility"> & {
+// anchor positioning을 사용하는 인라인 style용. CSS 변수 키와 positionAnchor를
+// 안전하게 받으면서, visibility처럼 React.CSSProperties의 좁은 유니온과
+// 호환되지 않는 var(...) 값을 string으로 허용. 경계에서 toCSSProperties로 한 번만 캐스트.
+type AnchorPositionedStyle = Omit<React.CSSProperties, "visibility"> & {
   visibility?: string;
   positionAnchor?: string;
 } & Record<`--${string}`, string>;
 
-const toCSSProperties = (s: PolaroidStyle): React.CSSProperties =>
+const toCSSProperties = (s: AnchorPositionedStyle): React.CSSProperties =>
   s as unknown as React.CSSProperties;
 
 const GLOBE_CONFIG: COBEOptions = {
@@ -366,12 +365,10 @@ export default function Globe({
       {mounted && renderProfile.showMarkers && (
         <span
           className="seoul-pulse"
-          style={
-            {
-              positionAnchor: "--cobe-seoul",
-              opacity: "var(--cobe-visible-seoul, 0)",
-            } as React.CSSProperties
-          }
+          style={toCSSProperties({
+            positionAnchor: "--cobe-seoul",
+            opacity: "var(--cobe-visible-seoul, 0)",
+          })}
           aria-hidden
         >
           <span className="seoul-pulse__ring seoul-pulse__ring--late" />
@@ -385,9 +382,10 @@ export default function Globe({
             className="polaroid-marker"
             style={toCSSProperties({
               positionAnchor: `--cobe-${m.id}`,
-              // cobe는 마커가 보일 때만 --cobe-visible-{id}를 정의함.
-              // 정의됨: IACVT → opacity·visibility의 initial 값(1, visible) 사용.
-              // 정의 안 됨: fallback 0/hidden → 합성 레이어에서 완전히 제외.
+              // cobe는 마커가 보일 때만 --cobe-visible-{id}를 0..1 숫자로 정의함.
+              // 정의됨: opacity는 그 값을 보간 사용(예: 0.42 → 반투명).
+              //         visibility는 숫자가 유효 키워드가 아니어서 IACVT → initial(visible).
+              // 정의 안 됨: opacity fallback 0, visibility fallback hidden → 합성 레이어 제외.
               opacity: `var(--cobe-visible-${m.id}, 0)`,
               visibility: `var(--cobe-visible-${m.id}, hidden)`,
               // 홈베이스 Seoul은 인접 마커(Tokyo 등)와 겹치면 항상 위에 보이도록 z-index 한 단계 올림.
