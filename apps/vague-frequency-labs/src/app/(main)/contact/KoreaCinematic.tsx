@@ -307,11 +307,10 @@ export default function KoreaCinematic() {
                       }}
                     />
                   )}
-                  {/* "Seoul" 라벨 — pin dot 우상단의 chip 형태. wrapper zoom 후 화면
-                      표시 사이즈 21~30px. editorial wordmark 톤 (Fraunces+Geist 코드베이스와
-                      정합), 반투명 chip이 한반도 어떤 픽셀 위에서도 일관된 contrast 보장. */}
+                  {/* "Seoul" 라벨 — pin dot 우상단에 raw text로. 배경 chip 없이 text-shadow
+                      halo로 한반도 어디 위에서도 분리감 확보 (라이트는 white halo, 다크는 black halo). */}
                   <motion.span
-                    className="absolute left-full top-0 ml-1.5 -translate-y-3/4 rounded-[1px] bg-neutral-900/70 px-1 py-0.5 text-[6px] font-light tracking-[0.2em] whitespace-nowrap text-neutral-100 uppercase backdrop-blur-[2px]"
+                    className="absolute left-full top-0 ml-1.5 -translate-y-3/4 text-[6px] font-light tracking-[0.2em] whitespace-nowrap text-neutral-900 uppercase [text-shadow:0_0_3px_rgba(255,255,255,0.95)] dark:text-neutral-50 dark:[text-shadow:0_0_3px_rgba(0,0,0,0.95)]"
                     initial={{ opacity: 0, x: -5 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
