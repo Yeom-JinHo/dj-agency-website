@@ -1,19 +1,21 @@
-import { Bracket } from "@/components/Bracket";
+import Image from "next/image";
 
 export default function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-[100dvh] flex-col justify-between pt-[140px] pb-16"
+      className="relative flex min-h-[100dvh] flex-col pt-[140px] pb-16"
     >
-      <h1 className="px-10 font-display text-[clamp(72px,15vw,224px)] uppercase leading-[0.86] tracking-[-0.005em]">
-        <span className="block">
-          <Bracket>Celebrate</Bracket>
-        </span>
-        <span className="block">
-          Agency<span className="italic text-ca-red">.</span>
-        </span>
-      </h1>
+      <div className="flex flex-1 items-center justify-center px-10">
+        <Image
+          src="/images/logo/hero.png"
+          alt="Celebrate Agency"
+          width={400}
+          height={300}
+          priority
+          className="h-auto max-h-[75vh] w-full max-w-4xl"
+        />
+      </div>
 
       <div className="grid grid-cols-1 items-end gap-20 px-10 pt-12 lg:grid-cols-[1.1fr_1fr]">
         <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg">
