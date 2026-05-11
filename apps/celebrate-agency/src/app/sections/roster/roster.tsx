@@ -48,7 +48,7 @@ export default function Roster() {
 
         <a
           href={`mailto:${BOOKING_EMAIL}`}
-          className="group relative block bg-ca-red p-6 transition-colors hover:bg-ca-red-dim"
+          className="group relative hidden bg-ca-red p-6 transition-colors hover:bg-ca-red-dim lg:block"
         >
           <div className="relative mb-[18px] flex aspect-[3/4] flex-col justify-end overflow-hidden border border-ca-fg/20 p-4">
             <span className="font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg">
@@ -66,7 +66,7 @@ export default function Roster() {
           </div>
         </a>
 
-        <div className="relative block bg-ca-bg p-6">
+        <div className="relative hidden bg-ca-bg p-6 lg:block">
           <div className="ca-stripe-ph relative mb-[18px] aspect-[3/4] overflow-hidden border border-ca-line">
             <Corner pos="tl" />
             <Corner pos="tr" />
