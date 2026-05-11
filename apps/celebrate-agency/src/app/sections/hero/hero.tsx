@@ -1,5 +1,4 @@
 import { Bracket } from "@/components/Bracket";
-import { Clock } from "@/components/Clock";
 
 export default function Hero() {
   return (
@@ -14,15 +13,7 @@ export default function Hero() {
             <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
               Index
             </span>
-            <span className="font-mono text-sm text-ca-fg">01 / 06</span>
-          </div>
-          <div className="min-w-[140px] text-right">
-            <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-              KST
-            </span>
-            <span className="font-mono text-sm text-ca-fg">
-              <Clock />
-            </span>
+            <span className="font-mono text-sm text-ca-fg">01 / 04</span>
           </div>
         </div>
       </div>
@@ -45,7 +36,7 @@ export default function Hero() {
         <div className="flex items-center gap-3.5 lg:justify-end">
           <span className="inline-block h-2 w-2 animate-pulse-dot rounded-full bg-ca-red" />
           <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-ca-red">
-            ↓ 01 / 06
+            ↓ 01 / 04
           </span>
         </div>
       </div>

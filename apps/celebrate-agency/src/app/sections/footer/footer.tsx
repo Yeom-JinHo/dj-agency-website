@@ -10,7 +10,7 @@ export default function Footer() {
         <div>
           <div className="mb-8 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
             <span className="text-ca-red">●</span>
-            &nbsp; [ 06 ] &nbsp; / &nbsp; CONTACT
+            &nbsp; [ 04 ] &nbsp; / &nbsp; CONTACT
           </div>
           <h2 className="font-display text-[clamp(72px,11vw,168px)] uppercase leading-[0.88] tracking-[-0.005em]">
             Brief<span className="italic text-ca-red">.</span>
