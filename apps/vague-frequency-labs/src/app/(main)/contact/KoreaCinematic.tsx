@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { IconMapPin } from "@tabler/icons-react";
 
 // window.naver 타입은 src/types/naver.d.ts에 분리됨
 
@@ -11,9 +12,10 @@ const SEOUL_COORDS = { lat: 37.5665, lng: 126.978 };
 // public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom)
 const KOREA_SVG_SRC = "/korea-peninsula.svg";
 const KOREA_ASPECT = 761 / 1243; // SVG width / height
-// Seoul 위치 (SVG viewBox 비율). 위도 37.566 / 경도 126.978의 한반도 외곽 추정값.
-// 첫 cinematic frame에서 어색하면 0.5pt 단위로 미세 조정.
-const SEOUL_PCT = { x: 42.6, y: 54.3 };
+// Seoul 위치 (SVG viewBox 비율). 위도 37.566 / 경도 126.978을 한반도 위경도 범위
+// (lat 43↔34, lng 124↔131)에 대해 단순 비례로 추정한 값. SVG 투영이 mercator라
+// 약간 어긋날 수 있어 실제 렌더에서 0.5pt 단위 미세 조정 가능.
+const SEOUL_PCT = { x: 42.6, y: 61 };
 
 const SCRIPT_TIMEOUT_MS = 5000;
 // pulse 단계가 cinematic의 일부로 자동 진행되는 시간 (사용자 click 부담 제거)
@@ -162,11 +164,16 @@ export default function KoreaCinematic() {
     [handleClick2],
   );
 
-  // 반응형 zoom scale: viewport 기반 (Tailwind 기준 md=768px). 320px ≤ 3.5, 768px+ ≤ 5.
-  const getZoomScale = () => {
-    if (typeof window === "undefined") return 5;
-    return window.innerWidth >= 768 ? 5 : 3.5;
-  };
+  // 반응형 zoom scale (320px: 3.5, 768px+: 5). SSR/hydration mismatch 방지를 위해
+  // 초기값은 데스크톱 default(5)로 둔 뒤 mount 후 useEffect로 갱신. resize 대응까지 포함.
+  const [zoomScale, setZoomScale] = useState(5);
+  useEffect(() => {
+    const update = () =>
+      setZoomScale(window.innerWidth >= 768 ? 5 : 3.5);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const fadeDuration = reduce ? 0.05 : 0.3;
   const showSvgLayer =
@@ -237,7 +244,7 @@ export default function KoreaCinematic() {
               }}
               initial={{ scale: 1 }}
               animate={{
-                scale: state === "idle" ? 1 : getZoomScale(),
+                scale: state === "idle" ? 1 : zoomScale,
               }}
               transition={{
                 duration: state === "zooming" ? 0.8 : 0,
@@ -349,7 +356,12 @@ export default function KoreaCinematic() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: 0.2 }}
                   >
-                    <span aria-hidden="true">📍</span>
+                    <IconMapPin
+                      size={14}
+                      stroke={1.6}
+                      aria-hidden="true"
+                      className="-mt-px shrink-0"
+                    />
                     Seoul · 클릭해서 지도 열기
                   </motion.div>
                 </>
