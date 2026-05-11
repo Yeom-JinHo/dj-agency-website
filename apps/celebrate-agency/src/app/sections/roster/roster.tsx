@@ -40,7 +40,9 @@ export default function Roster() {
               {artist.name}
             </div>
             <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-              <span className="text-[13px]">{artist.roles.join(" · ")}</span>
+              <span className="lg:text-[13px]">
+                {artist.roles.join(" · ")}
+              </span>
               <span className="text-ca-red">SEOUL ↗</span>
             </div>
           </a>
