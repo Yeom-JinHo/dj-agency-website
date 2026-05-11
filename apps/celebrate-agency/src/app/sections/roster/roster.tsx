@@ -39,8 +39,8 @@ export default function Roster() {
             <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red">
               {artist.name}
             </div>
-            <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-              <span>DJ</span>
+            <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
+              <span className="text-[13px]">DJ</span>
               <span className="text-ca-red">SEOUL ↗</span>
             </div>
           </a>
