@@ -310,7 +310,7 @@ export default function KoreaCinematic() {
                   {/* "Seoul" 라벨 — pin dot 우상단에 raw text로. 배경 chip 없이 text-shadow
                       halo로 한반도 어디 위에서도 분리감 확보 (라이트는 white halo, 다크는 black halo). */}
                   <motion.span
-                    className="absolute left-full top-0 ml-1.5 -translate-y-3/4 text-[6px] font-light tracking-[0.2em] whitespace-nowrap text-neutral-900 uppercase [text-shadow:0_0_3px_rgba(255,255,255,0.95)] dark:text-neutral-50 dark:[text-shadow:0_0_3px_rgba(0,0,0,0.95)]"
+                    className="absolute left-full top-0 ml-1.5 -translate-y-3/4 font-display text-[6px] font-medium tracking-[0.2em] whitespace-nowrap text-neutral-900 uppercase [text-shadow:0_0_3px_rgba(255,255,255,0.95)] dark:text-neutral-50 dark:[text-shadow:0_0_3px_rgba(0,0,0,0.95)]"
                     initial={{ opacity: 0, x: -5 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{
