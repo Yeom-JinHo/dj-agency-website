@@ -263,8 +263,11 @@ export default function KoreaCinematic() {
                 className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100"
                 style={{
                   backgroundImage: `url("${KOREA_FLAG_SRC}")`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
+                  // height 40% → 국기 가로 전체(4괘 포함)가 stencil 안에 들어오는 크기
+                  backgroundSize: "auto 40%",
+                  // flag center를 Seoul 위치에 정렬 → zoom 시 transform-origin과 일치해 drift 제거
+                  backgroundPosition: `${SEOUL_PCT.x}% ${SEOUL_PCT.y}%`,
+                  backgroundRepeat: "no-repeat",
                   maskImage: `url("${KOREA_SVG_SRC}")`,
                   maskSize: "contain",
                   maskRepeat: "no-repeat",
