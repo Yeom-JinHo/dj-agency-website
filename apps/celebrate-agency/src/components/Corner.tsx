@@ -1,3 +1,5 @@
+import { cn } from "@repo/ui";
+
 type Pos = "tl" | "tr" | "bl" | "br";
 
 const POSITIONS: Record<Pos, string> = {
@@ -11,7 +13,10 @@ export function Corner({ pos }: Readonly<{ pos: Pos }>) {
   return (
     <span
       aria-hidden="true"
-      className={`absolute h-[22px] w-[22px] border-ca-red ${POSITIONS[pos]}`}
+      className={cn(
+        "absolute h-[22px] w-[22px] border-ca-red",
+        POSITIONS[pos]
+      )}
     />
   );
 }
