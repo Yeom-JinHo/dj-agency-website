@@ -59,7 +59,7 @@ export default function Footer() {
           />
           <div className="flex flex-col gap-0.5">
             <span className="font-display text-lg tracking-[0.08em]">
-              CELEBRATE / AGENCY
+              CELEBRATE AGENCY
             </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ca-muted">
               Talent · Production · Direction
