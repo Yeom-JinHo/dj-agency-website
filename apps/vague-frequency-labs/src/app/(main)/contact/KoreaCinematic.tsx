@@ -9,8 +9,10 @@ import { IconMapPin } from "@tabler/icons-react";
 
 const SEOUL_COORDS = { lat: 37.5665, lng: 126.978 };
 
-// public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom)
+// public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom) — stencil
 const KOREA_SVG_SRC = "/korea-peninsula.svg";
+// public/south-korea-flag.svg (Wikimedia Commons, Public Domain) — background painted into the stencil
+const KOREA_FLAG_SRC = "/south-korea-flag.svg";
 const KOREA_ASPECT = 761 / 1243; // SVG width / height
 // Seoul 위치 (SVG viewBox 비율). 위도 37.566 / 경도 126.978을 한반도 위경도 범위
 // (lat 43↔34, lng 124↔131)에 대해 단순 비례로 추정한 값. SVG 투영이 mercator라
@@ -254,14 +256,24 @@ export default function KoreaCinematic() {
                 state === "zooming" ? handleZoomDone : undefined
               }
             >
-              {/* Wikimedia Commons / Public Domain (Ksiom, 2008). public/korea-peninsula.svg */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={KOREA_SVG_SRC}
-                alt=""
+              {/* 한반도 SVG를 alpha mask로 사용 — stencil 안쪽으로 태극기 SVG가 배경으로
+                  비쳐 보임. 둘 다 Wikimedia Commons Public Domain. */}
+              <div
                 aria-hidden="true"
-                draggable={false}
-                className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100 dark:opacity-70 dark:group-hover:opacity-95"
+                className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  backgroundImage: `url("${KOREA_FLAG_SRC}")`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                  maskImage: `url("${KOREA_SVG_SRC}")`,
+                  maskSize: "contain",
+                  maskRepeat: "no-repeat",
+                  maskPosition: "center",
+                  WebkitMaskImage: `url("${KOREA_SVG_SRC}")`,
+                  WebkitMaskSize: "contain",
+                  WebkitMaskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                }}
               />
 
               {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
