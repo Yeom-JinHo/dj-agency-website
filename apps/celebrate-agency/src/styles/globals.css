@@ -34,6 +34,19 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  --color-ca-bg: #0a0a0a;
+  --color-ca-bg-2: #111111;
+  --color-ca-fg: #f5f3ef;
+  --color-ca-muted: #8a8a8a;
+  --color-ca-dim: #3a3a3a;
+  --color-ca-line: #1f1f1f;
+  --color-ca-red: #e63329;
+  --color-ca-red-dim: #8a1f19;
+
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jbmono);
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -41,6 +54,8 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
 
   @keyframes accordion-down {
     from {
@@ -66,6 +81,23 @@
     100% {
       opacity: 1;
       transform: translate(-50%, -40%) scale(1);
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
     }
   }
 }
@@ -152,7 +184,18 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-ca-bg);
+    color: var(--color-ca-fg);
+    font-feature-settings:
+      "ss01",
+      "cv11";
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
 
@@ -176,6 +219,53 @@
 
   .lenis.lenis-scrolling iframe {
     @apply pointer-events-none;
+  }
+}
+
+@layer components {
+  .ca-br {
+    position: relative;
+    display: inline-block;
+    padding: 0 0.18em;
+  }
+  .ca-br::before,
+  .ca-br::after {
+    content: "";
+    position: absolute;
+    top: 8%;
+    bottom: 8%;
+    width: 0.18em;
+    background: var(--color-ca-red);
+  }
+  .ca-br::before {
+    left: 0;
+    border-top: 0.18em solid var(--color-ca-red);
+    border-bottom: 0.18em solid var(--color-ca-red);
+  }
+  .ca-br::after {
+    right: 0;
+    border-top: 0.18em solid var(--color-ca-red);
+    border-bottom: 0.18em solid var(--color-ca-red);
+  }
+  .ca-br-thin::before,
+  .ca-br-thin::after {
+    width: 0.1em;
+    border-width: 0.1em;
+  }
+
+  .ca-stripe-ph {
+    background: repeating-linear-gradient(
+      45deg,
+      #1a1a1a 0 8px,
+      #141414 8px 16px
+    );
+  }
+  .ca-stripe-ph-lg {
+    background: repeating-linear-gradient(
+      45deg,
+      #1a1a1a 0 10px,
+      #141414 10px 20px
+    );
   }
 }
 
