@@ -21,7 +21,7 @@ export default function Roster() {
           <a
             key={artist.id}
             href="#"
-            className="group relative block bg-ca-bg p-6 transition-colors hover:bg-ca-bg-2"
+            className="group relative block bg-ca-bg p-6 transition-colors duration-300 hover:bg-[#1a1a1a]"
           >
             <div className="relative mb-[18px] aspect-[3/4] overflow-hidden bg-ca-bg-2">
               <Image
