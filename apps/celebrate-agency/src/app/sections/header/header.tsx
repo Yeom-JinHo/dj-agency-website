@@ -22,8 +22,8 @@ export default function Header() {
             className="h-7 w-7 rounded-sm"
             priority
           />
-          <span className="hidden font-display text-lg tracking-[0.06em] sm:inline">
-            CELEBRATE AGENCY
+          <span className="font-display text-lg tracking-[0.06em]">
+            CELEBRATE<span className="hidden sm:inline"> AGENCY</span>
           </span>
         </Link>
 
