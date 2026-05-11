@@ -1,18 +1,7 @@
-const ITEMS = [
-  "Yuna Park",
-  "DIRECTOR",
-  "Mateo Ruiz",
-  "PHOTOGRAPHY",
-  "Iris Han",
-  "STYLING",
-  "Kojiro Sato",
-  "CREATIVE DIR.",
-  "Noor Aziz",
-  "MUSIC",
-];
+import { ARTISTS } from '@/consts/artists';
 
 export default function Marquee() {
-  const loop = [...ITEMS, ...ITEMS];
+  const loop = [...ARTISTS.map((artist) => artist.name), ...ARTISTS.map((artist) => artist.name)];
   return (
     <div
       aria-hidden="true"

@@ -1,8 +1,8 @@
 const STATS: { v: string; sup: string | null; k: string }[] = [
-  { v: "8", sup: "★", k: "Signed artists" },
+  { v: "6", sup: "★", k: "Signed artists" },
   { v: "112", sup: null, k: "Projects shipped" },
   { v: "6", sup: null, k: "Years on the wall" },
-  { v: "2", sup: "×", k: "Cities · Seoul, LA" },
+  { v: "1", sup: null, k: "City · Seoul" },
 ];
 
 export default function Stats() {

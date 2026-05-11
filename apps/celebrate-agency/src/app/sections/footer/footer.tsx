@@ -19,24 +19,8 @@ export default function Footer() {
           </h2>
         </div>
         <div className="flex flex-col justify-end gap-9">
-          <Block title="General & Press">
-            <a
-              href="mailto:hello@celebrate.agency"
-              className="block transition-colors hover:text-ca-red"
-            >
-              hello@celebrate.agency
-            </a>
-            <a
-              href="mailto:press@celebrate.agency"
-              className="block transition-colors hover:text-ca-red"
-            >
-              press@celebrate.agency
-            </a>
-          </Block>
           <Block title="Studios">
             Seoul — 38 Seongsui-ro, Seongdong-gu
-            <br />
-            Los Angeles — 1142 N. Fairfax Ave., 90046
           </Block>
           <Block title="Bookings">
             <a
@@ -45,9 +29,7 @@ export default function Footer() {
             >
               book@celebrate.agency
             </a>
-            <span className="text-ca-muted">
-              +82 2 000 0000 · +1 323 000 0000
-            </span>
+            <span className="text-ca-muted">+82 2 000 0000</span>
           </Block>
         </div>
       </div>
@@ -75,17 +57,14 @@ export default function Footer() {
             Instagram ↗
           </a>
           <a href="#" className="transition-colors hover:text-ca-red">
-            Vimeo ↗
+            Youtube ↗
           </a>
           <a href="#" className="transition-colors hover:text-ca-red">
-            LinkedIn ↗
-          </a>
-          <a href="#" className="transition-colors hover:text-ca-red">
-            Newsletter ↗
+            TikTok ↗
           </a>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted">
-          © 2026 Celebrate Agency · All rights reserved · v0.1 draft
+          © 2026 ye0m2 · All rights reserved
         </div>
       </div>
     </footer>
