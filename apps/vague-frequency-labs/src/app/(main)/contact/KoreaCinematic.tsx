@@ -267,17 +267,6 @@ export default function KoreaCinematic() {
                 className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100"
               />
 
-              {/* 한국 국기 badge — 한반도 우하단에 작은 인디케이터로 정체성 신호.
-                  한반도와 함께 zoom되어 click 1 후 화면 밖으로 자연스럽게 사라짐.
-                  Wikimedia Commons / Public Domain. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={KOREA_FLAG_SRC}
-                alt=""
-                aria-hidden="true"
-                draggable={false}
-                className="pointer-events-none absolute right-1 bottom-3 w-12 rounded-sm opacity-90 shadow-md ring-1 ring-black/10 transition-opacity duration-300 group-hover:opacity-100 dark:ring-white/10"
-              />
 
               {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
               {(state === "pulse" || state === "zooming") && (
@@ -320,44 +309,56 @@ export default function KoreaCinematic() {
                 </div>
               )}
 
-              {/* idle 상태: Seoul attention dot + 명확한 CTA chip */}
+              {/* idle 상태: Seoul flag pin (펄럭임) + anchor + 명확한 CTA chip.
+                  pin의 anchor 끝(원형 점)이 Seoul 좌표에 위치, flag는 stick 위에서 살짝 펄럭. */}
               {state === "idle" && (
                 <>
                   <div
-                    className="pointer-events-none absolute"
+                    className="pointer-events-none absolute flex flex-col items-center"
                     style={{
                       left: `${SEOUL_PCT.x}%`,
                       top: `${SEOUL_PCT.y}%`,
-                      transform: "translate(-50%, -50%)",
+                      transform: "translate(-50%, -100%)",
                     }}
                   >
-                    <motion.div
-                      className="h-2.5 w-2.5 rounded-full bg-neutral-900 shadow-[0_0_0_2px_rgba(255,255,255,0.85)] dark:bg-neutral-100 dark:shadow-[0_0_0_2px_rgba(0,0,0,0.6)]"
+                    {/* 한국 국기 — pin의 깃발. 살짝 펄럭임 (bottom center 회전축). */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <motion.img
+                      src={KOREA_FLAG_SRC}
+                      alt=""
+                      aria-hidden="true"
+                      draggable={false}
+                      className="block h-4 w-6 select-none rounded-[2px] shadow-md ring-1 ring-black/20 dark:ring-white/15"
+                      style={{ transformOrigin: "bottom center" }}
                       animate={
-                        reduce
-                          ? { opacity: 1 }
-                          : { scale: [1, 1.25, 1], opacity: [1, 0.7, 1] }
+                        reduce ? { rotate: 0 } : { rotate: [-5, 5, -5] }
                       }
                       transition={{
                         repeat: reduce ? 0 : Infinity,
-                        duration: 1.8,
+                        duration: 2.4,
                         ease: "easeInOut",
                       }}
                     />
-                    {!reduce && (
-                      <motion.div
-                        className="absolute inset-0 rounded-full border border-neutral-900 dark:border-neutral-100"
-                        animate={{
-                          scale: [1, 2.6, 1],
-                          opacity: [0.55, 0, 0.55],
-                        }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 1.8,
-                          ease: "easeOut",
-                        }}
-                      />
-                    )}
+                    {/* pin stick */}
+                    <span className="block h-2 w-px bg-neutral-900 dark:bg-neutral-100" />
+                    {/* anchor dot + expanding ring (attention pulse) */}
+                    <span className="relative block h-1.5 w-1.5">
+                      <span className="absolute inset-0 rounded-full bg-neutral-900 dark:bg-neutral-100" />
+                      {!reduce && (
+                        <motion.span
+                          className="absolute inset-0 block rounded-full border border-neutral-900 dark:border-neutral-100"
+                          animate={{
+                            scale: [1, 3.5, 1],
+                            opacity: [0.55, 0, 0.55],
+                          }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 1.8,
+                            ease: "easeOut",
+                          }}
+                        />
+                      )}
+                    </span>
                   </div>
 
                   <motion.div
