@@ -46,9 +46,9 @@ export default function Header() {
           </span>
           <Link
             href="#contact"
-            className="rounded-full border border-ca-fg px-4 py-2 text-[11px] uppercase tracking-[0.16em] transition-colors hover:bg-ca-fg hover:text-ca-bg"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ca-red px-4 py-2 text-[11px] font-medium uppercase tracking-[0.16em] text-ca-fg transition-colors hover:bg-ca-red-dim"
           >
-            Start a project
+            Book a Set <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </div>

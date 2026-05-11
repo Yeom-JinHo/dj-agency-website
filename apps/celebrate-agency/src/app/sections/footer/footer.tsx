@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 
 import icon from "@/app/icon.png";
 
+const BOOKING_EMAIL = "book@celebrate.agency";
+
 export default function Footer() {
   return (
     <footer id="contact" className="border-t border-ca-line px-10 pt-20 pb-10">
@@ -12,24 +14,36 @@ export default function Footer() {
             <span className="text-ca-red">●</span>
             &nbsp; [ 04 ] &nbsp; / &nbsp; CONTACT
           </div>
-          <h2 className="font-display text-[clamp(72px,11vw,168px)] uppercase leading-[0.88] tracking-[-0.005em]">
-            Brief<span className="italic text-ca-red">.</span>
-            <br />
-            Send<span className="italic text-ca-red">.</span>
-          </h2>
+          <a
+            href={`mailto:${BOOKING_EMAIL}`}
+            className="group block transition-colors hover:text-ca-red"
+          >
+            <h2 className="font-display text-[clamp(72px,11vw,168px)] uppercase leading-[0.88] tracking-[-0.005em]">
+              Brief<span className="italic text-ca-red">.</span>
+              <br />
+              Send<span className="italic text-ca-red">.</span>
+            </h2>
+            <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red">
+              <span className="inline-block h-2 w-2 bg-ca-red" />
+              {BOOKING_EMAIL}
+              <span aria-hidden="true">↗</span>
+            </span>
+          </a>
         </div>
-        <div className="flex flex-col justify-end gap-9">
-          <Block title="Studios">
-            Seoul — 38 Seongsui-ro, Seongdong-gu
-          </Block>
+        <div className="flex flex-col justify-end gap-10">
           <Block title="Bookings">
             <a
-              href="mailto:book@celebrate.agency"
-              className="block transition-colors hover:text-ca-red"
+              href={`mailto:${BOOKING_EMAIL}`}
+              className="block font-display text-[clamp(32px,4vw,48px)] uppercase leading-[0.95] tracking-[0.01em] transition-colors hover:text-ca-red"
             >
-              book@celebrate.agency
+              {BOOKING_EMAIL}
             </a>
-            <span className="text-ca-muted">+82 2 000 0000</span>
+            <span className="mt-3 block font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
+              +82 2 000 0000
+            </span>
+          </Block>
+          <Block title="Studios">
+            Seoul — 38 Seongsui-ro, Seongdong-gu
           </Block>
         </div>
       </div>
