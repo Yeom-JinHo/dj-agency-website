@@ -270,7 +270,8 @@ export default function KoreaCinematic() {
               />
 
 
-              {/* Seoul pulse — pulse 상태 전용 (zooming 동안에는 flag pin이 attention 역할) */}
+              {/* Seoul pulse — pulse 상태 전용 (zooming 동안에는 flag pin이 attention 역할).
+                  pulse 진입 직후 dot 오른쪽에 'Seoul' 라벨이 fade-in 되어 도시명을 명시. */}
               {state === "pulse" && (
                 <div
                   className="pointer-events-none absolute"
@@ -284,19 +285,17 @@ export default function KoreaCinematic() {
                     className="relative h-2 w-2 rounded-full bg-neutral-900 dark:bg-neutral-100"
                     initial={{ scale: 1, opacity: 0.9 }}
                     animate={
-                      state === "pulse"
-                        ? reduce
-                          ? { opacity: [0.6, 1, 0.6] }
-                          : { scale: [1, 1.6, 1], opacity: [0.9, 0.4, 0.9] }
-                        : { scale: 1, opacity: 0.9 }
+                      reduce
+                        ? { opacity: [0.6, 1, 0.6] }
+                        : { scale: [1, 1.6, 1], opacity: [0.9, 0.4, 0.9] }
                     }
                     transition={{
-                      repeat: state === "pulse" ? Infinity : 0,
+                      repeat: Infinity,
                       duration: 1.6,
                       ease: "easeInOut",
                     }}
                   />
-                  {state === "pulse" && !reduce && (
+                  {!reduce && (
                     <motion.div
                       className="absolute inset-0 rounded-full border border-neutral-900 dark:border-neutral-100"
                       initial={{ scale: 1, opacity: 0.6 }}
@@ -308,6 +307,20 @@ export default function KoreaCinematic() {
                       }}
                     />
                   )}
+                  {/* "Seoul" 라벨 — pin dot 우상단에 raw text로. 배경 chip 없이 text-shadow
+                      halo로 한반도 어디 위에서도 분리감 확보 (라이트는 white halo, 다크는 black halo). */}
+                  <motion.span
+                    className="absolute left-full top-0 ml-1.5 -translate-y-3/4 font-display text-[6px] font-medium tracking-[0.2em] whitespace-nowrap text-neutral-900 uppercase [text-shadow:0_0_3px_rgba(255,255,255,0.95)] dark:text-neutral-50 dark:[text-shadow:0_0_3px_rgba(0,0,0,0.95)]"
+                    initial={{ opacity: 0, x: -5 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: reduce ? 0.05 : 0.25,
+                      delay: reduce ? 0 : 0.15,
+                      ease: "easeOut",
+                    }}
+                  >
+                    Seoul
+                  </motion.span>
                 </div>
               )}
 
