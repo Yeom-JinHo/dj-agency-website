@@ -17,6 +17,20 @@ const PLATFORM_ICON: Record<ArtistSocialPlatform, IconName | null> = {
   etc: null,
 };
 
+let bodyScrollLockCount = 0;
+function lockBodyScroll() {
+  if (bodyScrollLockCount === 0) {
+    document.body.classList.add("overflow-hidden");
+  }
+  bodyScrollLockCount += 1;
+}
+function unlockBodyScroll() {
+  bodyScrollLockCount = Math.max(0, bodyScrollLockCount - 1);
+  if (bodyScrollLockCount === 0) {
+    document.body.classList.remove("overflow-hidden");
+  }
+}
+
 interface ArtistDetailModalProps {
   artist: Artist | null;
   onClose: () => void;
@@ -37,7 +51,7 @@ export function ArtistDetailModal({
     const first = focusables?.[0];
     const last = focusables?.[focusables.length - 1];
 
-    document.body.classList.add("overflow-hidden");
+    lockBodyScroll();
     first?.focus();
 
     const onKey = (e: KeyboardEvent) => {
@@ -59,7 +73,7 @@ export function ArtistDetailModal({
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.classList.remove("overflow-hidden");
+      unlockBodyScroll();
     };
   }, [artist, onClose]);
 
