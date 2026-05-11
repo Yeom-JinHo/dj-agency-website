@@ -23,13 +23,13 @@ export default function Roster() {
             href="#"
             className="group relative block bg-ca-bg p-6 transition-colors hover:bg-ca-bg-2"
           >
-            <div className="relative mb-[18px] aspect-[3/4] overflow-hidden border border-ca-line bg-ca-bg-2 transition-colors duration-300 group-hover:border-ca-red/40">
+            <div className="relative mb-[18px] aspect-[3/4] overflow-hidden bg-ca-bg-2">
               <Image
                 src={artist.image}
                 alt={artist.name}
                 fill
                 sizes="(max-width: 1024px) 50vw, 25vw"
-                className="object-cover transition-[transform,filter] duration-500 group-hover:scale-[1.06] group-hover:brightness-110"
+                className="object-cover transition-[transform,filter] duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-110"
               />
               <Corner pos="tl" />
               <Corner pos="tr" />
