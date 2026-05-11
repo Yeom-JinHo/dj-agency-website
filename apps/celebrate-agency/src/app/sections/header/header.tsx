@@ -5,9 +5,7 @@ import icon from "@/app/icon.png";
 
 const NAV_LINKS = [
   { href: "#roster", label: "Roster" },
-  { href: "#services", label: "Services" },
   { href: "#work", label: "Work" },
-  { href: "#about", label: "About" },
   { href: "#contact", label: "Contact" },
 ];
 
