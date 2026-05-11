@@ -256,27 +256,27 @@ export default function KoreaCinematic() {
                 state === "zooming" ? handleZoomDone : undefined
               }
             >
-              {/* 한반도 SVG를 alpha mask로 사용 — stencil 안쪽으로 태극기 SVG가 배경으로
-                  비쳐 보임. 둘 다 Wikimedia Commons Public Domain. */}
-              <div
+              {/* 한반도 stencil — 1178 path의 섬/해안 디테일을 잃지 않도록 <img>로 그대로.
+                  Wikimedia Commons / Public Domain (Ksiom, 2008). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={KOREA_SVG_SRC}
+                alt=""
                 aria-hidden="true"
+                draggable={false}
                 className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100"
-                style={{
-                  backgroundImage: `url("${KOREA_FLAG_SRC}")`,
-                  // height 40% → 국기 가로 전체(4괘 포함)가 stencil 안에 들어오는 크기
-                  backgroundSize: "auto 40%",
-                  // flag center를 Seoul 위치에 정렬 → zoom 시 transform-origin과 일치해 drift 제거
-                  backgroundPosition: `${SEOUL_PCT.x}% ${SEOUL_PCT.y}%`,
-                  backgroundRepeat: "no-repeat",
-                  maskImage: `url("${KOREA_SVG_SRC}")`,
-                  maskSize: "contain",
-                  maskRepeat: "no-repeat",
-                  maskPosition: "center",
-                  WebkitMaskImage: `url("${KOREA_SVG_SRC}")`,
-                  WebkitMaskSize: "contain",
-                  WebkitMaskRepeat: "no-repeat",
-                  WebkitMaskPosition: "center",
-                }}
+              />
+
+              {/* 한국 국기 badge — 한반도 우하단에 작은 인디케이터로 정체성 신호.
+                  한반도와 함께 zoom되어 click 1 후 화면 밖으로 자연스럽게 사라짐.
+                  Wikimedia Commons / Public Domain. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={KOREA_FLAG_SRC}
+                alt=""
+                aria-hidden="true"
+                draggable={false}
+                className="pointer-events-none absolute right-1 bottom-3 w-12 rounded-sm opacity-90 shadow-md ring-1 ring-black/10 transition-opacity duration-300 group-hover:opacity-100 dark:ring-white/10"
               />
 
               {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
