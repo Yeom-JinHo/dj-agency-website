@@ -41,6 +41,7 @@ export function ArtistDetailModal({
   onClose,
 }: ArtistDetailModalProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const mouseDownOnBackdropRef = useRef(false);
 
   useEffect(() => {
     if (!artist) return;
@@ -86,7 +87,18 @@ export function ArtistDetailModal({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          onClick={onClose}
+          onMouseDown={(e) => {
+            mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+          }}
+          onMouseUp={(e) => {
+            if (
+              e.target === e.currentTarget &&
+              mouseDownOnBackdropRef.current
+            ) {
+              onClose();
+            }
+            mouseDownOnBackdropRef.current = false;
+          }}
         >
           <motion.div
             ref={containerRef}
@@ -99,7 +111,6 @@ export function ArtistDetailModal({
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.96, opacity: 0, y: 4 }}
             transition={{ type: "spring", stiffness: 320, damping: 28, mass: 0.7 }}
-            onClick={(e) => e.stopPropagation()}
           >
             <div className="relative aspect-[3/4]">
               <Image
