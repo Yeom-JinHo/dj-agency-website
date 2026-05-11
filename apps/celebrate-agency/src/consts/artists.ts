@@ -30,7 +30,7 @@ export const ARTISTS: Artist[] = [
     name: "Loozbone",
     image: "/images/artist/loozbone/profile.webp",
     bio: "Rising electronic dance music artist with a distinctive sound and stage presence, performing across Asia.",
-    roles: ["DJ"],
+    roles: ["DJ", "Producer"],
     socials: [
       { platform: "youtube", url: "https://www.youtube.com/watch?v=1lAXNqA25Bs" },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
@@ -42,7 +42,7 @@ export const ARTISTS: Artist[] = [
     name: "DearBoi",
     image: "/images/artist/dearboi/profile.webp",
     bio: "House and tech house DJ based in Seoul with a unique vibe, currently resident at MUSE.",
-    roles: ["DJ"],
+    roles: ["DJ", "Producer"],
     socials: [
       { platform: "youtube", url: "https://www.youtube.com/watch?v=1lAXNqA25Bs" },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
