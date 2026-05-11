@@ -9,9 +9,9 @@ import { IconMapPin } from "@tabler/icons-react";
 
 const SEOUL_COORDS = { lat: 37.5665, lng: 126.978 };
 
-// public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom) — stencil
+// public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom) — peninsula outline image
 const KOREA_SVG_SRC = "/korea-peninsula.svg";
-// public/south-korea-flag.svg (Wikimedia Commons, Public Domain) — background painted into the stencil
+// public/south-korea-flag.svg (Wikimedia Commons, Public Domain) — flag pin image at Seoul
 const KOREA_FLAG_SRC = "/south-korea-flag.svg";
 const KOREA_ASPECT = 761 / 1243; // SVG width / height
 // Seoul 위치 (SVG viewBox 비율). 위도 37.566 / 경도 126.978을 한반도 위경도 범위
@@ -37,6 +37,7 @@ export default function KoreaCinematic() {
   const reduce = useReducedMotion();
   const mapRef = useRef<unknown>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapElRef = useRef<HTMLDivElement | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // pulse 진입 후 자동으로 mapping으로 진행 (사용자 click 부담 제거).
@@ -68,10 +69,10 @@ export default function KoreaCinematic() {
 
   const initMap = useCallback((lat: number, lng: number) => {
     if (typeof window === "undefined" || !window.naver?.maps) return;
-    const el = document.getElementById("vfl-map");
+    const el = mapElRef.current;
     if (!el) return;
     try {
-      const map = new window.naver.maps.Map("vfl-map", {
+      const map = new window.naver.maps.Map(el, {
         center: new window.naver.maps.LatLng(lat, lng),
         zoom: 16,
         mapTypeControl: true,
@@ -115,11 +116,12 @@ export default function KoreaCinematic() {
     setState("mapped");
   }, [state, scriptReady, initMap]);
 
-  // unmount cleanup — Naver Maps v3는 destroy() 없음 → ref null + map container clear
+  // unmount cleanup — Naver Maps v3는 destroy() 없음 → ref null + map container clear.
+  // mapElRef.current를 effect 진입 시점에 capture해 unmount 시 안전하게 사용.
   useEffect(() => {
+    const mapEl = mapElRef.current;
     return () => {
       mapRef.current = null;
-      const mapEl = document.getElementById("vfl-map");
       if (mapEl) mapEl.replaceChildren();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -268,8 +270,8 @@ export default function KoreaCinematic() {
               />
 
 
-              {/* Seoul pulse — wrapper와 SVG가 1:1 비율이므로 % 좌표가 SVG 픽셀 좌표와 정확히 일치 */}
-              {(state === "pulse" || state === "zooming") && (
+              {/* Seoul pulse — pulse 상태 전용 (zooming 동안에는 flag pin이 attention 역할) */}
+              {state === "pulse" && (
                 <div
                   className="pointer-events-none absolute"
                   style={{
@@ -309,50 +311,52 @@ export default function KoreaCinematic() {
                 </div>
               )}
 
-              {/* idle 상태: Seoul flag pin (펄럭임) + anchor + 명확한 CTA chip.
-                  pin의 anchor 끝(원형 점)이 Seoul 좌표에 위치, flag는 stick 위에서 살짝 펄럭. */}
-              {state === "idle" && (
-                <>
-                  <div
-                    className="pointer-events-none absolute flex flex-col items-center"
-                    style={{
-                      left: `${SEOUL_PCT.x}%`,
-                      top: `${SEOUL_PCT.y}%`,
-                      transform: "translate(-50%, -100%)",
-                    }}
-                  >
-                    {/* 한국 국기 — pin의 깃발 (정적). */}
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={KOREA_FLAG_SRC}
-                      alt=""
-                      aria-hidden="true"
-                      draggable={false}
-                      className="block h-7 w-10 select-none rounded-[3px] shadow-md ring-1 ring-black/20 dark:ring-white/15"
-                    />
-                    {/* pin stick */}
-                    <span className="block h-3 w-px bg-neutral-900 dark:bg-neutral-100" />
-                    {/* anchor dot + expanding ring (attention pulse) */}
-                    <span className="relative block h-1.5 w-1.5">
-                      <span className="absolute inset-0 rounded-full bg-neutral-900 dark:bg-neutral-100" />
-                      {!reduce && (
-                        <motion.span
-                          className="absolute inset-0 block rounded-full border border-neutral-900 dark:border-neutral-100"
-                          animate={{
-                            scale: [1, 3.5, 1],
-                            opacity: [0.55, 0, 0.55],
-                          }}
-                          transition={{
-                            repeat: Infinity,
-                            duration: 1.8,
-                            ease: "easeOut",
-                          }}
-                        />
-                      )}
-                    </span>
-                  </div>
+              {/* Seoul flag pin — idle + zooming 동안 표시. zooming 단계에선 wrapper와 함께
+                  5x로 확대되며 자연스럽게 화면 밖으로 sweep out (pop 없음). */}
+              {(state === "idle" || state === "zooming") && (
+                <div
+                  className="pointer-events-none absolute flex flex-col items-center"
+                  style={{
+                    left: `${SEOUL_PCT.x}%`,
+                    top: `${SEOUL_PCT.y}%`,
+                    transform: "translate(-50%, -100%)",
+                  }}
+                >
+                  {/* 한국 국기 — pin의 깃발 (정적). */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={KOREA_FLAG_SRC}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                    className="block h-7 w-10 select-none rounded-[3px] shadow-md ring-1 ring-black/20 dark:ring-white/15"
+                  />
+                  {/* pin stick — flag와 anchor dot 사이의 깃대. */}
+                  <span className="block h-5 w-px bg-neutral-900 dark:bg-neutral-100" />
+                  {/* anchor dot + expanding ring (attention pulse). */}
+                  <span className="relative block h-1.5 w-1.5">
+                    <span className="absolute inset-0 rounded-full bg-neutral-900 dark:bg-neutral-100" />
+                    {!reduce && state === "idle" && (
+                      <motion.span
+                        className="absolute inset-0 block rounded-full border border-neutral-900 dark:border-neutral-100"
+                        animate={{
+                          scale: [1, 3.5, 1],
+                          opacity: [0.55, 0, 0.55],
+                        }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 1.8,
+                          ease: "easeOut",
+                        }}
+                      />
+                    )}
+                  </span>
+                </div>
+              )}
 
-                  <motion.div
+              {/* CTA chip — idle에서만 (zoom 시작과 함께 사라짐). */}
+              {state === "idle" && (
+                <motion.div
                     className="pointer-events-none absolute flex items-center gap-2 rounded-full bg-neutral-900/55 px-4 py-2 text-sm font-semibold tracking-tight whitespace-nowrap text-white shadow-lg shadow-black/30 ring-1 ring-white/15 backdrop-blur-md"
                     style={{
                       left: `${SEOUL_PCT.x}%`,
@@ -378,10 +382,9 @@ export default function KoreaCinematic() {
                       aria-hidden="true"
                       className="ml-0.5 text-base leading-none opacity-70"
                     >
-                      ↗
-                    </span>
-                  </motion.div>
-                </>
+                    ↗
+                  </span>
+                </motion.div>
               )}
             </motion.div>
 
@@ -426,7 +429,7 @@ export default function KoreaCinematic() {
               ease: [0.22, 1, 0.36, 1],
             }}
           >
-            <div id="vfl-map" className="h-full w-full" />
+            <div ref={mapElRef} id="vfl-map" className="h-full w-full" />
           </motion.div>
         )}
 
