@@ -321,26 +321,17 @@ export default function KoreaCinematic() {
                       transform: "translate(-50%, -100%)",
                     }}
                   >
-                    {/* 한국 국기 — pin의 깃발. 살짝 펄럭임 (bottom center 회전축). */}
+                    {/* 한국 국기 — pin의 깃발 (정적). */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <motion.img
+                    <img
                       src={KOREA_FLAG_SRC}
                       alt=""
                       aria-hidden="true"
                       draggable={false}
-                      className="block h-4 w-6 select-none rounded-[2px] shadow-md ring-1 ring-black/20 dark:ring-white/15"
-                      style={{ transformOrigin: "bottom center" }}
-                      animate={
-                        reduce ? { rotate: 0 } : { rotate: [-5, 5, -5] }
-                      }
-                      transition={{
-                        repeat: reduce ? 0 : Infinity,
-                        duration: 2.4,
-                        ease: "easeInOut",
-                      }}
+                      className="block h-7 w-10 select-none rounded-[3px] shadow-md ring-1 ring-black/20 dark:ring-white/15"
                     />
                     {/* pin stick */}
-                    <span className="block h-2 w-px bg-neutral-900 dark:bg-neutral-100" />
+                    <span className="block h-3 w-px bg-neutral-900 dark:bg-neutral-100" />
                     {/* anchor dot + expanding ring (attention pulse) */}
                     <span className="relative block h-1.5 w-1.5">
                       <span className="absolute inset-0 rounded-full bg-neutral-900 dark:bg-neutral-100" />
