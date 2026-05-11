@@ -346,7 +346,7 @@ export default function KoreaCinematic() {
                   </div>
 
                   <motion.div
-                    className="pointer-events-none absolute flex items-center gap-2 rounded-full bg-neutral-900 px-4 py-2 text-sm font-semibold tracking-tight whitespace-nowrap text-white shadow-xl shadow-black/20 ring-1 ring-black/5 dark:bg-white dark:text-neutral-900 dark:shadow-white/10 dark:ring-white/10"
+                    className="pointer-events-none absolute flex items-center gap-2 rounded-full bg-neutral-900/55 px-4 py-2 text-sm font-semibold tracking-tight whitespace-nowrap text-white shadow-lg shadow-black/30 ring-1 ring-white/15 backdrop-blur-md"
                     style={{
                       left: `${SEOUL_PCT.x}%`,
                       top: `calc(${SEOUL_PCT.y}% + 28px)`,
