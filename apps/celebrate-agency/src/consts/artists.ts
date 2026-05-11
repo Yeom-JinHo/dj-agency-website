@@ -24,10 +24,10 @@ export const ARTISTS: Artist[] = [
     ],
   },
   {
-    id: "sam",
-    name: "SAM",
-    image: "/images/artist/sam/profile.webp",
-    bio: "Korean DJ and producer crafting a distinctive electronic sound.",
+    id: "loozbone",
+    name: "Loozbone",
+    image: "/images/artist/loozbone/profile.webp",
+    bio: "Rising electronic dance music artist with a distinctive sound and stage presence, performing across Asia.",
     socials: [
       { platform: "youtube", url: "https://www.youtube.com/watch?v=1lAXNqA25Bs" },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
@@ -57,10 +57,10 @@ export const ARTISTS: Artist[] = [
     ],
   },
   {
-    id: "loozbone",
-    name: "Loozbone",
-    image: "/images/artist/loozbone/profile.webp",
-    bio: "Rising electronic dance music artist with a distinctive sound and stage presence, performing across Asia.",
+    id: "sam",
+    name: "SAM",
+    image: "/images/artist/sam/profile.webp",
+    bio: "Korean DJ and producer crafting a distinctive electronic sound.",
     socials: [
       { platform: "youtube", url: "https://www.youtube.com/watch?v=1lAXNqA25Bs" },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },

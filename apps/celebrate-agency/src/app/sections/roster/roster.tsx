@@ -13,7 +13,7 @@ export default function Roster() {
         title="Roster"
         aside={`${ARTISTS.length} artists. By invitation.`}
       />
-      <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4">
         {ARTISTS.map((artist) => (
           <a
             key={artist.id}
