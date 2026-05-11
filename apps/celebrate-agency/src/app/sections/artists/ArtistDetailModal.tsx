@@ -52,7 +52,7 @@ export function ArtistDetailModal({
     const last = focusables?.[focusables.length - 1];
 
     lockBodyScroll();
-    first?.focus();
+    containerRef.current?.focus();
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -93,7 +93,8 @@ export function ArtistDetailModal({
             role="dialog"
             aria-modal="true"
             aria-label={artist.name}
-            className="relative w-full max-w-[18rem] overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl sm:max-w-sm"
+            tabIndex={-1}
+            className="relative w-full max-w-[18rem] overflow-hidden rounded-2xl bg-neutral-900 text-white shadow-2xl outline-none sm:max-w-sm"
             initial={{ scale: 0.92, opacity: 0, y: 8 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.96, opacity: 0, y: 4 }}
