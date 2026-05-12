@@ -54,11 +54,14 @@ export function ArtistModal({
   const artist = artists[index];
   const total = artists.length;
   const dialogRef = useRef<HTMLDivElement>(null);
+  const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
-      if (event.target === event.currentTarget) onClose();
+      const inner = modalInnerRef.current;
+      if (inner && inner.contains(event.target as Node)) return;
+      onClose();
     },
     [onClose]
   );
@@ -131,6 +134,7 @@ export function ArtistModal({
       aria-modal="true"
       aria-label={`${artist.name} profile`}
       tabIndex={-1}
+      onClick={handleBackdrop}
       className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px]"
     >
       <div
@@ -141,11 +145,11 @@ export function ArtistModal({
       >
         {artist.name}, {idxLabel} of {totalLabel}
       </div>
-      <div
-        onClick={handleBackdrop}
-        className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12"
-      >
-        <div className="relative flex max-h-[calc(100vh-32px)] w-full max-w-[clamp(720px,90vw,1100px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-96px)]">
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12">
+        <div
+          ref={modalInnerRef}
+          className="relative flex max-h-[calc(100vh-32px)] w-full max-w-[clamp(720px,90vw,1100px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-96px)]"
+        >
           <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
             <span>
               [ {idxLabel} / {totalLabel} ]
