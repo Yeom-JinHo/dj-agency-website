@@ -7,7 +7,6 @@ import { SectionHead } from "@/components/SectionHead";
 import { ARTISTS } from "@/consts/artists";
 import { BOOKING_EMAIL } from "@/consts/brand";
 
-const ROSTER_CAP = 8;
 const MOBILE_COLS = 2;
 const DESKTOP_COLS = 4;
 
@@ -35,7 +34,7 @@ export default function Roster() {
         num="02"
         numLabel="ROSTER"
         title="Roster"
-        aside={`${ARTISTS.length} of ${ROSTER_CAP} · By invitation.`}
+        aside={`${ARTISTS.length} artists · By invitation.`}
       />
       <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4">
         {ARTISTS.map((artist) => (
