@@ -136,6 +136,26 @@ export function ArtistModal({
               {artist.name}
             </h2>
 
+            {artist.socials.length > 0 ? (
+              <div className="flex flex-wrap items-center gap-5">
+                {artist.socials.map((social) => {
+                  const Icon = SOCIAL_ICONS[social.platform];
+                  return (
+                    <a
+                      key={social.platform}
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={SOCIAL_LABELS[social.platform]}
+                      className="text-ca-fg transition-colors duration-200 hover:text-ca-red"
+                    >
+                      <Icon size={32} stroke={1.75} />
+                    </a>
+                  );
+                })}
+              </div>
+            ) : null}
+
             <div>
               <h3 className="mb-3.5 font-mono text-[10px] uppercase tracking-[0.16em] text-ca-red">
                 [ Selected works ]
@@ -162,30 +182,6 @@ export function ArtistModal({
               </div>
             </div>
 
-            {artist.socials.length > 0 ? (
-              <div>
-                <h3 className="mb-3.5 font-mono text-[10px] uppercase tracking-[0.16em] text-ca-red">
-                  [ Listen / Follow ]
-                </h3>
-                <div className="flex flex-wrap items-center gap-4">
-                  {artist.socials.map((social) => {
-                    const Icon = SOCIAL_ICONS[social.platform];
-                    return (
-                      <a
-                        key={social.platform}
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={SOCIAL_LABELS[social.platform]}
-                        className="text-ca-muted transition-colors duration-200 hover:text-ca-red"
-                      >
-                        <Icon size={22} stroke={1.5} />
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null}
           </div>
         </div>
 
