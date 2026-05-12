@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-[100dvh] flex-col pt-[140px] pb-16"
+      className="relative flex min-h-[100dvh] flex-col pt-[100px] pb-16"
     >
       <div className="flex flex-1 items-center justify-center px-10">
         <Image
@@ -13,7 +13,7 @@ export default function Hero() {
           width={400}
           height={300}
           priority
-          className="h-auto max-h-[75vh] w-full max-w-4xl"
+          className="h-auto max-h-[calc(100dvh-320px)] w-full max-w-4xl"
         />
       </div>
 
