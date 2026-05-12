@@ -98,14 +98,14 @@ export function ArtistModal({
             <Corner pos="br" />
           </div>
 
-          <div className="flex flex-col gap-8 px-6 pt-8 md:px-12 md:pt-12">
-            <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+          <div className="flex flex-col px-5 pt-6 md:px-10 md:pt-8">
+            <div className="mb-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
               <span>{artist.roles.join(" · ")}</span>
               <span> &nbsp;·&nbsp; </span>
               <span className="text-ca-red">{artist.city}</span>
             </div>
 
-            <h2 className="font-display text-[clamp(56px,7vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
+            <h2 className="mb-6 font-display text-[clamp(56px,7vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
               {artist.name}
             </h2>
 
@@ -117,7 +117,7 @@ export function ArtistModal({
                 {artist.selectedWorks.map((work, i) => (
                   <div
                     key={work.id}
-                    className={`grid grid-cols-[36px_1fr_auto] items-baseline gap-4 border-t border-ca-line py-3.5 text-sm ${
+                    className={`grid grid-cols-[36px_1fr_auto] items-baseline gap-4 border-t border-ca-line py-2.5 text-sm ${
                       i === artist.selectedWorks.length - 1
                         ? "border-b"
                         : ""
