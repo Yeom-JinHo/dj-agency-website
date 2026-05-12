@@ -163,7 +163,7 @@ export function ArtistModal({
           </div>
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
-            <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
+            <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-4">
               <div className="relative aspect-[3/4] w-3/5 max-w-[240px] lg:w-full lg:max-w-none">
                 <div className="ca-stripe-ph-lg absolute inset-0 overflow-hidden">
                   <Image
