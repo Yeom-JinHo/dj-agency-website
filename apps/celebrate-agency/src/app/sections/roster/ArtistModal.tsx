@@ -88,7 +88,7 @@ export function ArtistModal({
       onClick={handleBackdrop}
       className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] backdrop-blur-[8px]"
     >
-      <div className="relative mx-auto my-12 max-w-[1280px] border border-ca-line bg-ca-bg">
+      <div className="relative mx-auto my-4 max-w-[clamp(720px,90vw,1200px)] border border-ca-line bg-ca-bg sm:my-8 lg:my-12">
         <div className="sticky top-0 z-[2] flex items-center justify-between border-b border-ca-line bg-ca-bg px-7 py-[18px] font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
           <span>
             [ {idxLabel} / {totalLabel} ] &nbsp; / &nbsp; ARTIST PROFILE &nbsp;
@@ -109,13 +109,13 @@ export function ArtistModal({
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="ca-stripe-ph-lg relative aspect-square overflow-hidden border-b border-ca-line md:aspect-[3/4] md:border-b-0 md:border-r">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="ca-stripe-ph-lg relative aspect-square overflow-hidden border-b border-ca-line lg:aspect-[3/4] lg:border-b-0 lg:border-r">
             <Image
               src={artist.image}
               alt={artist.name}
               fill
-              sizes="(max-width: 880px) 100vw, 640px"
+              sizes="(max-width: 1024px) 100vw, 600px"
               className="object-cover"
               priority
             />
@@ -125,14 +125,14 @@ export function ArtistModal({
             <Corner pos="br" />
           </div>
 
-          <div className="flex flex-col gap-8 px-5 pt-6 md:px-10 md:pt-8">
+          <div className="flex flex-col gap-8 px-5 pt-6 lg:px-10 lg:pt-8">
             <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
               <span>{artist.roles.join(" · ")}</span>
               <span> &nbsp;·&nbsp; </span>
               <span className="text-ca-red">{artist.city}</span>
             </div>
 
-            <h2 className="font-display text-[clamp(56px,7vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
+            <h2 className="font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
               {artist.name}
             </h2>
 
