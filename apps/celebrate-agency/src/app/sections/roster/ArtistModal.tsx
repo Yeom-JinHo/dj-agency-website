@@ -111,7 +111,7 @@ export function ArtistModal({
 
         <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-2 lg:grid-rows-1">
           <div className="flex justify-center border-b border-ca-line p-4 lg:block lg:border-b-0 lg:border-r lg:p-0">
-            <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[240px] overflow-hidden lg:aspect-[4/5] lg:w-full lg:max-w-none">
+            <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[240px] overflow-hidden lg:mx-auto lg:w-[15/16] lg:max-w-none">
               <Image
                 src={artist.image}
                 alt={artist.name}
