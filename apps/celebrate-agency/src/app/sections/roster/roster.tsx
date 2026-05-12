@@ -82,14 +82,16 @@ export default function Roster() {
             aria-label={`View ${artist.name} profile`}
             className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-[#1a1a1a]"
           >
-            <div className="relative mb-[18px] aspect-[3/4] overflow-hidden bg-ca-bg-2">
-              <Image
-                src={artist.image}
-                alt={artist.name}
-                fill
-                sizes="(max-width: 1024px) 50vw, 25vw"
-                className="transform-gpu object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-              />
+            <div className="relative mb-[18px] aspect-[3/4]">
+              <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">
+                <Image
+                  src={artist.image}
+                  alt={artist.name}
+                  fill
+                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  className="transform-gpu object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                />
+              </div>
               <Tape pos="tl" />
               <Tape pos="tr" />
               <Tape pos="bl" />
