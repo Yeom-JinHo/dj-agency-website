@@ -91,27 +91,26 @@ export function ArtistModal({
         onClick={handleBackdrop}
         className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12"
       >
-        <div className="relative w-full max-w-[clamp(720px,90vw,1200px)] border border-ca-line bg-ca-bg">
-        <div className="sticky top-0 z-[2] flex items-center justify-between border-b border-ca-line bg-ca-bg px-7 py-[18px] font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+        <div className="relative flex max-h-[calc(100vh-32px)] w-full max-w-[clamp(720px,90vw,1200px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-96px)]">
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
           <span>
-            [ {idxLabel} / {totalLabel} ] &nbsp; / &nbsp; ARTIST PROFILE
+            [ {idxLabel} / {totalLabel} ]
           </span>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex items-center gap-2.5 border border-ca-dim px-3.5 py-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
+            className="border border-ca-dim p-2 text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
           >
             <span
               aria-hidden="true"
-              className="relative inline-block h-2.5 w-2.5 before:absolute before:left-0 before:top-1/2 before:h-px before:w-full before:rotate-45 before:bg-current after:absolute after:left-0 after:top-1/2 after:h-px after:w-full after:-rotate-45 after:bg-current"
+              className="relative inline-block h-3 w-3 before:absolute before:left-0 before:top-1/2 before:h-px before:w-full before:rotate-45 before:bg-current after:absolute after:left-0 after:top-1/2 after:h-px after:w-full after:-rotate-45 after:bg-current"
             />
-            Close
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2">
-          <div className="ca-stripe-ph-lg relative aspect-square overflow-hidden border-b border-ca-line lg:aspect-[4/5] lg:border-b-0 lg:border-r">
+        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-2">
+          <div className="ca-stripe-ph-lg relative aspect-[4/3] flex-shrink-0 overflow-hidden border-b border-ca-line lg:aspect-[4/5] lg:flex-shrink lg:border-b-0 lg:border-r">
             <Image
               src={artist.image}
               alt={artist.name}
@@ -126,19 +125,19 @@ export function ArtistModal({
             <Corner pos="br" />
           </div>
 
-          <div className="flex flex-col gap-8 px-5 pt-6 lg:px-10 lg:pt-8">
-            <div className="font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+          <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
+            <div className="flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
               <span>{artist.roles.join(" · ")}</span>
               <span> &nbsp;·&nbsp; </span>
               <span className="text-ca-red">{artist.city}</span>
             </div>
 
-            <h2 className="font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
+            <h2 className="flex-shrink-0 font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
               {artist.name}
             </h2>
 
             {artist.socials.length > 0 ? (
-              <div className="flex flex-wrap items-center gap-5">
+              <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
                 {artist.socials.map((social) => {
                   const Icon = SOCIAL_ICONS[social.platform];
                   return (
@@ -157,11 +156,11 @@ export function ArtistModal({
               </div>
             ) : null}
 
-            <div>
-              <h3 className="mb-3.5 font-mono text-[10px] uppercase tracking-[0.16em] text-ca-red">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <h3 className="mb-3.5 flex-shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-ca-red">
                 [ Selected works ]
               </h3>
-              <div className="flex flex-col">
+              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-6">
                 {artist.selectedWorks.map((work, i) => (
                   <div
                     key={work.id}
@@ -186,7 +185,7 @@ export function ArtistModal({
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-between border-t border-ca-line px-7 py-6">
+        <div className="flex flex-shrink-0 items-center justify-between border-t border-ca-line px-5 py-3">
           <button
             type="button"
             onClick={onPrev}
