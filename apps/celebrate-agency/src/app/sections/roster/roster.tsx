@@ -7,6 +7,7 @@ import { cn } from "@repo/ui";
 
 import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
+import { Tape } from "@/components/Tape";
 import { ARTISTS } from "@/consts/artists";
 import { BOOKING_EMAIL } from "@/consts/brand";
 
@@ -34,15 +35,19 @@ export default function Roster() {
   const reservedVisibility = getFillerVisibility(1);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const triggerRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const activeIndexRef = useRef<number | null>(null);
+  activeIndexRef.current = activeIndex;
 
-  const open = useCallback((index: number, el: HTMLButtonElement) => {
-    triggerRef.current = el;
+  const open = useCallback((index: number) => {
     setActiveIndex(index);
   }, []);
   const close = useCallback(() => {
+    const idx = activeIndexRef.current;
     setActiveIndex(null);
-    requestAnimationFrame(() => triggerRef.current?.focus());
+    requestAnimationFrame(() => {
+      if (idx !== null) triggerRefs.current[idx]?.focus();
+    });
   }, []);
   const step = useCallback(
     (delta: number) =>
@@ -68,8 +73,11 @@ export default function Roster() {
         {ARTISTS.map((artist, index) => (
           <button
             key={artist.id}
+            ref={(el) => {
+              triggerRefs.current[index] = el;
+            }}
             type="button"
-            onClick={(e) => open(index, e.currentTarget)}
+            onClick={() => open(index)}
             aria-haspopup="dialog"
             aria-label={`View ${artist.name} profile`}
             className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-[#1a1a1a]"
@@ -82,10 +90,10 @@ export default function Roster() {
                 sizes="(max-width: 1024px) 50vw, 25vw"
                 className="transform-gpu object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
               />
-              <Corner pos="tl" />
-              <Corner pos="tr" />
-              <Corner pos="bl" />
-              <Corner pos="br" />
+              <Tape pos="tl" />
+              <Tape pos="tr" />
+              <Tape pos="bl" />
+              <Tape pos="br" />
             </div>
             <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red">
               {artist.name}

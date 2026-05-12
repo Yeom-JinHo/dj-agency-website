@@ -13,7 +13,7 @@ import {
   type Icon as TablerIcon,
 } from "@tabler/icons-react";
 
-import { Corner } from "@/components/Corner";
+import { Tape } from "@/components/Tape";
 import type { Artist, ArtistSocialPlatform } from "@/types/artist";
 
 const SOCIAL_ICONS: Record<ArtistSocialPlatform, TablerIcon> = {
@@ -77,12 +77,16 @@ export function ArtistModal({
         onClose();
         return;
       }
-      if (event.key === "ArrowLeft") {
-        onPrev();
-        return;
-      }
-      if (event.key === "ArrowRight") {
-        onNext();
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        const target = event.target as HTMLElement | null;
+        const inEditable =
+          target instanceof HTMLInputElement ||
+          target instanceof HTMLTextAreaElement ||
+          target instanceof HTMLSelectElement ||
+          target?.isContentEditable === true;
+        if (inEditable) return;
+        if (event.key === "ArrowLeft") onPrev();
+        else onNext();
         return;
       }
       if (event.key !== "Tab") return;
@@ -114,7 +118,7 @@ export function ArtistModal({
     };
   }, [onClose, onPrev, onNext]);
 
-  if (!artist) return null;
+  if (!artist || total === 0) return null;
 
   const idxLabel = String(index + 1).padStart(2, "0");
   const totalLabel = String(total).padStart(2, "0");
@@ -169,10 +173,10 @@ export function ArtistModal({
                   className="object-cover"
                   priority
                 />
-                <Corner pos="tl" />
-                <Corner pos="tr" />
-                <Corner pos="bl" />
-                <Corner pos="br" />
+                <Tape pos="tl" />
+                <Tape pos="tr" />
+                <Tape pos="bl" />
+                <Tape pos="br" />
               </div>
             </div>
 
