@@ -109,20 +109,22 @@ export function ArtistModal({
           </button>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden lg:grid-cols-2">
-          <div className="ca-stripe-ph-lg relative aspect-[4/3] flex-shrink-0 overflow-hidden border-b border-ca-line lg:aspect-[4/5] lg:flex-shrink lg:border-b-0 lg:border-r">
-            <Image
-              src={artist.image}
-              alt={artist.name}
-              fill
-              sizes="(max-width: 1024px) 100vw, 600px"
-              className="object-cover"
-              priority
-            />
-            <Corner pos="tl" />
-            <Corner pos="tr" />
-            <Corner pos="bl" />
-            <Corner pos="br" />
+        <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-2 lg:grid-rows-1">
+          <div className="flex justify-center border-b border-ca-line p-4 lg:block lg:border-b-0 lg:border-r lg:p-0">
+            <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[240px] overflow-hidden lg:aspect-[4/5] lg:w-full lg:max-w-none">
+              <Image
+                src={artist.image}
+                alt={artist.name}
+                fill
+                sizes="(max-width: 1024px) 60vw, 600px"
+                className="object-cover"
+                priority
+              />
+              <Corner pos="tl" />
+              <Corner pos="tr" />
+              <Corner pos="bl" />
+              <Corner pos="br" />
+            </div>
           </div>
 
           <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
