@@ -85,10 +85,13 @@ export function ArtistModal({
       role="dialog"
       aria-modal="true"
       aria-label={`${artist.name} profile`}
-      onClick={handleBackdrop}
       className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] backdrop-blur-[8px]"
     >
-      <div className="relative mx-auto my-4 max-w-[clamp(720px,90vw,1200px)] border border-ca-line bg-ca-bg sm:my-8 lg:my-12">
+      <div
+        onClick={handleBackdrop}
+        className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12"
+      >
+        <div className="relative w-full max-w-[clamp(720px,90vw,1200px)] border border-ca-line bg-ca-bg">
         <div className="sticky top-0 z-[2] flex items-center justify-between border-b border-ca-line bg-ca-bg px-7 py-[18px] font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
           <span>
             [ {idxLabel} / {totalLabel} ] &nbsp; / &nbsp; ARTIST PROFILE
@@ -108,7 +111,7 @@ export function ArtistModal({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2">
-          <div className="ca-stripe-ph-lg relative aspect-square overflow-hidden border-b border-ca-line lg:aspect-[3/4] lg:border-b-0 lg:border-r">
+          <div className="ca-stripe-ph-lg relative aspect-square overflow-hidden border-b border-ca-line lg:aspect-[4/5] lg:border-b-0 lg:border-r">
             <Image
               src={artist.image}
               alt={artist.name}
@@ -198,6 +201,7 @@ export function ArtistModal({
           >
             Next →
           </button>
+        </div>
         </div>
       </div>
     </div>
