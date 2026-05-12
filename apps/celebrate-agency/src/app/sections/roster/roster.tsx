@@ -1,13 +1,34 @@
 import Image from "next/image";
 
+import { cn } from "@repo/ui";
+
 import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
 import { ARTISTS } from "@/consts/artists";
 import { BOOKING_EMAIL } from "@/consts/brand";
 
 const ROSTER_CAP = 8;
+const MOBILE_COLS = 2;
+const DESKTOP_COLS = 4;
+
+const mobileFillerCount =
+  (MOBILE_COLS - (ARTISTS.length % MOBILE_COLS)) % MOBILE_COLS;
+const desktopFillerCount =
+  (DESKTOP_COLS - (ARTISTS.length % DESKTOP_COLS)) % DESKTOP_COLS;
+
+function getFillerVisibility(index: number): string | null {
+  const onMobile = index < mobileFillerCount;
+  const onDesktop = index < desktopFillerCount;
+  if (!onMobile && !onDesktop) return null;
+  if (onMobile && onDesktop) return "block";
+  if (onDesktop) return "hidden lg:block";
+  return "block lg:hidden";
+}
 
 export default function Roster() {
+  const bookingVisibility = getFillerVisibility(0);
+  const reservedVisibility = getFillerVisibility(1);
+
   return (
     <section id="roster" className="border-t border-ca-line pt-[120px] pb-0">
       <SectionHead
@@ -48,44 +69,51 @@ export default function Roster() {
           </a>
         ))}
 
-        <a
-          href={`mailto:${BOOKING_EMAIL}`}
-          className="group relative hidden bg-ca-red p-6 transition-colors hover:bg-ca-red-dim lg:block"
-        >
-          <div className="relative mb-[18px] flex aspect-[3/4] flex-col justify-end overflow-hidden border border-ca-fg/20 p-4">
-            <span className="font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg">
-              Book
-              <br />a Set
-              <span aria-hidden="true"> ↗</span>
-            </span>
-          </div>
-          <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-fg">
-            Booking
-          </div>
-          <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-fg/80">
-            <span>Brief</span>
-            <span>MAIL ↗</span>
-          </div>
-        </a>
+        {bookingVisibility !== null ? (
+          <a
+            href={`mailto:${BOOKING_EMAIL}`}
+            className={cn(
+              "group relative bg-ca-red p-6 transition-colors hover:bg-ca-red-dim",
+              bookingVisibility
+            )}
+          >
+            <div className="relative mb-[18px] flex aspect-[3/4] flex-col justify-end overflow-hidden border border-ca-fg/20 p-4">
+              <span className="font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg">
+                Book
+                <br />a Set
+                <span aria-hidden="true"> ↗</span>
+              </span>
+            </div>
+            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-fg">
+              Booking
+            </div>
+            <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-fg/80">
+              <span>Brief</span>
+              <span>MAIL ↗</span>
+            </div>
+          </a>
+        ) : null}
 
-        <div className="relative hidden bg-ca-bg p-6 lg:block">
-          <div className="ca-stripe-ph relative mb-[18px] aspect-[3/4] overflow-hidden border border-ca-line">
-            <Corner pos="tl" />
-            <Corner pos="tr" />
-            <Corner pos="bl" />
-            <Corner pos="br" />
-            <span className="absolute inset-0 flex items-center justify-center font-display text-[clamp(48px,6vw,80px)] uppercase leading-none tracking-[0.02em] text-ca-dim">
-              [ 08 ]
-            </span>
+        {reservedVisibility !== null ? (
+          <div className={cn("relative bg-ca-bg p-6", reservedVisibility)}>
+            <div className="ca-stripe-ph relative mb-[18px] aspect-[3/4] overflow-hidden border border-ca-line">
+              <Corner pos="tl" />
+              <Corner pos="tr" />
+              <Corner pos="bl" />
+              <Corner pos="br" />
+              <span className="absolute inset-0 flex items-center justify-center font-display text-[clamp(48px,6vw,80px)] uppercase leading-none tracking-[0.02em] text-ca-dim">
+                [ 08 ]
+              </span>
+            </div>
+            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-muted">
+              Reserved
+            </div>
+            <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
+              <span>By invitation</span>
+              <span aria-hidden="true">—</span>
+            </div>
           </div>
-          <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-muted">
-            Reserved
-          </div>
-          <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-            <span>By invitation</span>
-            <span aria-hidden="true">—</span>
-          </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );
