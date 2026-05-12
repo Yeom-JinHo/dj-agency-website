@@ -9,6 +9,7 @@ import {
   IconBrandX,
   IconBrandYoutube,
   IconLink,
+  IconX,
   type Icon as TablerIcon,
 } from "@tabler/icons-react";
 
@@ -32,6 +33,9 @@ const SOCIAL_LABELS: Record<ArtistSocialPlatform, string> = {
   x: "X",
   etc: "Link",
 };
+
+const CHROME_BUTTON =
+  "border border-ca-dim text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red";
 
 interface ArtistModalProps {
   artists: Artist[];
@@ -92,117 +96,113 @@ export function ArtistModal({
         className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12"
       >
         <div className="relative flex max-h-[calc(100vh-32px)] w-full max-w-[clamp(720px,90vw,1100px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-96px)]">
-        <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
-          <span>
-            [ {idxLabel} / {totalLabel} ]
-          </span>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="border border-ca-dim p-2 text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
-          >
-            <span
-              aria-hidden="true"
-              className="relative inline-block h-3.5 w-3.5 before:absolute before:left-0 before:top-1/2 before:h-px before:w-full before:rotate-45 before:bg-current after:absolute after:left-0 after:top-1/2 after:h-px after:w-full after:-rotate-45 after:bg-current"
-            />
-          </button>
-        </div>
-
-        <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
-          <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
-            <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[240px] overflow-hidden lg:w-full lg:max-w-none">
-              <Image
-                src={artist.image}
-                alt={artist.name}
-                fill
-                sizes="(max-width: 1024px) 60vw, 600px"
-                className="object-cover"
-                priority
-              />
-              <Corner pos="tl" />
-              <Corner pos="tr" />
-              <Corner pos="bl" />
-              <Corner pos="br" />
-            </div>
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
+            <span>
+              [ {idxLabel} / {totalLabel} ]
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className={`${CHROME_BUTTON} p-2`}
+            >
+              <IconX size={14} stroke={1.75} />
+            </button>
           </div>
 
-          <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
-            <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
-              <span>{artist.roles.join(" · ")}</span>
-              <span> &nbsp;·&nbsp; </span>
-              <span className="text-ca-red">{artist.city}</span>
+          <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
+            <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
+              <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[240px] overflow-hidden lg:w-full lg:max-w-none">
+                <Image
+                  src={artist.image}
+                  alt={artist.name}
+                  fill
+                  sizes="(max-width: 1024px) 60vw, 600px"
+                  className="object-cover"
+                  priority
+                />
+                <Corner pos="tl" />
+                <Corner pos="tr" />
+                <Corner pos="bl" />
+                <Corner pos="br" />
+              </div>
             </div>
 
-            <h2 className="flex-shrink-0 font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
-              {artist.name}
-            </h2>
+            <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
+              <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
+                <span>{artist.roles.join(" · ")}</span>
+                <span> &nbsp;·&nbsp; </span>
+                <span className="text-ca-red">{artist.city}</span>
+              </div>
 
-            {artist.socials.length > 0 ? (
-              <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
-                {artist.socials.map((social) => {
-                  const Icon = SOCIAL_ICONS[social.platform];
-                  return (
-                    <a
-                      key={social.platform}
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={SOCIAL_LABELS[social.platform]}
-                      className="text-ca-fg transition-colors duration-200 hover:text-ca-red"
+              <h2 className="flex-shrink-0 font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
+                {artist.name}
+              </h2>
+
+              {artist.socials.length > 0 ? (
+                <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
+                  {artist.socials.map((social) => {
+                    const Icon = SOCIAL_ICONS[social.platform];
+                    return (
+                      <a
+                        key={social.platform}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={SOCIAL_LABELS[social.platform]}
+                        className="text-ca-fg transition-colors duration-200 hover:text-ca-red"
+                      >
+                        <Icon size={32} stroke={1.75} />
+                      </a>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              <div className="flex min-h-0 flex-1 flex-col">
+                <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
+                  [ Selected works ]
+                </h3>
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-6">
+                  {artist.selectedWorks.map((work, i) => (
+                    <div
+                      key={work.id}
+                      className={`grid grid-cols-[36px_1fr_auto] items-baseline gap-4 border-t border-ca-line py-3.5 text-base ${
+                        i === artist.selectedWorks.length - 1 ? "border-b" : ""
+                      }`}
                     >
-                      <Icon size={32} stroke={1.75} />
-                    </a>
-                  );
-                })}
-              </div>
-            ) : null}
-
-            <div className="flex min-h-0 flex-1 flex-col">
-              <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
-                [ Selected works ]
-              </h3>
-              <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-6">
-                {artist.selectedWorks.map((work, i) => (
-                  <div
-                    key={work.id}
-                    className={`grid grid-cols-[36px_1fr_auto] items-baseline gap-4 border-t border-ca-line py-3.5 text-base ${
-                      i === artist.selectedWorks.length - 1
-                        ? "border-b"
-                        : ""
-                    }`}
-                  >
-                    <span className="font-mono text-[11px] tracking-[0.14em] text-ca-muted">
-                      {work.id}
-                    </span>
-                    <span className="font-sans font-medium">{work.title}</span>
-                    <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ca-muted">
-                      {work.meta}
-                    </span>
-                  </div>
-                ))}
+                      <span className="font-mono text-[11px] tracking-[0.14em] text-ca-muted">
+                        {work.id}
+                      </span>
+                      <span className="font-sans font-medium">
+                        {work.title}
+                      </span>
+                      <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ca-muted">
+                        {work.meta}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-
           </div>
-        </div>
 
-        <div className="flex flex-shrink-0 items-center justify-between border-t border-ca-line px-5 py-3">
-          <button
-            type="button"
-            onClick={onPrev}
-            className="border border-ca-dim px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
-          >
-            ← Prev
-          </button>
-          <button
-            type="button"
-            onClick={onNext}
-            className="border border-ca-dim px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
-          >
-            Next →
-          </button>
-        </div>
+          <div className="flex flex-shrink-0 items-center justify-between border-t border-ca-line px-5 py-3">
+            <button
+              type="button"
+              onClick={onPrev}
+              className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em]`}
+            >
+              ← Prev
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em]`}
+            >
+              Next →
+            </button>
+          </div>
         </div>
       </div>
     </div>
