@@ -183,6 +183,10 @@
     @apply border-border m-0 box-border p-0;
   }
 
+  html {
+    scroll-padding-top: 4rem;
+  }
+
   body {
     background-color: var(--color-ca-bg);
     color: var(--color-ca-fg);
