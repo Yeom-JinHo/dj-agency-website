@@ -78,7 +78,7 @@ export function ArtistModal({
               aria-hidden="true"
               className="relative inline-block h-2.5 w-2.5 before:absolute before:left-0 before:top-1/2 before:h-px before:w-full before:rotate-45 before:bg-current after:absolute after:left-0 after:top-1/2 after:h-px after:w-full after:-rotate-45 after:bg-current"
             />
-            Close · esc
+            Close
           </button>
         </div>
 
@@ -96,9 +96,6 @@ export function ArtistModal({
             <Corner pos="tr" />
             <Corner pos="bl" />
             <Corner pos="br" />
-            <span className="absolute bottom-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted">
-              [ portrait · 3:4 ]
-            </span>
           </div>
 
           <div className="flex flex-col gap-8 px-6 pt-8 md:px-12 md:pt-12">
@@ -140,23 +137,21 @@ export function ArtistModal({
           </div>
         </div>
 
-        <div className="mt-8 flex items-center justify-end border-t border-ca-line px-7 py-6">
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={onPrev}
-              className="border border-ca-dim px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
-            >
-              ← Prev
-            </button>
-            <button
-              type="button"
-              onClick={onNext}
-              className="border border-ca-dim px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
-            >
-              Next →
-            </button>
-          </div>
+        <div className="mt-8 flex items-center justify-between border-t border-ca-line px-7 py-6">
+          <button
+            type="button"
+            onClick={onPrev}
+            className="border border-ca-dim px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
+          >
+            ← Prev
+          </button>
+          <button
+            type="button"
+            onClick={onNext}
+            className="border border-ca-dim px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
+          >
+            Next →
+          </button>
         </div>
       </div>
     </div>
