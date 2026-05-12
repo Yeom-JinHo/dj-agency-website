@@ -1,4 +1,4 @@
-import { Bricolage_Grotesque } from "next/font/google";
+import { Anton, Inter, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
 
@@ -12,10 +12,25 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
 
-// https://iamsteve.me/blog/the-best-ink-trap-typefaces-for-websites
-const bricolage_grotesque = Bricolage_Grotesque({
+const anton = Anton({
   subsets: ["latin"],
+  weight: "400",
   display: "swap",
+  variable: "--font-anton",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+  variable: "--font-jbmono",
 });
 
 export const metadata = createMetadata({
@@ -31,10 +46,7 @@ export const metadata = createMetadata({
 });
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  themeColor: "#0a0a0a",
   width: "device-width",
   initialScale: 1,
 };
@@ -45,8 +57,12 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage_grotesque.className} antialiased`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${anton.variable} ${inter.variable} ${jetbrainsMono.variable}`}
+    >
+      <body className="font-sans antialiased">
         <ReactScan />
         <ErrorBoundary>
           <Providers>

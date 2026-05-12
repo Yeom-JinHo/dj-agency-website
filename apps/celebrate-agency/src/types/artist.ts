@@ -12,10 +12,13 @@ export interface ArtistSocial {
   label?: string;
 }
 
+export type ArtistRole = "DJ" | "Producer";
+
 export interface Artist {
   id: string;
   name: string;
   image: string;
   bio: string;
+  roles: ArtistRole[];
   socials: ArtistSocial[];
 }
