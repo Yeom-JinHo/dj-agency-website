@@ -88,7 +88,7 @@ export function ArtistModal({
       onClick={handleBackdrop}
       className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] backdrop-blur-[8px]"
     >
-      <div className="relative mx-auto my-12 min-h-[calc(100vh-96px)] max-w-[1280px] border border-ca-line bg-ca-bg">
+      <div className="relative mx-auto my-12 max-w-[1280px] border border-ca-line bg-ca-bg">
         <div className="sticky top-0 z-[2] flex items-center justify-between border-b border-ca-line bg-ca-bg px-7 py-[18px] font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
           <span>
             [ {idxLabel} / {totalLabel} ] &nbsp; / &nbsp; ARTIST PROFILE &nbsp;
