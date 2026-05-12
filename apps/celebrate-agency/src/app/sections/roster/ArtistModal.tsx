@@ -91,9 +91,7 @@ export function ArtistModal({
       <div className="relative mx-auto my-4 max-w-[clamp(720px,90vw,1200px)] border border-ca-line bg-ca-bg sm:my-8 lg:my-12">
         <div className="sticky top-0 z-[2] flex items-center justify-between border-b border-ca-line bg-ca-bg px-7 py-[18px] font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
           <span>
-            [ {idxLabel} / {totalLabel} ] &nbsp; / &nbsp; ARTIST PROFILE &nbsp;
-            · &nbsp; <span className="text-ca-red">●</span>{" "}
-            <span>{artist.cityCode}</span>
+            [ {idxLabel} / {totalLabel} ] &nbsp; / &nbsp; ARTIST PROFILE
           </span>
           <button
             type="button"
