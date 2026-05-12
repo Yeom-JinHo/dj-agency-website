@@ -91,8 +91,8 @@ export function ArtistModal({
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
       );
       if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
       const active = document.activeElement as HTMLElement | null;
 
       if (event.shiftKey && (active === first || !dialog.contains(active))) {
@@ -118,8 +118,8 @@ export function ArtistModal({
 
   const idxLabel = String(index + 1).padStart(2, "0");
   const totalLabel = String(total).padStart(2, "0");
-  const prevArtist = artists[(index - 1 + total) % total];
-  const nextArtist = artists[(index + 1) % total];
+  const prevArtist = artists[(index - 1 + total) % total]!;
+  const nextArtist = artists[(index + 1) % total]!;
 
   return (
     <div
