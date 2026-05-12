@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 
 import { cn } from "@repo/ui";
@@ -34,9 +34,16 @@ export default function Roster() {
   const reservedVisibility = getFillerVisibility(1);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
-  const open = useCallback((index: number) => setActiveIndex(index), []);
-  const close = useCallback(() => setActiveIndex(null), []);
+  const open = useCallback((index: number, el: HTMLButtonElement) => {
+    triggerRef.current = el;
+    setActiveIndex(index);
+  }, []);
+  const close = useCallback(() => {
+    setActiveIndex(null);
+    requestAnimationFrame(() => triggerRef.current?.focus());
+  }, []);
   const step = useCallback(
     (delta: number) =>
       setActiveIndex((current) =>
@@ -46,6 +53,8 @@ export default function Roster() {
       ),
     []
   );
+  const onPrev = useCallback(() => step(-1), [step]);
+  const onNext = useCallback(() => step(1), [step]);
 
   return (
     <section id="roster" className="border-t border-ca-line pt-[120px] pb-0">
@@ -60,7 +69,7 @@ export default function Roster() {
           <button
             key={artist.id}
             type="button"
-            onClick={() => open(index)}
+            onClick={(e) => open(index, e.currentTarget)}
             aria-haspopup="dialog"
             aria-label={`View ${artist.name} profile`}
             className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-[#1a1a1a]"
@@ -142,8 +151,8 @@ export default function Roster() {
           artists={ARTISTS}
           index={activeIndex}
           onClose={close}
-          onPrev={() => step(-1)}
-          onNext={() => step(1)}
+          onPrev={onPrev}
+          onNext={onNext}
         />
       ) : null}
     </section>

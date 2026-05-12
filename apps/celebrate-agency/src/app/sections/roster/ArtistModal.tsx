@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   IconBrandInstagram,
@@ -54,6 +54,8 @@ export function ArtistModal({
 }: ArtistModalProps) {
   const artist = artists[index];
   const total = artists.length;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -63,18 +65,51 @@ export function ArtistModal({
   );
 
   useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-      else if (event.key === "ArrowLeft") onPrev();
-      else if (event.key === "ArrowRight") onNext();
+      if (event.key === "Escape") {
+        onClose();
+        return;
+      }
+      if (event.key === "ArrowLeft") {
+        onPrev();
+        return;
+      }
+      if (event.key === "ArrowRight") {
+        onNext();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = dialog.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+
+      if (event.shiftKey && (active === first || !dialog.contains(active))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    document.addEventListener("keydown", onKey);
+    dialog.addEventListener("keydown", onKey);
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      document.removeEventListener("keydown", onKey);
+      dialog.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
   }, [onClose, onPrev, onNext]);
@@ -83,14 +118,26 @@ export function ArtistModal({
 
   const idxLabel = String(index + 1).padStart(2, "0");
   const totalLabel = String(total).padStart(2, "0");
+  const prevArtist = artists[(index - 1 + total) % total];
+  const nextArtist = artists[(index + 1) % total];
 
   return (
     <div
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={`${artist.name} profile`}
-      className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] backdrop-blur-[8px]"
+      tabIndex={-1}
+      className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px]"
     >
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {artist.name}, {idxLabel} of {totalLabel}
+      </div>
       <div
         onClick={handleBackdrop}
         className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12"
@@ -101,9 +148,10 @@ export function ArtistModal({
               [ {idxLabel} / {totalLabel} ]
             </span>
             <button
+              ref={closeButtonRef}
               type="button"
               onClick={onClose}
-              aria-label="Close"
+              aria-label={`Close ${artist.name} profile`}
               className={`${CHROME_BUTTON} p-2`}
             >
               <IconX size={14} stroke={1.75} />
@@ -149,7 +197,7 @@ export function ArtistModal({
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={SOCIAL_LABELS[social.platform]}
+                        aria-label={`${SOCIAL_LABELS[social.platform]} (opens in new tab)`}
                         className="text-ca-fg transition-colors duration-200 hover:text-ca-red"
                       >
                         <Icon size={32} stroke={1.75} />
@@ -191,6 +239,7 @@ export function ArtistModal({
             <button
               type="button"
               onClick={onPrev}
+              aria-label={`Previous artist: ${prevArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em]`}
             >
               ← Prev
@@ -198,6 +247,7 @@ export function ArtistModal({
             <button
               type="button"
               onClick={onNext}
+              aria-label={`Next artist: ${nextArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em]`}
             >
               Next →
