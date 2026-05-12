@@ -14,11 +14,20 @@ export interface ArtistSocial {
 
 export type ArtistRole = "DJ" | "Producer";
 
+export interface ArtistWork {
+  id: string;
+  title: string;
+  meta: string;
+}
+
 export interface Artist {
   id: string;
   name: string;
   image: string;
   bio: string;
   roles: ArtistRole[];
+  cityCode: string;
+  city: string;
+  selectedWorks: ArtistWork[];
   socials: ArtistSocial[];
 }

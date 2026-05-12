@@ -1,3 +1,6 @@
+"use client";
+
+import { useCallback, useState } from "react";
 import Image from "next/image";
 
 import { cn } from "@repo/ui";
@@ -6,6 +9,8 @@ import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
 import { ARTISTS } from "@/consts/artists";
 import { BOOKING_EMAIL } from "@/consts/brand";
+
+import { ArtistModal } from "./ArtistModal";
 
 const MOBILE_COLS = 2;
 const DESKTOP_COLS = 4;
@@ -28,6 +33,20 @@ export default function Roster() {
   const bookingVisibility = getFillerVisibility(0);
   const reservedVisibility = getFillerVisibility(1);
 
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const open = useCallback((index: number) => setActiveIndex(index), []);
+  const close = useCallback(() => setActiveIndex(null), []);
+  const step = useCallback(
+    (delta: number) =>
+      setActiveIndex((current) =>
+        current === null
+          ? current
+          : (current + delta + ARTISTS.length) % ARTISTS.length
+      ),
+    []
+  );
+
   return (
     <section id="roster" className="border-t border-ca-line pt-[120px] pb-0">
       <SectionHead
@@ -37,11 +56,14 @@ export default function Roster() {
         aside={`${ARTISTS.length} artists · By invitation.`}
       />
       <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4">
-        {ARTISTS.map((artist) => (
-          <a
+        {ARTISTS.map((artist, index) => (
+          <button
             key={artist.id}
-            href="#"
-            className="group relative block bg-ca-bg p-6 transition-colors duration-300 hover:bg-[#1a1a1a]"
+            type="button"
+            onClick={() => open(index)}
+            aria-haspopup="dialog"
+            aria-label={`View ${artist.name} profile`}
+            className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-[#1a1a1a]"
           >
             <div className="relative mb-[18px] aspect-[3/4] overflow-hidden bg-ca-bg-2">
               <Image
@@ -65,7 +87,7 @@ export default function Roster() {
               </span>
               <span className="text-ca-red">SEOUL ↗</span>
             </div>
-          </a>
+          </button>
         ))}
 
         {bookingVisibility !== null ? (
@@ -114,6 +136,16 @@ export default function Roster() {
           </div>
         ) : null}
       </div>
+
+      {activeIndex !== null ? (
+        <ArtistModal
+          artists={ARTISTS}
+          index={activeIndex}
+          onClose={close}
+          onPrev={() => step(-1)}
+          onNext={() => step(1)}
+        />
+      ) : null}
     </section>
   );
 }
