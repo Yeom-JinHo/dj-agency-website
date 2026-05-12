@@ -4,7 +4,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative flex flex-col pt-[140px] pb-16"
+      className="relative flex min-h-[100dvh] flex-col pt-[140px] pb-16"
     >
       <div className="flex flex-1 items-center justify-center px-10">
         <Image
