@@ -92,7 +92,7 @@ export function ArtistModal({
         className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12"
       >
         <div className="relative flex max-h-[calc(100vh-32px)] w-full max-w-[clamp(720px,90vw,1200px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-96px)]">
-        <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+        <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
           <span>
             [ {idxLabel} / {totalLabel} ]
           </span>
@@ -104,7 +104,7 @@ export function ArtistModal({
           >
             <span
               aria-hidden="true"
-              className="relative inline-block h-3 w-3 before:absolute before:left-0 before:top-1/2 before:h-px before:w-full before:rotate-45 before:bg-current after:absolute after:left-0 after:top-1/2 after:h-px after:w-full after:-rotate-45 after:bg-current"
+              className="relative inline-block h-3.5 w-3.5 before:absolute before:left-0 before:top-1/2 before:h-px before:w-full before:rotate-45 before:bg-current after:absolute after:left-0 after:top-1/2 after:h-px after:w-full after:-rotate-45 after:bg-current"
             />
           </button>
         </div>
@@ -128,7 +128,7 @@ export function ArtistModal({
           </div>
 
           <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
-            <div className="flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+            <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
               <span>{artist.roles.join(" · ")}</span>
               <span> &nbsp;·&nbsp; </span>
               <span className="text-ca-red">{artist.city}</span>
@@ -159,24 +159,24 @@ export function ArtistModal({
             ) : null}
 
             <div className="flex min-h-0 flex-1 flex-col">
-              <h3 className="mb-3.5 flex-shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-ca-red">
+              <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
                 [ Selected works ]
               </h3>
               <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-6">
                 {artist.selectedWorks.map((work, i) => (
                   <div
                     key={work.id}
-                    className={`grid grid-cols-[36px_1fr_auto] items-baseline gap-4 border-t border-ca-line py-3.5 text-sm ${
+                    className={`grid grid-cols-[36px_1fr_auto] items-baseline gap-4 border-t border-ca-line py-3.5 text-base ${
                       i === artist.selectedWorks.length - 1
                         ? "border-b"
                         : ""
                     }`}
                   >
-                    <span className="font-mono text-[10px] tracking-[0.14em] text-ca-muted">
+                    <span className="font-mono text-[11px] tracking-[0.14em] text-ca-muted">
                       {work.id}
                     </span>
                     <span className="font-sans font-medium">{work.title}</span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-ca-muted">
+                    <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ca-muted">
                       {work.meta}
                     </span>
                   </div>
@@ -191,14 +191,14 @@ export function ArtistModal({
           <button
             type="button"
             onClick={onPrev}
-            className="border border-ca-dim px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
+            className="border border-ca-dim px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
           >
             ← Prev
           </button>
           <button
             type="button"
             onClick={onNext}
-            className="border border-ca-dim px-4 py-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
+            className="border border-ca-dim px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red"
           >
             Next →
           </button>
