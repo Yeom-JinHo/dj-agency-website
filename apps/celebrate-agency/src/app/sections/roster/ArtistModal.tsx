@@ -2,9 +2,36 @@
 
 import { useCallback, useEffect } from "react";
 import Image from "next/image";
+import {
+  IconBrandInstagram,
+  IconBrandSoundcloud,
+  IconBrandSpotify,
+  IconBrandX,
+  IconBrandYoutube,
+  IconLink,
+  type Icon as TablerIcon,
+} from "@tabler/icons-react";
 
 import { Corner } from "@/components/Corner";
-import type { Artist } from "@/types/artist";
+import type { Artist, ArtistSocialPlatform } from "@/types/artist";
+
+const SOCIAL_ICONS: Record<ArtistSocialPlatform, TablerIcon> = {
+  soundcloud: IconBrandSoundcloud,
+  instagram: IconBrandInstagram,
+  spotify: IconBrandSpotify,
+  youtube: IconBrandYoutube,
+  x: IconBrandX,
+  etc: IconLink,
+};
+
+const SOCIAL_LABELS: Record<ArtistSocialPlatform, string> = {
+  soundcloud: "SoundCloud",
+  instagram: "Instagram",
+  spotify: "Spotify",
+  youtube: "YouTube",
+  x: "X",
+  etc: "Link",
+};
 
 interface ArtistModalProps {
   artists: Artist[];
@@ -134,6 +161,31 @@ export function ArtistModal({
                 ))}
               </div>
             </div>
+
+            {artist.socials.length > 0 ? (
+              <div>
+                <h3 className="mb-3.5 font-mono text-[10px] uppercase tracking-[0.16em] text-ca-red">
+                  [ Listen / Follow ]
+                </h3>
+                <div className="flex flex-wrap items-center gap-4">
+                  {artist.socials.map((social) => {
+                    const Icon = SOCIAL_ICONS[social.platform];
+                    return (
+                      <a
+                        key={social.platform}
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={SOCIAL_LABELS[social.platform]}
+                        className="text-ca-muted transition-colors duration-200 hover:text-ca-red"
+                      >
+                        <Icon size={22} stroke={1.5} />
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 

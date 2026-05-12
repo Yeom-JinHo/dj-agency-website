@@ -25,6 +25,7 @@ export const ARTISTS: Artist[] = [
       },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
       { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
   {
@@ -47,6 +48,7 @@ export const ARTISTS: Artist[] = [
       },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
       { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
   {
@@ -69,6 +71,7 @@ export const ARTISTS: Artist[] = [
       },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
       { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
   {
@@ -91,6 +94,7 @@ export const ARTISTS: Artist[] = [
       },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
       { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
   {
@@ -113,6 +117,7 @@ export const ARTISTS: Artist[] = [
       },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
       { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
   {
@@ -139,6 +144,7 @@ export const ARTISTS: Artist[] = [
       },
       { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
       { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
 ];
