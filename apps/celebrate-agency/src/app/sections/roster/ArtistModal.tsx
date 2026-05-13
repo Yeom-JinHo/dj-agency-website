@@ -179,15 +179,15 @@ export function ArtistModal({
           </div>
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
-            <div className="flex justify-center border-b border-ca-line p-3 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
-              <div className="ca-stripe-ph-lg relative h-[44dvh] w-full overflow-hidden sm:aspect-[3/4] sm:h-auto sm:w-3/4 sm:max-w-[320px] lg:w-full lg:max-w-none">
+            <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
+              <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden lg:w-full lg:max-w-none">
                 <Image
                   key={artist.id}
                   src={artist.image}
                   alt={artist.name}
                   fill
                   sizes="(max-width: 1024px) 60vw, 600px"
-                  className={`object-cover object-top transition-opacity duration-300 lg:object-center ${photoLoaded ? "opacity-100" : "opacity-0"}`}
+                  className={`object-cover transition-opacity duration-300 ${photoLoaded ? "opacity-100" : "opacity-0"}`}
                   onLoad={() => setPhotoLoaded(true)}
                   priority
                 />
