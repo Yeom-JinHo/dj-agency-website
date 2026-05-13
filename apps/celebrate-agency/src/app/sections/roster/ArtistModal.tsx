@@ -194,15 +194,15 @@ export function ArtistModal({
             </div>
 
             <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
-              <h2 className="flex-shrink-0 font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
-                {artist.name}
-              </h2>
-
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
                 <span>{artist.roles.join(" · ")}</span>
                 <span> &nbsp;·&nbsp; </span>
                 <span className="text-ca-red">{artist.city}</span>
               </div>
+
+              <h2 className="flex-shrink-0 font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
+                {artist.name}
+              </h2>
 
               {artist.socials.length > 0 ? (
                 <div className="flex flex-shrink-0 flex-wrap items-center gap-5 pb-6 lg:pb-0">
