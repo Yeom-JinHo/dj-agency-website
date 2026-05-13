@@ -6,8 +6,11 @@ import { BOOKING_EMAIL } from "@/consts/brand";
 
 export default function Footer() {
   return (
-    <footer id="contact" className="border-t border-ca-line px-10 pt-20 pb-10">
-      <div className="mb-20 grid grid-cols-1 gap-[60px] lg:grid-cols-[1.2fr_1fr]">
+    <footer
+      id="contact"
+      className="border-t border-ca-line px-10 pt-16 pb-10 lg:pt-20"
+    >
+      <div className="mb-14 grid grid-cols-1 gap-[60px] lg:mb-20 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <div className="mb-8 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
             <span className="text-ca-red">●</span>

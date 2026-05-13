@@ -62,7 +62,10 @@ export default function Roster() {
   const onNext = useCallback(() => step(1), [step]);
 
   return (
-    <section id="roster" className="border-t border-ca-line pt-[120px] pb-0">
+    <section
+      id="roster"
+      className="border-t border-ca-line pt-20 pb-0 lg:pt-[120px]"
+    >
       <SectionHead
         num="02"
         numLabel="ROSTER"

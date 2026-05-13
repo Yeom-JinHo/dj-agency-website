@@ -17,7 +17,7 @@ export default function Hero() {
         />
       </div>
 
-      <div className="grid grid-cols-1 items-end gap-20 px-10 pt-12 lg:grid-cols-[1.1fr_1fr]">
+      <div className="grid grid-cols-1 items-end gap-10 px-10 pt-8 lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:pt-12">
         <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg">
           Talent · Production · Direction.
           <br />

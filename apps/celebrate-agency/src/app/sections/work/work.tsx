@@ -56,7 +56,10 @@ const CASES: Case[] = [
 
 export default function Work() {
   return (
-    <section id="work" className="border-t border-ca-line py-[120px]">
+    <section
+      id="work"
+      className="border-t border-ca-line py-20 lg:py-[120px]"
+    >
       <SectionHead
         num="03"
         numLabel="SELECTED WORK"
