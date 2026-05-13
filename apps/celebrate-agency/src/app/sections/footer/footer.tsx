@@ -8,7 +8,7 @@ export default function Footer() {
   return (
     <footer
       id="contact"
-      className="border-t border-ca-line px-10 pt-16 pb-10 lg:pt-20"
+      className="border-t border-ca-line px-6 pt-16 pb-10 lg:px-10 lg:pt-20"
     >
       <div className="mb-14 grid grid-cols-1 gap-[60px] lg:mb-20 lg:grid-cols-[1.2fr_1fr]">
         <div>

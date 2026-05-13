@@ -72,7 +72,7 @@ export default function Work() {
           </>
         }
       />
-      <div className="grid grid-cols-1 gap-6 px-10 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-6 px-6 lg:grid-cols-12 lg:px-10">
         {CASES.map((c) => (
           <a
             key={c.id}

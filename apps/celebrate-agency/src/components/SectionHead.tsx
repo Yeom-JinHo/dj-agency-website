@@ -9,7 +9,7 @@ type Props = Readonly<{
 
 export function SectionHead({ num, numLabel, title, aside }: Props) {
   return (
-    <div className="mb-10 grid grid-cols-1 items-start gap-6 px-10 lg:mb-16 lg:grid-cols-[200px_1fr_200px] lg:gap-10">
+    <div className="mb-10 grid grid-cols-1 items-start gap-6 px-6 lg:mb-16 lg:grid-cols-[200px_1fr_200px] lg:gap-10 lg:px-10">
       <div className="pt-2 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-muted">
         <span className="text-ca-red">[ {num} ]</span>
         &nbsp; / &nbsp;
