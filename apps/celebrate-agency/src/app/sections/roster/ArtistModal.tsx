@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { preload } from "react-dom";
 import Image from "next/image";
 import {
   IconBrandInstagram,
@@ -132,6 +133,9 @@ export function ArtistModal({
   const totalLabel = String(total).padStart(2, "0");
   const prevArtist = artists[(index - 1 + total) % total]!;
   const nextArtist = artists[(index + 1) % total]!;
+
+  preload(prevArtist.image, { as: "image" });
+  preload(nextArtist.image, { as: "image" });
 
   return (
     <div
@@ -268,29 +272,6 @@ export function ArtistModal({
             </button>
           </div>
 
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
-          >
-            <div className="relative aspect-[3/4] w-[600px]">
-              <Image
-                src={prevArtist.image}
-                alt=""
-                fill
-                sizes="(max-width: 1024px) 60vw, 600px"
-                loading="eager"
-              />
-            </div>
-            <div className="relative aspect-[3/4] w-[600px]">
-              <Image
-                src={nextArtist.image}
-                alt=""
-                fill
-                sizes="(max-width: 1024px) 60vw, 600px"
-                loading="eager"
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>
