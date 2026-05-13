@@ -193,7 +193,7 @@ export function ArtistModal({
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 lg:px-10 lg:pt-8">
+            <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 pb-6 lg:px-10 lg:pt-8 lg:pb-0">
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
                 <span>{artist.roles.join(" · ")}</span>
                 <span> &nbsp;·&nbsp; </span>
@@ -205,7 +205,7 @@ export function ArtistModal({
               </h2>
 
               {artist.socials.length > 0 ? (
-                <div className="flex flex-shrink-0 flex-wrap items-center gap-5 pb-6 lg:pb-0">
+                <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
                   {artist.socials.map((social) => {
                     const Icon = SOCIAL_ICONS[social.platform];
                     return (
@@ -223,6 +223,10 @@ export function ArtistModal({
                   })}
                 </div>
               ) : null}
+
+              <p className="max-w-[52ch] flex-shrink-0 text-base leading-relaxed text-ca-fg">
+                {artist.bio}
+              </p>
 
               <div className="hidden min-h-0 flex-1 flex-col lg:flex">
                 <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
