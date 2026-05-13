@@ -23,6 +23,7 @@ export interface Artist {
   name: string;
   image: string;
   bio: string;
+  city: string;
   selectedWorks: ArtistWork[];
   socials: ArtistSocial[];
 }
