@@ -105,7 +105,7 @@ export default function Roster() {
             </div>
             <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
               <span className="lg:text-[13px]">{ARTIST_ROLE_LABEL}</span>
-              <span className="text-ca-red">SEOUL ↗</span>
+              <span className="text-ca-red">SEOUL</span>
             </div>
           </button>
         ))}
