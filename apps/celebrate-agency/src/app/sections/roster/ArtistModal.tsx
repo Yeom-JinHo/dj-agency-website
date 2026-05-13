@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
   IconBrandInstagram,
@@ -56,6 +56,11 @@ export function ArtistModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+
+  useEffect(() => {
+    setPhotoLoaded(false);
+  }, [artist?.id]);
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -164,11 +169,13 @@ export function ArtistModal({
             <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
               <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[240px] overflow-hidden lg:w-full lg:max-w-none">
                 <Image
+                  key={artist.id}
                   src={artist.image}
                   alt={artist.name}
                   fill
                   sizes="(max-width: 1024px) 60vw, 600px"
-                  className="object-cover"
+                  className={`object-cover transition-opacity duration-300 ${photoLoaded ? "opacity-100" : "opacity-0"}`}
+                  onLoad={() => setPhotoLoaded(true)}
                   priority
                 />
               </div>
@@ -250,6 +257,30 @@ export function ArtistModal({
             >
               Next →
             </button>
+          </div>
+
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
+          >
+            <div className="relative aspect-[3/4] w-[600px]">
+              <Image
+                src={prevArtist.image}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 60vw, 600px"
+                priority
+              />
+            </div>
+            <div className="relative aspect-[3/4] w-[600px]">
+              <Image
+                src={nextArtist.image}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 60vw, 600px"
+                priority
+              />
+            </div>
           </div>
         </div>
       </div>
