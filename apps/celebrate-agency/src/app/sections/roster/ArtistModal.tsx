@@ -279,7 +279,7 @@ export function ArtistModal({
                 alt=""
                 fill
                 sizes="(max-width: 1024px) 60vw, 600px"
-                priority
+                loading="eager"
               />
             </div>
             <div className="relative aspect-[3/4] w-[600px]">
@@ -288,7 +288,7 @@ export function ArtistModal({
                 alt=""
                 fill
                 sizes="(max-width: 1024px) 60vw, 600px"
-                priority
+                loading="eager"
               />
             </div>
           </div>
