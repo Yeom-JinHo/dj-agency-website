@@ -198,7 +198,7 @@ export function ArtistModal({
               </h2>
 
               {artist.socials.length > 0 ? (
-                <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
+                <div className="flex flex-shrink-0 flex-wrap items-center gap-5 pb-6 lg:pb-0">
                   {artist.socials.map((social) => {
                     const Icon = SOCIAL_ICONS[social.platform];
                     return (
