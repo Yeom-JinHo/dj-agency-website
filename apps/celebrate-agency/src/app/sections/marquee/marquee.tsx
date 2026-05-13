@@ -1,4 +1,4 @@
-import { ARTISTS } from '@/consts/artists';
+import { ARTISTS } from "@/consts/artists";
 
 export default function Marquee() {
   const loop = [...ARTISTS.map((artist) => artist.name), ...ARTISTS.map((artist) => artist.name)];
