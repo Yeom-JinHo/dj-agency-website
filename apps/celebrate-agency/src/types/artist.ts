@@ -26,7 +26,6 @@ export interface Artist {
   image: string;
   bio: string;
   roles: ArtistRole[];
-  cityCode: string;
   city: string;
   selectedWorks: ArtistWork[];
   socials: ArtistSocial[];

@@ -7,7 +7,6 @@ export const ARTISTS: Artist[] = [
     image: "/images/artist/juntaro/profile.webp",
     bio: "Tech House producer and DJ based in Seoul, presenting fresh trends with his own sound. Released on labels like Matroda's Terminal Underground Records and peaked at #6 on the Beatport Tech House charts.",
     roles: ["DJ", "Producer"],
-    cityCode: "SEL",
     city: "Seoul",
     selectedWorks: [
       {
@@ -34,7 +33,6 @@ export const ARTISTS: Artist[] = [
     image: "/images/artist/sielo/profile.webp",
     bio: "DJ and producer making waves in the global Tech House scene since 2020 with releases on labels like In/Rotation, The Myth Of NYX, and Controversia.",
     roles: ["DJ", "Producer"],
-    cityCode: "SEL",
     city: "Seoul",
     selectedWorks: [
       { id: "A01", title: "In/Rotation — EP", meta: "RECORD · 2024" },
@@ -57,7 +55,6 @@ export const ARTISTS: Artist[] = [
     image: "/images/artist/loozbone/profile.webp",
     bio: "Rising electronic dance music artist with a distinctive sound and stage presence, performing across Asia.",
     roles: ["DJ", "Producer"],
-    cityCode: "SEL",
     city: "Seoul",
     selectedWorks: [
       { id: "A01", title: "Asia Tour 2025", meta: "LIVE · 2025" },
@@ -80,7 +77,6 @@ export const ARTISTS: Artist[] = [
     image: "/images/artist/dearboi/profile.webp",
     bio: "House and tech house DJ based in Seoul with a unique vibe, currently resident at MUSE.",
     roles: ["DJ", "Producer"],
-    cityCode: "SEL",
     city: "Seoul",
     selectedWorks: [
       { id: "A01", title: "MUSE — Resident Set", meta: "LIVE · 2025" },
@@ -103,7 +99,6 @@ export const ARTISTS: Artist[] = [
     image: "/images/artist/playmode/profile.webp",
     bio: "Seoul-based electronic music producer and DJ focused on Tech and Bass House, known for blending diverse sounds across genres.",
     roles: ["DJ", "Producer"],
-    cityCode: "SEL",
     city: "Seoul",
     selectedWorks: [
       { id: "A01", title: "Bass House — EP", meta: "RECORD · 2025" },
@@ -126,7 +121,6 @@ export const ARTISTS: Artist[] = [
     image: "/images/artist/sam/profile.webp",
     bio: "Korean DJ and producer crafting a distinctive electronic sound.",
     roles: ["DJ", "Producer"],
-    cityCode: "SEL",
     city: "Seoul",
     selectedWorks: [
       { id: "A01", title: "Producer Set 01", meta: "MIX · 2025" },
