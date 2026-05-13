@@ -268,6 +268,29 @@ export function ArtistModal({
             </button>
           </div>
 
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
+          >
+            <div className="relative aspect-[3/4] w-[600px]">
+              <Image
+                src={prevArtist.image}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 60vw, 600px"
+                loading="eager"
+              />
+            </div>
+            <div className="relative aspect-[3/4] w-[600px]">
+              <Image
+                src={nextArtist.image}
+                alt=""
+                fill
+                sizes="(max-width: 1024px) 60vw, 600px"
+                loading="eager"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
