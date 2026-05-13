@@ -224,7 +224,7 @@ export function ArtistModal({
                 </div>
               ) : null}
 
-              <p className="max-w-[52ch] flex-shrink-0 text-base leading-relaxed text-ca-fg">
+              <p className="max-w-[52ch] min-h-0 overflow-y-auto text-base leading-relaxed text-ca-fg lg:flex-shrink-0 lg:overflow-visible">
                 {artist.bio}
               </p>
 
