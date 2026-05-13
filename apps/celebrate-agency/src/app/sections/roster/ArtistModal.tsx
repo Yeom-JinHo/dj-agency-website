@@ -105,22 +105,27 @@ export function ArtistModal({
       const first = focusable[0]!;
       const last = focusable[focusable.length - 1]!;
       const active = document.activeElement as HTMLElement | null;
+      const focusInside = !!active && dialog.contains(active);
 
-      if (event.shiftKey && (active === first || !dialog.contains(active))) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && active === last) {
-        event.preventDefault();
-        first.focus();
+      if (event.shiftKey) {
+        if (!focusInside || active === first) {
+          event.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (!focusInside || active === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
-    dialog.addEventListener("keydown", onKey);
+    document.addEventListener("keydown", onKey);
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
-      dialog.removeEventListener("keydown", onKey);
+      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
   }, [onClose, onPrev, onNext]);
