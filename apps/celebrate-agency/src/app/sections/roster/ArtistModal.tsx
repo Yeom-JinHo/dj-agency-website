@@ -198,7 +198,7 @@ export function ArtistModal({
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
                 <span>{ARTIST_ROLE_LABEL}</span>
                 <span> &nbsp;·&nbsp; </span>
-                <span className="text-ca-red">{artist.city}</span>
+                <span className="text-ca-red">SEOUL</span>
               </div>
 
               <h2 className="flex-shrink-0 font-display text-[clamp(40px,10vw,104px)] uppercase leading-[0.88] tracking-[-0.005em]">
