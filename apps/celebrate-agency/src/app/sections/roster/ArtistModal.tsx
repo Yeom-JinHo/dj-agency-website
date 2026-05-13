@@ -148,22 +148,17 @@ export function ArtistModal({
       <div className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12">
         <div
           ref={modalInnerRef}
-          className="relative flex max-h-[calc(100vh-32px)] w-full max-w-[clamp(720px,90vw,1100px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100vh-64px)] lg:max-h-[calc(100vh-96px)]"
+          className="relative flex max-h-[calc(100dvh-32px)] w-full max-w-[clamp(720px,90vw,1100px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] lg:max-h-[calc(100dvh-96px)]"
         >
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
-            <span>
-              [ {idxLabel} / {totalLabel} ]
-            </span>
-            <button
-              ref={closeButtonRef}
-              type="button"
-              onClick={onClose}
-              aria-label={`Close ${artist.name} profile`}
-              className={`${CHROME_BUTTON} p-2`}
-            >
-              <IconX size={14} stroke={1.75} />
-            </button>
-          </div>
+          <button
+            ref={closeButtonRef}
+            type="button"
+            onClick={onClose}
+            aria-label={`Close ${artist.name} profile`}
+            className={`${CHROME_BUTTON} absolute right-3 top-3 z-10 bg-ca-bg/80 p-2 backdrop-blur`}
+          >
+            <IconX size={14} stroke={1.75} />
+          </button>
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
             <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
