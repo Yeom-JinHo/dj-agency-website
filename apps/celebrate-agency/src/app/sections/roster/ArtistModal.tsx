@@ -154,7 +154,7 @@ export function ArtistModal({
       <div className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12">
         <div
           ref={modalInnerRef}
-          className="relative flex max-h-[calc(100dvh-32px)] w-full max-w-[clamp(720px,90vw,1100px)] flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] lg:max-h-[calc(100dvh-96px)]"
+          className="relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]"
         >
           <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
             <span>
@@ -172,7 +172,7 @@ export function ArtistModal({
           </div>
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
-            <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
+            <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
               <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden lg:w-full lg:max-w-none">
                 <Image
                   key={artist.id}
@@ -186,7 +186,7 @@ export function ArtistModal({
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 pb-6 lg:px-10 lg:pt-8 lg:pb-0">
+            <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0">
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
                 <span>{ARTIST_ROLE_LABEL}</span>
                 <span> &nbsp;·&nbsp; </span>
@@ -217,15 +217,15 @@ export function ArtistModal({
                 </div>
               ) : null}
 
-              <p className="max-w-[52ch] min-h-0 overflow-y-auto text-base leading-relaxed text-ca-fg lg:flex-shrink-0 lg:overflow-visible">
+              <p className="max-w-[52ch] flex-shrink-0 text-base leading-relaxed text-ca-fg">
                 {artist.bio}
               </p>
 
-              <div className="hidden min-h-0 flex-1 flex-col lg:flex">
+              <div className="hidden flex-col lg:flex lg:min-h-0 lg:flex-1">
                 <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
                   [ Selected works ]
                 </h3>
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto pb-6">
+                <div className="flex flex-col pb-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-6">
                   {artist.selectedWorks.map((work, i) => (
                     <div
                       key={work.id}

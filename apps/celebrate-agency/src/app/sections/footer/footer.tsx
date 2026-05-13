@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 
 import icon from "@/app/icon.png";
-import { BOOKING_EMAIL } from "@/consts/brand";
+import { ARROW_NE, BOOKING_EMAIL } from "@/consts/brand";
 
 export default function Footer() {
   return (
@@ -28,7 +28,7 @@ export default function Footer() {
             <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red">
               <span className="inline-block h-2 w-2 bg-ca-red" />
               {BOOKING_EMAIL}
-              <span aria-hidden="true">↗</span>
+              <span aria-hidden="true">{ARROW_NE}</span>
             </span>
           </a>
         </div>
@@ -75,7 +75,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="transition-colors hover:text-ca-red"
           >
-            Instagram <span aria-hidden="true">↗</span>
+            Instagram <span aria-hidden="true">{ARROW_NE}</span>
           </a>
           <a
             href="https://www.youtube.com/@ye0m_2"
@@ -83,7 +83,7 @@ export default function Footer() {
             rel="noopener noreferrer"
             className="transition-colors hover:text-ca-red"
           >
-            Youtube <span aria-hidden="true">↗</span>
+            Youtube <span aria-hidden="true">{ARROW_NE}</span>
           </a>
           <span className="text-ca-muted">
             TikTok <span aria-hidden="true">—</span>

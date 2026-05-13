@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import icon from "@/app/icon.png";
+import { ARROW_NE } from "@/consts/brand";
 
 const NAV_LINKS = [
   { href: "#roster", label: "Roster" },
@@ -12,7 +13,7 @@ const NAV_LINKS = [
 export default function Header() {
   return (
     <nav className="fixed inset-x-0 top-0 z-50 border-b border-ca-line bg-ca-bg/70 backdrop-blur-lg">
-      <div className="flex h-16 items-center justify-between px-8">
+      <div className="flex h-16 items-center justify-between px-6 lg:px-10">
         <Link href="#top" className="flex items-center gap-3">
           <Image
             src={icon}
@@ -48,7 +49,7 @@ export default function Header() {
             href="#contact"
             className="inline-flex items-center gap-1.5 rounded-full bg-ca-red px-4 py-2 text-[11px] font-medium uppercase tracking-[0.16em] text-ca-fg transition-colors hover:bg-ca-red-dim"
           >
-            Book a Set <span aria-hidden="true">↗</span>
+            Book a Set <span aria-hidden="true">{ARROW_NE}</span>
           </Link>
         </div>
       </div>
