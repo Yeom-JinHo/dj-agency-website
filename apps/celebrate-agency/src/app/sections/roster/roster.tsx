@@ -119,7 +119,7 @@ export default function Roster() {
             )}
           >
             <div className="relative mb-[18px] flex aspect-[3/4] flex-col justify-end overflow-hidden border border-ca-fg/20 p-4">
-              <span className="font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg">
+              <span className="inline-block origin-bottom-left font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg transition-transform duration-500 ease-out group-hover:scale-125">
                 Book
                 <br />a Set
                 <span aria-hidden="true"> {ARROW_NE}</span>
