@@ -8,7 +8,7 @@ import { cn } from "@repo/ui";
 import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
 import { Tape } from "@/components/Tape";
-import { ARTISTS } from "@/consts/artists";
+import { ARTIST_ROLE_LABEL, ARTISTS } from "@/consts/artists";
 import { BOOKING_EMAIL } from "@/consts/brand";
 
 import { ArtistModal } from "./ArtistModal";
@@ -104,9 +104,7 @@ export default function Roster() {
               {artist.name}
             </div>
             <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-              <span className="lg:text-[13px]">
-                {artist.roles.join(" · ")}
-              </span>
+              <span className="lg:text-[13px]">{ARTIST_ROLE_LABEL}</span>
               <span className="text-ca-red">SEOUL ↗</span>
             </div>
           </button>

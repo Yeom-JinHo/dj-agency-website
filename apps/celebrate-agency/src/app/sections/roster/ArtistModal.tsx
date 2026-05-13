@@ -13,6 +13,7 @@ import {
   type Icon as TablerIcon,
 } from "@tabler/icons-react";
 
+import { ARTIST_ROLE_LABEL } from "@/consts/artists";
 import type { Artist, ArtistSocialPlatform } from "@/types/artist";
 
 const SOCIAL_ICONS: Record<ArtistSocialPlatform, TablerIcon> = {
@@ -179,7 +180,7 @@ export function ArtistModal({
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
             <div className="flex justify-center border-b border-ca-line p-4 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
-              <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/5 max-w-[280px] overflow-hidden lg:w-full lg:max-w-none">
+              <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden lg:w-full lg:max-w-none">
                 <Image
                   key={artist.id}
                   src={artist.image}
@@ -195,7 +196,7 @@ export function ArtistModal({
 
             <div className="flex min-h-0 flex-col gap-6 overflow-hidden px-5 pt-6 pb-6 lg:px-10 lg:pt-8 lg:pb-0">
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
-                <span>{artist.roles.join(" · ")}</span>
+                <span>{ARTIST_ROLE_LABEL}</span>
                 <span> &nbsp;·&nbsp; </span>
                 <span className="text-ca-red">{artist.city}</span>
               </div>

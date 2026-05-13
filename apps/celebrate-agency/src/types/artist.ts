@@ -12,8 +12,6 @@ export interface ArtistSocial {
   label?: string;
 }
 
-export type ArtistRole = "DJ" | "Producer";
-
 export interface ArtistWork {
   id: string;
   title: string;
@@ -25,7 +23,6 @@ export interface Artist {
   name: string;
   image: string;
   bio: string;
-  roles: ArtistRole[];
   city: string;
   selectedWorks: ArtistWork[];
   socials: ArtistSocial[];

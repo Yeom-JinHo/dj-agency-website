@@ -19,7 +19,7 @@ export function SectionHead({ num, numLabel, title, aside }: Props) {
         {title}
         <span className="text-ca-red">.</span>
       </h2>
-      <div className="text-right text-[13px] leading-[1.55] text-ca-muted">
+      <div className="text-left text-[13px] leading-[1.55] text-ca-muted lg:text-right">
         {aside}
       </div>
     </div>
