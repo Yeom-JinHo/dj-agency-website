@@ -57,10 +57,12 @@ export function ArtistModal({
   const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [photoLoaded, setPhotoLoaded] = useState(false);
+  const lastArtistIdRef = useRef(artist?.id);
 
-  useEffect(() => {
+  if (artist?.id !== lastArtistIdRef.current) {
+    lastArtistIdRef.current = artist?.id;
     setPhotoLoaded(false);
-  }, [artist?.id]);
+  }
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
