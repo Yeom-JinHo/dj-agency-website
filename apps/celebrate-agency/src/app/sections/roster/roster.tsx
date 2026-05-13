@@ -9,7 +9,7 @@ import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
 import { Tape } from "@/components/Tape";
 import { ARTIST_ROLE_LABEL, ARTISTS } from "@/consts/artists";
-import { BOOKING_EMAIL } from "@/consts/brand";
+import { ARROW_NE, BOOKING_EMAIL } from "@/consts/brand";
 
 import { ArtistModal } from "./ArtistModal";
 
@@ -122,7 +122,7 @@ export default function Roster() {
               <span className="font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg">
                 Book
                 <br />a Set
-                <span aria-hidden="true"> ↗</span>
+                <span aria-hidden="true"> {ARROW_NE}</span>
               </span>
             </div>
             <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-fg">
@@ -130,7 +130,7 @@ export default function Roster() {
             </div>
             <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-fg/80">
               <span>Brief</span>
-              <span>MAIL ↗</span>
+              <span>MAIL {ARROW_NE}</span>
             </div>
           </a>
         ) : null}
