@@ -212,7 +212,7 @@ export function ArtistModal({
                 </div>
               ) : null}
 
-              <div className="flex min-h-0 flex-1 flex-col">
+              <div className="hidden min-h-0 flex-1 flex-col lg:flex">
                 <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
                   [ Selected works ]
                 </h3>
