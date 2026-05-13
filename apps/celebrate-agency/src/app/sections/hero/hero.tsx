@@ -4,20 +4,20 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-[100dvh] flex-col pt-[140px] pb-16"
+      className="relative flex min-h-[100dvh] flex-col pt-[100px] pb-16"
     >
-      <div className="flex flex-1 items-center justify-center px-10">
+      <div className="flex flex-1 items-center justify-center px-6 lg:px-10">
         <Image
           src="/images/logo/hero.png"
           alt="Celebrate Agency"
           width={400}
           height={300}
           priority
-          className="h-auto max-h-[75vh] w-full max-w-4xl"
+          className="h-auto max-h-[calc(100dvh-320px)] w-full max-w-4xl"
         />
       </div>
 
-      <div className="grid grid-cols-1 items-end gap-20 px-10 pt-12 lg:grid-cols-[1.1fr_1fr]">
+      <div className="grid grid-cols-1 items-end gap-10 px-6 pt-8 lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
         <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg">
           Talent · Production · Direction.
           <br />

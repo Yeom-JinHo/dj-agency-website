@@ -5,7 +5,7 @@ export default function Marquee() {
   return (
     <div
       aria-hidden="true"
-      className="mt-[60px] overflow-hidden border-y border-ca-line bg-ca-bg py-6"
+      className="mt-10 overflow-hidden border-y border-ca-line bg-ca-bg py-5 lg:mt-[60px] lg:py-6"
     >
       <div className="flex w-max animate-marquee gap-[60px] whitespace-nowrap">
         {loop.map((item, i) => (

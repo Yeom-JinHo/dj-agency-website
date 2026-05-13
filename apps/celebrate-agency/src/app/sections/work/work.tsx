@@ -56,7 +56,10 @@ const CASES: Case[] = [
 
 export default function Work() {
   return (
-    <section id="work" className="border-t border-ca-line py-[120px]">
+    <section
+      id="work"
+      className="border-t border-ca-line py-20 lg:py-[120px]"
+    >
       <SectionHead
         num="03"
         numLabel="SELECTED WORK"
@@ -69,7 +72,7 @@ export default function Work() {
           </>
         }
       />
-      <div className="grid grid-cols-1 gap-6 px-10 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-6 px-6 lg:grid-cols-12 lg:px-10">
         {CASES.map((c) => (
           <a
             key={c.id}

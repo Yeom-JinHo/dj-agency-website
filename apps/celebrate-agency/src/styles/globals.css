@@ -56,6 +56,16 @@
   --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
   --animate-marquee: marquee 38s linear infinite;
   --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+  --animate-modal-fade: modal-fade 0.2s ease-out;
+
+  @keyframes modal-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
   @keyframes accordion-down {
     from {
