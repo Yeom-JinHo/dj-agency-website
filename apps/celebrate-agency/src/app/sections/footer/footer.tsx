@@ -50,7 +50,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6 border-t border-ca-line pt-8 lg:flex-row lg:flex-wrap lg:items-end lg:justify-between lg:gap-10">
+      <div className="flex flex-col items-center gap-6 border-t border-ca-line pt-8 text-center lg:flex-row lg:flex-wrap lg:items-end lg:justify-between lg:gap-10 lg:text-left">
         <div className="flex items-center gap-3.5">
           <Image
             src={icon}
