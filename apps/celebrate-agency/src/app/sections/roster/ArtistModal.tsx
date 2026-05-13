@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import {
   IconBrandInstagram,
@@ -57,13 +57,6 @@ export function ArtistModal({
   const dialogRef = useRef<HTMLDivElement>(null);
   const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const [photoLoaded, setPhotoLoaded] = useState(false);
-  const lastArtistIdRef = useRef(artist?.id);
-
-  if (artist?.id !== lastArtistIdRef.current) {
-    lastArtistIdRef.current = artist?.id;
-    setPhotoLoaded(false);
-  }
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -187,8 +180,7 @@ export function ArtistModal({
                   alt={artist.name}
                   fill
                   sizes="(max-width: 1024px) 60vw, 600px"
-                  className={`object-cover transition-opacity duration-300 ${photoLoaded ? "opacity-100" : "opacity-0"}`}
-                  onLoad={() => setPhotoLoaded(true)}
+                  className="object-cover"
                   priority
                 />
               </div>
