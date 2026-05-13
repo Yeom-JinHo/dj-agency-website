@@ -1,7 +1,15 @@
 import { ARTISTS } from "@/consts/artists";
 
+// Each set must exceed viewport width so the -50% translate (= one set)
+// always lands on filled track. Sized for 4K+ ultrawide displays.
+const REPEATS_PER_SET = 6;
+
+const SET = Array.from({ length: REPEATS_PER_SET }).flatMap(() =>
+  ARTISTS.map((artist) => artist.name)
+);
+
 export default function Marquee() {
-  const loop = [...ARTISTS.map((artist) => artist.name), ...ARTISTS.map((artist) => artist.name)];
+  const loop = [...SET, ...SET];
   return (
     <div
       aria-hidden="true"
