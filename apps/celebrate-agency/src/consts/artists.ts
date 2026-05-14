@@ -137,4 +137,72 @@ export const ARTISTS: Artist[] = [
       { platform: "spotify", url: "https://open.spotify.com/" },
     ],
   },
+  {
+    id: "aster",
+    name: "Aster",
+    image: "/images/artist/aster/profile.webp",
+    bio: "Coming Soon.",
+    city: "Seoul",
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
+    socials: [
+      {
+        platform: "youtube",
+        url: "https://www.youtube.com/watch?v=1lAXNqA25Bs",
+      },
+      { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
+      { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
+    ],
+  },
+  {
+    id: "breeze",
+    name: "Breeze",
+    image: "/images/artist/breeze/profile.webp",
+    bio: "Coming Soon.",
+    city: "Seoul",
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
+    socials: [
+      {
+        platform: "youtube",
+        url: "https://www.youtube.com/watch?v=1lAXNqA25Bs",
+      },
+      { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
+      { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
+    ],
+  },
+  {
+    id: "gg",
+    name: "GG",
+    image: "/images/artist/gg/profile.webp",
+    bio: "Coming Soon.",
+    city: "Seoul",
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
+    socials: [
+      {
+        platform: "youtube",
+        url: "https://www.youtube.com/watch?v=1lAXNqA25Bs",
+      },
+      { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
+      { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
+    ],
+  },
+  {
+    id: "jeride",
+    name: "Jeride",
+    image: "/images/artist/jeride/profile.webp",
+    bio: "Coming Soon.",
+    city: "Seoul",
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
+    socials: [
+      {
+        platform: "youtube",
+        url: "https://www.youtube.com/watch?v=1lAXNqA25Bs",
+      },
+      { platform: "instagram", url: "https://www.instagram.com/ye0m_2/" },
+      { platform: "soundcloud", url: "https://soundcloud.com/ye0m2" },
+      { platform: "spotify", url: "https://open.spotify.com/" },
+    ],
+  },
 ];
