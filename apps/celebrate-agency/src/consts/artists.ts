@@ -140,10 +140,10 @@ export const ARTISTS: Artist[] = [
   {
     id: "aster",
     name: "Aster",
-    image: "/images/artist/aster/profile.jpg",
-    bio: "To be continued.",
+    image: "/images/artist/aster/profile.webp",
+    bio: "Coming Soon.",
     city: "Seoul",
-    selectedWorks: [{ id: "—", title: "To be continued", meta: "—" }],
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
     socials: [
       {
         platform: "youtube",
@@ -157,10 +157,10 @@ export const ARTISTS: Artist[] = [
   {
     id: "breeze",
     name: "Breeze",
-    image: "/images/artist/breeze/profile.jpg",
-    bio: "To be continued.",
+    image: "/images/artist/breeze/profile.webp",
+    bio: "Coming Soon.",
     city: "Seoul",
-    selectedWorks: [{ id: "—", title: "To be continued", meta: "—" }],
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
     socials: [
       {
         platform: "youtube",
@@ -174,10 +174,10 @@ export const ARTISTS: Artist[] = [
   {
     id: "gg",
     name: "GG",
-    image: "/images/artist/gg/profile.jpg",
-    bio: "To be continued.",
+    image: "/images/artist/gg/profile.webp",
+    bio: "Coming Soon.",
     city: "Seoul",
-    selectedWorks: [{ id: "—", title: "To be continued", meta: "—" }],
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
     socials: [
       {
         platform: "youtube",
@@ -191,10 +191,10 @@ export const ARTISTS: Artist[] = [
   {
     id: "jeride",
     name: "Jeride",
-    image: "/images/artist/jeride/profile.jpg",
-    bio: "To be continued.",
+    image: "/images/artist/jeride/profile.webp",
+    bio: "Coming Soon.",
     city: "Seoul",
-    selectedWorks: [{ id: "—", title: "To be continued", meta: "—" }],
+    selectedWorks: [{ id: "—", title: "Coming Soon", meta: "—" }],
     socials: [
       {
         platform: "youtube",
