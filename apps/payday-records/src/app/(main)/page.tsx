@@ -19,11 +19,13 @@ export const metadata = createMetadata({
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
-    title,
+    // `absolute` so the root layout's "%s | Payday Records" template is not
+    // applied to the share-card title (which would duplicate the brand name).
+    title: { absolute: title },
     description,
     images: [{ ...ogImage, type: "image/jpeg" }],
   },
-  twitter: { title, description, images: [ogImage] },
+  twitter: { title: { absolute: title }, description, images: [ogImage] },
 });
 
 export default function Home(): ReactElement {

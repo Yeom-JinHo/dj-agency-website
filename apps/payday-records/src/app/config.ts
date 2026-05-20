@@ -8,7 +8,7 @@ const metadata: Metadata = {
   },
   site: {
     title: "Payday Records",
-    description: "Payday Records",
+    description: "Payday Records is an independent music label.",
     url: "https://payday-records.com",
     keywords: ["Payday Records"],
     language: "en",
