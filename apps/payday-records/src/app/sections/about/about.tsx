@@ -6,7 +6,7 @@ import MotionWrap from "@repo/ui/common/MotionWrap";
 function About() {
   return (
     <MotionWrap className="w-full py-24 lg:py-32" id="about">
-      <ScrollVelocity texts={["Payday", "Records"]} className="font-display" />
+      <ScrollVelocity texts={["Payday", "Records"]} className="font-gothic" />
       <div className="mt-24 flex flex-col items-center px-4 text-center">
         <TextReveal as="h2" className="section-heading">
           About

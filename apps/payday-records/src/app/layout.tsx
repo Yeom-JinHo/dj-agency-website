@@ -1,4 +1,4 @@
-import { Anton, Bricolage_Grotesque } from "next/font/google";
+import { Anton, Bricolage_Grotesque, UnifrakturCook } from "next/font/google";
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
 
@@ -18,12 +18,21 @@ const bricolage_grotesque = Bricolage_Grotesque({
   display: "swap",
 });
 
-// Condensed gothic display face — echoes the blackletter wordmark across headings/marquee.
+// Condensed gothic face — kept for small/legibility-critical spots (header wordmark).
 const anton = Anton({
   weight: "400",
   subsets: ["latin"],
   display: "swap",
   variable: "--font-anton",
+});
+
+// Heavy blackletter display face — matches the bold, angular hero wordmark
+// on large headings + marquee.
+const blackletter = UnifrakturCook({
+  weight: "700",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-blackletter",
 });
 
 export const metadata = createMetadata({
@@ -55,7 +64,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${bricolage_grotesque.className} ${anton.variable} antialiased`}
+        className={`${bricolage_grotesque.className} ${anton.variable} ${blackletter.variable} antialiased`}
       >
         <ReactScan />
         <ErrorBoundary>
