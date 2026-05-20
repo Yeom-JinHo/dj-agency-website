@@ -5,6 +5,7 @@ import type { Viewport } from "next";
 import "@/styles/globals.css";
 
 import { metadata as meta } from "@/app/config";
+import { OG_IMAGE } from "@/consts/brand";
 import { Providers } from "@repo/ui/common/Providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
@@ -39,9 +40,13 @@ export const metadata = createMetadata({
     template: `%s | ${meta.site.title}`,
   },
   description: meta.site.description,
+  openGraph: {
+    images: [OG_IMAGE],
+  },
   twitter: {
     title: meta.site.title,
     description: meta.site.description,
+    images: [OG_IMAGE],
   },
 });
 
