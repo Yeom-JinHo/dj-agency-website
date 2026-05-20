@@ -3,25 +3,25 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
-// hero.png is read from disk, so this must run on the Node.js runtime.
+// The brand icon is read from disk, so this must run on the Node.js runtime.
 export const runtime = "nodejs";
 // No request-dependent input — generate once at build time and cache.
 export const dynamic = "force-static";
 
 const SIZE = { width: 1200, height: 630 } as const;
-const PADDING = 96;
+// app/icon.png is a 512×512 black-background wordmark — high-contrast and
+// crisp. Rendered at its native size (no upscaling) so the card stays sharp.
+const LOGO = 512;
 
 export async function GET() {
-  let heroSrc: string | null = null;
+  let logoSrc: string | null = null;
   try {
-    const heroBytes = await readFile(
-      join(process.cwd(), "public/images/logo/hero.png"),
-    );
-    heroSrc = `data:image/png;base64,${heroBytes.toString("base64")}`;
+    const bytes = await readFile(join(process.cwd(), "src/app/icon.png"));
+    logoSrc = `data:image/png;base64,${bytes.toString("base64")}`;
   } catch {
     // Asset moved/renamed — fall back to a brand-text card so the OG image
     // still resolves instead of returning a 500.
-    heroSrc = null;
+    logoSrc = null;
   }
 
   return new ImageResponse(
@@ -33,18 +33,18 @@ export async function GET() {
           height: "100%",
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: "#0a0a0a",
-          padding: PADDING,
+          // Pure black matches the icon's baked-in background so the square
+          // blends seamlessly into a full-bleed card.
+          backgroundColor: "#000000",
         }}
       >
-        {heroSrc ? (
+        {logoSrc ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={heroSrc}
+            src={logoSrc}
             alt="Celebrate Agency"
-            width={SIZE.width - PADDING * 2}
-            height={SIZE.height - PADDING * 2}
-            style={{ objectFit: "contain" }}
+            width={LOGO}
+            height={LOGO}
           />
         ) : (
           <div
