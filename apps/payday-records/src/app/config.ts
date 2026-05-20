@@ -16,4 +16,13 @@ const metadata: Metadata = {
   },
 };
 
-export { metadata };
+// Single source of truth for the static OG/Twitter share image (see public/og-image.jpg).
+// jpg (not webp) for SNS scraper compatibility — see .omc/plans/payday-records-seo-consensus.md.
+const ogImage = {
+  url: "/og-image.jpg",
+  width: 1200,
+  height: 630,
+  alt: "Payday Records",
+} as const;
+
+export { metadata, ogImage };
