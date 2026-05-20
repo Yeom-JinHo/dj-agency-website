@@ -110,16 +110,6 @@
   font-size: clamp(2rem, 5vw, 2.75rem);
 }
 
-/* Eyebrow/kicker label that gives each section structure + place. */
-@utility section-kicker {
-  display: inline-block;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: hsl(240 5% 64.9%);
-}
-
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still

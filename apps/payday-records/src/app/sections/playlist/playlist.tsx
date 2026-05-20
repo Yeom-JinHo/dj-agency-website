@@ -8,7 +8,6 @@ function Playlist() {
   return (
     <MotionWrap className="w-full py-24 lg:py-32" id="playlist">
       <div className="flex flex-col items-center justify-center px-4 text-center">
-        <span className="section-kicker mb-5">02 — Music</span>
         <TextReveal as="h2" className="section-heading">
           Sound
         </TextReveal>

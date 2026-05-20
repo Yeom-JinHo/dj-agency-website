@@ -8,7 +8,6 @@ function About() {
     <MotionWrap className="w-full py-24 lg:py-32" id="about">
       <ScrollVelocity texts={["Payday", "Records"]} className="font-display" />
       <div className="mt-24 flex flex-col items-center px-4 text-center">
-        <span className="section-kicker mb-5">01 — Label</span>
         <TextReveal as="h2" className="section-heading">
           About
         </TextReveal>
