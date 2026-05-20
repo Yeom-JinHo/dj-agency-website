@@ -1,4 +1,4 @@
-import { Bricolage_Grotesque } from "next/font/google";
+import { Anton, Bricolage_Grotesque } from "next/font/google";
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
 
@@ -16,6 +16,14 @@ import { ReactScan } from "@repo/ui/common/ReactScan";
 const bricolage_grotesque = Bricolage_Grotesque({
   subsets: ["latin"],
   display: "swap",
+});
+
+// Condensed gothic display face — echoes the blackletter wordmark across headings/marquee.
+const anton = Anton({
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-anton",
 });
 
 export const metadata = createMetadata({
@@ -46,7 +54,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${bricolage_grotesque.className} antialiased`}>
+      <body
+        className={`${bricolage_grotesque.className} ${anton.variable} antialiased`}
+      >
         <ReactScan />
         <ErrorBoundary>
           <Providers>

@@ -6,7 +6,7 @@ function Hero() {
     <section className="relative flex h-[100vh] items-center justify-center">
       <BlurFade>
         <Image
-          src="/images/logo/400_300/PAYDAY.png"
+          src="/images/logo/400_300/PAYDAY.webp"
           alt="Payday Records"
           width={900}
           height={600}

@@ -13,11 +13,7 @@ function Contact() {
     <div className="w-full" id="contact">
       <div className="flex flex-col items-center justify-center">
         <MacBookScroll
-          title={
-            <span className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight">
-              Show me the your dream
-            </span>
-          }
+          title={<span className="section-heading">Show me your dream</span>}
           badge={
             <a href="https://www.instagram.com/samkor.br/">
               <Image
@@ -33,16 +29,17 @@ function Contact() {
         />
         <div
           style={{
-            backdropFilter: "blur(11px) saturate(200%)",
-            WebkitBackdropFilter: "blur(11px) saturate(200%)",
-            backgroundColor: "rgba(17, 25, 40, 0.27)",
+            backdropFilter: "blur(16px) saturate(140%)",
+            WebkitBackdropFilter: "blur(16px) saturate(140%)",
+            backgroundColor: "rgba(9, 9, 11, 0.55)",
             borderRadius: "12px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
           className="pointer-events-auto relative mb-[200px] flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] [@media(max-width:375px)]:mb-40"
         >
           <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
-          <h3 className="mb-8 text-center text-3xl font-bold">Contact</h3>
+          <span className="section-kicker mb-3">03 — Reach out</span>
+          <h3 className="card-heading mb-8 text-center">Contact</h3>
           <div className="flex items-center">
             <p className="text-lg md:text-xl">{contact.email}</p>
             <CopyButton text={contact.email} className="ml-2" />

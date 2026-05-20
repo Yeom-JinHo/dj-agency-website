@@ -7,16 +7,14 @@ import { playlist } from "./config";
 function Playlist() {
   return (
     <MotionWrap className="w-full py-24 lg:py-32" id="playlist">
-      <div className="flex flex-col items-center justify-center px-4">
-        <TextReveal
-          as="h2"
-          className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-        >
+      <div className="flex flex-col items-center justify-center px-4 text-center">
+        <span className="section-kicker mb-5">02 — Music</span>
+        <TextReveal as="h2" className="section-heading">
           Sound
         </TextReveal>
         <TextReveal
           as="p"
-          className="mt-4 max-w-[700px] text-center text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+          className="mt-6 max-w-[640px] text-base/relaxed text-neutral-400 md:text-lg/relaxed"
         >
           Curated by Payday Records
         </TextReveal>
