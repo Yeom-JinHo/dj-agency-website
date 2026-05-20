@@ -46,6 +46,7 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 - 저장소에 추가되는 모든 이미지(`.png`, `.jpg`, `.jpeg`, `.gif`, `.avif` 등)는 즉시 webp로 변환 후 원본 삭제.
 - 변환은 `sharp`로 수행. quality 80에서 시작해 1MB 초과 시 quality를 단계적으로 낮춰 1MB 이하를 보장.
 - 코드/마크다운/설정의 이미지 참조 경로도 함께 `.webp`로 갱신.
+- **예외**: Next.js 메타데이터 컨벤션 파일(`icon.*`, `apple-icon.*`, `favicon.*`, `opengraph-image.*`, `twitter-image.*`)과 SVG는 그대로 둔다. 메타데이터 파일은 Next.js가 고정 확장자로 인식하고, SVG는 벡터라 변환 대상이 아니다.
 
 ## Git
 
