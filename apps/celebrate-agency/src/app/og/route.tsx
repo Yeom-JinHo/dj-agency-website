@@ -12,10 +12,17 @@ const SIZE = { width: 1200, height: 630 } as const;
 const PADDING = 96;
 
 export async function GET() {
-  const heroBytes = await readFile(
-    join(process.cwd(), "public/images/logo/hero.png"),
-  );
-  const heroSrc = `data:image/png;base64,${heroBytes.toString("base64")}`;
+  let heroSrc: string | null = null;
+  try {
+    const heroBytes = await readFile(
+      join(process.cwd(), "public/images/logo/hero.png"),
+    );
+    heroSrc = `data:image/png;base64,${heroBytes.toString("base64")}`;
+  } catch {
+    // Asset moved/renamed — fall back to a brand-text card so the OG image
+    // still resolves instead of returning a 500.
+    heroSrc = null;
+  }
 
   return new ImageResponse(
     (
@@ -30,14 +37,28 @@ export async function GET() {
           padding: PADDING,
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={heroSrc}
-          alt="Celebrate Agency"
-          width={SIZE.width - PADDING * 2}
-          height={SIZE.height - PADDING * 2}
-          style={{ objectFit: "contain" }}
-        />
+        {heroSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={heroSrc}
+            alt="Celebrate Agency"
+            width={SIZE.width - PADDING * 2}
+            height={SIZE.height - PADDING * 2}
+            style={{ objectFit: "contain" }}
+          />
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              color: "#ffffff",
+              fontSize: 96,
+              fontWeight: 700,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Celebrate Agency
+          </div>
+        )}
       </div>
     ),
     { ...SIZE },

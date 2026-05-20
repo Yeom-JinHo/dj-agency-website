@@ -7,7 +7,7 @@ import Marquee from "@/app/sections/marquee/marquee";
 import Roster from "@/app/sections/roster/roster";
 import Stats from "@/app/sections/stats/stats";
 import Work from "@/app/sections/work/work";
-import { organizationJsonLd } from "@/utils/jsonLd";
+import { jsonLdScript, organizationJsonLd } from "@/utils/jsonLd";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -19,7 +19,7 @@ export default function CelebrateAgencyPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(organizationJsonLd()),
+          __html: jsonLdScript(organizationJsonLd()),
         }}
       />
       <Header />

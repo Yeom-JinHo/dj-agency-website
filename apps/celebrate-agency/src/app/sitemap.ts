@@ -4,18 +4,18 @@ import { metadata as meta } from "@/app/config";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = meta.site.url;
-  const lastModified = new Date();
 
+  // lastModified is intentionally omitted: a near-static marketing site would
+  // otherwise stamp every URL with the build time on each deploy, which trains
+  // crawlers to distrust the lastmod signal.
   return [
     {
       url: baseUrl,
-      lastModified,
       changeFrequency: "monthly",
       priority: 1,
     },
     {
       url: `${baseUrl}/intro`,
-      lastModified,
       changeFrequency: "monthly",
       priority: 0.5,
     },
