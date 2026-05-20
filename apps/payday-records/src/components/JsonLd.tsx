@@ -3,25 +3,6 @@ import type { Organization, WebSite, WithContext } from "schema-dts";
 import { metadata as meta } from "@/app/config";
 import { contact } from "@/app/sections/contact/config";
 
-// JSON.stringify does not escape HTML-significant characters, so a value
-// containing "</script>" could break out of the JSON-LD block. Inputs are
-// static today, but escaping < > & keeps this safe if the data ever becomes
-// dynamic (e.g. sourced from a CMS or user input).
-function serializeJsonLd(data: unknown): string {
-  return JSON.stringify(data).replace(/[<>&]/g, (char) => {
-    switch (char) {
-      case "<":
-        return "\\u003c";
-      case ">":
-        return "\\u003e";
-      case "&":
-        return "\\u0026";
-      default:
-        return char;
-    }
-  });
-}
-
 // sameAs should list the entity's own profile pages, so content URLs such as
 // a YouTube video are excluded. Confirming the official Payday Records brand
 // accounts (vs. the associated v.f.labs / artist pages) remains a follow-up.
@@ -52,11 +33,11 @@ export function JsonLd() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(organization) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: serializeJsonLd(website) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
       />
     </>
   );
