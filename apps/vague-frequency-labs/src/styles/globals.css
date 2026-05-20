@@ -6,7 +6,13 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
+/*
+  Font tokens reference runtime CSS variables (--font-geist / --font-fraunces)
+  injected by next/font on <body>. In Tailwind v4 these must live in
+  `@theme inline` so the generated utilities emit `var(--font-*)` literally
+  instead of being resolved (to empty) at build time.
+*/
+@theme inline {
   --font-sans:
     var(--font-geist), "Pretendard Variable", Pretendard, system-ui,
     -apple-system, BlinkMacSystemFont, sans-serif;
@@ -16,7 +22,9 @@
   --font-display:
     var(--font-fraunces), "Pretendard Variable", Pretendard, ui-serif, Georgia,
     serif;
+}
 
+@theme {
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
@@ -169,7 +177,7 @@
   h2,
   h3,
   .font-display {
-    font-family: var(--font-display);
+    @apply font-display;
   }
 }
 
