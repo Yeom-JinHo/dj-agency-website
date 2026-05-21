@@ -24,6 +24,9 @@ export const metadata = createMetadata({
     title,
     description,
   },
+  alternates: {
+    canonical: "/artist",
+  },
 });
 
 const jsonLd: WithContext<CollectionPage> = {

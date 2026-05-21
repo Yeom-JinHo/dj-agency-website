@@ -41,6 +41,9 @@ export async function generateMetadata(props: {
       ],
       authors: meta.author.name,
     },
+    alternates: {
+      canonical: `/artist/${encodeURIComponent(artist.name)}`,
+    },
   }) satisfies Metadata;
 }
 

@@ -21,6 +21,9 @@ export const metadata = createMetadata({
     title,
     description,
   },
+  alternates: {
+    canonical: "/about",
+  },
 });
 
 const jsonLd: WithContext<Organization> = {
