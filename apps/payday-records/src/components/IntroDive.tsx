@@ -8,7 +8,7 @@ import { motion } from "motion/react";
  * 필드가 사라지며 P의 보울(구멍) 너머로 뒤의 Hero가 드러난다 → P는 보울 중심을
  * 기준으로 거대하게 확대되어 실루엣이 화면 밖으로 날아가고 Hero만 남는다.
  *
- * 실루엣은 알파 PNG를 CSS 마스크로 입혀 테마색(bg-foreground)으로 렌더한다.
+ * 실루엣은 알파 webp를 CSS 마스크로 입혀 테마색(bg-foreground)으로 렌더한다.
  * 마스크 투명 영역(보울 + 실루엣 바깥)으로 뒤의 Hero가 비친다.
  * 매 진입마다 1회 재생한다.
  *
@@ -17,7 +17,7 @@ import { motion } from "motion/react";
  */
 
 // 메탈 P 실루엣 마스크 (배경/보울 알파 투명). 비율 1600x1333.
-const MASK_SRC = "/images/intro/metal-p.png";
+const MASK_SRC = "/images/intro/metal-p.webp";
 const MASK_RATIO = "1600 / 1333";
 
 // 실루엣 박스 기준 보울(구멍) 중심 — 카메라가 빨려드는 지점.
