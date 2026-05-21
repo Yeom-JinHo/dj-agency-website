@@ -14,6 +14,9 @@ const metadata: Metadata = {
     keywords: ["Vague Frequency Laboratory"],
     language: "en",
     charset: "UTF-8",
+    // Served by the app/opengraph-image.png file convention (replaces the
+    // factory's default /og, which has no route in this app).
+    ogImage: "/opengraph-image.png",
   },
 };
 

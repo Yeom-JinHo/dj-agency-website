@@ -15,6 +15,13 @@ export interface AppMetaConfig {
     language: string;
     charset: string;
     ogLocale?: string;
+    /**
+     * Path/URL for the default OG & Twitter card image, resolved against
+     * `metadataBase`. Defaults to `/og` for backward compatibility; set this to
+     * a served route (e.g. the `app/opengraph-image.png` convention path) to
+     * override per app. Pages may still override `openGraph.images` themselves.
+     */
+    ogImage?: string;
   };
 }
 
@@ -38,6 +45,7 @@ export function createMetadataFactory(meta: AppMetaConfig) {
   return function createMetadata(override: Metadata): Metadata {
     const imageAlt = deriveImageAlt(override.title, meta.site.title);
     const ogLocale = meta.site.ogLocale ?? DEFAULT_OG_LOCALE;
+    const ogImageUrl = meta.site.ogImage ?? "/og";
     const twitterHandle = meta.author.twitterHandle;
 
     return {
@@ -64,7 +72,7 @@ export function createMetadataFactory(meta: AppMetaConfig) {
             alt: imageAlt,
             width: 1200,
             height: 630,
-            url: "/og",
+            url: ogImageUrl,
             type: "image/png",
           },
         ],
@@ -83,7 +91,7 @@ export function createMetadataFactory(meta: AppMetaConfig) {
             alt: imageAlt,
             width: 1200,
             height: 630,
-            url: "/og",
+            url: ogImageUrl,
           },
         ],
         ...override.twitter,
