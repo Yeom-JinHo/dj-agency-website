@@ -13,12 +13,12 @@ import { AnimatePresence, motion } from "motion/react";
  * 매 진입마다 1회 재생한다.
  */
 
-// 메탈 P 실루엣 마스크 (배경/보울 알파 투명). 비율 1600x1327.
+// 메탈 P 실루엣 마스크 (배경/보울 알파 투명). 비율 1600x1333.
 const MASK_SRC = "/images/intro/metal-p.png";
-const MASK_RATIO = "1600 / 1327";
+const MASK_RATIO = "1600 / 1333";
 
 // 실루엣 박스 기준 보울(구멍) 중심 — 카메라가 빨려드는 지점.
-const COUNTER_ORIGIN = "54% 36%";
+const COUNTER_ORIGIN = "55% 36%";
 
 // 전체 연출 길이(초).
 const DURATION = 2;
