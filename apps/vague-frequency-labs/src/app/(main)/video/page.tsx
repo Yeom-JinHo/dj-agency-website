@@ -7,10 +7,9 @@ import { createMetadata } from "@/utils/index";
 
 import YoutubeCard from "./components/YoutubeCard";
 
-const title = "Video";
-// 사용자 검토 필요 (영문 메타 카피 초안)
+const title = "Videos & Live Sets";
 const description =
-  "Watch live sets, DJ mixes, and performance videos from Vague Frequency Laboratory artists, featuring tech house and electronic music from Seoul and beyond.";
+  "Watch live sets, DJ mixes, and performances from Vague Frequency Laboratory artists — experimental tech house and electronic music from Seoul.";
 
 export const metadata = createMetadata({
   title,

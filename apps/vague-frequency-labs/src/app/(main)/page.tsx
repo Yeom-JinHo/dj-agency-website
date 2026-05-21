@@ -4,9 +4,8 @@ import ArtistProfiles from "../sections/artistProfiles/artistProfiles";
 import MusicList from "../sections/musicList/MusicList";
 import Hero from "../sections/hero/hero";
 
-// 사용자 검토 필요 (영문 메타 카피 초안)
 const description =
-  "Vague Frequency Laboratory is an independent music label focused on experimental and innovative electronic music, representing a roster of tech house and bass house artists from Seoul.";
+  "Vague Frequency Laboratory is an independent Seoul electronic music label spotlighting experimental tech house and bass house artists, releases, and live sets.";
 
 export const metadata = createMetadata({
   description,

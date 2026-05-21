@@ -3,9 +3,8 @@ import { getAppUrls } from "@repo/utils/app-urls";
 import { createMetadata } from "@/utils/index";
 
 const title = "Intro";
-// 사용자 검토 필요 (영문 메타 카피 초안)
 const description =
-  "Enter Vague Frequency Laboratory — an independent electronic music label and creative studio based in Seoul.";
+  "Enter Vague Frequency Laboratory — an independent Seoul electronic music label and creative studio for experimental tech house and bass house.";
 
 export const metadata = createMetadata({
   title,

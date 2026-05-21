@@ -9,8 +9,9 @@ import { createMetadata } from "@/utils/index";
 
 import ArtistSimpleCard from "../../sections/artistProfiles/ArtistSimpleCard";
 
-const title = "Artist";
-const description = "Here are some artist I have worked on.";
+const title = "Artists";
+const description =
+  "Meet the Vague Frequency Laboratory roster — tech house and bass house artists and DJs shaping experimental electronic music from Seoul.";
 
 export const metadata = createMetadata({
   title,

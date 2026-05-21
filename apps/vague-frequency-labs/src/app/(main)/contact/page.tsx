@@ -2,10 +2,9 @@ import type { ReactElement } from "react";
 import { createMetadata } from "@/utils/index";
 import ContactContent from "./ContactContent";
 
-const title = "Contact";
-// 사용자 검토 필요 (영문 메타 카피 초안)
+const title = "Contact & Booking";
 const description =
-  "Get in touch with Vague Frequency Laboratory. Reach out for bookings, releases, and collaboration inquiries with our Seoul-based electronic music label.";
+  "Contact Vague Frequency Laboratory for bookings, releases, and collaborations with our Seoul-based independent electronic music label and its artists.";
 
 export const metadata = createMetadata({
   title,
