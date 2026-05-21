@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Footer, Header } from "../sections";
+import IntroDive from "../../components/IntroDive";
 
 export default function MainLayout({
   children,
@@ -8,6 +9,7 @@ export default function MainLayout({
 }>) {
   return (
     <div className="flex min-h-[100dvh] flex-col">
+      <IntroDive />
       <Header />
       {children}
       <footer>
