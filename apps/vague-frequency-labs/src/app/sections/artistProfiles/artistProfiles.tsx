@@ -122,7 +122,7 @@ function ArtistProfiles() {
               Artist Profiles
             </TextReveal>
           </div>
-          <p className="mt-4 hidden text-gray-500 lg:mt-0 lg:block lg:w-[35%] dark:text-gray-400">
+          <p className="mt-4 hidden text-gray-600 lg:mt-0 lg:block lg:w-[35%] dark:text-gray-300">
             Vague Frequency Laboratory
           </p>
         </div>

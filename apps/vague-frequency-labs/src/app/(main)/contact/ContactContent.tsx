@@ -34,7 +34,7 @@ export default function ContactContent(): ReactElement {
                 <div className="space-y-4">
                   <TextReveal
                     as="p"
-                    className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+                    className="text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-300"
                   >
                     vaguefrequencylabs@gmail.com
                   </TextReveal>
@@ -50,7 +50,7 @@ export default function ContactContent(): ReactElement {
                 <div className="space-y-4">
                   <TextReveal
                     as="p"
-                    className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+                    className="text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-300"
                   >
                     서울특별시 중구 세종대로 110(수정)
                   </TextReveal>
