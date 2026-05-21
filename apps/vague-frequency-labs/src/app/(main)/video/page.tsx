@@ -1,46 +1,33 @@
+import type { ReactElement } from "react";
 import React from "react";
 import { musicInfo } from "@/source";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
+import { createMetadata } from "@/utils/index";
 
 import YoutubeCard from "./components/YoutubeCard";
 
-// TODO: 수정필요
-// export const metadata = createMetadata({
-//   title,
-//   description,
-//   openGraph: {
-//     url: "/music",
-//     title,
-//     description,
-//   },
-//   twitter: {
-//     title,
-//     description,
-//   },
-// });
+const title = "Videos & Live Sets";
+const description =
+  "Watch live sets, DJ mixes, and performances from Vague Frequency Laboratory artists — experimental tech house and electronic music from Seoul.";
 
-// const jsonLd: WithContext<CollectionPage> = {
-//   "@context": "https://schema.org",
-//   "@type": "CollectionPage",
-//   name: title,
-//   description,
-//   url: `${meta.site.url}/music`,
-//   isPartOf: {
-//     "@type": "WebSite",
-//     name: meta.site.title,
-//     url: meta.site.url,
-//   },
-//   hasPart: [...project.getPages()].map((project) => ({
-//     "@type": "SoftwareApplication",
-//     name: project.data.title,
-//     description: project.data.description,
-//     url: project.url,
-//     applicationCategory: "WebApplication",
-//   })),
-// };
-
-import type { ReactElement } from "react";
+export const metadata = createMetadata({
+  title,
+  description,
+  keywords: ["Live Sets", "DJ Mix", "Performance", "Electronic Music", "Seoul"],
+  openGraph: {
+    url: "/video",
+    title,
+    description,
+  },
+  twitter: {
+    title,
+    description,
+  },
+  alternates: {
+    canonical: "/video",
+  },
+});
 
 export default function VideoPage(): ReactElement {
   const musicInfos = [
@@ -53,10 +40,6 @@ export default function VideoPage(): ReactElement {
 
   return (
     <main className="my-16 flex-1">
-      {/* <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      /> */}
       <section
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="video"

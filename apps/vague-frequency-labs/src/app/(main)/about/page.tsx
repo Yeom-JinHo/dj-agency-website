@@ -7,7 +7,8 @@ import ParallaxGlobeLogo from "@/components/ParallaxGlobeLogo";
 import { createMetadata } from "@/utils/index";
 
 const title = "About";
-const description = "Learn more about Vague Frequency Laboratory";
+const description =
+  "About Vague Frequency Laboratory — an independent Seoul electronic music label and creative studio built around experimental tech house and bass house.";
 
 export const metadata = createMetadata({
   title,
@@ -20,6 +21,9 @@ export const metadata = createMetadata({
   twitter: {
     title,
     description,
+  },
+  alternates: {
+    canonical: "/about",
   },
 });
 
