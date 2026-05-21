@@ -15,20 +15,17 @@ function Credits() {
 
   return (
     <MotionWrap className="w-full py-24 lg:py-32" id="credits">
-      <div className="flex flex-col items-center justify-center px-4">
-        <TextReveal
-          as="h2"
-          className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-        >
+      <div className="flex flex-col items-center justify-center px-4 text-center">
+        <TextReveal as="h2" className="section-heading">
           Shoutouts
         </TextReveal>
         <TextReveal
           as="p"
-          className="mt-4 max-w-[700px] text-center text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+          className="mt-6 max-w-[640px] text-base/relaxed text-neutral-400 md:text-lg/relaxed"
         >
-          Artists playing & repping Payday Records
+          Artists playing &amp; repping Payday Records
         </TextReveal>
-        <ul className="mt-12 w-full max-w-[760px] divide-y divide-white/10">
+        <ul className="mt-12 w-full max-w-[760px] divide-y divide-white/10 text-left">
           {credits.map((credit, index) => {
             const platform = platforms[credit.platform];
 
@@ -39,7 +36,7 @@ function Credits() {
                     href={credit.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 py-4 transition-colors hover:bg-white/[0.03]"
+                    className="group flex items-center gap-4 py-5 transition-colors hover:bg-white/[0.03]"
                   >
                     <Icon
                       name={platform.iconName}
@@ -47,19 +44,21 @@ function Credits() {
                       className="h-5 w-5 shrink-0"
                     />
                     <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                      <span className="font-medium">{credit.artist}</span>
+                      <span className="text-base font-medium md:text-lg">
+                        {credit.artist}
+                      </span>
                       {credit.note && (
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                        <span className="text-sm text-neutral-400">
                           {credit.note}
                         </span>
                       )}
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                      <span className="text-sm text-neutral-500">
                         · {credit.date}
                       </span>
                     </div>
                     <Icon
                       name="LuArrowUpRight"
-                      className="h-4 w-4 shrink-0 text-gray-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 dark:text-gray-400"
+                      className="h-4 w-4 shrink-0 text-neutral-500 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-300"
                     />
                   </Link>
                 </BlurFade>
