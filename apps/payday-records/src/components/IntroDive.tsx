@@ -21,7 +21,7 @@ const MASK_RATIO = "1600 / 1333";
 const COUNTER_ORIGIN = "55% 36%";
 
 // 전체 연출 길이(초).
-const DURATION = 2;
+const DURATION = 2.8;
 
 // 실루엣 확대 배율 — 다이브 느낌은 주되 격하게 날아가지 않을 정도.
 const MAX_SCALE = 22;
