@@ -4,6 +4,7 @@ import { createMetadata } from "@/utils";
 import { ogImage } from "@/app/config";
 import About from "../sections/about/about";
 import Contact from "../sections/contact/contact";
+import Credits from "../sections/credits/credits";
 import Hero from "../sections/hero/hero";
 import Playlist from "../sections/playlist/playlist";
 
@@ -34,6 +35,7 @@ export default function Home(): ReactElement {
       <Hero />
       <About />
       <Playlist />
+      <Credits />
       <Contact />
     </main>
   );

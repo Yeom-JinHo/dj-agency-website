@@ -1,10 +1,18 @@
 import type { FC } from "react";
 import { IconType } from "react-icons";
-import { LuPlus, LuMenu, LuX, LuArrowLeft, LuArrowRight } from "react-icons/lu";
+import {
+  LuPlus,
+  LuMenu,
+  LuX,
+  LuArrowLeft,
+  LuArrowRight,
+  LuArrowUpRight,
+} from "react-icons/lu";
 import {
   SiApple,
   SiBeatport,
   SiInstagram,
+  SiMixcloud,
   SiSoundcloud,
   SiSpotify,
   SiX,
@@ -15,6 +23,7 @@ export type IconName =
   | "SiApple"
   | "SiBeatport"
   | "SiInstagram"
+  | "SiMixcloud"
   | "SiSoundcloud"
   | "SiSpotify"
   | "SiX"
@@ -23,12 +32,14 @@ export type IconName =
   | "LuMenu"
   | "LuClose"
   | "LuArrowLeft"
-  | "LuArrowRight";
+  | "LuArrowRight"
+  | "LuArrowUpRight";
 
 const iconMap: Record<IconName, IconType> = {
   SiApple: SiApple,
   SiBeatport: SiBeatport,
   SiInstagram: SiInstagram,
+  SiMixcloud: SiMixcloud,
   SiSoundcloud: SiSoundcloud,
   SiSpotify: SiSpotify,
   SiX: SiX,
@@ -38,6 +49,7 @@ const iconMap: Record<IconName, IconType> = {
   LuClose: LuX,
   LuArrowLeft: LuArrowLeft,
   LuArrowRight: LuArrowRight,
+  LuArrowUpRight: LuArrowUpRight,
 };
 
 interface IconProps {
