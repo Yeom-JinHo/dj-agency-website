@@ -27,31 +27,10 @@ const platforms: Record<PlatformName, Platform> = {
 // 운영자가 직접 큐레이션하는 크레딧 목록. 최신순(날짜 내림차순)으로 둔다.
 const credits: Credit[] = [
   {
-    artist: "Kota Yamamoto",
-    platform: "Mixcloud",
-    date: "Mar 2025",
-    url: "https://www.mixcloud.com/",
-    note: "Mixcloud set",
-  },
-  {
-    artist: "Lena Brandt",
-    platform: "SoundCloud",
-    date: "Feb 2025",
-    url: "https://soundcloud.com/",
-    note: "Radio show",
-  },
-  {
-    artist: "Marcus Ueda",
-    platform: "YouTube",
-    date: "Jan 2025",
-    url: "https://www.youtube.com/",
-    note: "Live clip",
-  },
-  {
-    artist: "Sofia Reyes",
+    artist: "John Summit",
     platform: "Instagram",
-    date: "Dec 2024",
-    url: "https://www.instagram.com/",
+    date: "May 2026",
+    url: "https://www.instagram.com/p/DYh7OaEE-6l/?img_index=2",
   },
 ];
 
