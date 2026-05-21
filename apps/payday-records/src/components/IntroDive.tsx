@@ -23,8 +23,8 @@ const COUNTER_ORIGIN = "55% 36%";
 // 전체 연출 길이(초).
 const DURATION = 2.8;
 
-// 실루엣 확대 배율 — 다이브 느낌은 주되 격하게 날아가지 않을 정도.
-const MAX_SCALE = 22;
+// 실루엣 확대 배율 — 디졸브로 사라지므로 크게 날릴 필요 없음.
+const MAX_SCALE = 16;
 
 function IntroDive() {
   const [done, setDone] = useState(false);
@@ -46,7 +46,7 @@ function IntroDive() {
         style={{ willChange: "opacity" }}
         initial={{ opacity: 1 }}
         animate={{ opacity: [1, 1, 0, 0] }}
-        transition={{ duration: DURATION, times: [0, 0.32, 0.62, 1], ease: "easeInOut" }}
+        transition={{ duration: DURATION, times: [0, 0.25, 0.5, 1], ease: "easeInOut" }}
       />
 
       {/* P 실루엣: 보울 중심으로 거대하게 확대 → 구멍 너머 Hero가 드러난다. */}
@@ -68,16 +68,17 @@ function IntroDive() {
         }}
         initial={{ scale: 1, opacity: 0, filter: "blur(14px)" }}
         animate={{
-          scale: [1, 1.05, MAX_SCALE],
+          scale: [1, 1.06, MAX_SCALE],
           opacity: [0, 1, 1, 0],
-          filter: ["blur(14px)", "blur(0px)", "blur(0px)", "blur(10px)"],
+          filter: ["blur(14px)", "blur(0px)", "blur(0px)", "blur(8px)"],
         }}
         transition={{
           duration: DURATION,
-          scale: { times: [0, 0.22, 1], ease: ["easeOut", "easeIn"] },
-          // 다이브 막바지에 페이드아웃 + 살짝 블러로 Hero에 부드럽게 녹아든다.
-          opacity: { times: [0, 0.22, 0.7, 1], ease: "easeInOut" },
-          filter: { times: [0, 0.22, 0.7, 1], ease: "easeIn" },
+          // 처음부터 꾸준히 확대(easeInOut) — 끝에 모션이 몰리지 않게.
+          scale: { times: [0, 0.18, 1], ease: "easeInOut" },
+          // 절반(0.5)부터 천천히 페이드+블러 → Hero 위에서 서서히 녹아든다.
+          opacity: { times: [0, 0.18, 0.5, 1], ease: "easeInOut" },
+          filter: { times: [0, 0.18, 0.5, 1], ease: "easeInOut" },
         }}
         onAnimationComplete={() => setDone(true)}
       />
