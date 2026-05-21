@@ -23,8 +23,8 @@ const COUNTER_ORIGIN = "55% 36%";
 // 전체 연출 길이(초).
 const DURATION = 2;
 
-// 실루엣 확대 배율 — 잉크가 화면 밖으로 사라질 만큼만(과한 합성 비용 방지).
-const MAX_SCALE = 32;
+// 실루엣 확대 배율 — 다이브 느낌은 주되 격하게 날아가지 않을 정도.
+const MAX_SCALE = 22;
 
 function IntroDive() {
   const [done, setDone] = useState(false);
@@ -69,13 +69,15 @@ function IntroDive() {
         initial={{ scale: 1, opacity: 0, filter: "blur(14px)" }}
         animate={{
           scale: [1, 1.05, MAX_SCALE],
-          opacity: [0, 1, 1],
-          filter: ["blur(14px)", "blur(0px)", "blur(0px)"],
+          opacity: [0, 1, 1, 0],
+          filter: ["blur(14px)", "blur(0px)", "blur(0px)", "blur(10px)"],
         }}
         transition={{
           duration: DURATION,
-          times: [0, 0.22, 1],
-          ease: ["easeOut", "easeIn"],
+          scale: { times: [0, 0.22, 1], ease: ["easeOut", "easeIn"] },
+          // 다이브 막바지에 페이드아웃 + 살짝 블러로 Hero에 부드럽게 녹아든다.
+          opacity: { times: [0, 0.22, 0.7, 1], ease: "easeInOut" },
+          filter: { times: [0, 0.22, 0.7, 1], ease: "easeIn" },
         }}
         onAnimationComplete={() => setDone(true)}
       />
