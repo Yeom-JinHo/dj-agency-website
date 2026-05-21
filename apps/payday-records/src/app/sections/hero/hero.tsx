@@ -9,7 +9,7 @@ function Hero() {
       <h1 className="sr-only">Payday Records — Independent Music Label</h1>
       <BlurFade>
         <Image
-          src="/images/logo/400_300/PAYDAY.png"
+          src="/images/logo/400_300/PAYDAY.webp"
           alt="Payday Records"
           width={900}
           height={600}

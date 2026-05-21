@@ -81,6 +81,46 @@
   }
 }
 
+/* Condensed gothic display face (Anton) — brand voice for headings + marquee. */
+@utility font-display {
+  font-family:
+    var(--font-anton), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+}
+
+/* Single section-title scale shared by every section heading. */
+@utility section-heading {
+  font-family:
+    var(--font-anton), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.92;
+  font-size: clamp(2.75rem, 7vw, 4.5rem);
+}
+
+/* Oversized hero statement (e.g. the MacBook "Show me your dream" headline). */
+@utility hero-heading {
+  font-family:
+    var(--font-anton), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  line-height: 0.88;
+  font-size: clamp(3.5rem, 11vw, 8rem);
+}
+
+/* Secondary scale for in-card titles (e.g. Contact). */
+@utility card-heading {
+  font-family:
+    var(--font-anton), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+}
+
 /*
   The default border color has changed to `currentColor` in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
