@@ -20,13 +20,13 @@ function Credits() {
           as="h2"
           className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
         >
-          On Rotation
+          Shoutouts
         </TextReveal>
         <TextReveal
           as="p"
           className="mt-4 max-w-[700px] text-center text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
         >
-          As heard in
+          Artists playing & repping Payday Records
         </TextReveal>
         <ul className="mt-12 w-full max-w-[760px] divide-y divide-white/10">
           {credits.map((credit, index) => {
