@@ -39,7 +39,7 @@ function MusicList() {
             ))}
           </div>
           <Link href="/music">
-            <Button className="mt-12">
+            <Button variant="outline" className="mt-12">
               <Icon name="LuPlus" className="mr-2 h-4 w-4" />
               More
             </Button>

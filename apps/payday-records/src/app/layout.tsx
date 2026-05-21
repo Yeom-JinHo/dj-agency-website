@@ -4,10 +4,11 @@ import type { Viewport } from "next";
 
 import "@/styles/globals.css";
 
-import { metadata as meta } from "@/app/config";
+import { metadata as meta, ogImage } from "@/app/config";
 import { Providers } from "@repo/ui/common/Providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
+import { JsonLd } from "@/components/JsonLd";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
@@ -32,9 +33,13 @@ export const metadata = createMetadata({
     template: `%s | ${meta.site.title}`,
   },
   description: meta.site.description,
+  openGraph: {
+    images: [{ ...ogImage, type: "image/jpeg" }],
+  },
   twitter: {
     title: meta.site.title,
     description: meta.site.description,
+    images: [ogImage],
   },
 });
 
@@ -57,6 +62,7 @@ export default function RootLayout({
       <body
         className={`${bricolage_grotesque.className} ${anton.variable} antialiased`}
       >
+        <JsonLd />
         <ReactScan />
         <ErrorBoundary>
           <Providers>

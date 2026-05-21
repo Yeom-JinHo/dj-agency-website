@@ -41,7 +41,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             src={musicInfo.image}
             alt={musicInfo.name}
             sizes="(max-width: 768px) 150px, 360px"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
           <Image
             src={texture}
