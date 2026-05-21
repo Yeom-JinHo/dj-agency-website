@@ -13,7 +13,7 @@ function Contact() {
     <div className="w-full" id="contact">
       <div className="flex flex-col items-center justify-center">
         <MacBookScroll
-          title={<span className="section-heading">Show me your dream</span>}
+          title={<span className="hero-heading">Show me your dream</span>}
           badge={
             <a href="https://www.instagram.com/samkor.br/">
               <Image
