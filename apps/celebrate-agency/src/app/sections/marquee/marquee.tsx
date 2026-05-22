@@ -19,7 +19,7 @@ export default function Marquee() {
         {loop.map((item, i) => (
           <span
             key={`${item}-${i}`}
-            className="flex items-center gap-[60px] pr-[60px] font-display text-5xl uppercase tracking-[0.02em]"
+            className="flex items-center gap-[60px] pr-[60px] font-display text-4xl uppercase tracking-[0.02em] lg:text-5xl"
           >
             {item}
             <span className="inline-block h-2.5 w-2.5 rounded-full bg-ca-red" />

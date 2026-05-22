@@ -54,7 +54,10 @@
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-spotlight: spotlight 2s ease 0.75s 1 forwards;
-  --animate-marquee: marquee 38s linear infinite;
+  /* Track is one SET (REPEATS_PER_SET names) wide per -50% cycle, so duration
+     scales with the track. 370s over the mobile track ≈ 37px/s — slow enough
+     to read on a narrow viewport. Desktop eases up to ≈50px/s below. */
+  --animate-marquee: marquee 370s linear infinite;
   --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
   --animate-modal-fade: modal-fade 0.2s ease-out;
 
@@ -210,6 +213,16 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+}
+
+@layer base {
+  /* Desktop has a larger display font (track ~15.5k px) and room to read, so
+     ease the marquee up to ≈50px/s. Mobile stays slower (see --animate-marquee). */
+  @media (width >= 64rem) {
+    :root {
+      --animate-marquee: marquee 310s linear infinite;
+    }
   }
 }
 
