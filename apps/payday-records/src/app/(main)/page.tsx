@@ -6,6 +6,7 @@ import About from "../sections/about/about";
 import Contact from "../sections/contact/contact";
 import Hero from "../sections/hero/hero";
 import Playlist from "../sections/playlist/playlist";
+import Release from "../sections/release/release";
 
 const title = "Payday Records — Independent Music Label";
 const description =
@@ -33,6 +34,7 @@ export default function Home(): ReactElement {
     <main className="flex-1">
       <Hero />
       <About />
+      <Release />
       <Playlist />
       <Contact />
     </main>
