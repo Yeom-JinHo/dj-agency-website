@@ -9,7 +9,7 @@ import { releases } from "./config";
 function Release() {
   return (
     <MotionWrap
-      className="w-full border-t border-black/5 py-24 lg:py-32 dark:border-white/10"
+      className="w-full py-24 lg:py-32"
       id="release"
     >
       <div className="flex flex-col items-center justify-center px-4 text-center">
@@ -68,7 +68,7 @@ function Release() {
                     {release.artist}
                   </p>
                   {(release.label || release.catalogNo) && (
-                    <p className="text-muted-foreground/70 mt-1 truncate font-mono text-[10px] tracking-widest uppercase">
+                    <p className="text-muted-foreground mt-1 truncate font-mono text-[10px] tracking-widest uppercase">
                       {[release.label, release.catalogNo]
                         .filter(Boolean)
                         .join(" · ")}
