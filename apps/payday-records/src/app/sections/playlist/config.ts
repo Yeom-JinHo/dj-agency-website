@@ -17,22 +17,7 @@ const playlist = {
   },
   soundcloud: {
     url: SOUNDCLOUD_URL,
-    variants: [
-      {
-        label: "Visual",
-        meta: "visual=true",
-        height: 450,
-        embedSrc: buildSoundcloudSrc(`visual=true&${baseSoundcloudParams}`),
-      },
-      {
-        label: "Classic",
-        meta: "visual=false, SoundCloud 시그니처 파형",
-        height: 300,
-        embedSrc: buildSoundcloudSrc(
-          `visual=false&show_artwork=true&${baseSoundcloudParams}`,
-        ),
-      },
-    ],
+    embedSrc: buildSoundcloudSrc(`visual=true&${baseSoundcloudParams}`),
   },
 };
 
