@@ -1,28 +1,13 @@
 import type { Release } from "@/types/release";
 
-// placeholder — 실제 발매 정보와 아트워크는 여기만 채우면 됩니다.
+// 발매 정보는 여기에 추가합니다. artwork는 로컬 /public 경로만 사용.
 // artwork를 비워두면 그라데이션 카드로 렌더됩니다.
 const releases: Release[] = [
   {
-    title: "Release Title 1",
-    artist: "Artist Name",
-    label: "Payday Records",
-    href: "https://www.beatport.com/label/payday-records",
-    catalogNo: "PDR001",
-  },
-  {
-    title: "Release Title 2",
-    artist: "Artist Name",
-    label: "Payday Records",
-    href: "https://www.beatport.com/label/payday-records",
-    catalogNo: "PDR002",
-  },
-  {
-    title: "Release Title 3",
-    artist: "Artist Name",
-    label: "Payday Records",
-    href: "https://www.beatport.com/label/payday-records",
-    catalogNo: "PDR003",
+    title: "On Your Knees",
+    artist: "Sam Collins",
+    artwork: "/images/release/on-your-knees.webp",
+    href: "https://open.spotify.com/album/1u7feUZVMDcAlTxezTAnu5",
   },
 ];
 
