@@ -10,6 +10,10 @@ const links: Link[] = [
     href: "#about",
   },
   {
+    title: "Release",
+    href: "#release",
+  },
+  {
     title: "Contact",
     href: "#contact",
   },
