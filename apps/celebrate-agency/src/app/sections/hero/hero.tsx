@@ -25,9 +25,27 @@ export default function Hero() {
         </p>
         <div className="flex items-center gap-3.5 lg:justify-end">
           <span className="inline-block h-2 w-2 animate-pulse-dot rounded-full bg-ca-red" />
-          <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-ca-red">
-            ↓ 01 / 04
-          </span>
+          <nav
+            aria-label="Section index"
+            className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-red"
+          >
+            <span aria-hidden>↓</span>
+            <a href="#roster" className="transition-colors hover:text-ca-fg">
+              Roster
+            </a>
+            <span aria-hidden className="text-ca-muted">
+              /
+            </span>
+            <a href="#work" className="transition-colors hover:text-ca-fg">
+              Work
+            </a>
+            <span aria-hidden className="text-ca-muted">
+              /
+            </span>
+            <a href="#contact" className="transition-colors hover:text-ca-fg">
+              Contact
+            </a>
+          </nav>
         </div>
       </div>
     </section>
