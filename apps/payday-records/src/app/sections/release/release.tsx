@@ -218,7 +218,7 @@ function PlatformModal({
         transition={{ type: "spring", damping: 26, stiffness: 320 }}
       >
         <div className="flex max-h-[88vh] flex-col overflow-y-auto">
-          <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-[#1a1a1a]">
+          <div className="relative aspect-[3/2] w-full flex-shrink-0 overflow-hidden bg-[#1a1a1a]">
             {release.artwork ? (
               <Image
                 src={release.artwork}
