@@ -113,69 +113,64 @@ function Release() {
         </TextReveal>
 
         <div className="mt-12 flex w-full max-w-[1200px] flex-wrap justify-center gap-8 md:gap-14">
-          {releases.map((release, index) => {
-            const hasPlatforms = PLATFORM_ORDER.some((p) => release.links[p]);
-            return (
-              <BlurFade
-                key={release.catalogNo ?? release.title}
-                inView
-                duration={0.6}
-                delay={index * 0.08}
+          {releases.map((release, index) => (
+            <BlurFade
+              key={release.catalogNo ?? release.title}
+              inView
+              duration={0.6}
+              delay={index * 0.08}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenIndex(index)}
+                className="group block w-[160px] cursor-pointer text-left md:w-[340px]"
+                aria-haspopup="dialog"
+                aria-label={`${release.title} - ${release.artist} 플랫폼 선택`}
               >
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(index)}
-                  className="group block w-[160px] cursor-pointer text-left md:w-[340px]"
-                  aria-haspopup="dialog"
-                  aria-label={`${release.title} - ${release.artist} 플랫폼 선택`}
-                >
-                  <div className="relative aspect-square w-full overflow-hidden rounded-lg">
-                    {release.artwork ? (
-                      <Image
-                        src={release.artwork}
-                        alt={release.title}
-                        width={340}
-                        height={340}
-                        sizes="(max-width: 768px) 160px, 340px"
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
-                      />
-                    ) : (
-                      <div className="relative flex h-full w-full items-center justify-center bg-[#0f0f0f] p-4 text-center">
-                        <span className="absolute top-0 left-0 h-full w-[3px] bg-orange-500" />
-                        <span className="line-clamp-3 max-w-[85%] text-lg font-semibold tracking-tight text-white/85 md:text-xl">
-                          {release.title}
-                        </span>
-                      </div>
-                    )}
-
-                    {hasPlatforms && (
-                      <span className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/45 text-white/85 backdrop-blur-sm transition-colors duration-200 group-hover:bg-black/70 group-hover:text-white">
-                        <IconDots className="h-3.5 w-3.5" stroke={2.5} />
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+                  {release.artwork ? (
+                    <Image
+                      src={release.artwork}
+                      alt={release.title}
+                      width={340}
+                      height={340}
+                      sizes="(max-width: 768px) 160px, 340px"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+                    />
+                  ) : (
+                    <div className="relative flex h-full w-full items-center justify-center bg-[#0f0f0f] p-4 text-center">
+                      <span className="absolute top-0 left-0 h-full w-[3px] bg-orange-500" />
+                      <span className="line-clamp-3 max-w-[85%] text-lg font-semibold tracking-tight text-white/85 md:text-xl">
+                        {release.title}
                       </span>
-                    )}
+                    </div>
+                  )}
 
-                    <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/15" />
+                  <span className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/45 text-white/85 backdrop-blur-sm transition-colors duration-200 group-hover:bg-black/70 group-hover:text-white">
+                    <IconDots className="h-3.5 w-3.5" stroke={2.5} />
+                  </span>
+
+                  <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/15" />
                   </div>
 
-                  <div className="mt-3 text-left">
-                    <h4 className="truncate text-sm font-semibold md:text-base">
-                      {release.title}
-                    </h4>
-                    <p className="text-muted-foreground truncate text-xs md:text-sm">
-                      {release.artist}
+                <div className="mt-3 text-left">
+                  <h4 className="truncate text-sm font-semibold md:text-base">
+                    {release.title}
+                  </h4>
+                  <p className="text-muted-foreground truncate text-xs md:text-sm">
+                    {release.artist}
+                  </p>
+                  {(release.label || release.catalogNo) && (
+                    <p className="text-muted-foreground mt-1 truncate font-mono text-[10px] tracking-widest uppercase">
+                      {[release.label, release.catalogNo]
+                        .filter(Boolean)
+                        .join(" · ")}
                     </p>
-                    {(release.label || release.catalogNo) && (
-                      <p className="text-muted-foreground mt-1 truncate font-mono text-[10px] tracking-widest uppercase">
-                        {[release.label, release.catalogNo]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
-                    )}
-                  </div>
-                </button>
-              </BlurFade>
-            );
-          })}
+                  )}
+                </div>
+              </button>
+            </BlurFade>
+          ))}
         </div>
       </div>
 
@@ -268,33 +263,27 @@ function PlatformModal({
 
         <div className="h-px w-full bg-white/[0.08]" />
 
-        {availablePlatforms.length > 0 ? (
-          <ul className="max-h-[60vh] overflow-y-auto py-1">
-            {availablePlatforms.map((platform) => {
-              const { label, Icon } = PLATFORM_META[platform];
-              return (
-                <li key={platform}>
-                  <a
-                    href={release.links[platform]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group/row flex h-14 items-center gap-4 px-5 transition-colors hover:bg-white/[0.06]"
-                  >
-                    <Icon className="h-6 w-6 text-white/90" />
-                    <span className="flex-1 text-sm font-medium text-white/90">
-                      {label}
-                    </span>
-                    <IconArrowUpRight className="h-4 w-4 text-white/35 transition-colors group-hover/row:text-white/80" />
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="px-5 py-8 text-center text-sm text-white/40">
-            아직 등록된 플랫폼이 없습니다.
-          </p>
-        )}
+        <ul className="max-h-[60vh] overflow-y-auto py-1">
+          {availablePlatforms.map((platform) => {
+            const { label, Icon } = PLATFORM_META[platform];
+            return (
+              <li key={platform}>
+                <a
+                  href={release.links[platform]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group/row flex h-14 items-center gap-4 px-5 transition-colors hover:bg-white/[0.06]"
+                >
+                  <Icon className="h-6 w-6 text-white/90" />
+                  <span className="flex-1 text-sm font-medium text-white/90">
+                    {label}
+                  </span>
+                  <IconArrowUpRight className="h-4 w-4 text-white/35 transition-colors group-hover/row:text-white/80" />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
       </motion.div>
     </motion.div>
   );
