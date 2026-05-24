@@ -211,7 +211,7 @@ function PlatformModal({
       />
 
       <motion.div
-        className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl"
+        className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl md:max-w-[600px] md:rounded-3xl md:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.7)]"
         initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 8 }}
@@ -221,38 +221,40 @@ function PlatformModal({
           type="button"
           aria-label="닫기"
           onClick={onClose}
-          className="absolute top-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full text-white/55 transition-colors hover:bg-white/10 hover:text-white"
+          className="absolute top-3 right-3 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full text-white/55 transition-colors hover:bg-white/10 hover:text-white md:top-5 md:right-5 md:h-9 md:w-9"
         >
-          <IconX className="h-4 w-4" />
+          <IconX className="h-4 w-4 md:h-[18px] md:w-[18px]" />
         </button>
 
-        <div className="flex items-start gap-4 p-5 pr-12 text-left">
-          <div className="relative h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-md md:h-20 md:w-20">
+        <div className="flex items-start gap-4 p-5 pr-12 text-left md:gap-6 md:p-7 md:pr-16">
+          <div className="relative h-[72px] w-[72px] flex-shrink-0 overflow-hidden rounded-md md:h-[120px] md:w-[120px] md:rounded-lg">
             {release.artwork ? (
               <Image
                 src={release.artwork}
                 alt={release.title}
-                width={80}
-                height={80}
-                sizes="80px"
+                width={120}
+                height={120}
+                sizes="(min-width: 768px) 120px, 72px"
                 className="h-full w-full object-cover"
               />
             ) : (
               <div className="relative flex h-full w-full items-center justify-center bg-[#1a1a1a]">
-                <span className="absolute top-0 left-0 h-full w-[2px] bg-orange-500" />
-                <span className="line-clamp-2 px-2 text-center text-[10px] font-semibold tracking-tight text-white/85">
+                <span className="absolute top-0 left-0 h-full w-[2px] bg-orange-500 md:w-[3px]" />
+                <span className="line-clamp-2 px-2 text-center text-[10px] font-semibold tracking-tight text-white/85 md:text-xs">
                   {release.title}
                 </span>
               </div>
             )}
           </div>
-          <div className="min-w-0 flex-1 pt-0.5">
-            <h3 className="truncate text-base font-semibold text-white">
+          <div className="min-w-0 flex-1 pt-0.5 md:pt-1">
+            <h3 className="truncate text-base font-semibold text-white md:text-xl">
               {release.title}
             </h3>
-            <p className="truncate text-sm text-white/60">{release.artist}</p>
+            <p className="truncate text-sm text-white/60 md:mt-0.5 md:text-base">
+              {release.artist}
+            </p>
             {(release.label || release.catalogNo) && (
-              <p className="mt-1 truncate font-mono text-[10px] tracking-widest text-white/35 uppercase">
+              <p className="mt-1 truncate font-mono text-[10px] tracking-widest text-white/35 uppercase md:mt-2 md:text-[11px]">
                 {[release.label, release.catalogNo]
                   .filter(Boolean)
                   .join(" · ")}
@@ -263,7 +265,7 @@ function PlatformModal({
 
         <div className="h-px w-full bg-white/[0.08]" />
 
-        <ul className="max-h-[60vh] overflow-y-auto py-1">
+        <ul className="max-h-[60vh] overflow-y-auto py-1 md:py-2">
           {availablePlatforms.map((platform) => {
             const { label, Icon } = PLATFORM_META[platform];
             return (
@@ -272,13 +274,13 @@ function PlatformModal({
                   href={release.links[platform]}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group/row flex h-14 items-center gap-4 px-5 transition-colors hover:bg-white/[0.06]"
+                  className="group/row flex h-14 items-center gap-4 px-5 transition-colors hover:bg-white/[0.06] md:h-[72px] md:gap-5 md:px-7"
                 >
-                  <Icon className="h-6 w-6 text-white/90" />
-                  <span className="flex-1 text-sm font-medium text-white/90">
+                  <Icon className="h-6 w-6 text-white/90 md:h-7 md:w-7" />
+                  <span className="flex-1 text-sm font-medium text-white/90 md:text-base">
                     {label}
                   </span>
-                  <IconArrowUpRight className="h-4 w-4 text-white/35 transition-colors group-hover/row:text-white/80" />
+                  <IconArrowUpRight className="h-4 w-4 text-white/35 transition-colors group-hover/row:text-white/80 md:h-5 md:w-5" />
                 </a>
               </li>
             );
