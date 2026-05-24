@@ -111,11 +111,11 @@ export default function Header() {
             <nav className="flex items-center gap-4">
               <div
                 ref={navRef}
-                className="relative flex items-center gap-4 lg:gap-6"
+                className="relative flex items-center gap-2 lg:gap-3"
               >
                 {links.slice(0, linkLimit).map(({ title, href }, index) => (
                   <Link
-                    className="flex items-center text-xl font-medium underline-offset-4 transition-colors"
+                    className="flex items-center px-2 py-1.5 text-xl font-medium underline-offset-4 transition-colors"
                     href={href}
                     key={`header-desktop-link_${index}`}
                     ref={(el) => {
