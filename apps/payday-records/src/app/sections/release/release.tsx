@@ -211,26 +211,26 @@ function PlatformModal({
       />
 
       <motion.div
-        className="relative z-10 w-full max-w-[420px] overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl md:max-w-[440px] md:shadow-[0_30px_90px_-20px_rgba(0,0,0,0.7)]"
+        className="relative z-10 w-full max-w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl"
         initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.96, y: 8 }}
         transition={{ type: "spring", damping: 26, stiffness: 320 }}
       >
         <div className="flex max-h-[88vh] flex-col overflow-y-auto">
-          <div className="relative aspect-[3/2] w-full flex-shrink-0 overflow-hidden bg-[#1a1a1a]">
+          <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-[#1a1a1a]">
             {release.artwork ? (
               <Image
                 src={release.artwork}
                 alt={release.title}
                 fill
-                sizes="(min-width: 768px) 440px, 420px"
+                sizes="360px"
                 className="object-cover"
               />
             ) : (
               <div className="relative flex h-full w-full items-center justify-center">
                 <span className="absolute top-0 left-0 h-full w-1 bg-orange-500" />
-                <span className="line-clamp-3 max-w-[80%] text-center text-2xl font-semibold tracking-tight text-white/85 md:text-3xl">
+                <span className="line-clamp-3 max-w-[80%] text-center text-2xl font-semibold tracking-tight text-white/85">
                   {release.title}
                 </span>
               </div>
