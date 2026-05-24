@@ -56,9 +56,9 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
           <h4 className="truncate text-sm font-semibold md:text-base">
             {musicInfo.name}
           </h4>
-          {musicInfo.label && (
+          {musicInfo.artist && (
             <p className="text-muted-foreground truncate text-xs md:text-sm">
-              {musicInfo.label}
+              {musicInfo.artist}
             </p>
           )}
         </div>
