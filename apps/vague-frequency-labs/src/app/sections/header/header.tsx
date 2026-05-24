@@ -113,19 +113,28 @@ export default function Header() {
                 ref={navRef}
                 className="relative flex items-center gap-2 lg:gap-3"
               >
-                {links.slice(0, linkLimit).map(({ title, href }, index) => (
-                  <Link
-                    className="flex items-center px-2 py-1.5 text-xl font-medium underline-offset-4 transition-colors"
-                    href={href}
-                    key={`header-desktop-link_${index}`}
-                    ref={(el) => {
-                      linkRefs.current[href] = el;
-                    }}
-                    onMouseEnter={() => setHoveredLink(href)}
-                  >
-                    {title}
-                  </Link>
-                ))}
+                {links.slice(0, linkLimit).map(({ title, href }, index) => {
+                  const isActive = href === pathname;
+                  return (
+                    <Link
+                      className={[
+                        "flex items-center rounded-sm px-2 py-1.5 text-xl font-medium underline-offset-4 transition-colors duration-200",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
+                        isActive
+                          ? "text-foreground"
+                          : "text-foreground/65 hover:text-foreground",
+                      ].join(" ")}
+                      href={href}
+                      key={`header-desktop-link_${index}`}
+                      ref={(el) => {
+                        linkRefs.current[href] = el;
+                      }}
+                      onMouseEnter={() => setHoveredLink(href)}
+                    >
+                      {title}
+                    </Link>
+                  );
+                })}
                 {underline ? (
                   <motion.div
                     aria-hidden
