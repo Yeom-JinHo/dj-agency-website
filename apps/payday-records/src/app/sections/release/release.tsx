@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import {
   IconArrowUpRight,
@@ -42,29 +42,33 @@ const BeatportMark = ({ className }: IconProps) => (
 
 const PLATFORM_META: Record<
   ReleasePlatform,
-  { label: string; Icon: (props: IconProps) => ReactNode }
+  { label: string; brand: string; Icon: (props: IconProps) => ReactNode }
 > = {
-  beatport: { label: "Beatport", Icon: BeatportMark },
+  beatport: { label: "Beatport", brand: "#01FF95", Icon: BeatportMark },
   spotify: {
     label: "Spotify",
+    brand: "#1DB954",
     Icon: ({ className }: IconProps) => (
       <IconBrandSpotify className={className} />
     ),
   },
   appleMusic: {
     label: "Apple Music",
+    brand: "#FA2D48",
     Icon: ({ className }: IconProps) => (
       <IconBrandApple className={className} />
     ),
   },
   soundcloud: {
     label: "SoundCloud",
+    brand: "#FF5500",
     Icon: ({ className }: IconProps) => (
       <IconBrandSoundcloud className={className} />
     ),
   },
   youtubeMusic: {
     label: "YouTube Music",
+    brand: "#FF0000",
     Icon: ({ className }: IconProps) => (
       <IconBrandYoutube className={className} />
     ),
@@ -266,16 +270,17 @@ function PlatformModal({
 
           <ul className="py-1">
             {availablePlatforms.map((platform) => {
-              const { label, Icon } = PLATFORM_META[platform];
+              const { label, brand, Icon } = PLATFORM_META[platform];
               return (
                 <li key={platform}>
                   <a
                     href={release.links[platform]}
                     target="_blank"
                     rel="noopener noreferrer"
+                    style={{ "--brand": brand } as CSSProperties}
                     className="group/row flex h-14 items-center gap-4 px-5 transition-colors hover:bg-white/[0.06]"
                   >
-                    <Icon className="h-6 w-6 text-white/90" />
+                    <Icon className="h-6 w-6 text-white/90 transition-colors duration-200 group-hover/row:text-[var(--brand)]" />
                     <span className="flex-1 text-sm font-medium text-white/90">
                       {label}
                     </span>
