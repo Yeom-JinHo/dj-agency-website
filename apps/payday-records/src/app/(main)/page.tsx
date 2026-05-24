@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
 
 import { createMetadata } from "@/utils";
-import { ogImage } from "@/app/config";
 import About from "../sections/about/about";
 import Contact from "../sections/contact/contact";
 import Hero from "../sections/hero/hero";
@@ -24,9 +23,8 @@ export const metadata = createMetadata({
     // applied to the share-card title (which would duplicate the brand name).
     title: { absolute: title },
     description,
-    images: [{ ...ogImage, type: "image/jpeg" }],
   },
-  twitter: { title: { absolute: title }, description, images: [ogImage] },
+  twitter: { title: { absolute: title }, description },
 });
 
 export default function Home(): ReactElement {

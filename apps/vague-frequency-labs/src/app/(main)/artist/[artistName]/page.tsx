@@ -25,21 +25,24 @@ export async function generateMetadata(props: {
   const artist = artistProfile.getPage(artistName);
   if (!artist) notFound();
 
+  const cardImage = {
+    alt: artist.name,
+    width: 1200,
+    height: 630,
+    url: artist.image,
+    type: "image/png",
+  } as const;
+
   return createMetadata({
     title: artist.name,
     description: artist.shortDescription,
     openGraph: {
       type: "article",
-      images: [
-        {
-          alt: artist.name,
-          width: 1200,
-          height: 630,
-          url: artist.image,
-          type: "image/png",
-        },
-      ],
+      images: [cardImage],
       authors: meta.author.name,
+    },
+    twitter: {
+      images: [cardImage],
     },
     alternates: {
       canonical: `/artist/${encodeURIComponent(artist.name)}`,

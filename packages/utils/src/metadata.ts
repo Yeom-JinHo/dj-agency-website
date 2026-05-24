@@ -19,7 +19,10 @@ export interface AppMetaConfig {
      * Path/URL for the default OG & Twitter card image, resolved against
      * `metadataBase`. Defaults to `/og` for backward compatibility; set this to
      * a served route (e.g. the `app/opengraph-image.png` convention path) to
-     * override per app. Pages may still override `openGraph.images` themselves.
+     * override per app. `.jpg`/`.jpeg` URLs are emitted as `image/jpeg`,
+     * everything else as `image/png`. Pages may still override
+     * `openGraph.images` themselves — supply matching `twitter.images` if the
+     * cards should stay in sync.
      */
     ogImage?: string;
   };
@@ -27,25 +30,16 @@ export interface AppMetaConfig {
 
 const DEFAULT_OG_LOCALE = "en_US";
 
-function deriveImageAlt(
-  title: Metadata["title"],
-  fallback: string,
-): string {
-  if (typeof title === "string") return title || fallback;
-  if (title && typeof title === "object") {
-    if ("absolute" in title && title.absolute) return title.absolute;
-    if ("default" in title && title.default) return title.default;
-  }
-  return fallback;
-}
-
 export function createMetadataFactory(meta: AppMetaConfig) {
   const baseUrl = meta.site.url;
 
   return function createMetadata(override: Metadata): Metadata {
-    const imageAlt = deriveImageAlt(override.title, meta.site.title);
     const ogLocale = meta.site.ogLocale ?? DEFAULT_OG_LOCALE;
     const ogImageUrl = meta.site.ogImage ?? "/og";
+    const ogImageType =
+      ogImageUrl.endsWith(".jpg") || ogImageUrl.endsWith(".jpeg")
+        ? "image/jpeg"
+        : "image/png";
     const twitterHandle = meta.author.twitterHandle;
 
     return {
@@ -69,11 +63,11 @@ export function createMetadataFactory(meta: AppMetaConfig) {
         locale: ogLocale,
         images: [
           {
-            alt: imageAlt,
+            alt: meta.site.title,
             width: 1200,
             height: 630,
             url: ogImageUrl,
-            type: "image/png",
+            type: ogImageType,
           },
         ],
         siteName: meta.site.title,
@@ -88,7 +82,7 @@ export function createMetadataFactory(meta: AppMetaConfig) {
           : {}),
         images: [
           {
-            alt: imageAlt,
+            alt: meta.site.title,
             width: 1200,
             height: 630,
             url: ogImageUrl,
