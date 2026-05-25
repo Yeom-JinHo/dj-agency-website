@@ -17,14 +17,14 @@ export interface AppMetaConfig {
     ogLocale?: string;
     /**
      * Path/URL for the default OG & Twitter card image, resolved against
-     * `metadataBase`. Defaults to `/og` for backward compatibility; set this to
-     * a served route (e.g. the `app/opengraph-image.png` convention path) to
-     * override per app. `.jpg`/`.jpeg` URLs are emitted as `image/jpeg`,
-     * everything else as `image/png`. Pages may still override
-     * `openGraph.images` themselves — supply matching `twitter.images` if the
-     * cards should stay in sync.
+     * `metadataBase`. Required so new apps cannot silently 404 on share cards
+     * — point at a served route (e.g. the `app/opengraph-image.png` file
+     * convention) or a static file under `public/`. `.jpg`/`.jpeg` URLs are
+     * emitted as `image/jpeg`, everything else as `image/png`. Pages may
+     * still override `openGraph.images` themselves — supply matching
+     * `twitter.images` if the cards should stay in sync.
      */
-    ogImage?: string;
+    ogImage: string;
   };
 }
 
@@ -35,7 +35,7 @@ export function createMetadataFactory(meta: AppMetaConfig) {
 
   return function createMetadata(override: Metadata): Metadata {
     const ogLocale = meta.site.ogLocale ?? DEFAULT_OG_LOCALE;
-    const ogImageUrl = meta.site.ogImage ?? "/og";
+    const ogImageUrl = meta.site.ogImage;
     const ogImageType =
       ogImageUrl.endsWith(".jpg") || ogImageUrl.endsWith(".jpeg")
         ? "image/jpeg"
