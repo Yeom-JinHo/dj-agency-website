@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
 import { Fraunces, Geist } from "next/font/google";
+import localFont from "next/font/local";
 
 import "@/styles/globals.css";
 
@@ -22,6 +23,13 @@ const geist = Geist({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-geist",
+});
+
+const pretendard = localFont({
+  src: "../../public/fonts/PretendardStdVariable.woff2",
+  display: "swap",
+  variable: "--font-pretendard",
+  weight: "45 920",
 });
 
 export const metadata = createMetadata({
@@ -52,14 +60,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
-      </head>
       <body
-        className={`${fraunces.variable} ${geist.variable} font-sans antialiased`}
+        className={`${fraunces.variable} ${geist.variable} ${pretendard.variable} font-sans antialiased`}
       >
         <ReactScan />
         <ErrorBoundary>
