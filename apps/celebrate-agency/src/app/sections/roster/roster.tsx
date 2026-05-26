@@ -3,15 +3,12 @@
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 
-import { cn } from "@repo/ui";
-
-import { Corner } from "@/components/Corner";
 import { SectionHead } from "@/components/SectionHead";
-import { Tape } from "@/components/Tape";
+import { TapeCorners } from "@/components/Tape";
 import { ARTIST_ROLE_LABEL, ARTISTS } from "@/consts/artists";
-import { ARROW_NE, BOOKING_EMAIL } from "@/consts/brand";
 
 import { ArtistModal } from "./ArtistModal";
+import { BookingFiller, ReservedFiller } from "./RosterFiller";
 
 const MOBILE_COLS = 2;
 const DESKTOP_COLS = 4;
@@ -97,10 +94,7 @@ export default function Roster() {
                   className="transform-gpu object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                 />
               </div>
-              <Tape pos="tl" />
-              <Tape pos="tr" />
-              <Tape pos="bl" />
-              <Tape pos="br" />
+              <TapeCorners />
             </div>
             <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red">
               {artist.name}
@@ -113,49 +107,14 @@ export default function Roster() {
         ))}
 
         {bookingVisibility !== null ? (
-          <a
-            href={`mailto:${BOOKING_EMAIL}`}
-            className={cn(
-              "group relative bg-ca-red p-6 transition-colors hover:bg-ca-red-dim",
-              bookingVisibility
-            )}
-          >
-            <div className="relative mb-[18px] flex aspect-[3/4] flex-col justify-end overflow-hidden border border-ca-fg/20 p-4">
-              <span className="inline-block origin-bottom-left font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg transition-transform duration-500 ease-out group-hover:scale-125">
-                Book
-                <br />a Set
-                <span aria-hidden="true"> {ARROW_NE}</span>
-              </span>
-            </div>
-            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-fg">
-              Booking
-            </div>
-            <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-fg/80">
-              <span>Brief</span>
-              <span>MAIL {ARROW_NE}</span>
-            </div>
-          </a>
+          <BookingFiller visibility={bookingVisibility} />
         ) : null}
 
         {reservedVisibility !== null ? (
-          <div className={cn("relative bg-ca-bg p-6", reservedVisibility)}>
-            <div className="ca-stripe-ph relative mb-[18px] aspect-[3/4] overflow-hidden border border-ca-line">
-              <Corner pos="tl" />
-              <Corner pos="tr" />
-              <Corner pos="bl" />
-              <Corner pos="br" />
-              <span className="absolute inset-0 flex items-center justify-center font-display text-[clamp(48px,6vw,80px)] uppercase leading-none tracking-[0.02em] text-ca-dim">
-                [ {reservedSlotLabel} ]
-              </span>
-            </div>
-            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-muted">
-              Reserved
-            </div>
-            <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-              <span>By invitation</span>
-              <span aria-hidden="true">—</span>
-            </div>
-          </div>
+          <ReservedFiller
+            visibility={reservedVisibility}
+            slotLabel={reservedSlotLabel}
+          />
         ) : null}
       </div>
 
