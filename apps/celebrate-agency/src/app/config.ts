@@ -19,6 +19,9 @@ const metadata: Metadata = {
     ],
     language: "en",
     charset: "UTF-8",
+    // Prebuilt social card served as a static file at public/opengraph-image.png.
+    // Overrides the factory's default "/og" reference so no app route is needed.
+    ogImage: "/opengraph-image.png",
   },
 };
 

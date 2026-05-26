@@ -2,7 +2,6 @@ import { Intro } from "@repo/ui/features/intro";
 import { getAppUrls } from "@repo/utils/app-urls";
 
 import { createMetadata } from "@/utils";
-import { ogImage } from "@/app/config";
 
 const title = "Intro";
 const description = "Enter Payday Records — an independent music label.";
@@ -17,9 +16,8 @@ export const metadata = createMetadata({
     url: "/intro",
     title,
     description,
-    images: [{ ...ogImage, type: "image/jpeg" }],
   },
-  twitter: { title, description, images: [ogImage] },
+  twitter: { title, description },
 });
 
 export default function IntroPage() {
