@@ -12,7 +12,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
     <div className="relative w-full">
       <div className="flex flex-col items-center pt-4">
         <Image
-          src={`/images/logo/400_300/${COMPANY_SHORT_NAME.VAGUE_FREQUENCY_LABS}.png`}
+          src={`/images/logo/400_300/${COMPANY_SHORT_NAME.VAGUE_FREQUENCY_LABS}.webp`}
           alt="Vague Frequency Laboratory"
           width={400}
           height={400}
