@@ -26,9 +26,12 @@ export default function Header() {
   const navRef = useRef<HTMLDivElement | null>(null);
   const linkRefs = useRef<Record<string, HTMLAnchorElement | null>>({});
 
-  const activeHref =
-    hoveredLink ??
-    (links.some((link) => link.href === pathname) ? pathname : null);
+  const matchedHref =
+    links.find(
+      (link) =>
+        pathname === link.href || pathname.startsWith(`${link.href}/`),
+    )?.href ?? null;
+  const activeHref = hoveredLink ?? matchedHref;
 
   const measureUnderline = useCallback(() => {
     if (!activeHref || !navRef.current) {
@@ -114,7 +117,8 @@ export default function Header() {
                 className="relative flex items-center gap-2 lg:gap-3"
               >
                 {links.slice(0, linkLimit).map(({ title, href }, index) => {
-                  const isActive = href === pathname;
+                  const isActive =
+                    pathname === href || pathname.startsWith(`${href}/`);
                   return (
                     <Link
                       className={[
@@ -124,6 +128,7 @@ export default function Header() {
                           ? "text-foreground"
                           : "text-foreground/65 hover:text-foreground",
                       ].join(" ")}
+                      aria-current={isActive ? "page" : undefined}
                       href={href}
                       key={`header-desktop-link_${index}`}
                       ref={(el) => {
