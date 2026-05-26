@@ -53,7 +53,7 @@ export function Intro({ currentApp, appUrls }: IntroProps) {
           <span>We&apos;re </span>
           <motion.span
             className="inline-block text-white"
-            key={hoveredText}
+            key={hoveredText || "__caret__"}
             initial={{ opacity: 0, y: -40, rotateX: -90 }}
             animate={{ opacity: 1, y: 0, rotateX: 0 }}
             exit={{ opacity: 0, y: 40, rotateX: 90 }}
@@ -65,7 +65,22 @@ export function Intro({ currentApp, appUrls }: IntroProps) {
               damping: 15,
             }}
           >
-            {hoveredText || "?"}
+            {hoveredText ? (
+              hoveredText
+            ) : (
+              <motion.span
+                aria-hidden="true"
+                className="inline-block tracking-[0.05em]"
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{
+                  duration: 1.1,
+                  repeat: Infinity,
+                  ease: [0.4, 0, 0.6, 1],
+                }}
+              >
+                _____
+              </motion.span>
+            )}
           </motion.span>
         </div>
       )}

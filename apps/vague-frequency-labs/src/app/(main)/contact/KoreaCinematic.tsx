@@ -11,8 +11,6 @@ const SEOUL_COORDS = { lat: 37.5665, lng: 126.978 };
 
 // public/korea-peninsula.svg (Wikimedia Commons, Public Domain by Ksiom) — peninsula outline image
 const KOREA_SVG_SRC = "/korea-peninsula.svg";
-// public/south-korea-flag.svg (Wikimedia Commons, Public Domain) — flag pin image at Seoul
-const KOREA_FLAG_SRC = "/south-korea-flag.svg";
 const KOREA_ASPECT = 761 / 1243; // SVG width / height
 // Seoul 위치 (SVG viewBox 비율). 위도 37.566 / 경도 126.978을 한반도 위경도 범위
 // (lat 43↔34, lng 124↔131)에 대해 단순 비례로 추정한 값. SVG 투영이 mercator라
@@ -258,7 +256,7 @@ export default function KoreaCinematic() {
                 state === "zooming" ? handleZoomDone : undefined
               }
             >
-              {/* 한반도 stencil — 1178 path의 섬/해안 디테일을 잃지 않도록 <img>로 그대로.
+              {/* 한반도 stencil — line-art 톤(낮은 opacity)으로 미니멀하게.
                   Wikimedia Commons / Public Domain (Ksiom, 2008). */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -266,13 +264,15 @@ export default function KoreaCinematic() {
                 alt=""
                 aria-hidden="true"
                 draggable={false}
-                className="pointer-events-none h-full w-full select-none opacity-80 transition-opacity duration-300 group-hover:opacity-100"
+                className="pointer-events-none h-full w-full select-none opacity-45 transition-opacity duration-300 group-hover:opacity-65"
               />
 
 
-              {/* Seoul pulse — pulse 상태 전용 (zooming 동안에는 flag pin이 attention 역할).
-                  pulse 진입 직후 dot 오른쪽에 'Seoul' 라벨이 fade-in 되어 도시명을 명시. */}
-              {state === "pulse" && (
+              {/* Seoul marker — idle/zooming/pulse 동안 dot + ring으로 일관 표시.
+                  깃발/깃대 없이 미니멀. zooming 단계에선 wrapper와 함께 sweep out. */}
+              {(state === "idle" ||
+                state === "zooming" ||
+                state === "pulse") && (
                 <div
                   className="pointer-events-none absolute"
                   style={{
@@ -285,85 +285,45 @@ export default function KoreaCinematic() {
                     className="relative h-2 w-2 rounded-full bg-neutral-900 dark:bg-neutral-100"
                     initial={{ scale: 1, opacity: 0.9 }}
                     animate={
-                      reduce
-                        ? { opacity: [0.6, 1, 0.6] }
-                        : { scale: [1, 1.6, 1], opacity: [0.9, 0.4, 0.9] }
+                      state === "pulse"
+                        ? reduce
+                          ? { opacity: [0.6, 1, 0.6] }
+                          : { scale: [1, 1.6, 1], opacity: [0.9, 0.4, 0.9] }
+                        : { scale: 1, opacity: 0.95 }
                     }
                     transition={{
-                      repeat: Infinity,
+                      repeat: state === "pulse" ? Infinity : 0,
                       duration: 1.6,
                       ease: "easeInOut",
                     }}
                   />
-                  {!reduce && (
+                  {!reduce && (state === "idle" || state === "pulse") && (
                     <motion.div
                       className="absolute inset-0 rounded-full border border-neutral-900 dark:border-neutral-100"
-                      initial={{ scale: 1, opacity: 0.6 }}
-                      animate={{ scale: [1, 3, 1], opacity: [0.6, 0, 0.6] }}
+                      initial={{ scale: 1, opacity: 0.55 }}
+                      animate={{ scale: [1, 3.2, 1], opacity: [0.55, 0, 0.55] }}
                       transition={{
                         repeat: Infinity,
-                        duration: 1.6,
+                        duration: state === "idle" ? 1.8 : 1.6,
                         ease: "easeOut",
                       }}
                     />
                   )}
-                  {/* "Seoul" 라벨 — pin dot 우상단에 raw text로. 배경 chip 없이 text-shadow
-                      halo로 한반도 어디 위에서도 분리감 확보 (라이트는 white halo, 다크는 black halo). */}
-                  <motion.span
-                    className="absolute left-full top-0 ml-1.5 -translate-y-3/4 font-display text-[6px] font-medium tracking-[0.2em] whitespace-nowrap text-neutral-900 uppercase [text-shadow:0_0_3px_rgba(255,255,255,0.95)] dark:text-neutral-50 dark:[text-shadow:0_0_3px_rgba(0,0,0,0.95)]"
-                    initial={{ opacity: 0, x: -5 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: reduce ? 0.05 : 0.25,
-                      delay: reduce ? 0 : 0.15,
-                      ease: "easeOut",
-                    }}
-                  >
-                    Seoul
-                  </motion.span>
-                </div>
-              )}
-
-              {/* Seoul flag pin — idle + zooming 동안 표시. zooming 단계에선 wrapper와 함께
-                  5x로 확대되며 자연스럽게 화면 밖으로 sweep out (pop 없음). */}
-              {(state === "idle" || state === "zooming") && (
-                <div
-                  className="pointer-events-none absolute flex flex-col items-center"
-                  style={{
-                    left: `${SEOUL_PCT.x}%`,
-                    top: `${SEOUL_PCT.y}%`,
-                    transform: "translate(-50%, -100%)",
-                  }}
-                >
-                  {/* 한국 국기 — pin의 깃발 (정적). */}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={KOREA_FLAG_SRC}
-                    alt=""
-                    aria-hidden="true"
-                    draggable={false}
-                    className="block h-7 w-10 select-none rounded-[3px] shadow-md ring-1 ring-black/20 dark:ring-white/15"
-                  />
-                  {/* pin stick — flag와 anchor dot 사이의 깃대. */}
-                  <span className="block h-5 w-px bg-neutral-900 dark:bg-neutral-100" />
-                  {/* anchor dot + expanding ring (attention pulse). */}
-                  <span className="relative block h-1.5 w-1.5">
-                    <span className="absolute inset-0 rounded-full bg-neutral-900 dark:bg-neutral-100" />
-                    {!reduce && state === "idle" && (
-                      <motion.span
-                        className="absolute inset-0 block rounded-full border border-neutral-900 dark:border-neutral-100"
-                        animate={{
-                          scale: [1, 3.5, 1],
-                          opacity: [0.55, 0, 0.55],
-                        }}
-                        transition={{
-                          repeat: Infinity,
-                          duration: 1.8,
-                          ease: "easeOut",
-                        }}
-                      />
-                    )}
-                  </span>
+                  {/* "Seoul" 라벨 — pulse 진입 후에만 (idle 단계는 CTA chip이 라벨 역할). */}
+                  {state === "pulse" && (
+                    <motion.span
+                      className="absolute left-full top-0 ml-1.5 -translate-y-3/4 font-display text-[6px] font-medium tracking-[0.2em] whitespace-nowrap text-neutral-900 uppercase [text-shadow:0_0_3px_rgba(255,255,255,0.95)] dark:text-neutral-50 dark:[text-shadow:0_0_3px_rgba(0,0,0,0.95)]"
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{
+                        duration: reduce ? 0.05 : 0.25,
+                        delay: reduce ? 0 : 0.15,
+                        ease: "easeOut",
+                      }}
+                    >
+                      Seoul
+                    </motion.span>
+                  )}
                 </div>
               )}
 
