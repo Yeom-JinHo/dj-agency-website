@@ -16,14 +16,5 @@
   "packageManager": "pnpm@10.15.0",
   "engines": {
     "node": ">=18"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "sharp"
-    ],
-    "overrides": {
-      "postcss@<8.5.10": ">=8.5.10"
-    }
   }
 }
