@@ -20,3 +20,15 @@ export function Corner({ pos }: Readonly<{ pos: Pos }>) {
     />
   );
 }
+
+const CORNER_POSITIONS: Pos[] = ["tl", "tr", "bl", "br"];
+
+export function CornerFrame() {
+  return (
+    <>
+      {CORNER_POSITIONS.map((pos) => (
+        <Corner key={pos} pos={pos} />
+      ))}
+    </>
+  );
+}

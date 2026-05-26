@@ -20,3 +20,15 @@ export function Tape({ pos }: Readonly<{ pos: TapePos }>) {
     />
   );
 }
+
+const TAPE_CORNERS: TapePos[] = ["tl", "tr", "bl", "br"];
+
+export function TapeCorners() {
+  return (
+    <>
+      {TAPE_CORNERS.map((pos) => (
+        <Tape key={pos} pos={pos} />
+      ))}
+    </>
+  );
+}
