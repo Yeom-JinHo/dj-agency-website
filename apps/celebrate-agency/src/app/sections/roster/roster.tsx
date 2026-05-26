@@ -21,6 +21,8 @@ const mobileFillerCount =
 const desktopFillerCount =
   (DESKTOP_COLS - (ARTISTS.length % DESKTOP_COLS)) % DESKTOP_COLS;
 
+const reservedSlotLabel = String(ARTISTS.length + 2).padStart(2, "0");
+
 function getFillerVisibility(index: number): string | null {
   const onMobile = index < mobileFillerCount;
   const onDesktop = index < desktopFillerCount;
@@ -143,7 +145,7 @@ export default function Roster() {
               <Corner pos="bl" />
               <Corner pos="br" />
               <span className="absolute inset-0 flex items-center justify-center font-display text-[clamp(48px,6vw,80px)] uppercase leading-none tracking-[0.02em] text-ca-dim">
-                [ 08 ]
+                [ {reservedSlotLabel} ]
               </span>
             </div>
             <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-muted">
