@@ -26,7 +26,7 @@ export default function Loader() {
     if (isReady) {
       timerRef.current = setTimeout(() => {
         setIsVisible(false);
-      }, 400);
+      }, 1000);
     }
 
     // cleanup 함수 - 컴포넌트 언마운트 시에도 실행됨
@@ -48,7 +48,7 @@ export default function Loader() {
               from={10}
               target={100}
               autoStart={true}
-              transition={{ duration: 1.2, type: "tween", ease: "easeInOut" }}
+              transition={{ duration: 2, type: "tween", ease: "easeInOut" }}
               onComplete={() => setIsReady(true)}
             />
           ) : (
