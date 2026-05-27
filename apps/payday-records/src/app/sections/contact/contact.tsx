@@ -8,6 +8,14 @@ import Link from "next/link";
 import { contact } from "./config";
 import { Icon } from "@repo/ui/common/Icon";
 
+const brandHoverColor: Record<string, string> = {
+  SiYoutube: "group-hover:text-[#FF4444]",
+  SiInstagram: "group-hover:text-[#E1306C]",
+  SiApple:
+    "group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.7)]",
+  SiBeatport: "group-hover:text-[#A8FF04]",
+};
+
 function Contact() {
   return (
     <div className="w-full" id="contact">
@@ -45,17 +53,26 @@ function Contact() {
           </div>
           <div className="mt-8 flex items-center">
             {contact.socials.map((link, index) => {
-              const { href, iconName } = link;
+              const { href, iconName, name } = link;
+              const brandHover =
+                iconName && iconName in brandHoverColor
+                  ? brandHoverColor[iconName]
+                  : "";
 
               return (
                 <Link
-                  className={`underline-offset-4 hover:underline ${index > 0 ? "ml-4 border-l border-gray-300 pl-4" : ""}`}
+                  className={`group ${index > 0 ? "ml-4 border-l border-white/15 pl-4" : ""}`}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={name}
                   key={`ft-l_social_${index}`}
                 >
-                  {iconName && <Icon name={iconName} className="h-6 w-6" />}
+                  <span
+                    className={`inline-flex transition duration-300 group-hover:scale-110 ${brandHover}`}
+                  >
+                    {iconName && <Icon name={iconName} className="h-6 w-6" />}
+                  </span>
                 </Link>
               );
             })}
