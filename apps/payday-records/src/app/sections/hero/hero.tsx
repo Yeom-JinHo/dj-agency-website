@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { IconChevronDown } from "@tabler/icons-react";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 
 function Hero() {
@@ -25,12 +24,15 @@ function Hero() {
       <a
         href="#about"
         aria-label="다음 섹션으로 스크롤"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/35 transition-colors hover:text-white/70 focus-visible:text-white/70 focus-visible:outline-none"
+        className="absolute bottom-[8vh] left-1/2 flex -translate-x-1/2 flex-col items-center gap-3 p-2 text-white/55 transition-colors hover:text-white/85 focus-visible:text-white/85 focus-visible:outline-none"
       >
-        <IconChevronDown
-          className="h-6 w-6 animate-bounce motion-reduce:animate-none"
-          stroke={1.5}
-        />
+        <span className="font-display text-[10px] tracking-[0.3em] uppercase">
+          Scroll
+        </span>
+        <span className="relative flex h-2 w-2 items-center justify-center">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-current opacity-60 motion-reduce:animate-none" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-current" />
+        </span>
       </a>
     </section>
   );
