@@ -14,14 +14,12 @@
 */
 @theme inline {
   --font-sans:
-    var(--font-geist), "Pretendard Variable", Pretendard, system-ui,
-    -apple-system, BlinkMacSystemFont, sans-serif;
+    var(--font-geist), var(--font-pretendard), system-ui, -apple-system,
+    BlinkMacSystemFont, sans-serif;
   --font-serif:
-    var(--font-fraunces), "Pretendard Variable", Pretendard, ui-serif, Georgia,
-    serif;
+    var(--font-fraunces), var(--font-pretendard), ui-serif, Georgia, serif;
   --font-display:
-    var(--font-fraunces), "Pretendard Variable", Pretendard, ui-serif, Georgia,
-    serif;
+    var(--font-fraunces), var(--font-pretendard), ui-serif, Georgia, serif;
 }
 
 @theme {

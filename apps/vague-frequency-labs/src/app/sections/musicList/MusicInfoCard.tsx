@@ -28,7 +28,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
       return char.charCodeAt(0) + ((acc << 5) - acc);
     }, 0);
     const textureNumber = (Math.abs(hash) % 3) + 1;
-    return `/images/texture/${textureNumber}.png`;
+    return `/images/texture/${textureNumber}.webp`;
   }, [musicInfo.name]);
 
   return (
