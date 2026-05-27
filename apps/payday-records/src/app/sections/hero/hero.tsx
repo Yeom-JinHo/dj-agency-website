@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { IconChevronDown } from "@tabler/icons-react";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 
 function Hero() {
@@ -16,10 +17,24 @@ function Hero() {
             alt="Payday Records"
             width={900}
             height={600}
+            sizes="(max-width: 640px) 320px, (max-width: 1024px) 600px, 900px"
             priority
           />
         </BlurFade>
       </div>
+      <a
+        href="#about"
+        aria-label="다음 섹션으로 스크롤"
+        className="absolute bottom-[8vh] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 p-2 text-white/55 transition-colors hover:text-white/85 focus-visible:text-white/85 focus-visible:outline-none"
+      >
+        <span className="font-display text-[10px] tracking-[0.3em] uppercase">
+          Scroll
+        </span>
+        <IconChevronDown
+          className="h-5 w-5 animate-bounce motion-reduce:animate-none"
+          stroke={2}
+        />
+      </a>
     </section>
   );
 }

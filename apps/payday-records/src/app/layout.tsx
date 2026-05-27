@@ -18,6 +18,7 @@ import { ReactScan } from "@repo/ui/common/ReactScan";
 const bricolage_grotesque = Bricolage_Grotesque({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-bricolage",
 });
 
 // Condensed gothic display face — echoes the blackletter wordmark across headings/marquee.
@@ -57,7 +58,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${bricolage_grotesque.className} ${anton.variable} antialiased`}
+        className={`${bricolage_grotesque.variable} ${anton.variable} antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />

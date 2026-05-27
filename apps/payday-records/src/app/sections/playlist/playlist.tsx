@@ -1,12 +1,10 @@
-import React from "react";
-import MotionWrap from "@repo/ui/common/MotionWrap";
 import TextReveal from "@repo/ui/common/TextReveal";
 
 import { playlist } from "./config";
 
 function Playlist() {
   return (
-    <MotionWrap className="w-full py-24 lg:py-32" id="playlist">
+    <section className="w-full py-24 lg:py-32" id="playlist">
       <div className="flex flex-col items-center justify-center px-6 text-center sm:px-4">
         <TextReveal as="h2" className="section-heading">
           Sound
@@ -46,7 +44,7 @@ function Playlist() {
           </div>
         </div>
       </div>
-    </MotionWrap>
+    </section>
   );
 }
 
