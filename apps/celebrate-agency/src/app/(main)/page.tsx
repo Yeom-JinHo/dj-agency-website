@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { JsonLd } from "@repo/ui/common/JsonLd";
+
 import Footer from "@/app/sections/footer/footer";
 import Header from "@/app/sections/header/header";
 import Hero from "@/app/sections/hero/hero";
@@ -16,12 +18,7 @@ export const metadata: Metadata = {
 export default function CelebrateAgencyPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(organizationJsonLd()),
-        }}
-      />
+      <JsonLd items={organizationJsonLd()} />
       <Header />
       <main className="flex-1">
         <Hero />

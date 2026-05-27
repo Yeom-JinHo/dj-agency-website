@@ -10,7 +10,7 @@ const sameAs = contact.socials
   .map((social) => social.href)
   .filter((href) => !/youtube\.com\/watch/.test(href));
 
-const organization: WithContext<Organization> = {
+export const organization: WithContext<Organization> = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: meta.site.title,
@@ -20,25 +20,10 @@ const organization: WithContext<Organization> = {
   sameAs,
 };
 
-const website: WithContext<WebSite> = {
+export const website: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: meta.site.title,
   description: meta.site.description,
   url: meta.site.url,
 };
-
-export function JsonLd() {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
-      />
-    </>
-  );
-}

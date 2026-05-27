@@ -8,7 +8,8 @@ import { metadata as meta } from "@/app/config";
 import { Providers } from "@repo/ui/common/Providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
-import { JsonLd } from "@/components/JsonLd";
+import { JsonLd } from "@repo/ui/common/JsonLd";
+import { organization, website } from "@/app/jsonLd";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
@@ -58,7 +59,7 @@ export default function RootLayout({
       <body
         className={`${bricolage_grotesque.className} ${anton.variable} antialiased`}
       >
-        <JsonLd />
+        <JsonLd items={[organization, website]} />
         <ReactScan />
         <ErrorBoundary>
           <Providers>
