@@ -22,9 +22,10 @@ function Playlist() {
                 src={playlist.spotify.embedSrc}
                 title="Payday Records curated playlist on Spotify"
                 width="100%"
+                height={420}
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 loading="lazy"
-                className="block h-[352px] sm:h-[420px]"
+                className="block"
                 style={{ border: 0 }}
               />
             </div>
@@ -33,9 +34,10 @@ function Playlist() {
                 src={playlist.soundcloud.embedSrc}
                 title="Payday Records on SoundCloud"
                 width="100%"
+                height={420}
                 allow="autoplay"
                 loading="lazy"
-                className="block h-[300px] sm:h-[420px]"
+                className="block"
                 style={{ border: 0 }}
               />
             </div>
