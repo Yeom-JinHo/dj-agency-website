@@ -17,7 +17,7 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
       aria-haspopup="dialog"
       aria-label={`${release.title} - ${release.artist} 플랫폼 선택`}
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+      <div className="relative aspect-square w-full overflow-hidden rounded-2xl">
         {release.artwork ? (
           <Image
             src={release.artwork}
@@ -36,8 +36,8 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
           </div>
         )}
 
-        <span className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/45 text-white/85 backdrop-blur-sm transition-colors duration-200 group-hover:bg-black/70 group-hover:text-white">
-          <IconDots className="h-3.5 w-3.5" stroke={2.5} />
+        <span className="absolute top-2.5 right-2.5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/45 text-white/85 backdrop-blur-sm transition-colors duration-200 group-hover:bg-black/70 group-hover:text-white">
+          <IconDots className="h-4 w-4" stroke={2.5} />
         </span>
 
         <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/30" />
