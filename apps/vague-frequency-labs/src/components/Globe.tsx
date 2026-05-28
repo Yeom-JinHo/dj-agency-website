@@ -2,6 +2,7 @@
 
 import type { COBEOptions } from "cobe";
 import { useEffect, useId, useRef, useState } from "react";
+import Image from "next/image";
 import createGlobe from "cobe";
 import { useMotionValue, useSpring } from "motion/react";
 
@@ -60,33 +61,82 @@ type CityMarker = {
   id: string;
   name: string;
   location: [number, number];
+  image: string;
+  code: string;
 };
 
 const SEOUL_MARKER: CityMarker = {
   id: "seoul",
   name: "Seoul",
   location: SEOUL,
+  image: "/images/hero/1.jpg",
+  code: "KR",
 };
 
 const FLIGHT_DESTINATIONS: CityMarker[] = [
-  { id: "tokyo", name: "Tokyo", location: [35.6762, 139.6503] },
-  { id: "bangkok", name: "Bangkok", location: [13.7563, 100.5018] },
-  { id: "sydney", name: "Sydney", location: [-33.8688, 151.2093] },
-  { id: "paris", name: "Paris", location: [48.8566, 2.3522] },
-  { id: "la", name: "Los Angeles", location: [34.0522, -118.2437] },
+  {
+    id: "tokyo",
+    name: "Tokyo",
+    location: [35.6762, 139.6503],
+    image: "/images/hero/1.jpg",
+    code: "JP",
+  },
+  {
+    id: "bangkok",
+    name: "Bangkok",
+    location: [13.7563, 100.5018],
+    image: "/images/hero/2.webp",
+    code: "TH",
+  },
+  {
+    id: "sydney",
+    name: "Sydney",
+    location: [-33.8688, 151.2093],
+    image: "/images/hero/3.jpg",
+    code: "AU",
+  },
+  {
+    id: "paris",
+    name: "Paris",
+    location: [48.8566, 2.3522],
+    image: "/images/hero/4.jpg",
+    code: "FR",
+  },
+  {
+    id: "la",
+    name: "Los Angeles",
+    location: [34.0522, -118.2437],
+    image: "/images/hero/5.webp",
+    code: "US",
+  },
 ];
 
 const ALL_MARKERS: CityMarker[] = [SEOUL_MARKER, ...FLIGHT_DESTINATIONS];
 
-// cobe `showcase: default` 색·치수에 맞춘 globe config
 const ACCENT: [number, number, number] = [0.3, 0.45, 0.85];
 const MARKER_SIZE = 0.04;
+// next/image가 디바이스 해상도에 맞춰 ~78px(또는 ×2 dpr=156px) 썸네일을 서빙하도록 폴라로이드 이미지 최대 픽셀 크기
+const POLAROID_IMAGE_SIZE = 78;
+// cobe 좌표계에서 lat=0, lon=L 지점이 정면(l.z=1)에 오는 phi 값: -π/2 - L(rad).
+// 첫 프레임에서 Seoul이 카메라 정면에 보이도록 phi 초기값을 Seoul 경도에 맞춰 둠.
+const SEOUL_FRONT_PHI = -Math.PI / 2 - (SEOUL[1] * Math.PI) / 180;
+
+// anchor positioning을 사용하는 인라인 style용. CSS 변수 키와 positionAnchor를
+// 안전하게 받으면서, visibility처럼 React.CSSProperties의 좁은 유니온과
+// 호환되지 않는 var(...) 값을 string으로 허용. 경계에서 toCSSProperties로 한 번만 캐스트.
+type AnchorPositionedStyle = Omit<React.CSSProperties, "visibility"> & {
+  visibility?: string;
+  positionAnchor?: string;
+} & Record<`--${string}`, string>;
+
+const toCSSProperties = (s: AnchorPositionedStyle): React.CSSProperties =>
+  s as unknown as React.CSSProperties;
 
 const GLOBE_CONFIG: COBEOptions = {
   width: 800,
   height: 800,
   devicePixelRatio: 2,
-  phi: 0,
+  phi: SEOUL_FRONT_PHI,
   theta: 0.3,
   dark: 0,
   diffuse: 1.5,
@@ -114,7 +164,7 @@ export default function Globe({
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pointerInteracting = useRef<number | null>(null);
-  const phiRef = useRef(0);
+  const phiRef = useRef(SEOUL_FRONT_PHI);
   const widthRef = useRef(0);
   const [isVisible, setIsVisible] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -315,12 +365,10 @@ export default function Globe({
       {mounted && renderProfile.showMarkers && (
         <span
           className="seoul-pulse"
-          style={
-            {
-              positionAnchor: "--cobe-seoul",
-              opacity: "var(--cobe-visible-seoul, 0)",
-            } as React.CSSProperties
-          }
+          style={toCSSProperties({
+            positionAnchor: "--cobe-seoul",
+            opacity: "var(--cobe-visible-seoul, 0)",
+          })}
           aria-hidden
         >
           <span className="seoul-pulse__ring seoul-pulse__ring--late" />
@@ -328,19 +376,37 @@ export default function Globe({
       )}
       {mounted &&
         renderProfile.showMarkers &&
-        ALL_MARKERS.map((m) => (
+        ALL_MARKERS.map((m, idx) => (
           <div
             key={m.id}
-            className="showcase-default-label"
-            style={
-              {
-                positionAnchor: `--cobe-${m.id}`,
-                opacity: `var(--cobe-visible-${m.id}, 0)`,
-                filter: `blur(calc((1 - var(--cobe-visible-${m.id}, 0)) * 8px))`,
-              } as React.CSSProperties
-            }
+            className="polaroid-marker"
+            style={toCSSProperties({
+              positionAnchor: `--cobe-${m.id}`,
+              // cobe는 마커가 보일 때만 --cobe-visible-{id}를 0..1 숫자로 정의함.
+              // 정의됨: opacity는 그 값을 보간 사용(예: 0.42 → 반투명).
+              //         visibility는 숫자가 유효 키워드가 아니어서 IACVT → initial(visible).
+              // 정의 안 됨: opacity fallback 0, visibility fallback hidden → 합성 레이어 제외.
+              opacity: `var(--cobe-visible-${m.id}, 0)`,
+              visibility: `var(--cobe-visible-${m.id}, hidden)`,
+              // 홈베이스 Seoul은 인접 마커(Tokyo 등)와 겹치면 항상 위에 보이도록 z-index 한 단계 올림.
+              zIndex: m.id === "seoul" ? 1 : undefined,
+            })}
           >
-            {m.name}
+            <Image
+              className="polaroid-marker__image"
+              src={m.image}
+              alt={m.name}
+              width={POLAROID_IMAGE_SIZE}
+              height={POLAROID_IMAGE_SIZE}
+              sizes="(max-width: 767px) 50px, (max-width: 1279px) 64px, 78px"
+              quality={70}
+            />
+            <div className="polaroid-marker__meta">
+              <span className="polaroid-marker__name">{m.name}</span>
+              <span className="polaroid-marker__sub">
+                {`${String(idx + 1).padStart(2, "0")} ─ ${m.code}`}
+              </span>
+            </div>
           </div>
         ))}
     </div>

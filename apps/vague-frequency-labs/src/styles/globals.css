@@ -377,75 +377,100 @@
   }
 }
 
-/* ── Globe city label (default showcase) ─────────────── */
+/* ── Globe polaroid marker (minimal editorial) ─────── */
 
-.showcase-default-label {
+.polaroid-marker {
   position: absolute;
   bottom: anchor(top);
   left: anchor(center);
   translate: -50% 0;
   margin-bottom: 8px;
-  padding: 0.15rem 0.35rem;
-  background: rgb(20, 30, 80);
-  color: #fff;
-  font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: opacity 0.8s, filter 0.8s;
+  padding: 6px 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid hsl(0 0% 88%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateZ(0);
+  transition: opacity 0.3s;
+  will-change: transform, opacity;
+  contain: layout paint style;
   pointer-events: none;
 }
 
-.showcase-default-label::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translate3d(-50%, -1px, 0);
-  border: 5px solid transparent;
-  border-top-color: rgb(20, 30, 80);
+.polaroid-marker__image {
+  display: block;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.polaroid-marker__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.polaroid-marker__name {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #111;
+  line-height: 1;
+}
+
+.polaroid-marker__sub {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.4rem;
+  letter-spacing: 0.04em;
+  color: #555;
+  line-height: 1;
 }
 
 @supports not (anchor-name: --x) {
   .seoul-pulse,
-  .showcase-default-label {
+  .polaroid-marker {
     display: none;
   }
 }
 
-@media (max-width: 640px) {
-  .showcase-default-label {
-    font-size: 0.5rem;
-    padding: 0.1rem 0.25rem;
-    margin-bottom: 6px;
-  }
-  .showcase-default-label::after {
-    border-width: 4px;
-  }
-}
-
 @media (min-width: 768px) {
-  .showcase-default-label {
-    font-size: 0.78rem;
-    padding: 0.22rem 0.5rem;
-    margin-bottom: 11px;
-    letter-spacing: 0.09em;
+  .polaroid-marker {
+    padding: 8px 8px 10px;
+    gap: 5px;
+    margin-bottom: 10px;
   }
-  .showcase-default-label::after {
-    border-width: 6px;
+  .polaroid-marker__image {
+    width: 64px;
+    height: 64px;
+  }
+  .polaroid-marker__name {
+    font-size: 0.65rem;
+  }
+  .polaroid-marker__sub {
+    font-size: 0.45rem;
   }
 }
 
 @media (min-width: 1280px) {
-  .showcase-default-label {
-    font-size: 0.9rem;
-    padding: 0.28rem 0.6rem;
-    margin-bottom: 13px;
+  .polaroid-marker {
+    padding: 10px 10px 12px;
+    gap: 6px;
+    margin-bottom: 12px;
   }
-  .showcase-default-label::after {
-    border-width: 7px;
+  .polaroid-marker__image {
+    width: 78px;
+    height: 78px;
+  }
+  .polaroid-marker__name {
+    font-size: 0.75rem;
+  }
+  .polaroid-marker__sub {
+    font-size: 0.5rem;
   }
 }
 
