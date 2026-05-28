@@ -15,7 +15,7 @@ const BeatportMark = ({ className }: IconProps) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth={1.8}
+    strokeWidth={1.75}
     className={className}
     aria-hidden
   >
@@ -37,28 +37,28 @@ export const PLATFORM_META: Record<
     label: "Spotify",
     brand: "#1DB954",
     Icon: ({ className }: IconProps) => (
-      <IconBrandSpotify className={className} />
+      <IconBrandSpotify className={className} stroke={1.75} />
     ),
   },
   appleMusic: {
     label: "Apple Music",
     brand: "#FA2D48",
     Icon: ({ className }: IconProps) => (
-      <IconBrandApple className={className} />
+      <IconBrandApple className={className} stroke={1.75} />
     ),
   },
   soundcloud: {
     label: "SoundCloud",
     brand: "#FF5500",
     Icon: ({ className }: IconProps) => (
-      <IconBrandSoundcloud className={className} />
+      <IconBrandSoundcloud className={className} stroke={1.75} />
     ),
   },
   youtubeMusic: {
     label: "YouTube Music",
     brand: "#FF0000",
     Icon: ({ className }: IconProps) => (
-      <IconBrandYoutube className={className} />
+      <IconBrandYoutube className={className} stroke={1.75} />
     ),
   },
 };

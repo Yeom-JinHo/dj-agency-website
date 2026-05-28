@@ -1,5 +1,7 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
+
 import { useClipboard } from "../hooks/useClipboard";
 
 import { cn } from "../index";
@@ -15,52 +17,73 @@ export default function CopyButton({
 
   return (
     <button
-      data-copy-to-clipboard-target="npm-install-copy-text"
+      type="button"
       onClick={() => copy(text)}
+      aria-label={copied ? "Copied to clipboard" : "Copy to clipboard"}
       className={cn(
-        "inline-flex h-8 w-20 items-center justify-center rounded-lg border border-gray-200 bg-white px-2.5 py-2 text-gray-900 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700",
-        className
+        "relative inline-flex h-9 min-w-[88px] items-center justify-center gap-1.5 rounded-md px-2.5 text-white/55 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none active:scale-95",
+        className,
       )}
     >
-      {!copied ? (
-        <span id="default-message">
-          <span className="inline-flex items-center">
+      <span aria-live="polite" className="sr-only">
+        {copied ? "Copied" : ""}
+      </span>
+      <AnimatePresence initial={false} mode="wait">
+        {copied ? (
+          <motion.span
+            key="check"
+            className="inline-flex items-center gap-1.5 text-[#FFBE7B]"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.7 }}
+            transition={{ duration: 0.18 }}
+          >
             <svg
-              className="me-1.5 h-3 w-3"
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 18 20"
-            >
-              <path d="M16 1h-3.278A1.992 1.992 0 0 0 11 0H7a1.993 1.993 0 0 0-1.722 1H2a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2Zm-3 14H5a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2Zm0-4H5a1 1 0 0 1 0-2h8a1 1 0 1 1 0 2Zm0-5H5a1 1 0 0 1 0-2h2V2h4v2h2a1 1 0 1 1 0 2Z" />
-            </svg>
-            <span className="text-xs font-semibold">Copy</span>
-          </span>
-        </span>
-      ) : (
-        <span id="success-message">
-          <span className="inline-flex items-center">
-            <svg
-              className="me-1.5 h-3 w-3 text-blue-700 dark:text-blue-500"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
               fill="none"
-              viewBox="0 0 16 12"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+              aria-hidden
             >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M1 5.917 5.724 10.5 15 1.5"
-              />
+              <path d="M5 12l5 5L20 7" />
             </svg>
-            <span className="text-xs font-semibold text-blue-700 dark:text-blue-500">
+            <span className="text-[11px] font-medium tracking-wider uppercase">
               Copied
             </span>
-          </span>
-        </span>
-      )}
+          </motion.span>
+        ) : (
+          <motion.span
+            key="copy"
+            className="inline-flex items-center gap-1.5"
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.85 }}
+            transition={{ duration: 0.18 }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.75}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-4 w-4"
+              aria-hidden
+            >
+              <rect x="9" y="9" width="11" height="11" rx="2" />
+              <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+            </svg>
+            <span className="text-[11px] font-medium tracking-wider uppercase">
+              Copy
+            </span>
+          </motion.span>
+        )}
+      </AnimatePresence>
     </button>
   );
 }

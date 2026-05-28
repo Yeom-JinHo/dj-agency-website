@@ -45,7 +45,11 @@ function Contact() {
           }}
           className="pointer-events-auto relative mb-[200px] flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] [@media(max-width:375px)]:mb-40"
         >
-          <ShineBorder shineColor={["#A07CFE", "#FE8FB5", "#FFBE7B"]} />
+          <ShineBorder
+            borderWidth={2}
+            duration={8}
+            shineColor={["#FFBE7B", "#FFD580", "#FF9A3C"]}
+          />
           <h3 className="card-heading mb-8 text-center">Contact</h3>
           <div className="flex items-center">
             <p className="text-lg md:text-xl">{contact.email}</p>
