@@ -36,6 +36,7 @@
 
   --color-ca-bg: #0a0a0a;
   --color-ca-bg-2: #111111;
+  --color-ca-bg-hover: #1a1a1a;
   --color-ca-fg: #f5f3ef;
   --color-ca-muted: #8a8a8a;
   --color-ca-dim: #3a3a3a;
@@ -58,6 +59,7 @@
      scales with the track. 123s over the mobile track ≈ 37px/s — slow enough
      to read on a narrow viewport. Desktop eases up to ≈50px/s below. */
   --animate-marquee: marquee 123s linear infinite;
+  --animate-hero-fade-in: hero-fade-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
   --animate-modal-fade: modal-fade 0.2s ease-out;
 
@@ -102,6 +104,16 @@
     }
     to {
       transform: translateX(-50%);
+    }
+  }
+  @keyframes hero-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
   @keyframes pulse-dot {
