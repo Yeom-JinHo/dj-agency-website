@@ -44,10 +44,6 @@
   --color-ca-red: #e63329;
   --color-ca-red-dim: #8a1f19;
 
-  --font-display: var(--font-anton);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jbmono);
-
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -125,6 +121,14 @@
       opacity: 0.3;
     }
   }
+}
+
+/* font-* 토큰은 next/font가 주입하는 런타임 CSS var를 참조하므로
+   Tailwind v4가 빌드 타임에 var()를 resolve하도록 @theme inline 필요. */
+@theme inline {
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jbmono);
 }
 
 @utility container {
