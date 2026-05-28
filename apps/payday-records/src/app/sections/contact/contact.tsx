@@ -33,6 +33,7 @@ function Contact() {
             WebkitBackdropFilter: "blur(16px) saturate(140%)",
             backgroundColor: "rgba(9, 9, 11, 0.55)",
             borderRadius: "12px",
+            border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
           className="pointer-events-auto relative mb-[200px] flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] [@media(max-width:375px)]:mb-40"
         >
