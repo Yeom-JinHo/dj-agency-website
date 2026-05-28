@@ -220,7 +220,7 @@ export function ArtistModal({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${SOCIAL_LABELS[social.platform]} (opens in new tab)`}
-                        className={`text-ca-fg transition-all duration-200 hover:scale-110 ${SOCIAL_HOVER[social.platform]}`}
+                        className={`p-2 text-ca-fg transition-all duration-200 hover:scale-110 ${SOCIAL_HOVER[social.platform]}`}
                       >
                         <Icon size={32} stroke={1.75} />
                       </a>
