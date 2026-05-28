@@ -29,7 +29,7 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
           />
         ) : (
           <div className="relative flex h-full w-full items-center justify-center bg-[#0f0f0f] p-4 text-center">
-            <span className="absolute top-0 left-0 h-full w-[3px] bg-orange-500" />
+            <span className="bg-pd-accent absolute top-0 left-0 h-full w-[3px]" />
             <span className="line-clamp-3 max-w-[85%] text-lg font-semibold tracking-tight text-white/85 md:text-xl">
               {release.title}
             </span>
