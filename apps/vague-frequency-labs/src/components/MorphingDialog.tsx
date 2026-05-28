@@ -91,7 +91,7 @@ function MorphingDialogProvider({
       <MotionConfig
         transition={{
           type: "tween",
-          duration: 0.38,
+          duration: 0.3,
           ease: "easeOut",
           ...(transition ?? {}),
         }}

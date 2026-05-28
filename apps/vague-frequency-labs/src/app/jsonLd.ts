@@ -19,7 +19,7 @@ export const organization: WithContext<Organization> = {
     "@type": "Person",
     name: "Vague Frequency Laboratory Team",
   },
-  foundingDate: "2024",
+  foundingDate: "2025",
   knowsAbout: [
     "Electronic Music",
     "Experimental Music",
