@@ -11,11 +11,12 @@ export default function Hero() {
       </h1>
       <div className="flex flex-1 items-center justify-center px-6 lg:px-10">
         <Image
-          src="/images/logo/hero.png"
+          src="/images/logo/hero.webp"
           alt="Celebrate Agency"
           width={400}
           height={300}
           priority
+          sizes="(min-width: 1024px) 896px, 100vw"
           className="h-auto max-h-[calc(100dvh-320px)] w-full max-w-4xl"
         />
       </div>

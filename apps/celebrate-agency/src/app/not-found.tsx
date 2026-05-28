@@ -1,11 +1,10 @@
-import React, { FC } from "react";
 import Link from "next/link";
 import GalaxyBackground from "@repo/ui/common/GalaxyBackground";
 
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";
 
-const NotFoundPage: FC = () => {
+export default function NotFoundPage() {
   return (
     <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden">
       <main className="relative h-screen w-screen flex-1">
@@ -28,6 +27,4 @@ const NotFoundPage: FC = () => {
       </main>
     </div>
   );
-};
-
-export default NotFoundPage;
+}
