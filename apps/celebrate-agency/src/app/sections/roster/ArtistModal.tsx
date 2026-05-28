@@ -34,6 +34,15 @@ const SOCIAL_LABELS: Record<ArtistSocialPlatform, string> = {
   etc: "Link",
 };
 
+const SOCIAL_HOVER: Record<ArtistSocialPlatform, string> = {
+  soundcloud: "hover:text-[#FF5500]",
+  instagram: "hover:text-[#E1306C]",
+  spotify: "hover:text-[#1ED760]",
+  youtube: "hover:text-[#FF0000]",
+  x: "hover:text-white",
+  etc: "hover:text-ca-red",
+};
+
 const CHROME_BUTTON =
   "border border-ca-dim text-ca-fg transition-colors duration-200 hover:border-ca-red hover:text-ca-red";
 
@@ -208,7 +217,7 @@ export function ArtistModal({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${SOCIAL_LABELS[social.platform]} (opens in new tab)`}
-                        className="text-ca-fg transition-colors duration-200 hover:text-ca-red"
+                        className={`text-ca-fg transition-all duration-200 hover:scale-110 ${SOCIAL_HOVER[social.platform]}`}
                       >
                         <Icon size={32} stroke={1.75} />
                       </a>
