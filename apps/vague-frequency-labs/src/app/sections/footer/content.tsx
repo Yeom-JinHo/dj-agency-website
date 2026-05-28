@@ -2,6 +2,7 @@ import React from "react";
 import { metadata as meta } from "@/app/config";
 import Link from "next/link";
 import { contact } from "../contact/config";
+import { copyright } from "./config";
 import { Icon } from "@repo/ui/common/Icon";
 
 export default function Content() {
@@ -20,7 +21,7 @@ const Copyright = () => {
         v.f.labs
       </h1>
       <p className="mt-4 text-xs sm:mt-0 sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">
-        © {2025} {meta.author.name}
+        © {copyright.startYear} {meta.author.name}
       </p>
     </div>
   );
