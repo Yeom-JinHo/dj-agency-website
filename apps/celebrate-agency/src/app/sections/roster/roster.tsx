@@ -82,7 +82,7 @@ export default function Roster() {
             onClick={() => open(index)}
             aria-haspopup="dialog"
             aria-label={`View ${artist.name} profile`}
-            className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-[#1a1a1a]"
+            className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-ca-bg-hover"
           >
             <div className="relative mb-[18px] aspect-[3/4]">
               <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">

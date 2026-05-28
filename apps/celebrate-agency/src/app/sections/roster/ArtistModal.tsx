@@ -221,7 +221,7 @@ export function ArtistModal({
                 {artist.bio}
               </p>
 
-              <div className="hidden flex-col lg:flex lg:min-h-0 lg:flex-1">
+              <div className="flex flex-col lg:min-h-0 lg:flex-1">
                 <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
                   [ Selected works ]
                 </h3>

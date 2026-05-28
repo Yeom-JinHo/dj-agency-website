@@ -9,7 +9,7 @@ export default function Hero() {
       <h1 className="sr-only">
         Celebrate Agency — Talent · Production · Direction.
       </h1>
-      <div className="flex flex-1 items-center justify-center px-6 lg:px-10">
+      <div className="flex flex-1 animate-hero-fade-in items-center justify-center px-6 lg:px-10">
         <Image
           src="/images/logo/hero.webp"
           alt="Celebrate Agency"
@@ -21,7 +21,7 @@ export default function Hero() {
         />
       </div>
 
-      <div className="grid grid-cols-1 items-end gap-10 px-6 pt-8 lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
+      <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:180ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
         <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg">
           Talent · Production · Direction.
           <br />
