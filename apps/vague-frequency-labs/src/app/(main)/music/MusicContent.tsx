@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactElement } from "react";
 import React from "react";
 import { musicInfo } from "@/source";

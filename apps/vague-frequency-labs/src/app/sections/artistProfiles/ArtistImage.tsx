@@ -20,14 +20,14 @@ const ArtistImage = ({
         width={1280}
         height={600}
         alt={`Image of ${artist.name}`}
-        className={`h-full w-full object-cover object-center transition-all duration-300 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
+        className={`h-full w-full object-cover object-center transition-all duration-200 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
         priority={priority}
         sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
         placeholder="blur"
         blurDataURL={artist.imagePlaceholder}
       />
       {backgroundLogo && (
-        <div className="absolute inset-0 flex scale-95 items-center justify-center opacity-0 transition-all duration-150 ease-out group-hover:scale-100 group-hover:opacity-100">
+        <div className="absolute inset-0 flex scale-95 items-center justify-center opacity-0 transition-all duration-200 ease-out group-hover:scale-100 group-hover:opacity-100">
           <Image
             src={artist.logoImage}
             width={320}
