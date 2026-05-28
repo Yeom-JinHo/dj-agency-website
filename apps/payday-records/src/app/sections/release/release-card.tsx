@@ -13,7 +13,7 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
     <button
       type="button"
       onClick={onOpen}
-      className="group block w-[160px] cursor-pointer text-left md:w-[340px]"
+      className="group block w-[calc(50vw-2.5rem)] max-w-[200px] cursor-pointer text-left md:w-[340px] md:max-w-none"
       aria-haspopup="dialog"
       aria-label={`${release.title} - ${release.artist} 플랫폼 선택`}
     >
@@ -24,7 +24,7 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
             alt={release.title}
             width={340}
             height={340}
-            sizes="(max-width: 768px) 160px, 340px"
+            sizes="(max-width: 768px) calc(50vw - 2.5rem), 340px"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
           />
         ) : (
@@ -40,7 +40,7 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
           <IconDots className="h-3.5 w-3.5" stroke={2.5} />
         </span>
 
-        <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/15" />
+        <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/30" />
       </div>
 
       <div className="mt-3 text-left">
