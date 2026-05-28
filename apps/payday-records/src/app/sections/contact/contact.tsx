@@ -18,7 +18,11 @@ const brandHoverColor: Record<string, string> = {
 
 function Contact() {
   return (
-    <section className="w-full" id="contact" aria-label="Contact">
+    <section
+      className="section-gap w-full"
+      id="contact"
+      aria-label="Contact"
+    >
       <div className="flex flex-col items-center justify-center">
         <MacBookScroll
           title={<span className="hero-heading">Show me your dream</span>}
