@@ -1,8 +1,8 @@
 import { ARTISTS } from "@/consts/artists";
 
 // Each set must exceed viewport width so the -50% translate (= one set)
-// always lands on filled track. Sized for 4K+ ultrawide displays.
-const REPEATS_PER_SET = 6;
+// always lands on filled track. 2x ARTISTS covers up to ~4K displays.
+const REPEATS_PER_SET = 2;
 
 const SET = Array.from({ length: REPEATS_PER_SET }).flatMap(() =>
   ARTISTS.map((artist) => artist.name)
