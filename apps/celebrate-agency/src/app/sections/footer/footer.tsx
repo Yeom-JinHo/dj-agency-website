@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 
 import icon from "@/app/icon.png";
-import { ARROW_NE, BOOKING_EMAIL } from "@/consts/brand";
+import { AGENCY_ADDRESS, ARROW_NE, BOOKING_EMAIL, SOCIALS } from "@/consts/brand";
 
 export default function Footer() {
   return (
@@ -45,7 +45,7 @@ export default function Footer() {
             </span>
           </Block>
           <Block title="Studios">
-            Seoul — 38 Seongsui-ro, Seongdong-gu
+            Seoul — {AGENCY_ADDRESS.streetAddress}
           </Block>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function Footer() {
         </div>
         <div className="flex flex-wrap gap-6 font-mono text-[11px] uppercase tracking-[0.14em]">
           <a
-            href="https://www.instagram.com/ye0m_2/"
+            href={SOCIALS.instagram}
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-ca-red"
@@ -78,7 +78,7 @@ export default function Footer() {
             Instagram <span aria-hidden="true">{ARROW_NE}</span>
           </a>
           <a
-            href="https://www.youtube.com/@ye0m_2"
+            href={SOCIALS.youtube}
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-ca-red"
