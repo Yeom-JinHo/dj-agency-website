@@ -16,10 +16,10 @@ function About() {
           as="p"
           className="mt-6 max-w-[640px] text-base/relaxed text-neutral-400 md:text-lg/relaxed"
         >
-          payday records의 소개 payday records payday records payday records
-          payday records payday records payday records payday records payday
-          records payday records payday records payday records payday records
-          payday records payday records payday records payday records
+          Payday Records is an independent music label crafting a sound that
+          moves between deep house, melodic techno, and the textures in
+          between. We release records, curate playlists, and bring artists
+          to the floor.
         </TextReveal>
       </div>
     </section>
