@@ -63,7 +63,7 @@ const Nav = () => {
               key={`ft-l_social_${index}`}
               // external
             >
-              {iconName && <Icon name={iconName} className="h-4 w-4" />}
+              {iconName && <Icon name={iconName} className="h-5 w-5" />}
               {name}
             </Link>
           );

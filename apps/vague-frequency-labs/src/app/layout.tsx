@@ -9,6 +9,8 @@ import { metadata as meta } from "@/app/config";
 import { Providers } from "@repo/ui/common/Providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
+import { JsonLd } from "@repo/ui/common/JsonLd";
+import { organization, website } from "@/app/jsonLd";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
@@ -63,6 +65,7 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${geist.variable} ${pretendard.variable} font-sans antialiased`}
       >
+        <JsonLd items={[organization, website]} />
         <ReactScan />
         <ErrorBoundary>
           <Providers>

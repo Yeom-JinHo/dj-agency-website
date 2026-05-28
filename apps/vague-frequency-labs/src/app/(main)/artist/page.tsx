@@ -5,6 +5,7 @@ import { metadata as meta } from "@/app/config";
 import { artistProfile } from "@/source";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
+import { JsonLd } from "@repo/ui/common/JsonLd";
 import { createMetadata } from "@/utils/index";
 
 import ArtistSimpleCard from "../../sections/artistProfiles/ArtistSimpleCard";
@@ -54,10 +55,7 @@ const jsonLd: WithContext<CollectionPage> = {
 export default function ArtistPage(): ReactElement {
   return (
     <main className="my-16 flex-1">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd items={jsonLd} />
       <section
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="hero"

@@ -1,6 +1,4 @@
-import type { Organization, WithContext } from "schema-dts";
 import React from "react";
-import { metadata as meta } from "@/app/config";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import ParallaxGlobeLogo from "@/components/ParallaxGlobeLogo";
@@ -27,37 +25,9 @@ export const metadata = createMetadata({
   },
 });
 
-const jsonLd: WithContext<Organization> = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: "Vague Frequency Laboratory",
-  description:
-    "An independent music label focused on experimental and innovative electronic music",
-  url: `${meta.site.url}/about`,
-  sameAs: [meta.site.url],
-  founder: {
-    "@type": "Person",
-    name: "Vague Frequency Laboratory Team",
-  },
-  foundingDate: "2024",
-  knowsAbout: [
-    "Electronic Music",
-    "Experimental Music",
-    "Music Production",
-    "Sound Design",
-    "Audio Engineering",
-    "Ambient Music",
-    "IDM",
-  ],
-};
-
 export default function AboutPage() {
   return (
     <main className="my-14 flex-1">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <section
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="about"

@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactElement } from "react";
 import React from "react";
 import FancyLine from "@repo/ui/common/FancyLine";
