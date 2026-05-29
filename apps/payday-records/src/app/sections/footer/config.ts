@@ -1,3 +1,3 @@
 export const copyright = {
-  startYear: 2024,
+  startYear: 2025,
 };
