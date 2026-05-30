@@ -18,12 +18,18 @@ export default function Footer() {
           </div>
           <a
             href={`mailto:${BOOKING_EMAIL}`}
-            className="group block transition-colors hover:text-ca-red"
+            className="group block transition-colors hover:text-ca-red active:text-ca-red"
           >
             <h2 className="font-display text-[clamp(72px,11vw,168px)] uppercase leading-[0.88] tracking-[-0.005em]">
-              Brief<span className="italic text-ca-red">.</span>
+              Brief
+              <span className="italic text-ca-red transition-colors group-hover:text-white group-active:text-white">
+                .
+              </span>
               <br />
-              Send<span className="italic text-ca-red">.</span>
+              Send
+              <span className="italic text-ca-red transition-colors group-hover:text-white group-active:text-white">
+                .
+              </span>
             </h2>
             <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red">
               <span className="inline-block h-2 w-2 bg-ca-red" />
