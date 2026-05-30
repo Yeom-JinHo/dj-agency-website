@@ -21,8 +21,12 @@ export default function Stats() {
   return (
     <section
       ref={ref}
+      aria-labelledby="stats-heading"
       className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4"
     >
+      <h2 id="stats-heading" className="sr-only">
+        By the numbers
+      </h2>
       {stats.map((stat) => {
         const target = parseInt(stat.value, 10);
         return (

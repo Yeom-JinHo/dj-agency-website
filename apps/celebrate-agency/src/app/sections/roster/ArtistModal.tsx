@@ -195,7 +195,10 @@ export function ArtistModal({
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0">
+            <div
+              key={artist.id}
+              className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 animate-modal-fade lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
+            >
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
                 <span>{ARTIST_ROLE_LABEL}</span>
                 <span> &nbsp;·&nbsp; </span>
@@ -217,7 +220,7 @@ export function ArtistModal({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${SOCIAL_LABELS[social.platform]} (opens in new tab)`}
-                        className={`text-ca-fg transition-all duration-200 hover:scale-110 ${SOCIAL_HOVER[social.platform]}`}
+                        className={`p-2 text-ca-fg transition-all duration-200 hover:scale-110 ${SOCIAL_HOVER[social.platform]}`}
                       >
                         <Icon size={32} stroke={1.75} />
                       </a>

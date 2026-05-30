@@ -1,5 +1,5 @@
 import { metadata as meta } from "@/app/config";
-import { AGENCY_ADDRESS, BOOKING_EMAIL } from "@/consts/brand";
+import { AGENCY_ADDRESS, BOOKING_EMAIL, SOCIALS } from "@/consts/brand";
 
 /**
  * schema.org Organization JSON-LD for the agency home document.
@@ -23,8 +23,10 @@ export function organizationJsonLd() {
     },
     address: {
       "@type": "PostalAddress",
+      streetAddress: AGENCY_ADDRESS.streetAddress,
       addressLocality: AGENCY_ADDRESS.locality,
       addressCountry: AGENCY_ADDRESS.country,
     },
+    sameAs: [SOCIALS.instagram, SOCIALS.youtube],
   };
 }
