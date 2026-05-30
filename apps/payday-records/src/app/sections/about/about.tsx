@@ -3,10 +3,7 @@ import TextReveal from "@repo/ui/common/TextReveal";
 
 function About() {
   return (
-    <section
-      className="w-full pt-16 pb-24 lg:pt-20 lg:pb-32"
-      id="about"
-    >
+    <section className="section-gap w-full" id="about">
       <ScrollVelocity texts={["Payday", "Records"]} className="font-display" />
       <div className="mt-24 flex flex-col items-center px-4 text-center">
         <TextReveal as="h2" className="section-heading">

@@ -4,7 +4,7 @@ import { playlist } from "./config";
 
 function Playlist() {
   return (
-    <section className="w-full py-24 lg:py-32" id="playlist">
+    <section className="section-gap w-full" id="playlist">
       <div className="flex flex-col items-center justify-center px-6 text-center sm:px-4">
         <TextReveal as="h2" className="section-heading">
           Sound

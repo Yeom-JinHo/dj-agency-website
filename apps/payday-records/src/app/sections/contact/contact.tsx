@@ -18,7 +18,11 @@ const brandHoverColor: Record<string, string> = {
 
 function Contact() {
   return (
-    <div className="w-full" id="contact">
+    <section
+      className="section-gap w-full"
+      id="contact"
+      aria-label="Contact"
+    >
       <div className="flex flex-col items-center justify-center">
         <MacBookScroll
           title={<span className="hero-heading">Show me your dream</span>}
@@ -40,7 +44,7 @@ function Contact() {
             backdropFilter: "blur(16px) saturate(140%)",
             WebkitBackdropFilter: "blur(16px) saturate(140%)",
             backgroundColor: "rgba(9, 9, 11, 0.55)",
-            borderRadius: "12px",
+            borderRadius: "16px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
           className="pointer-events-auto relative mb-[200px] flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] [@media(max-width:375px)]:mb-40"
@@ -83,7 +87,7 @@ function Contact() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
 
