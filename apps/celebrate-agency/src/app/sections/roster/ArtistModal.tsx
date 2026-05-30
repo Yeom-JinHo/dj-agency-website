@@ -165,7 +165,7 @@ export function ArtistModal({
           ref={modalInnerRef}
           className="relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]"
         >
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
             <span>
               [ {idxLabel} / {totalLabel} ]
             </span>
@@ -199,7 +199,7 @@ export function ArtistModal({
               key={artist.id}
               className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 animate-modal-fade lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
             >
-              <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted">
+              <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
                 <span>{ARTIST_ROLE_LABEL}</span>
                 <span> &nbsp;·&nbsp; </span>
                 <span className="text-ca-red">{artist.city}</span>
@@ -229,12 +229,12 @@ export function ArtistModal({
                 </div>
               ) : null}
 
-              <p className="max-w-[52ch] flex-shrink-0 text-base leading-relaxed text-ca-fg">
+              <p className="max-w-[52ch] flex-shrink-0 text-base leading-relaxed text-ca-fg lg:text-lg">
                 {artist.bio}
               </p>
 
               <div className="flex flex-col lg:min-h-0 lg:flex-1">
-                <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red">
+                <h3 className="mb-3.5 flex-shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-ca-red lg:text-[13px]">
                   [ Selected works ]
                 </h3>
                 <div className="flex flex-col pb-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-6">
@@ -245,13 +245,13 @@ export function ArtistModal({
                         i === artist.selectedWorks.length - 1 ? "border-b" : ""
                       }`}
                     >
-                      <span className="font-mono text-[11px] tracking-[0.14em] text-ca-muted">
+                      <span className="font-mono text-[11px] tracking-[0.14em] text-ca-muted lg:text-[13px]">
                         {work.id}
                       </span>
                       <span className="font-sans font-medium">
                         {work.title}
                       </span>
-                      <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ca-muted">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-ca-muted lg:text-[13px]">
                         {work.meta}
                       </span>
                     </div>
@@ -266,7 +266,7 @@ export function ArtistModal({
               type="button"
               onClick={onPrev}
               aria-label={`Previous artist: ${prevArtist.name}`}
-              className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em]`}
+              className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
               ← Prev
             </button>
@@ -274,7 +274,7 @@ export function ArtistModal({
               type="button"
               onClick={onNext}
               aria-label={`Next artist: ${nextArtist.name}`}
-              className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em]`}
+              className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
               Next →
             </button>

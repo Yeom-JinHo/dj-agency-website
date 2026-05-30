@@ -4,7 +4,7 @@ import { CornerFrame } from "@/components/Corner";
 import { ARROW_NE, BOOKING_EMAIL } from "@/consts/brand";
 
 const FRAME_BASE = "relative mb-[18px] aspect-[3/4]";
-const META_LABEL = "flex justify-between font-mono text-[11px] uppercase tracking-[0.08em]";
+const META_LABEL = "flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] lg:text-[13px]";
 
 interface BookingFillerProps {
   visibility: string;

@@ -99,8 +99,8 @@ export default function Roster() {
             <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red">
               {artist.name}
             </div>
-            <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
-              <span className="lg:text-[13px]">{ARTIST_ROLE_LABEL}</span>
+            <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
+              <span>{ARTIST_ROLE_LABEL}</span>
               <span className="text-ca-red">{artist.city}</span>
             </div>
           </button>

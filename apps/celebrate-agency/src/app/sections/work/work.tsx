@@ -30,10 +30,10 @@ export default function Work() {
             <div
               className={`ca-stripe-ph-lg relative overflow-hidden border border-ca-line ${work.aspectClassName}`}
             >
-              <span className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted">
+              <span className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
                 {work.label}
               </span>
-              <span className="absolute top-4 right-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-red">
+              <span className="absolute top-4 right-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-red lg:text-[11px]">
                 {work.tag}
               </span>
             </div>
@@ -41,7 +41,7 @@ export default function Work() {
               <h4 className="font-display text-3xl uppercase leading-none tracking-[0.01em]">
                 {work.title}
               </h4>
-              <div className="text-right font-mono text-[11px] uppercase tracking-[0.1em] text-ca-muted">
+              <div className="text-right font-mono text-[11px] uppercase tracking-[0.1em] text-ca-muted lg:text-[13px]">
                 {work.credit}
                 <br />
                 {work.date}

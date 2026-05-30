@@ -49,7 +49,7 @@ export default function Stats() {
                 </sup>
               ) : null}
             </div>
-            <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+            <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
               {stat.label}
             </div>
           </div>
