@@ -101,9 +101,8 @@ export default function Footer() {
           <SignatureLink
             href={SOCIALS.instagram}
             ariaLabel="ye0m2 — Connect on Instagram"
-            className="text-ca-muted"
-            accentClassName="text-ca-red"
-            tooltipClassName="font-mono text-[10px] uppercase tracking-[0.14em]"
+            className="text-ca-muted hover:text-ca-red focus-visible:text-ca-red"
+            tooltipClassName="text-ca-red font-mono text-[10px] uppercase tracking-[0.14em]"
           >
             ye0m2
           </SignatureLink>{" "}
