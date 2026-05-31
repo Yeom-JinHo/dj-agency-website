@@ -1,5 +1,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import SignatureLink from "@repo/ui/common/SignatureLink";
 
 import icon from "@/app/icon.png";
 import { AGENCY_ADDRESS, ARROW_NE, BOOKING_EMAIL, SOCIALS } from "@/consts/brand";
@@ -96,7 +97,17 @@ export default function Footer() {
           </span>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
-          © 2026 ye0m2 · All rights reserved
+          © 2026{" "}
+          <SignatureLink
+            href={SOCIALS.instagram}
+            ariaLabel="ye0m2 — Connect on Instagram"
+            className="text-ca-muted"
+            accentClassName="text-ca-red"
+            tooltipClassName="font-mono text-[10px] uppercase tracking-[0.14em]"
+          >
+            ye0m2
+          </SignatureLink>{" "}
+          · All rights reserved
         </div>
       </div>
     </footer>
