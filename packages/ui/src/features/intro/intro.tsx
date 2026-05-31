@@ -12,9 +12,11 @@ import prLogo from "../../assets/logos/pr.png";
 interface IntroProps {
   currentApp: AppId;
   appUrls: Record<AppId, string>;
+  /** not-found 컨텍스트에서만 노출되는 절제된 한 줄 힌트. 정상 /intro에서는 넘기지 않는다. */
+  notice?: string;
 }
 
-export function Intro({ currentApp, appUrls }: IntroProps) {
+export function Intro({ currentApp, appUrls, notice }: IntroProps) {
   const isMobile = useMobile();
   const [hoveredText, setHoveredText] = useState("");
 
@@ -99,6 +101,18 @@ export function Intro({ currentApp, appUrls }: IntroProps) {
           {entry.label}
         </HighlightText>
       ))}
+
+      {notice && !isMobile && (
+        <motion.p
+          aria-hidden="true"
+          className="pointer-events-none fixed bottom-6 left-1/2 z-50 -translate-x-1/2 text-center text-xs tracking-[0.25em] text-white/45 uppercase"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+        >
+          {notice}
+        </motion.p>
+      )}
     </section>
   );
 }
