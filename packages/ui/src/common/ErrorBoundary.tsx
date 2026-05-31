@@ -2,10 +2,6 @@
 
 import type { ReactNode } from "react";
 import { Component } from "react";
-import GalaxyBackground from "../common/GalaxyBackground";
-
-import { cn } from "../index";
-import { buttonVariants } from "../common/Button";
 
 interface Props {
   children: ReactNode;
@@ -27,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: unknown) {
     // 웹뷰에서 발생하는 에러를 안전하게 로깅
     console.error("Error caught by boundary:", error, errorInfo);
   }
@@ -54,28 +50,31 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden">
-            <main className="relative h-screen w-screen flex-1">
-              <div className="align-center absolute top-1/2 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-4">
-                <h1 className="text-6xl">Something went wrong</h1>
-                <p className="text-muted-foreground mb-4">
-                  Please refresh the page or try again later.
-                </p>
-                <button
-                  className={cn(
-                    buttonVariants({ variant: "default" }),
-                    "w-full self-center rounded-full border border-white/30 bg-white/20 px-8 py-2 text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/30 md:self-start"
-                  )}
-                  onClick={this.handleReload}
-                >
-                  Refresh Page
-                </button>
-              </div>
-
-              <div className="absolute inset-0">
-                <GalaxyBackground mouseInteraction={false} />
-              </div>
-            </main>
+          <div className="relative flex min-h-[100dvh] flex-col items-center justify-center gap-6 overflow-hidden bg-[#0a0a0a] px-6 text-center">
+            <p className="font-mono text-[11px] tracking-[0.3em] text-white/40 uppercase">
+              Error
+            </p>
+            <h1 className="font-mono text-3xl font-semibold tracking-tight text-white md:text-4xl">
+              Something went wrong
+            </h1>
+            <p className="max-w-sm text-sm leading-relaxed text-white/55">
+              Please refresh the page or try again later.
+            </p>
+            <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row">
+              <button
+                type="button"
+                onClick={this.handleReload}
+                className="rounded-full border border-white/25 bg-white/10 px-7 py-2.5 font-mono text-[11px] tracking-[0.18em] text-white uppercase backdrop-blur-sm transition-colors hover:bg-white/20"
+              >
+                Refresh
+              </button>
+              <a
+                href="/"
+                className="font-mono text-[11px] tracking-[0.18em] text-white/45 uppercase underline-offset-4 transition-colors hover:text-white/80 hover:underline"
+              >
+                Home
+              </a>
+            </div>
           </div>
         )
       );
