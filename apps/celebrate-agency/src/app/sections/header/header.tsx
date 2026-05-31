@@ -33,7 +33,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs uppercase tracking-[0.14em] text-ca-fg/80 transition-opacity hover:opacity-100"
+              className="text-xs uppercase tracking-[0.14em] text-ca-fg/80 transition-opacity hover:opacity-100 lg:text-[13px]"
             >
               {link.label}
             </Link>
@@ -41,7 +41,7 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-3.5">
-          <span className="hidden font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted sm:inline-flex sm:items-center sm:gap-2">
+          <span className="hidden font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted sm:inline-flex sm:items-center sm:gap-2 lg:text-[13px]">
             <span className="text-ca-red">●</span>
             Booking 2026
           </span>

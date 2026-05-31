@@ -12,7 +12,7 @@ export default function Footer() {
     >
       <div className="mb-14 grid grid-cols-1 gap-[60px] lg:mb-20 lg:grid-cols-[1.2fr_1fr]">
         <div>
-          <div className="mb-8 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
+          <div className="mb-8 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
             <span className="text-ca-red">●</span>
             &nbsp; [ 04 ] &nbsp; / &nbsp; CONTACT
           </div>
@@ -31,7 +31,7 @@ export default function Footer() {
                 .
               </span>
             </h2>
-            <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red">
+            <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red lg:text-[13px]">
               <span className="inline-block h-2 w-2 bg-ca-red" />
               {BOOKING_EMAIL}
               <span aria-hidden="true">{ARROW_NE}</span>
@@ -46,7 +46,7 @@ export default function Footer() {
             >
               {BOOKING_EMAIL}
             </a>
-            <span className="mt-3 block font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted">
+            <span className="mt-3 block font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
               +82 2 000 0000
             </span>
           </Block>
@@ -69,12 +69,12 @@ export default function Footer() {
             <span className="font-display text-lg tracking-[0.08em]">
               CELEBRATE AGENCY
             </span>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ca-muted">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ca-muted lg:text-[11px]">
               Talent · Production · Direction
             </span>
           </div>
         </div>
-        <div className="flex flex-wrap gap-6 font-mono text-[11px] uppercase tracking-[0.14em]">
+        <div className="flex flex-wrap gap-6 font-mono text-[11px] uppercase tracking-[0.14em] lg:text-[13px]">
           <a
             href={SOCIALS.instagram}
             target="_blank"
@@ -95,7 +95,7 @@ export default function Footer() {
             TikTok <span aria-hidden="true">—</span>
           </span>
         </div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted">
+        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
           © 2026 ye0m2 · All rights reserved
         </div>
       </div>
@@ -109,10 +109,10 @@ function Block({
 }: Readonly<{ title: string; children: ReactNode }>) {
   return (
     <div>
-      <h5 className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted">
+      <h5 className="mb-2.5 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
         {title}
       </h5>
-      <div className="text-[15px] leading-[1.55]">{children}</div>
+      <div className="text-[15px] leading-[1.55] lg:text-base">{children}</div>
     </div>
   );
 }

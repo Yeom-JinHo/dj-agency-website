@@ -22,7 +22,7 @@ export default function Hero() {
       </div>
 
       <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:180ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
-        <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg">
+        <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg lg:text-[22px]">
           Talent · Production · Direction.
           <br />
           Seoul, Korea.
@@ -31,7 +31,7 @@ export default function Hero() {
           <span className="inline-block h-2 w-2 animate-pulse-dot rounded-full bg-ca-red" />
           <nav
             aria-label="Section index"
-            className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-red"
+            className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-red lg:text-[13px]"
           >
             <span aria-hidden>↓</span>
             <a href="#roster" className="transition-colors hover:text-ca-fg">
