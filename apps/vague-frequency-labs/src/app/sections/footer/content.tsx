@@ -26,6 +26,7 @@ const Copyright = () => {
         <SignatureLink
           href="https://www.instagram.com/ye0m_2/"
           ariaLabel={`${meta.author.name} — Connect on Instagram`}
+          tooltipClassName="text-xs tracking-[0.04em] sm:text-[13px]"
         >
           {meta.author.name}
         </SignatureLink>
