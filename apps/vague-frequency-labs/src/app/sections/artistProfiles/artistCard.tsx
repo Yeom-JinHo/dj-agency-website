@@ -59,12 +59,12 @@ export default function ArtistCard({
             blurDataURL={imagePlaceholder}
           />
         </div>
-        <div className="l:p-6 flex grow flex-col items-end justify-between gap-4 p-4">
+        <div className="lg:p-6 flex grow flex-col items-end justify-between gap-4 p-4">
           <div className="flex w-full flex-col gap-2">
-            <DialogTitle className="l:text-3xl text-2xl leading-8 font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+            <DialogTitle className="lg:text-3xl text-2xl leading-8 font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
               <TextReveal>{name}</TextReveal>
             </DialogTitle>
-            <DialogSubtitle className="text-md text-muted-foreground text-zinc-700 dark:text-zinc-400">
+            <DialogSubtitle className="text-base text-muted-foreground text-zinc-700 dark:text-zinc-400">
               <TextReveal>@{nickname ?? ""}</TextReveal>
             </DialogSubtitle>
           </div>
@@ -92,7 +92,7 @@ export default function ArtistCard({
               {name}
             </DialogTitle>
             <DialogDescription
-              className="text-md text-muted-foreground text-zinc-700 dark:text-zinc-400"
+              className="text-base text-muted-foreground text-zinc-700 dark:text-zinc-400"
               variants={{
                 initial: { opacity: 0 },
                 animate: { opacity: 1 },

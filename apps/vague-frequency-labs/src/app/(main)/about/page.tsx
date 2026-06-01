@@ -36,7 +36,7 @@ export default function AboutPage() {
           {/* todo: re-add delay of 0.2seconds */}
           <TextReveal
             as="h1"
-            className="leading-wide tracking-relaxed text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
+            className="leading-tight tracking-tight text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
           >
             About
           </TextReveal>
