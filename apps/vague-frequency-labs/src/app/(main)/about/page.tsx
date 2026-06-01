@@ -32,7 +32,7 @@ export default function AboutPage() {
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="about"
       >
-        <div className="flex flex-col items-center md:max-w-7xl">
+        <div className="flex w-full flex-col items-center md:max-w-7xl">
           <SectionHeading as="h1" variant="page">
             About
           </SectionHeading>
