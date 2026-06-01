@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 export default function Hero() {
   return (
     <section
@@ -10,15 +8,83 @@ export default function Hero() {
         Celebrate Agency — Talent · Production · Direction.
       </h1>
       <div className="flex flex-1 animate-hero-fade-in items-center justify-center px-6 lg:px-10">
-        <Image
-          src="/images/logo/hero.webp"
-          alt="Celebrate Agency"
-          width={400}
-          height={300}
-          priority
-          sizes="(min-width: 1024px) 896px, 100vw"
+        <svg
+          viewBox="0 0 400 300"
+          aria-hidden
           className="h-auto max-h-[calc(100dvh-320px)] w-full max-w-4xl"
-        />
+        >
+          <defs>
+            {/* Bebas Neue가 원본 로고보다 굵어, 글자를 안쪽으로 침식해 굵기를 맞춤 */}
+            <filter
+              id="celebrate-thin"
+              x="-10%"
+              y="-10%"
+              width="120%"
+              height="120%"
+            >
+              <feMorphology operator="erode" radius="1" />
+            </filter>
+          </defs>
+          <text
+            x="200"
+            y="175"
+            textAnchor="middle"
+            fontFamily="var(--font-bebas)"
+            fontSize="99"
+            letterSpacing="0.6"
+            fill="var(--color-ca-fg)"
+            filter="url(#celebrate-thin)"
+          >
+            CELEBRATE
+          </text>
+          <text
+            x="215"
+            y="216"
+            textAnchor="middle"
+            fontFamily="var(--font-bebas)"
+            fontSize="28"
+            letterSpacing="31.9"
+            fill="var(--color-ca-fg)"
+          >
+            AGENCY
+          </text>
+          <g fill="var(--color-ca-red)">
+            {/* 좌상: 곧추섬(-47°) / 우상: 대칭 */}
+            <rect
+              x="9.5"
+              y="102"
+              width="47"
+              height="10"
+              rx="2"
+              transform="rotate(-47 33 107)"
+            />
+            <rect
+              x="340.5"
+              y="102.5"
+              width="48"
+              height="10"
+              rx="2"
+              transform="rotate(45 364.5 107.5)"
+            />
+            {/* 하단: 짧게(34) */}
+            <rect
+              x="22"
+              y="166"
+              width="34"
+              height="10"
+              rx="2"
+              transform="rotate(45 39 171)"
+            />
+            <rect
+              x="344"
+              y="166"
+              width="34"
+              height="10"
+              rx="2"
+              transform="rotate(-45 361 171)"
+            />
+          </g>
+        </svg>
       </div>
 
       <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:180ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
