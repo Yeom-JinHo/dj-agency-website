@@ -4,7 +4,7 @@ import Link from "next/link";
 import { metadata as meta } from "@/app/config";
 import { artistProfile } from "@/source";
 import FancyLine from "@repo/ui/common/FancyLine";
-import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 import { JsonLd } from "@repo/ui/common/JsonLd";
 import { createMetadata } from "@/utils/index";
 
@@ -61,13 +61,9 @@ export default function ArtistPage(): ReactElement {
         id="hero"
       >
         <div className="flex flex-col items-center md:max-w-7xl">
-          {/* todo: re-add delay of 0.2seconds */}
-          <TextReveal
-            as="h1"
-            className="leading-wide tracking-relaxed text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
-          >
+          <SectionHeading as="h1" variant="page">
             Artist
-          </TextReveal>
+          </SectionHeading>
 
           <FancyLine className={"m-16"} />
           <div className="flex flex-wrap justify-center gap-16">

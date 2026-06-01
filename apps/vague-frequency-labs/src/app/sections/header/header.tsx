@@ -102,7 +102,10 @@ export default function Header() {
             v.f.labs
           </Link>
 
-          <button className="md:hidden" onClick={toggleMenu}>
+          <button
+            className="-mr-2 flex items-center justify-center rounded-sm p-2 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current md:hidden"
+            onClick={toggleMenu}
+          >
             <span className="sr-only">{isOpen ? "Close" : "Menu"}</span>
             {isOpen ? (
               <Icon name="LuClose" className="h-6 w-6" />

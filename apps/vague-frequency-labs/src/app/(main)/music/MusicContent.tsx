@@ -3,7 +3,7 @@ import React from "react";
 import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
-import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 import MusicInfoCard from "../../sections/musicList/MusicInfoCard";
 
 export default function MusicContent(): ReactElement {
@@ -26,12 +26,9 @@ export default function MusicContent(): ReactElement {
         id="hero"
       >
         <div className="flex flex-col items-center md:max-w-7xl">
-          <TextReveal
-            as="h1"
-            className="leading-wide tracking-relaxed text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
-          >
+          <SectionHeading as="h1" variant="page">
             Music
-          </TextReveal>
+          </SectionHeading>
 
           <FancyLine className={"m-16"} />
           <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">

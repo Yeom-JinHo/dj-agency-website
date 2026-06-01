@@ -6,6 +6,7 @@ import Globe from "./Globe";
 import { COMPANY_SHORT_NAME } from "@/consts/company";
 
 import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 
 export default function ParallaxGlobeLogo(): ReactElement {
   return (
@@ -19,16 +20,11 @@ export default function ParallaxGlobeLogo(): ReactElement {
           priority
         />
         <div className="space-y-4 p-8">
-          <TextReveal
-            as="h2"
-            className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-          >
-            About
-          </TextReveal>
+          <SectionHeading as="h2">About</SectionHeading>
           <div className="space-y-4">
             <TextReveal
               as="p"
-              className="max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+              className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
             >
               Vague Frequency Laboratory의 소개 Vague Frequency Laboratory
               Vague Frequency Laboratory Vague Frequency LaboratoryVague
@@ -38,16 +34,11 @@ export default function ParallaxGlobeLogo(): ReactElement {
           </div>
         </div>
         <div className="space-y-4 p-8">
-          <TextReveal
-            as="h2"
-            className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-          >
-            Partner
-          </TextReveal>
+          <SectionHeading as="h2">Partner</SectionHeading>
           <div className="space-y-4">
             <TextReveal
               as="p"
-              className="max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+              className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
             >
               Vague Frequency Laboratory의 소개 Vague Frequency Laboratory
               Vague Frequency Laboratory Vague Frequency LaboratoryVague
