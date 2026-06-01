@@ -5,7 +5,6 @@ import type { Viewport } from "next";
 import "@/styles/globals.css";
 
 import { metadata as meta } from "@/app/config";
-import { Providers } from "@repo/ui/common/Providers";
 import { ErrorBoundary } from "@repo/ui/common/ErrorBoundary";
 import { createMetadata } from "@/utils";
 import { JsonLd } from "@repo/ui/common/JsonLd";
@@ -56,18 +55,16 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark">
       <body
         className={`${bricolage_grotesque.variable} ${anton.variable} antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />
         <ErrorBoundary>
-          <Providers>
-            {children}
-            <Analytics />
-            <SpeedInsights />
-          </Providers>
+          {children}
+          <Analytics />
+          <SpeedInsights />
         </ErrorBoundary>
       </body>
     </html>
