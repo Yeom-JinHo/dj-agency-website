@@ -64,7 +64,7 @@ export class ErrorBoundary extends Component<Props, State> {
               className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden"
             >
               <span
-                className="font-display text-[28vw] font-bold uppercase leading-none tracking-[-0.04em] text-white/[0.028] sm:text-[22vw]"
+                className="font-display text-[18vw] font-bold uppercase leading-none tracking-[-0.04em] text-white/[0.028] sm:text-[22vw]"
                 style={{ whiteSpace: "nowrap" }}
               >
                 ERROR
@@ -77,7 +77,7 @@ export class ErrorBoundary extends Component<Props, State> {
               className="pointer-events-none absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(ellipse 60% 55% at 50% 50%, transparent 0%, #0a0a0a 80%)",
+                  "radial-gradient(ellipse 80% 50% at 50% 50%, transparent 0%, #0a0a0a 75%)",
               }}
             />
 
@@ -93,7 +93,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-red-500/80">
                   System Error
                 </p>
-                <h1 className="font-display text-[clamp(40px,8vw,88px)] uppercase leading-[0.92] tracking-[-0.02em] text-white">
+                <h1 className="font-display text-[clamp(34px,8vw,88px)] uppercase leading-[0.92] tracking-[-0.02em] text-white">
                   Something
                   <br />
                   went wrong
@@ -102,7 +102,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
               {/* Body + actions cluster */}
               <motion.div
-                className="mt-10 flex flex-col items-center gap-8"
+                className="mt-6 flex flex-col items-center gap-6 sm:mt-10 sm:gap-8"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
@@ -134,7 +134,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
               {/* Bottom meta: error code */}
               <motion.p
-                className="mt-16 font-mono text-[10px] uppercase tracking-[0.25em] text-white/20"
+                className="mt-8 font-mono text-[10px] uppercase tracking-[0.25em] text-white/20 sm:mt-16"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.35 }}
