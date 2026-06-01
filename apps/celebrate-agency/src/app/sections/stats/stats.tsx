@@ -43,6 +43,11 @@ export default function Stats() {
             ) : (
               <span>0</span>
             )}
+            {stat.superscript ? (
+              <sup className="ml-1 align-top text-[24px] text-ca-red lg:text-[32px]">
+                {stat.superscript}
+              </sup>
+            ) : null}
           </div>
           <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
             {stat.label}
