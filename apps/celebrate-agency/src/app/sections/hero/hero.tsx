@@ -19,14 +19,14 @@ export default function Hero() {
           <path d={CELEBRATE_PATH} fill="var(--color-ca-fg)" />
           <path d={AGENCY_PATH} fill="var(--color-ca-fg)" />
           <g fill="var(--color-ca-red)">
-            {/* 좌상: 곧추섬(-47°) / 우상: 대칭 */}
+            {/* 좌상: 곧추섬(-47°), C 어깨를 살짝 덮도록 우하로 이동 */}
             <rect
-              x="9.5"
-              y="102"
+              x="11.5"
+              y="106"
               width="47"
               height="10"
               rx="2"
-              transform="rotate(-47 33 107)"
+              transform="rotate(-47 35 111)"
             />
             <rect
               x="340.5"
