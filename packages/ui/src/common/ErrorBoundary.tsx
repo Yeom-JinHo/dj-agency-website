@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Component } from "react";
+import { motion } from "motion/react";
 
 interface Props {
   children: ReactNode;
@@ -50,31 +51,104 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="relative flex min-h-[100dvh] flex-col items-center justify-center gap-6 overflow-hidden bg-[#0a0a0a] px-6 text-center">
-            <p className="font-mono text-[11px] tracking-[0.3em] text-white/40 uppercase">
-              Error
-            </p>
-            <h1 className="font-mono text-3xl font-semibold tracking-tight text-white md:text-4xl">
-              Something went wrong
-            </h1>
-            <p className="max-w-sm text-sm leading-relaxed text-white/55">
-              Please refresh the page or try again later.
-            </p>
-            <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={this.handleReload}
-                className="rounded-full border border-white/25 bg-white/10 px-7 py-2.5 font-mono text-[11px] tracking-[0.18em] text-white uppercase backdrop-blur-sm transition-colors hover:bg-white/20"
+          <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#0a0a0a] px-6 text-center">
+            {/* Scan-line accent — top */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-red-500/60"
+            />
+
+            {/* Watermark: giant background "ERROR" typography */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden"
+            >
+              <span
+                className="font-display text-[28vw] font-bold uppercase leading-none tracking-[-0.04em] text-white/[0.028] sm:text-[22vw]"
+                style={{ whiteSpace: "nowrap" }}
               >
-                Refresh
-              </button>
-              <a
-                href="/"
-                className="font-mono text-[11px] tracking-[0.18em] text-white/45 uppercase underline-offset-4 transition-colors hover:text-white/80 hover:underline"
-              >
-                Home
-              </a>
+                ERROR
+              </span>
             </div>
+
+            {/* Radial vignette — adds depth around the watermark */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse 60% 55% at 50% 50%, transparent 0%, #0a0a0a 80%)",
+              }}
+            />
+
+            {/* Content */}
+            <div className="relative z-10 flex flex-col items-center">
+              {/* Meta label cluster */}
+              <motion.div
+                className="flex flex-col items-center gap-2"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-red-500/80">
+                  System Error
+                </p>
+                <h1 className="font-display text-[clamp(40px,8vw,88px)] uppercase leading-[0.92] tracking-[-0.02em] text-white">
+                  Something
+                  <br />
+                  went wrong
+                </h1>
+              </motion.div>
+
+              {/* Body + actions cluster */}
+              <motion.div
+                className="mt-10 flex flex-col items-center gap-8"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.55,
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: 0.13,
+                }}
+              >
+                <p className="max-w-[320px] font-sans text-sm leading-relaxed text-white/50">
+                  Please refresh the page or return home.
+                </p>
+
+                <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={this.handleReload}
+                    className="min-w-[140px] rounded-none border border-white/30 bg-transparent px-8 py-3 font-mono text-[11px] uppercase tracking-[0.22em] text-white transition-all duration-200 hover:border-white hover:bg-white hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                  >
+                    Refresh
+                  </button>
+                  <a
+                    href="/"
+                    className="min-h-[44px] inline-flex items-center font-mono text-[11px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-white/80"
+                  >
+                    ← Home
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Bottom meta: error code */}
+              <motion.p
+                className="mt-16 font-mono text-[10px] uppercase tracking-[0.25em] text-white/20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.35 }}
+                aria-hidden
+              >
+                ERR_RUNTIME_EXCEPTION
+              </motion.p>
+            </div>
+
+            {/* Scan-line accent — bottom */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-white/10"
+            />
           </div>
         )
       );
