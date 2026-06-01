@@ -1,4 +1,4 @@
-import { Anton, Bebas_Neue, Inter, JetBrains_Mono } from "next/font/google";
+import { Anton, Inter, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
 
@@ -32,14 +32,6 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jbmono",
 });
 
-// 로고(hero) 전용 콘덴스드 디스플레이 폰트
-const bebasNeue = Bebas_Neue({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-  variable: "--font-bebas",
-});
-
 export const metadata = createMetadata({
   title: {
     absolute: meta.site.title,
@@ -69,7 +61,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${anton.variable} ${inter.variable} ${jetbrainsMono.variable} ${bebasNeue.variable}`}
+      className={`dark ${anton.variable} ${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body className="font-sans antialiased">
         <ReactScan />

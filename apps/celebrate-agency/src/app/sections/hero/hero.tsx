@@ -1,3 +1,5 @@
+import { AGENCY_PATH, CELEBRATE_PATH } from "./logo-paths";
+
 export default function Hero() {
   return (
     <section
@@ -13,41 +15,9 @@ export default function Hero() {
           aria-hidden
           className="h-auto max-h-[calc(100dvh-320px)] w-full max-w-4xl"
         >
-          <defs>
-            {/* Bebas Neue가 원본 로고보다 굵어, 글자를 안쪽으로 침식해 굵기를 맞춤 */}
-            <filter
-              id="celebrate-thin"
-              x="-10%"
-              y="-10%"
-              width="120%"
-              height="120%"
-            >
-              <feMorphology operator="erode" radius="1" />
-            </filter>
-          </defs>
-          <text
-            x="200"
-            y="175"
-            textAnchor="middle"
-            fontFamily="var(--font-bebas)"
-            fontSize="99"
-            letterSpacing="0.6"
-            fill="var(--color-ca-fg)"
-            filter="url(#celebrate-thin)"
-          >
-            CELEBRATE
-          </text>
-          <text
-            x="215"
-            y="216"
-            textAnchor="middle"
-            fontFamily="var(--font-bebas)"
-            fontSize="28"
-            letterSpacing="31.9"
-            fill="var(--color-ca-fg)"
-          >
-            AGENCY
-          </text>
+          {/* 글자는 Bebas Neue 아웃라인을 path로 굳혀, 표시 크기와 무관하게 굵기 고정 */}
+          <path d={CELEBRATE_PATH} fill="var(--color-ca-fg)" />
+          <path d={AGENCY_PATH} fill="var(--color-ca-fg)" />
           <g fill="var(--color-ca-red)">
             {/* 좌상: 곧추섬(-47°) / 우상: 대칭 */}
             <rect
