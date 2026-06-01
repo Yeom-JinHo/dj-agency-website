@@ -91,7 +91,7 @@ export default async function ProjectPage(props0: {
         <h2 className="mb-2 text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
           About
         </h2>
-        <p className="whitespace-pre-line text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400">
+        <p className="whitespace-pre-line text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
           {artist.fullDescription}
         </p>
       </section>
@@ -101,7 +101,7 @@ export default async function ProjectPage(props0: {
         </h2>
         <TextReveal
           as="p"
-          className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-400"
+          className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
         >
           TBD
         </TextReveal>

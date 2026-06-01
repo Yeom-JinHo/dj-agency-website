@@ -15,7 +15,7 @@ function About() {
           </div>
           <TextReveal
             as="p"
-            className="mt-6 max-w-[640px] text-gray-600 lg:mt-2 lg:w-[45%] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed dark:text-gray-300"
+            className="mt-6 max-w-[640px] text-muted-foreground lg:mt-2 lg:w-[45%] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
           >
             Vague Frequency Laboratory의 소개 Vague Frequency Laboratory Vague
             Frequency Laboratory Vague Frequency LaboratoryVague Frequency

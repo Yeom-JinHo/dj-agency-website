@@ -114,7 +114,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
                 </p>
               )}
             </div>
-            <div className="mt-4 flex flex-col gap-2 border-t border-zinc-200 pt-2">
+            <div className="mt-4 flex flex-col gap-2 border-t border-border pt-2">
               {musicInfo.socials?.map((social, index) => {
                 return (
                   <Link

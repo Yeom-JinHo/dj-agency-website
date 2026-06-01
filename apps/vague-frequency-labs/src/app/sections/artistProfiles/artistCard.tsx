@@ -43,7 +43,7 @@ export default function ArtistCard({
           borderRadius: "12px",
         }}
         className={cn(
-          "flex flex-col overflow-hidden border border-zinc-950/10 bg-white dark:border-zinc-50/10 dark:bg-zinc-900",
+          "flex flex-col overflow-hidden border border-border bg-card",
           className
         )}
       >
@@ -61,10 +61,10 @@ export default function ArtistCard({
         </div>
         <div className="lg:p-6 flex grow flex-col items-end justify-between gap-4 p-4">
           <div className="flex w-full flex-col gap-2">
-            <DialogTitle className="lg:text-3xl text-2xl leading-8 font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+            <DialogTitle className="lg:text-3xl text-2xl leading-8 font-bold tracking-tight text-foreground">
               <TextReveal>{name}</TextReveal>
             </DialogTitle>
-            <DialogSubtitle className="text-base text-muted-foreground text-zinc-700 dark:text-zinc-400">
+            <DialogSubtitle className="text-base text-muted-foreground">
               <TextReveal>@{nickname ?? ""}</TextReveal>
             </DialogSubtitle>
           </div>
@@ -75,7 +75,7 @@ export default function ArtistCard({
           style={{
             borderRadius: "24px",
           }}
-          className="pointer-events-auto relative flex h-auto w-full min-w-[300px] basis-1/2 flex-col overflow-hidden border border-zinc-950/10 bg-white xl:basis-1/4 dark:border-zinc-50/10 dark:bg-zinc-900"
+          className="pointer-events-auto relative flex h-auto w-full min-w-[300px] basis-1/2 flex-col overflow-hidden border border-border bg-card xl:basis-1/4"
         >
           <div className="relative w-full">
             <DialogImage
@@ -88,11 +88,11 @@ export default function ArtistCard({
             />
           </div>
           <div className="flex flex-col gap-2 p-6">
-            <DialogTitle className="text-3xl leading-8 font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+            <DialogTitle className="text-3xl leading-8 font-bold tracking-tight text-foreground">
               {name}
             </DialogTitle>
             <DialogDescription
-              className="text-base text-muted-foreground text-zinc-700 dark:text-zinc-400"
+              className="text-base text-muted-foreground"
               variants={{
                 initial: { opacity: 0 },
                 animate: { opacity: 1 },
