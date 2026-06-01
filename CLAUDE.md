@@ -42,17 +42,17 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 
 ## Assets
 
-- **Images**: webp만 허용, 파일당 ≤1MB.
-- 저장소에 추가되는 모든 이미지(`.png`, `.jpg`, `.jpeg`, `.gif`, `.avif` 등)는 즉시 webp로 변환 후 원본 삭제.
-- 변환은 `sharp`로 수행. quality 80에서 시작해 1MB 초과 시 quality를 단계적으로 낮춰 1MB 이하를 보장.
-- 코드/마크다운/설정의 이미지 참조 경로도 함께 `.webp`로 갱신.
-- **예외**: Next.js 메타데이터 컨벤션 파일(`icon.*`, `apple-icon.*`, `favicon.*`, `opengraph-image.*`, `twitter-image.*`)과 SVG는 그대로 둔다. 메타데이터 파일은 Next.js가 고정 확장자로 인식하고, SVG는 벡터라 변환 대상이 아니다.
+- **Images**: webp only, ≤1MB per file.
+- Every image added to the repo (`.png`, `.jpg`, `.jpeg`, `.gif`, `.avif`, etc.) must be converted to webp immediately and the original deleted.
+- Convert with `sharp`. Start at quality 80 and step the quality down until the file is ≤1MB.
+- Update image reference paths in code/markdown/config to `.webp` accordingly.
+- **Exception**: Next.js metadata convention files (`icon.*`, `apple-icon.*`, `favicon.*`, `opengraph-image.*`, `twitter-image.*`) and SVGs are left as-is — Next.js recognizes metadata files by fixed extensions, and SVGs are vectors, not conversion targets.
 
 ## Git
 
 - Default branch: `master` (production, deployed).
 - Feature/fix branches MUST branch out from `master`.
-- 작업 시작 전 항상 `origin/master`를 최신화한 뒤 분기한다 (`git fetch origin master`). 새 브랜치·worktree는 stale한 로컬 `master`가 아니라 갱신된 `origin/master`에서 따낸다.
+- Always refresh `origin/master` before starting work and branch from it (`git fetch origin master`). Create new branches/worktrees from the updated `origin/master`, not a stale local `master`.
 - PRs MUST target `master`.
 - Before any `git push` (including `-u`, `--force`, `--force-with-lease`), run `git rev-parse --abbrev-ref HEAD` and show the user the current branch + remote target; proceed only after explicit confirmation. Never push directly to `master`.
 - For multi-step git workflows (branch + commit + push + PR, rebase, cherry-pick, refactors spanning >1 commit, parallel agents), Claude MUST operate in an isolated git worktree (`Agent({ isolation: "worktree" })` or `git worktree add`). After the work is merged, remove the worktree. Single-file edits or single quick commits on the current branch don't require a worktree.
