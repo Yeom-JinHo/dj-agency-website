@@ -64,8 +64,11 @@ export class ErrorBoundary extends Component<Props, State> {
               className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden"
             >
               <span
-                className="font-display text-[18vw] font-bold uppercase leading-none tracking-[-0.04em] text-white/[0.028] sm:text-[22vw]"
-                style={{ whiteSpace: "nowrap" }}
+                className="text-[18vw] font-bold uppercase leading-none tracking-[-0.04em] text-white/[0.028] sm:text-[22vw]"
+                style={{
+                  whiteSpace: "nowrap",
+                  fontFamily: "var(--font-anton), sans-serif",
+                }}
               >
                 ERROR
               </span>
@@ -93,7 +96,10 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-red-500/80 sm:text-sm">
                   System Error
                 </p>
-                <h1 className="font-display text-[clamp(44px,9vw,96px)] uppercase leading-[0.92] tracking-[-0.02em] text-white">
+                <h1
+                  className="text-[clamp(44px,9vw,96px)] uppercase leading-[0.92] tracking-[-0.02em] text-white"
+                  style={{ fontFamily: "var(--font-anton), sans-serif" }}
+                >
                   Something
                   <br />
                   went wrong
