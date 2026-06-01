@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
-import { Anton, Fraunces, Geist } from "next/font/google";
+import { Fraunces, Geist } from "next/font/google";
 import localFont from "next/font/local";
 
 import "@/styles/globals.css";
@@ -14,13 +14,6 @@ import { organization, website } from "@/app/jsonLd";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
-
-const anton = Anton({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-  variable: "--font-anton",
-});
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -70,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${anton.variable} ${fraunces.variable} ${geist.variable} ${pretendard.variable} font-sans antialiased`}
+        className={`${fraunces.variable} ${geist.variable} ${pretendard.variable} font-sans antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />
