@@ -34,13 +34,13 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   return (
     <Dialog>
       <DialogTrigger>
-        <motion.div className="group relative h-[150px] w-[150px] overflow-hidden md:h-[360px] md:w-[360px]">
+        <motion.div className="group relative h-[150px] w-[150px] overflow-hidden sm:h-[240px] sm:w-[240px] md:h-[360px] md:w-[360px]">
           <DialogImage
             width={360}
             height={360}
             src={musicInfo.image}
             alt={musicInfo.name}
-            sizes="(max-width: 768px) 150px, 360px"
+            sizes="(max-width: 640px) 150px, (max-width: 768px) 240px, 360px"
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
           <Image
@@ -48,11 +48,11 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             alt=""
             aria-hidden="true"
             fill
-            sizes="(max-width: 768px) 150px, 360px"
+            sizes="(max-width: 640px) 150px, (max-width: 768px) 240px, 360px"
             className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
         </motion.div>
-        <div className="mt-3 w-[150px] text-left md:w-[360px]">
+        <div className="mt-3 w-[150px] text-left sm:w-[240px] md:w-[360px]">
           <h4 className="truncate text-sm font-semibold md:text-base">
             {musicInfo.name}
           </h4>
@@ -130,7 +130,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
                     {social.iconName && (
                       <Icon name={social.iconName} className="size-6" />
                     )}
-                    <h3 className="text-muted-foreground text-m">
+                    <h3 className="text-muted-foreground text-sm">
                       {social.name}
                     </h3>
                     <Icon name="LuArrowRight" className="ml-auto size-4" />

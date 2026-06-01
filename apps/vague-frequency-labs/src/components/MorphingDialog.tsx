@@ -523,7 +523,10 @@ function MorphingDialogClose({
       type="button"
       aria-label="Close dialog"
       key={`dialog-close-${uniqueId}`}
-      className={cn("absolute top-6 right-6", className)}
+      className={cn(
+        "absolute top-4 right-4 flex items-center justify-center rounded-full p-2.5 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
+        className
+      )}
       initial="initial"
       animate="animate"
       exit="exit"
