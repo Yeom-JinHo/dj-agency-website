@@ -64,8 +64,13 @@ export class ErrorBoundary extends Component<Props, State> {
               className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden"
             >
               <span
-                className="font-mono text-[18vw] font-bold uppercase leading-none tracking-[-0.02em] text-white/[0.028] sm:text-[22vw]"
-                style={{ whiteSpace: "nowrap" }}
+                className="text-[18vw] font-bold uppercase leading-none tracking-[-0.02em] text-white/[0.028] sm:text-[22vw]"
+                style={{
+                  whiteSpace: "nowrap",
+                  // celebrate/payday는 --font-anton 정의 → Anton, vfl은 미정의 → mono fallback (앱별 의도 분기)
+                  fontFamily:
+                    "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                }}
               >
                 ERROR
               </span>
@@ -93,7 +98,14 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-red-500/80 sm:text-sm">
                   System Error
                 </p>
-                <h1 className="font-mono text-[clamp(40px,8vw,84px)] uppercase leading-[1.0] tracking-tight text-white">
+                <h1
+                  className="text-[clamp(40px,8vw,84px)] uppercase leading-[1.0] tracking-tight text-white"
+                  style={{
+                    // celebrate/payday → Anton, vfl → mono fallback (앱별 의도 분기)
+                    fontFamily:
+                      "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                  }}
+                >
                   Something
                   <br />
                   went wrong
