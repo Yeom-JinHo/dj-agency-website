@@ -4,7 +4,7 @@ import TextReveal from "@repo/ui/common/TextReveal";
 function About() {
   return (
     <section
-      className="w-full pt-16 pb-24 lg:pt-20 lg:pb-32"
+      className="w-full py-24 lg:py-32"
       id="about"
     >
       <ScrollVelocity texts={["Payday", "Records"]} className="font-display" />

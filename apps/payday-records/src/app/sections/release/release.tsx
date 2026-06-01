@@ -33,7 +33,7 @@ function Release() {
   const activeRelease = openIndex !== null ? releases[openIndex] : null;
 
   return (
-    <MotionWrap className="w-full py-28 lg:py-40" id="release">
+    <MotionWrap className="w-full py-24 lg:py-32" id="release">
       <div className="flex flex-col items-center justify-center px-4 text-center">
         <TextReveal as="h2" className="section-heading">
           Release
