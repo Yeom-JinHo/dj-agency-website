@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import React from "react";
 import { musicInfo } from "@/source";
 import FancyLine from "@repo/ui/common/FancyLine";
-import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 import { createMetadata } from "@/utils/index";
 
 import YoutubeCard from "./components/YoutubeCard";
@@ -45,13 +45,9 @@ export default function VideoPage(): ReactElement {
         id="video"
       >
         <div className="flex flex-col items-center md:max-w-7xl">
-          {/* todo: re-add delay of 0.2seconds */}
-          <TextReveal
-            as="h1"
-            className="leading-tight tracking-tight text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
-          >
+          <SectionHeading as="h1" variant="page">
             Video
-          </TextReveal>
+          </SectionHeading>
 
           <FancyLine className={"m-16"} />
           <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">

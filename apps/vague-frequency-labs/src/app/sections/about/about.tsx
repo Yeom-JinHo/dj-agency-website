@@ -1,4 +1,5 @@
 import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 
 function About() {
   return (
@@ -6,12 +7,7 @@ function About() {
       <div className="grid gap-10">
         <div className="flex w-full flex-col items-center justify-center px-4 text-center md:px-6 lg:flex-row lg:items-start lg:justify-between lg:text-left">
           <div className="flex flex-col items-center lg:items-start">
-            <TextReveal
-              as="h2"
-              className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-            >
-              About
-            </TextReveal>
+            <SectionHeading as="h2">About</SectionHeading>
           </div>
           <TextReveal
             as="p"

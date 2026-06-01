@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import React from "react";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 import KoreaCinematic from "./KoreaCinematic";
 
 export default function ContactContent(): ReactElement {
@@ -12,12 +13,9 @@ export default function ContactContent(): ReactElement {
         id="hero"
       >
         <div className="flex w-full flex-col items-center md:max-w-7xl">
-          <TextReveal
-            as="h1"
-            className="leading-tight tracking-tight text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
-          >
+          <SectionHeading as="h1" variant="page">
             Contact
-          </TextReveal>
+          </SectionHeading>
 
           <FancyLine className={"mt-16"} />
           <div className="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden">

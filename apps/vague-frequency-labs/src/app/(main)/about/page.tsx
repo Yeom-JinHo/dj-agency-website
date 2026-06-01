@@ -1,6 +1,6 @@
 import React from "react";
 import FancyLine from "@repo/ui/common/FancyLine";
-import TextReveal from "@repo/ui/common/TextReveal";
+import SectionHeading from "@/components/SectionHeading";
 import ParallaxGlobeLogo from "@/components/ParallaxGlobeLogo";
 import { createMetadata } from "@/utils/index";
 
@@ -32,14 +32,10 @@ export default function AboutPage() {
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="about"
       >
-        <div className="flex w-screen flex-col items-center">
-          {/* todo: re-add delay of 0.2seconds */}
-          <TextReveal
-            as="h1"
-            className="leading-tight tracking-tight text-5xl sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl"
-          >
+        <div className="flex flex-col items-center md:max-w-7xl">
+          <SectionHeading as="h1" variant="page">
             About
-          </TextReveal>
+          </SectionHeading>
           <FancyLine className={"mt-16"} />
           {/* Parallax Globe + Logo */}
           <div className="w-full">
