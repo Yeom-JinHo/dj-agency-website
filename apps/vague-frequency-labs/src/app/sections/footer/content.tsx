@@ -4,6 +4,7 @@ import Link from "next/link";
 import { contact } from "../contact/config";
 import { copyright } from "./config";
 import { Icon } from "@repo/ui/common/Icon";
+import SignatureLink from "@repo/ui/common/SignatureLink";
 
 export default function Content() {
   return (
@@ -21,7 +22,14 @@ const Copyright = () => {
         v.f.labs
       </h1>
       <p className="mt-4 text-xs sm:mt-0 sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">
-        © {copyright.startYear} {meta.author.name}
+        © {copyright.startYear}{" "}
+        <SignatureLink
+          href="https://www.instagram.com/ye0m_2/"
+          ariaLabel={`${meta.author.name} — Connect on Instagram`}
+          tooltipClassName="text-xs tracking-[0.04em] sm:text-[13px]"
+        >
+          {meta.author.name}
+        </SignatureLink>
       </p>
     </div>
   );
