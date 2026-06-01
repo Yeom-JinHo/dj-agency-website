@@ -18,8 +18,9 @@ export default function Hero() {
           {/* 글자는 Bebas Neue 아웃라인을 path로 굳혀, 표시 크기와 무관하게 굵기 고정 */}
           <path d={CELEBRATE_PATH} fill="var(--color-ca-fg)" />
           <path d={AGENCY_PATH} fill="var(--color-ca-fg)" />
+          {/* 스티치 4개는 원본의 손그림 비대칭(길이·각도 제각각)을 그대로 복제 */}
           <g fill="var(--color-ca-red)">
-            {/* 좌상: 곧추섬(-47°), C 어깨를 살짝 덮도록 우하로 이동 */}
+            {/* 좌상: 가장 길고 곧추섬(-47°), C 어깨를 살짝 덮음 */}
             <rect
               x="11.5"
               y="106"
@@ -28,30 +29,32 @@ export default function Hero() {
               rx="2"
               transform="rotate(-47 35 111)"
             />
+            {/* 우상 */}
             <rect
-              x="340.5"
-              y="102.5"
-              width="48"
+              x="344.4"
+              y="98.5"
+              width="43"
               height="10"
               rx="2"
-              transform="rotate(45 364.5 107.5)"
+              transform="rotate(46 366 103.5)"
             />
-            {/* 하단: 짧게(34) */}
+            {/* 좌하: 가장 짧음 */}
             <rect
-              x="22"
-              y="166"
-              width="34"
+              x="26.4"
+              y="163"
+              width="31"
               height="10"
               rx="2"
-              transform="rotate(45 39 171)"
+              transform="rotate(45 42 168)"
             />
+            {/* 우하 */}
             <rect
-              x="344"
-              y="166"
-              width="34"
+              x="343.6"
+              y="163"
+              width="37"
               height="10"
               rx="2"
-              transform="rotate(-45 361 171)"
+              transform="rotate(-45 362 168)"
             />
           </g>
         </svg>
