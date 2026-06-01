@@ -6,8 +6,8 @@ export type Stat = {
 };
 
 export const stats: Stat[] = [
-  { value: "6", label: "Signed artists", countUp: true },
+  { value: "10", label: "Signed artists", countUp: true },
   { value: "112", label: "Projects shipped", countUp: true },
-  { value: "6", label: "Years on the wall", countUp: true },
+  { value: "2025", label: "Established", countUp: false },
   { value: "Seoul", label: "Based in", countUp: false },
 ];
