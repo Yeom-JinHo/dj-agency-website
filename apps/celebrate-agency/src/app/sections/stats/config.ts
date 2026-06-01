@@ -1,12 +1,15 @@
 export type Stat = {
   value: string;
-  superscript: string | null;
   label: string;
+  /** Optional superscript mark (e.g. ★) rendered after the value in accent red. */
+  superscript?: string;
+  /** Animate from 0 with NumberTicker. Off for non-quantitative values (year, city). */
+  countUp: boolean;
 };
 
 export const stats: Stat[] = [
-  { value: "6", superscript: "★", label: "Signed artists" },
-  { value: "112", superscript: null, label: "Projects shipped" },
-  { value: "6", superscript: null, label: "Years on the wall" },
-  { value: "1", superscript: null, label: "City · Seoul" },
+  { value: "10", label: "Signed artists", superscript: "★", countUp: true },
+  { value: "112", label: "Projects shipped", countUp: true },
+  { value: "2025", label: "Established", countUp: false },
+  { value: "Seoul", label: "Based in", countUp: false },
 ];
