@@ -90,10 +90,10 @@ export class ErrorBoundary extends Component<Props, State> {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
               >
-                <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-red-500/80">
+                <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-red-500/80 sm:text-sm">
                   System Error
                 </p>
-                <h1 className="font-display text-[clamp(34px,8vw,88px)] uppercase leading-[0.92] tracking-[-0.02em] text-white">
+                <h1 className="font-display text-[clamp(44px,9vw,96px)] uppercase leading-[0.92] tracking-[-0.02em] text-white">
                   Something
                   <br />
                   went wrong
@@ -111,7 +111,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   delay: 0.13,
                 }}
               >
-                <p className="max-w-[320px] font-sans text-sm leading-relaxed text-white/50">
+                <p className="max-w-[340px] font-sans text-[15px] leading-relaxed text-white/50 sm:text-base">
                   Please refresh the page or return home.
                 </p>
 
@@ -119,13 +119,13 @@ export class ErrorBoundary extends Component<Props, State> {
                   <button
                     type="button"
                     onClick={this.handleReload}
-                    className="min-w-[140px] rounded-none border border-white/30 bg-transparent px-8 py-3 font-mono text-[11px] uppercase tracking-[0.22em] text-white transition-all duration-200 hover:border-white hover:bg-white hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                    className="min-w-[150px] rounded-none border border-white/30 bg-transparent px-8 py-3.5 font-mono text-[13px] uppercase tracking-[0.22em] text-white transition-all duration-200 hover:border-white hover:bg-white hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
                   >
                     Refresh
                   </button>
                   <a
                     href="/"
-                    className="min-h-[44px] inline-flex items-center font-mono text-[11px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-white/80"
+                    className="min-h-[44px] inline-flex items-center font-mono text-[13px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-white/80"
                   >
                     ← Home
                   </a>
@@ -134,7 +134,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
               {/* Bottom meta: error code */}
               <motion.p
-                className="mt-8 font-mono text-[10px] uppercase tracking-[0.25em] text-white/20 sm:mt-16"
+                className="mt-8 font-mono text-[11px] uppercase tracking-[0.25em] text-white/20 sm:mt-16"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.35 }}
