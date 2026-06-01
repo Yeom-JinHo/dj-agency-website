@@ -61,7 +61,7 @@ export default async function ProjectPage(props0: {
   return (
     <main className="my-16 flex-1">
       <div className="container mx-auto flex flex-col items-center justify-center">
-        <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+        <h2 className="font-sans text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
           {artistName}
         </h2>
         <div className="mt-12 h-[280px] w-[210px] sm:h-[340px] sm:w-[255px] md:h-96 md:w-72">
