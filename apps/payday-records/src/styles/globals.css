@@ -34,6 +34,9 @@
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
 
+  /* Payday's warm-orange brand accent (single source for bg-brand/text-brand). */
+  --color-brand: hsl(var(--brand));
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -161,6 +164,11 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.75rem;
+
+    /* Brand accent — Payday's warm orange. Shine grades tint → glow → base. */
+    --brand: 29 100% 62%;
+    --brand-tint: 31 100% 74%;
+    --brand-glow: 40 100% 75%;
   }
 
   .dark {

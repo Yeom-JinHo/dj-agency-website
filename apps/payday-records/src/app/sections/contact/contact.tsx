@@ -48,7 +48,11 @@ function Contact() {
           <ShineBorder
             borderWidth={2}
             duration={8}
-            shineColor={["#FFBE7B", "#FFD580", "#FF9A3C"]}
+            shineColor={[
+              "hsl(var(--brand-tint))",
+              "hsl(var(--brand-glow))",
+              "hsl(var(--brand))",
+            ]}
           />
           <h3 className="card-heading mb-8 text-center">Contact</h3>
           <div className="flex items-center">

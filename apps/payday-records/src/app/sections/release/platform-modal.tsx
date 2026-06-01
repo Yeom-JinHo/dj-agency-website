@@ -53,7 +53,7 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
               />
             ) : (
               <div className="relative flex h-full w-full items-center justify-center">
-                <span className="absolute top-0 left-0 h-full w-1 bg-orange-500" />
+                <span className="bg-brand absolute top-0 left-0 h-full w-1" />
                 <span className="line-clamp-3 max-w-[80%] text-center text-2xl font-semibold tracking-tight text-white/85">
                   {release.title}
                 </span>
