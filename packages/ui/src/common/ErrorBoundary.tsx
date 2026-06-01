@@ -2,10 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Component } from "react";
-import GalaxyBackground from "../common/GalaxyBackground";
-
-import { cn } from "../index";
-import { buttonVariants } from "../common/Button";
+import { motion } from "motion/react";
 
 interface Props {
   children: ReactNode;
@@ -27,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: unknown) {
     // 웹뷰에서 발생하는 에러를 안전하게 로깅
     console.error("Error caught by boundary:", error, errorInfo);
   }
@@ -54,28 +51,116 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden">
-            <main className="relative h-screen w-screen flex-1">
-              <div className="align-center absolute top-1/2 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col gap-4">
-                <h1 className="text-6xl">Something went wrong</h1>
-                <p className="text-muted-foreground mb-4">
-                  Please refresh the page or try again later.
-                </p>
-                <button
-                  className={cn(
-                    buttonVariants({ variant: "default" }),
-                    "w-full self-center rounded-full border border-white/30 bg-white/20 px-8 py-2 text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/30 md:self-start"
-                  )}
-                  onClick={this.handleReload}
-                >
-                  Refresh Page
-                </button>
-              </div>
+          <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden bg-[#0a0a0a] px-6 text-center">
+            {/* Scan-line accent — top */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute top-0 left-0 right-0 h-px bg-red-500/60"
+            />
 
-              <div className="absolute inset-0">
-                <GalaxyBackground mouseInteraction={false} />
-              </div>
-            </main>
+            {/* Watermark: giant background "ERROR" typography */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 flex items-center justify-center select-none overflow-hidden"
+            >
+              <span
+                className="text-[18vw] font-bold uppercase leading-none tracking-[-0.02em] text-white/[0.028] sm:text-[22vw]"
+                style={{
+                  whiteSpace: "nowrap",
+                  // celebrate/payday는 --font-anton 정의 → Anton, vfl은 미정의 → mono fallback (앱별 의도 분기)
+                  fontFamily:
+                    "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                }}
+              >
+                ERROR
+              </span>
+            </div>
+
+            {/* Radial vignette — adds depth around the watermark */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse 80% 50% at 50% 50%, transparent 0%, #0a0a0a 75%)",
+              }}
+            />
+
+            {/* Content */}
+            <div className="relative z-10 flex flex-col items-center">
+              {/* Meta label cluster */}
+              <motion.div
+                className="flex flex-col items-center gap-2"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <p className="font-mono text-[13px] uppercase tracking-[0.3em] text-red-500/80 sm:text-sm">
+                  System Error
+                </p>
+                <h1
+                  className="text-[clamp(40px,8vw,84px)] uppercase leading-[1.0] tracking-tight text-white"
+                  style={{
+                    // celebrate/payday → Anton, vfl → mono fallback (앱별 의도 분기)
+                    fontFamily:
+                      "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                  }}
+                >
+                  Something
+                  <br />
+                  went wrong
+                </h1>
+              </motion.div>
+
+              {/* Body + actions cluster */}
+              <motion.div
+                className="mt-6 flex flex-col items-center gap-6 sm:mt-10 sm:gap-8"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.55,
+                  ease: [0.22, 1, 0.36, 1],
+                  delay: 0.13,
+                }}
+              >
+                <p className="max-w-[340px] font-sans text-[15px] leading-relaxed text-white/50 sm:text-base">
+                  Please refresh the page or return home.
+                </p>
+
+                <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={this.handleReload}
+                    className="min-w-[150px] rounded-none border border-white/30 bg-transparent px-8 py-3.5 font-mono text-[13px] uppercase tracking-[0.22em] text-white transition-all duration-200 hover:border-white hover:bg-white hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+                  >
+                    Refresh
+                  </button>
+                  <a
+                    href="/"
+                    className="min-h-[44px] inline-flex items-center font-mono text-[13px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-white/80"
+                  >
+                    ← Home
+                  </a>
+                </div>
+              </motion.div>
+
+              {/* Bottom meta: error code */}
+              <motion.p
+                className="mt-8 font-mono text-[11px] uppercase tracking-[0.25em] text-white/20 sm:mt-16"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.35 }}
+                aria-hidden
+              >
+                ERR_RUNTIME_EXCEPTION
+              </motion.p>
+            </div>
+
+            {/* Scan-line accent — bottom */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute bottom-0 left-0 right-0 h-px bg-white/10"
+            />
           </div>
         )
       );
