@@ -29,32 +29,32 @@ export default function Hero() {
               rx="2"
               transform="rotate(-47 35 111)"
             />
-            {/* 우상 */}
+            {/* 우상: E 우상 모서리를 덮도록 좌하로 이동 */}
             <rect
-              x="344.4"
-              y="98.5"
+              x="342.4"
+              y="102.5"
               width="43"
               height="10"
               rx="2"
-              transform="rotate(46 366 103.5)"
+              transform="rotate(46 364 107.5)"
             />
-            {/* 좌하: 가장 짧음 */}
+            {/* 좌하: 가장 짧음, C 하단 곡선을 덮도록 우상으로 이동 */}
             <rect
-              x="26.4"
-              y="163"
+              x="28.4"
+              y="159"
               width="31"
               height="10"
               rx="2"
-              transform="rotate(45 42 168)"
+              transform="rotate(45 44 164)"
             />
-            {/* 우하 */}
+            {/* 우하: E 하단 모서리를 덮도록 좌상으로 이동 */}
             <rect
-              x="343.6"
-              y="163"
+              x="341.6"
+              y="159"
               width="37"
               height="10"
               rx="2"
-              transform="rotate(-45 362 168)"
+              transform="rotate(-45 360 164)"
             />
           </g>
         </svg>
