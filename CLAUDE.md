@@ -52,6 +52,7 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 
 - Default branch: `master` (production, deployed).
 - Feature/fix branches MUST branch out from `master`.
+- 작업 시작 전 항상 `origin/master`를 최신화한 뒤 분기한다 (`git fetch origin master`). 새 브랜치·worktree는 stale한 로컬 `master`가 아니라 갱신된 `origin/master`에서 따낸다.
 - PRs MUST target `master`.
 - Before any `git push` (including `-u`, `--force`, `--force-with-lease`), run `git rev-parse --abbrev-ref HEAD` and show the user the current branch + remote target; proceed only after explicit confirmation. Never push directly to `master`.
 - For multi-step git workflows (branch + commit + push + PR, rebase, cherry-pick, refactors spanning >1 commit, parallel agents), Claude MUST operate in an isolated git worktree (`Agent({ isolation: "worktree" })` or `git worktree add`). After the work is merged, remove the worktree. Single-file edits or single quick commits on the current branch don't require a worktree.
