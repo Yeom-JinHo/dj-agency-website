@@ -7,10 +7,10 @@ import { AGENCY_PATH, CELEBRATE_PATH } from "./logo-paths";
 // 빈 로고 위에 빨강이 꽂히는 게 또렷이 읽히도록 분리. delay 12ms 간격.
 type StitchStyle = CSSProperties & { "--sx": string; "--sy": string };
 const STITCH_INTRO: StitchStyle[] = [
-  { "--sx": "-13px", "--sy": "-16px", animationDelay: "560ms" }, // 좌상
-  { "--sx": "13px", "--sy": "-16px", animationDelay: "572ms" }, // 우상
-  { "--sx": "-13px", "--sy": "16px", animationDelay: "584ms" }, // 좌하
-  { "--sx": "13px", "--sy": "16px", animationDelay: "596ms" }, // 우하
+  { "--sx": "-13px", "--sy": "-16px", animationDelay: "440ms" }, // 좌상
+  { "--sx": "13px", "--sy": "-16px", animationDelay: "452ms" }, // 우상
+  { "--sx": "-13px", "--sy": "16px", animationDelay: "464ms" }, // 좌하
+  { "--sx": "13px", "--sy": "16px", animationDelay: "476ms" }, // 우하
 ];
 
 export default function Hero() {
@@ -109,7 +109,7 @@ export default function Hero() {
         </svg>
       </div>
 
-      <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:1040ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
+      <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:840ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
         <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg lg:text-[22px]">
           Talent · Production · Direction.
           <br />
