@@ -38,23 +38,23 @@ export default function Hero() {
               rx="2"
               transform="rotate(46 364 107.5)"
             />
-            {/* 좌하: 가장 짧음, 원본대로 C 아래 바깥에 배치(거의 안 덮음) */}
+            {/* 좌하: 가장 짧음, C 좌하 곡선을 대각으로 가로질러 가림 */}
             <rect
-              x="26.4"
-              y="163"
+              x="27.9"
+              y="160"
               width="31"
               height="10"
               rx="2"
-              transform="rotate(45 42 168)"
+              transform="rotate(45 43.5 165)"
             />
-            {/* 우하: 원본대로 E 아래 바깥에 배치(끝만 살짝 걸침) */}
+            {/* 우하: E 우하 모서리를 가리도록 좌상으로 이동 */}
             <rect
-              x="343.6"
-              y="163"
+              x="342.1"
+              y="160"
               width="37"
               height="10"
               rx="2"
-              transform="rotate(-45 362 168)"
+              transform="rotate(-45 360.5 165)"
             />
           </g>
         </svg>
