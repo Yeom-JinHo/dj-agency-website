@@ -20,14 +20,14 @@ export default function Hero() {
           <path d={AGENCY_PATH} fill="var(--color-ca-fg)" />
           {/* 스티치 4개는 원본의 손그림 비대칭(길이·각도 제각각)을 그대로 복제 */}
           <g fill="var(--color-ca-red)">
-            {/* 좌상: 가장 길고 곧추섬(-47°), C 어깨를 살짝 덮음 */}
+            {/* 좌상: 가장 길고 곧추섬(-47°), 끝이 C 정점에 닿을 만큼만 겹침 */}
             <rect
-              x="11.5"
-              y="106"
+              x="11"
+              y="105"
               width="47"
               height="10"
               rx="2"
-              transform="rotate(-47 35 111)"
+              transform="rotate(-47 34.5 110)"
             />
             {/* 우상: E 우상 모서리를 덮도록 좌하로 이동 */}
             <rect
