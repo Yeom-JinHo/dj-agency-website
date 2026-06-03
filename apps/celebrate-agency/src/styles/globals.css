@@ -316,18 +316,6 @@
     transform-box: fill-box;
     transform-origin: center;
   }
-  /* hover 시 진입의 반대 — 스티치가 자기 축 바깥으로 빠져나옴(un-stab).
-     진입 애니메이션(both fill)이 바깥 <g>의 transform을 점유하므로, hover는
-     안쪽 <g>(.ca-stitch-react)가 담당해 둘이 합성된다. --sx/--sy는 상속받음. */
-  .ca-stitch-react {
-    transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .ca-logo:hover .ca-stitch-react {
-    transform: translate(
-      calc(var(--sx, 0) * 0.6),
-      calc(var(--sy, 0) * 0.6)
-    );
-  }
 }
 
 @theme inline {
