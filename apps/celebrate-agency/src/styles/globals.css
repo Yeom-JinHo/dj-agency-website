@@ -58,6 +58,12 @@
   --animate-hero-fade-in: hero-fade-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
   --animate-modal-fade: modal-fade 0.2s ease-out;
+  /* 진입 인트로: 글자 은은히 등장 → 스티치가 자기 각도 바깥에서 탕! 박힘.
+     스탭은 ease-out(0.2,0.9,0.25,1) + keyframe 명시 overshoot(50% inward jab,
+     72% recoil)으로 반동 연출. 오프셋(--sx/--sy)·delay는 요소별 인라인. */
+  --animate-ca-type-in: ca-type-in 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-ca-stitch-stab: ca-stitch-stab 380ms cubic-bezier(0.2, 0.9, 0.25, 1)
+    both;
 
   @keyframes modal-fade {
     from {
@@ -119,6 +125,36 @@
     }
     50% {
       opacity: 0.3;
+    }
+  }
+  @keyframes ca-type-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes ca-stitch-stab {
+    /* 바깥에서 날아들어와(0%) 자기 축으로 최종점을 살짝 지나쳤다(50%, inward overshoot)
+       한 박자 되튕긴 뒤(72%, 미세 recoil) 콱 정착(100%). scale은 보조 펀치(1.08)만. */
+    0% {
+      opacity: 0;
+      transform: translate(var(--sx, 0), var(--sy, 0)) scale(0.82);
+    }
+    50% {
+      opacity: 1;
+      transform: translate(calc(var(--sx, 0) * -0.26), calc(var(--sy, 0) * -0.26))
+        scale(1.08);
+    }
+    72% {
+      transform: translate(calc(var(--sx, 0) * 0.12), calc(var(--sy, 0) * 0.12))
+        scale(0.975);
+    }
+    100% {
+      transform: translate(0, 0) scale(1);
     }
   }
 }
@@ -249,6 +285,7 @@
     *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
+      animation-delay: 0.01ms !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
@@ -272,6 +309,12 @@
       #1a1a1a 0 10px,
       #141414 10px 20px
     );
+  }
+  /* 스티치 진입 래퍼: scale overshoot 기준점을 각 stitch 자기 박스 중심으로 고정.
+     안쪽 rect의 rotate() 속성은 그대로 두고 entrance transform만 이 <g>에 적용. */
+  .ca-stitch {
+    transform-box: fill-box;
+    transform-origin: center;
   }
 }
 

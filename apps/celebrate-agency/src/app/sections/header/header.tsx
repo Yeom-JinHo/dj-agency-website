@@ -12,7 +12,7 @@ const NAV_LINKS = [
 
 export default function Header() {
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-ca-line bg-ca-bg/70 backdrop-blur-lg">
+    <nav className="fixed inset-x-0 top-0 z-50 animate-hero-fade-in border-b border-ca-line bg-ca-bg/70 backdrop-blur-lg [animation-delay:840ms]">
       <div className="flex h-16 items-center justify-between px-6 lg:px-10">
         <Link href="#top" className="flex items-center gap-3">
           <Image

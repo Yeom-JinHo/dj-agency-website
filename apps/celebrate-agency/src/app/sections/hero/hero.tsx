@@ -1,4 +1,17 @@
+import type { CSSProperties } from "react";
+
 import { AGENCY_PATH, CELEBRATE_PATH } from "./logo-paths";
+
+// 스티치 진입: 각자 자기 각도 바깥(코너 방향)에서 밀려 들어와 탕! 박힘.
+// 글자 fade(0~520ms)가 안착한 뒤 한 박자 띄워(560ms~) 단독 비트로 stab —
+// 빈 로고 위에 빨강이 꽂히는 게 또렷이 읽히도록 분리. delay 12ms 간격.
+type StitchStyle = CSSProperties & { "--sx": string; "--sy": string };
+const STITCH_INTRO: StitchStyle[] = [
+  { "--sx": "-13px", "--sy": "-16px", animationDelay: "440ms" }, // 좌상
+  { "--sx": "13px", "--sy": "-16px", animationDelay: "452ms" }, // 우상
+  { "--sx": "-13px", "--sy": "16px", animationDelay: "464ms" }, // 좌하
+  { "--sx": "13px", "--sy": "16px", animationDelay: "476ms" }, // 우하
+];
 
 export default function Hero() {
   return (
@@ -9,58 +22,81 @@ export default function Hero() {
       <h1 className="sr-only">
         Celebrate Agency — Talent · Production · Direction.
       </h1>
-      <div className="flex flex-1 animate-hero-fade-in items-center justify-center px-6 lg:px-10">
+      <div className="flex flex-1 items-center justify-center px-6 lg:px-10">
         <svg
           viewBox="0 0 400 300"
           aria-hidden
           className="h-auto max-h-[calc(100dvh-320px)] w-full max-w-4xl"
         >
           {/* 글자는 Bebas Neue 아웃라인을 path로 굳혀, 표시 크기와 무관하게 굵기 고정 */}
-          <path d={CELEBRATE_PATH} fill="var(--color-ca-fg)" />
-          <path d={AGENCY_PATH} fill="var(--color-ca-fg)" />
-          {/* 스티치 4개는 원본의 손그림 비대칭(길이·각도 제각각)을 그대로 복제 */}
+          <g className="animate-ca-type-in">
+            <path d={CELEBRATE_PATH} fill="var(--color-ca-fg)" />
+            <path d={AGENCY_PATH} fill="var(--color-ca-fg)" />
+          </g>
+          {/* 스티치 4개는 원본의 손그림 비대칭(길이·각도 제각각)을 그대로 복제.
+              entrance transform은 .ca-stitch <g>에, rotate는 안쪽 rect에 분리. */}
           <g fill="var(--color-ca-red)">
             {/* 좌상: 가장 길고 곧추섬(-47°), 끝이 C 정점에 닿을 만큼만 겹침 */}
-            <rect
-              x="11"
-              y="105"
-              width="47"
-              height="10"
-              rx="2"
-              transform="rotate(-47 34.5 110)"
-            />
+            <g
+              className="ca-stitch animate-ca-stitch-stab"
+              style={STITCH_INTRO[0]}
+            >
+              <rect
+                x="11"
+                y="105"
+                width="47"
+                height="10"
+                rx="2"
+                transform="rotate(-47 34.5 110)"
+              />
+            </g>
             {/* 우상: E 우상 모서리를 덮도록 좌하로 이동 */}
-            <rect
-              x="342.4"
-              y="102.5"
-              width="43"
-              height="10"
-              rx="2"
-              transform="rotate(46 364 107.5)"
-            />
+            <g
+              className="ca-stitch animate-ca-stitch-stab"
+              style={STITCH_INTRO[1]}
+            >
+              <rect
+                x="342.4"
+                y="102.5"
+                width="43"
+                height="10"
+                rx="2"
+                transform="rotate(46 364 107.5)"
+              />
+            </g>
             {/* 좌하: 가장 짧음, 원본 빨강 위치 그대로(C 좌하를 가로질러 가림) */}
-            <rect
-              x="23.5"
-              y="166"
-              width="31"
-              height="10"
-              rx="2"
-              transform="rotate(45 39 171)"
-            />
+            <g
+              className="ca-stitch animate-ca-stitch-stab"
+              style={STITCH_INTRO[2]}
+            >
+              <rect
+                x="23.5"
+                y="166"
+                width="31"
+                height="10"
+                rx="2"
+                transform="rotate(45 39 171)"
+              />
+            </g>
             {/* 우하: 원본 빨강 위치 그대로(E 우하 모서리를 가림) */}
-            <rect
-              x="345"
-              y="165.5"
-              width="37"
-              height="10"
-              rx="2"
-              transform="rotate(-45 363.5 170.5)"
-            />
+            <g
+              className="ca-stitch animate-ca-stitch-stab"
+              style={STITCH_INTRO[3]}
+            >
+              <rect
+                x="345"
+                y="165.5"
+                width="37"
+                height="10"
+                rx="2"
+                transform="rotate(-45 363.5 170.5)"
+              />
+            </g>
           </g>
         </svg>
       </div>
 
-      <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:180ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
+      <div className="grid animate-hero-fade-in grid-cols-1 items-end gap-10 px-6 pt-8 [animation-delay:840ms] lg:grid-cols-[1.1fr_1fr] lg:gap-20 lg:px-10 lg:pt-12">
         <p className="max-w-[540px] text-lg leading-relaxed text-ca-fg lg:text-[22px]">
           Talent · Production · Direction.
           <br />
