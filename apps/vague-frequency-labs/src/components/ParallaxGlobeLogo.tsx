@@ -24,7 +24,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
           <div className="space-y-4">
             <TextReveal
               as="p"
-              className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
+              className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
             >
               Vague Frequency Laboratory의 소개 Vague Frequency Laboratory
               Vague Frequency Laboratory Vague Frequency LaboratoryVague
@@ -38,7 +38,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
           <div className="space-y-4">
             <TextReveal
               as="p"
-              className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
+              className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
             >
               Vague Frequency Laboratory의 소개 Vague Frequency Laboratory
               Vague Frequency Laboratory Vague Frequency LaboratoryVague
