@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import CopyButton from "@repo/ui/common/CopyButton";
-import { MacBookScroll } from "@/components/MacBookScroll";
+import { MacBookScroll } from "./macbook-scroll-lazy";
 import { ShineBorder } from "@repo/ui/common/ShineBorder";
 import Link from "next/link";
 
@@ -18,11 +18,7 @@ const brandHoverColor: Record<string, string> = {
 
 function Contact() {
   return (
-    <section
-      className="section-gap w-full"
-      id="contact"
-      aria-label="Contact"
-    >
+    <section className="section-gap w-full" id="contact" aria-label="Contact">
       <div className="flex flex-col items-center justify-center">
         <MacBookScroll
           title={<span className="hero-heading">Show me your dream</span>}
