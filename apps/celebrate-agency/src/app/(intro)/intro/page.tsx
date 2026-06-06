@@ -7,9 +7,9 @@ export const metadata = {
   ...createMetadata({
     title: "Intro",
     description: "Enter Celebrate Agency — Talent · Production · Direction.",
-    alternates: { canonical: "/intro" },
   }),
-  robots: { index: false, follow: false },
+  // Gate/entry page — noindex but keep links followable (standard for gates).
+  robots: { index: false, follow: true },
 };
 
 export default function IntroPage() {
