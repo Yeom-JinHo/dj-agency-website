@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import CopyButton from "@repo/ui/common/CopyButton";
-import { MacBookScroll } from "./macbook-scroll-lazy";
+import { MacBookScroll } from "@/components/MacBookScroll";
 import { ShineBorder } from "@repo/ui/common/ShineBorder";
 import Link from "next/link";
 
