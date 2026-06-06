@@ -10,6 +10,7 @@ import { createMetadata } from "@/utils/index";
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";
 import ArtistImage from "@/app/sections/artistProfiles/ArtistImage";
+import SectionHeading from "@/components/SectionHeading";
 
 export function generateStaticParams() {
   return artistProfile.getPages().map((artist) => ({
@@ -22,7 +23,7 @@ export async function generateMetadata(props: {
 }) {
   const params = await props.params;
   const { artistName } = params;
-  const artist = artistProfile.getPage(artistName);
+  const artist = artistProfile.getPage(decodeURIComponent(artistName));
   if (!artist) notFound();
 
   const cardImage = {
@@ -55,15 +56,15 @@ export default async function ProjectPage(props0: {
 }) {
   const params = await props0.params;
   const { artistName } = params;
-  const artist = artistProfile.getPage(artistName);
+  const artist = artistProfile.getPage(decodeURIComponent(artistName));
   if (!artist) notFound();
 
   return (
     <main className="my-16 flex-1">
       <div className="container mx-auto flex flex-col items-center justify-center">
-        <h2 className="font-sans text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-          {artistName}
-        </h2>
+        <SectionHeading as="h1" variant="page">
+          {artist.name}
+        </SectionHeading>
         <div className="mt-12 h-[280px] w-[210px] sm:h-[340px] sm:w-[255px] md:h-96 md:w-72">
           <ArtistImage artist={artist} backgroundLogo={false} />
         </div>
