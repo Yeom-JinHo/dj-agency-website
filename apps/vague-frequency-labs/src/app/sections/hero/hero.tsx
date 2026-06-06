@@ -28,7 +28,7 @@ function Hero() {
         >
           We are
         </motion.p>
-        <Globe className="h-[min(85vw,calc(100svh-10rem))] w-[min(85vw,calc(100svh-10rem))] md:h-[min(70vw,calc(100svh-14rem))] md:w-[min(70vw,calc(100svh-14rem))] lg:h-[min(55vw,calc(100svh-16rem))] lg:w-[min(55vw,calc(100svh-16rem))] 2xl:h-[min(50vw,calc(100svh-18rem))] 2xl:w-[min(50vw,calc(100svh-18rem))]" />
+        <Globe className="h-[min(78vw,calc(100svh-13rem))] w-[min(78vw,calc(100svh-13rem))] md:h-[min(70vw,calc(100svh-14rem))] md:w-[min(70vw,calc(100svh-14rem))] lg:h-[min(55vw,calc(100svh-16rem))] lg:w-[min(55vw,calc(100svh-16rem))] 2xl:h-[min(50vw,calc(100svh-18rem))] 2xl:w-[min(50vw,calc(100svh-18rem))]" />
         <motion.h1
           {...rise(2.8)}
           className="w-full text-center text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl"
