@@ -64,6 +64,7 @@
   --animate-ca-type-in: ca-type-in 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-ca-stitch-stab: ca-stitch-stab 380ms cubic-bezier(0.2, 0.9, 0.25, 1)
     both;
+  --animate-modal-pop: modal-pop 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes modal-fade {
     from {
@@ -71,6 +72,17 @@
     }
     to {
       opacity: 1;
+    }
+  }
+
+  /* opacity는 backdrop(modal-fade)이 담당. 본문은 transform만 — 이중
+     투명도 곱연산으로 초기 프레임이 과하게 비치는 현상 방지. */
+  @keyframes modal-pop {
+    from {
+      transform: scale(0.96) translateY(8px);
+    }
+    to {
+      transform: scale(1) translateY(0);
     }
   }
 
