@@ -27,9 +27,9 @@ export const metadata = createMetadata({
 
 export default function AboutPage() {
   return (
-    <main className="my-14 flex-1">
+    <main className="my-16 flex-1">
       <section
-        className="relative flex min-h-[calc(50dvh)] items-center justify-center"
+        className="relative flex min-h-[50dvh] items-center justify-center"
         id="about"
       >
         <div className="flex w-full flex-col items-center md:max-w-7xl">

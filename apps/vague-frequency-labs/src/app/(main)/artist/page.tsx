@@ -57,7 +57,7 @@ export default function ArtistPage(): ReactElement {
     <main className="my-16 flex-1">
       <JsonLd items={jsonLd} />
       <section
-        className="relative flex min-h-[calc(50dvh)] items-center justify-center"
+        className="relative flex min-h-[50dvh] items-center justify-center"
         id="hero"
       >
         <div className="flex flex-col items-center md:max-w-7xl">
@@ -65,7 +65,7 @@ export default function ArtistPage(): ReactElement {
             Artist
           </SectionHeading>
 
-          <FancyLine className={"m-16"} />
+          <FancyLine className={"mt-16"} />
           <div className="flex flex-wrap justify-center gap-16">
             {artistProfile.getPages().map((artist, index) => (
               <Link

@@ -22,7 +22,7 @@ export default function MusicContent(): ReactElement {
   return (
     <main className="my-16 flex-1">
       <section
-        className="relative flex min-h-[calc(50dvh)] items-center justify-center"
+        className="relative flex min-h-[50dvh] items-center justify-center"
         id="hero"
       >
         <div className="flex flex-col items-center md:max-w-7xl">
@@ -30,7 +30,7 @@ export default function MusicContent(): ReactElement {
             Music
           </SectionHeading>
 
-          <FancyLine className={"m-16"} />
+          <FancyLine className={"mt-16"} />
           <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
             <div className="flex flex-wrap justify-center gap-16">
               {musicInfos.map((info, index) => (

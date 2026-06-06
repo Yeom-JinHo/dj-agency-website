@@ -10,6 +10,7 @@ import { createMetadata } from "@/utils/index";
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";
 import ArtistImage from "@/app/sections/artistProfiles/ArtistImage";
+import SectionHeading from "@/components/SectionHeading";
 
 export function generateStaticParams() {
   return artistProfile.getPages().map((artist) => ({
@@ -88,17 +89,17 @@ export default async function ProjectPage(props0: {
         </div>
       </div>
       <section className="container mb-12">
-        <h2 className="mb-2 text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+        <SectionHeading as="h2" className="mb-2">
           About
-        </h2>
+        </SectionHeading>
         <p className="whitespace-pre-line text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
           {artist.fullDescription}
         </p>
       </section>
       <section className="container mb-12">
-        <h2 className="mb-2 text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
+        <SectionHeading as="h2" className="mb-2">
           Photos
-        </h2>
+        </SectionHeading>
         <TextReveal
           as="p"
           className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"

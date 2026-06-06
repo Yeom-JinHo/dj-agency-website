@@ -9,7 +9,7 @@ export default function ContactContent(): ReactElement {
   return (
     <main className="my-16 flex-1">
       <section
-        className="relative flex min-h-[calc(50dvh)] items-center justify-center"
+        className="relative flex min-h-[50dvh] items-center justify-center"
         id="hero"
       >
         <div className="flex w-full flex-col items-center md:max-w-7xl">
@@ -21,12 +21,7 @@ export default function ContactContent(): ReactElement {
           <div className="relative flex h-full w-full flex-col items-center justify-center gap-4 overflow-hidden">
             <div className="flex w-full flex-col">
               <div className="space-y-4 p-8">
-                <TextReveal
-                  as="h2"
-                  className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-                >
-                  Email
-                </TextReveal>
+                <SectionHeading as="h2">Email</SectionHeading>
                 <div className="space-y-4">
                   <TextReveal
                     as="p"
@@ -37,12 +32,7 @@ export default function ContactContent(): ReactElement {
                 </div>
               </div>
               <div className="space-y-4 p-8">
-                <TextReveal
-                  as="h2"
-                  className="text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight"
-                >
-                  Address
-                </TextReveal>
+                <SectionHeading as="h2">Address</SectionHeading>
                 <div className="space-y-4">
                   <TextReveal
                     as="p"
