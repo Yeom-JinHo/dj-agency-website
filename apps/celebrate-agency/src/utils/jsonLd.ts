@@ -15,6 +15,8 @@ export function organizationJsonLd() {
     url: baseUrl,
     logo: new URL("/icon.png", baseUrl).toString(),
     description: meta.site.description,
+    // Founding year — matches the "Established 2025" stat and sibling brands.
+    foundingDate: "2025",
     email: BOOKING_EMAIL,
     contactPoint: {
       "@type": "ContactPoint",
