@@ -38,9 +38,9 @@ export default function Work() {
               </span>
             </div>
             <div className="flex items-end justify-between pt-4">
-              <h4 className="font-display text-3xl uppercase leading-none tracking-[0.01em]">
+              <h3 className="font-display text-3xl uppercase leading-none tracking-[0.01em]">
                 {work.title}
-              </h4>
+              </h3>
               <div className="text-right font-mono text-[11px] uppercase tracking-[0.1em] text-ca-muted lg:text-[13px]">
                 {work.credit}
                 <br />
