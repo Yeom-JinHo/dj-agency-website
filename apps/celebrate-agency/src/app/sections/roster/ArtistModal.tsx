@@ -163,7 +163,7 @@ export function ArtistModal({
       <div className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12">
         <div
           ref={modalInnerRef}
-          className="relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]"
+          className="animate-modal-pop relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]"
         >
           <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
             <span>
@@ -197,7 +197,7 @@ export function ArtistModal({
 
             <div
               key={artist.id}
-              className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 animate-modal-fade lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
+              className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
             >
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
                 <span>{ARTIST_ROLE_LABEL}</span>
