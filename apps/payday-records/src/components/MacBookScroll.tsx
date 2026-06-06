@@ -151,7 +151,25 @@ export const Lid = ({
             boxShadow: "0px 2px 0px 2px #171717 inset",
           }}
           className="absolute inset-0 flex items-center justify-center rounded-lg bg-[#010101]"
-        />
+        >
+          {/* lid 마크: 인트로 다이브와 동일한 metal-p 실루엣을 재사용해
+              외부 템플릿 로고 자리를 Payday 브랜드 P로 대체한다. */}
+          <span
+            aria-hidden
+            className="bg-foreground/85 block h-9"
+            style={{
+              aspectRatio: "1600 / 1333",
+              WebkitMaskImage: "url(/images/intro/metal-p.webp)",
+              maskImage: "url(/images/intro/metal-p.webp)",
+              WebkitMaskSize: "contain",
+              maskSize: "contain",
+              WebkitMaskRepeat: "no-repeat",
+              maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center",
+              maskPosition: "center",
+            }}
+          />
+        </div>
       </div>
       <motion.div
         style={{
