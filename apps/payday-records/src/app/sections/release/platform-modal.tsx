@@ -18,36 +18,12 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
   const availablePlatforms = PLATFORM_ORDER.filter((p) => release.links[p]);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // On open: move focus into the panel and trap Tab within it; on close:
-  // restore focus to the element that opened the modal. (Esc-to-close lives
-  // in the parent Release section.)
+  // On open: move focus into the panel; on close: restore it to the element
+  // that opened the modal. (Esc-to-close lives in the parent Release section.)
   useEffect(() => {
     const trigger = document.activeElement as HTMLElement | null;
-    const panel = panelRef.current;
-    panel?.querySelector<HTMLElement>("a[href], button")?.focus();
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Tab" || !panel) return;
-      const focusables = panel.querySelectorAll<HTMLElement>(
-        'a[href], button, [tabindex]:not([tabindex="-1"])'
-      );
-      if (focusables.length === 0) return;
-      const first = focusables[0];
-      const last = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last?.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      trigger?.focus?.();
-    };
+    panelRef.current?.querySelector<HTMLElement>("a[href], button")?.focus();
+    return () => trigger?.focus?.();
   }, []);
 
   return (
