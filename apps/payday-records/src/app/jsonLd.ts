@@ -17,6 +17,7 @@ export const organization: WithContext<Organization> = {
   description: meta.site.description,
   url: meta.site.url,
   logo: `${meta.site.url}/images/logo/400_300/PAYDAY.webp`,
+  foundingDate: "2025",
   sameAs,
 };
 

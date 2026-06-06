@@ -54,7 +54,7 @@ function Contact() {
             duration={8}
             shineColor={["#FFBE7B", "#FFD580", "#FF9A3C"]}
           />
-          <h3 className="card-heading mb-8 text-center">Contact</h3>
+          <h2 className="card-heading mb-8 text-center">Contact</h2>
           <div className="flex items-center">
             <p className="text-lg md:text-xl">{contact.email}</p>
             <CopyButton text={contact.email} className="ml-2" />

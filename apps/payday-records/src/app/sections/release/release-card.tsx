@@ -44,9 +44,9 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
       </div>
 
       <div className="mt-3 text-left">
-        <h4 className="truncate text-sm font-semibold md:text-base">
+        <h3 className="truncate text-sm font-semibold md:text-base">
           {release.title}
-        </h4>
+        </h3>
         <p className="text-muted-foreground truncate text-xs md:text-sm">
           {release.artist}
         </p>

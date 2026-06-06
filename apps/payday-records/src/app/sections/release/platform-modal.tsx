@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { IconArrowUpRight, IconX } from "@tabler/icons-react";
 import { motion } from "motion/react";
@@ -15,6 +16,15 @@ type PlatformModalProps = {
 
 function PlatformModal({ release, onClose }: PlatformModalProps) {
   const availablePlatforms = PLATFORM_ORDER.filter((p) => release.links[p]);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  // On open: move focus into the panel; on close: restore it to the element
+  // that opened the modal. (Esc-to-close lives in the parent Release section.)
+  useEffect(() => {
+    const trigger = document.activeElement as HTMLElement | null;
+    panelRef.current?.querySelector<HTMLElement>("a[href], button")?.focus();
+    return () => trigger?.focus?.();
+  }, []);
 
   return (
     <motion.div
@@ -35,6 +45,7 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
       />
 
       <motion.div
+        ref={panelRef}
         className="relative z-10 w-full max-w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl"
         initial={{ opacity: 0, scale: 0.96, y: 8 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
