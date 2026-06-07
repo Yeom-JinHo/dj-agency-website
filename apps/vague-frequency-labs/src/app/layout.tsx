@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
-import { Anton, Do_Hyeon, Space_Mono } from "next/font/google";
+import { Anton, Space_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 import "@/styles/globals.css";
@@ -21,21 +21,14 @@ const pretendard = localFont({
   weight: "45 920",
 });
 
-// Worldwide hero typography (DJ Hero handoff): condensed poster English +
-// condensed Korean display + monospace labels. Do Hyeon matches Anton's
-// narrow, tall poster skeleton for Korean; Pretendard is the Korean fallback.
+// Worldwide hero typography (DJ Hero handoff): condensed poster English (Anton)
+// + monospace labels. Anton is Latin-only, so Korean headings fall back to
+// Pretendard (already loaded for body) instead of registering an extra font.
 const anton = Anton({
   subsets: ["latin"],
   weight: "400",
   display: "swap",
   variable: "--font-anton",
-});
-
-const doHyeon = Do_Hyeon({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-  variable: "--font-dohyeon",
 });
 
 const spaceMono = Space_Mono({
@@ -74,7 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${pretendard.variable} ${anton.variable} ${doHyeon.variable} ${spaceMono.variable} font-sans antialiased`}
+        className={`${pretendard.variable} ${anton.variable} ${spaceMono.variable} font-sans antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />
