@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
-import { Geist, Anton, Black_Han_Sans, Space_Mono } from "next/font/google";
+import { Anton, Space_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 import "@/styles/globals.css";
@@ -14,12 +14,6 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
 
-const geist = Geist({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-geist",
-});
-
 const pretendard = localFont({
   src: "../../public/fonts/PretendardStdVariable.woff2",
   display: "swap",
@@ -27,21 +21,14 @@ const pretendard = localFont({
   weight: "45 920",
 });
 
-// Worldwide hero typography (DJ Hero handoff): condensed poster English +
-// heavy Korean display + monospace labels. Black Han Sans renders Korean via
-// non-preloaded unicode-range; Pretendard is the Korean fallback.
+// Worldwide hero typography (DJ Hero handoff): condensed poster English (Anton)
+// + monospace labels. Anton is Latin-only, so Korean headings fall back to
+// Pretendard (already loaded for body) instead of registering an extra font.
 const anton = Anton({
   subsets: ["latin"],
   weight: "400",
   display: "swap",
   variable: "--font-anton",
-});
-
-const blackHanSans = Black_Han_Sans({
-  subsets: ["latin"],
-  weight: "400",
-  display: "swap",
-  variable: "--font-han",
 });
 
 const spaceMono = Space_Mono({
@@ -80,7 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geist.variable} ${pretendard.variable} ${anton.variable} ${blackHanSans.variable} ${spaceMono.variable} font-sans antialiased`}
+        className={`${pretendard.variable} ${anton.variable} ${spaceMono.variable} font-sans antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />

@@ -7,21 +7,26 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Font tokens reference runtime CSS variables (--font-geist / --font-anton /
-  --font-space-mono) injected by next/font on <body>. In Tailwind v4 these must
-  live in `@theme inline` so the generated utilities emit `var(--font-*)`
-  literally instead of being resolved (to empty) at build time.
+  Font tokens reference runtime CSS variables (--font-pretendard / --font-anton
+  / --font-space-mono) injected by next/font on <body>. In
+  Tailwind v4 these must live in `@theme inline` so the generated utilities emit
+  `var(--font-*)` literally instead of being resolved (to empty) at build time.
 
-  - sans (body): Geist → Pretendard (Korean)
-  - display (headings): Anton → Black Han Sans (Korean) → Pretendard
+  NOTE: `@theme inline` does NOT emit --font-sans/display/mono onto :root, so
+  raw CSS selectors below CANNOT use var(--font-display)/var(--font-mono) — they
+  resolve to empty. Reference the runtime next/font variables directly instead
+  (var(--font-anton) / var(--font-space-mono) / ...). The Tailwind `font-sans`
+  /`font-display`/`font-mono` utility classes DO work and inline these stacks.
+
+  - sans (body): Pretendard (covers Latin + Korean uniformly)
+  - display (headings): Anton (Latin) → Pretendard (Korean, already loaded)
   - mono (sub: kickers, labels, meta, captions): Space Mono
 */
 @theme inline {
   --font-sans:
-    var(--font-geist), var(--font-pretendard), system-ui, -apple-system,
-    BlinkMacSystemFont, sans-serif;
-  --font-display:
-    var(--font-anton), var(--font-han), var(--font-pretendard), sans-serif;
+    var(--font-pretendard), system-ui, -apple-system, BlinkMacSystemFont,
+    sans-serif;
+  --font-display: var(--font-anton), var(--font-pretendard), sans-serif;
   --font-mono:
     var(--font-space-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
@@ -274,7 +279,8 @@
 
 .orbit-text {
   font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    var(--font-space-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, monospace;
   font-size: 6px;
   fill: rgb(76, 115, 230);
   font-weight: 600;
@@ -393,7 +399,8 @@
   background: rgb(20, 30, 80);
   color: #fff;
   font-family:
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    var(--font-space-mono), ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, monospace;
   font-size: 0.6rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -707,8 +714,7 @@
   max-width: min(720px, 84%);
 }
 .vfl-h-big {
-  font-family:
-    var(--font-anton), var(--font-han), var(--font-pretendard), sans-serif;
+  font-family: var(--font-anton), var(--font-pretendard), sans-serif;
   font-weight: 400;
   font-size: clamp(38px, 6.4vw, 108px);
   line-height: 0.92;
