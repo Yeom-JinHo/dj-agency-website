@@ -9,17 +9,23 @@ interface PreloaderProps {
   children: React.ReactNode;
 }
 
-// Hold the intro briefly after mount, then sweep the overlay up.
-const HOLD = 0.3;
+// When (ms, from navigation start) the overlay starts sweeping up. The CSS intro
+// beats ("Hey" → "Are you ready?") are self-timed and land well before this, so
+// the payoff line is on screen when the sweep begins. Floored on hydration: on a
+// slow load the sweep waits for mount (it needs window dimensions), but it never
+// fires earlier than this so the beats always get their moment.
+const SWEEP_AT_MS = 2200;
 
 export function Preloader({ children }: PreloaderProps) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
-  const [mounted, setMounted] = useState(false);
+  const [sweep, setSweep] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     setDimension({ width: window.innerWidth, height: window.innerHeight });
-    setMounted(true);
+    const remaining = Math.max(0, SWEEP_AT_MS - performance.now());
+    const t = setTimeout(() => setSweep(true), remaining);
+    return () => clearTimeout(t);
   }, []);
 
   // Unmount once the slide-up has finished so the off-screen overlay does not
@@ -29,27 +35,27 @@ export function Preloader({ children }: PreloaderProps) {
   const initialPath = `M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height} Q${dimension.width / 2} ${dimension.height + 300} 0 ${dimension.height}  L0 0`;
   const targetPath = `M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height} Q${dimension.width / 2} ${dimension.height} 0 ${dimension.height}  L0 0`;
 
-  // The visible intro (text fade + breathe) runs on CSS from the very first
-  // paint — before hydration — so there is no frozen black frame. The slide-up
-  // is keyed on `mounted` (not on `dimension`), so the overlay always dismisses
-  // even on a 0-width viewport; the SVG curve is the only piece that needs real
-  // dimensions, and it rides the same motion clock to stay in sync.
+  // The two-beat intro runs on CSS from the very first paint — before hydration
+  // — so there is no frozen black frame. The overlay slide-up and its SVG curve
+  // share the same `sweep` clock so the curve stays in sync with the slide. The
+  // sweep is keyed on `sweep` (not on `dimension`), so the overlay always
+  // dismisses even on a 0-width viewport; only the curve needs real dimensions.
   const hasDimensions = dimension.width > 0;
 
   return (
     <motion.div
       aria-hidden="true"
       initial={{ y: 0 }}
-      animate={mounted ? { y: "-100dvh" } : { y: 0 }}
-      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: HOLD }}
+      animate={sweep ? { y: "-100dvh" } : { y: 0 }}
+      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
       onAnimationComplete={() => {
-        if (mounted) setDismissed(true);
+        if (sweep) setDismissed(true);
       }}
       className="bg-background fixed top-0 left-0 z-999 flex h-[100dvh] w-[100dvw] cursor-wait items-center justify-center px-[60px] pb-[40px]"
     >
       <div
         className={cn(
-          "vfl-loader-intro text-foreground absolute z-1 flex items-center text-6xl font-bold xl:text-[12rem]",
+          "vfl-loader-intro text-foreground absolute z-1 text-6xl font-bold xl:text-[12rem]",
           "font-display",
         )}
       >
@@ -60,8 +66,8 @@ export function Preloader({ children }: PreloaderProps) {
         <svg className="absolute top-0 h-[calc(100%+300px)] w-full">
           <motion.path
             initial={{ d: initialPath }}
-            animate={{ d: targetPath }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: HOLD }}
+            animate={sweep ? { d: targetPath } : { d: initialPath }}
+            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
             className="fill-background"
           ></motion.path>
         </svg>
