@@ -21,6 +21,8 @@ interface WorldMapProps {
   dotColor?: string;
   /** Stroke color of the arc + pins. */
   lineColor?: string;
+  /** Seconds to delay the standing arcs' staggered draw-in (sync with entrance). */
+  revealDelay?: number;
 }
 
 interface PlacedCity {
@@ -42,6 +44,7 @@ export function WorldMap({
   homeId,
   dotColor = "#E8E2D085",
   lineColor = "#E8E2D0",
+  revealDelay = 0,
 }: WorldMapProps) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
@@ -68,9 +71,13 @@ export function WorldMap({
   }, [cities, dotColor]);
 
   const home = placed.find((p) => p.city.id === homeId) ?? null;
-  const activePlaced = placed.find((p) => p.city.id === active) ?? null;
-  const showArc =
-    activePlaced && home && activePlaced.city.id !== home.city.id;
+  // Every non-home city keeps a standing arc back to the home base so the
+  // "Seoul → everywhere" hub reads at rest; hovering a city isolates its arc.
+  const arcs = home
+    ? placed
+        .filter((p) => p.city.id !== homeId)
+        .map((p) => ({ id: p.city.id, d: curvedPath(p, home) }))
+    : [];
 
   return (
     // Decorative map: the pins enhance the visual but carry no content that
@@ -103,18 +110,39 @@ export function WorldMap({
             <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
           </linearGradient>
         </defs>
-        {showArc && activePlaced && home && (
-          <motion.path
-            key={activePlaced.city.id}
-            d={curvedPath(activePlaced, home)}
-            stroke="url(#vfl-arc-gradient)"
-            strokeWidth={0.5}
-            strokeDasharray="1.4 2.4"
-            initial={reduce ? { pathLength: 1 } : { pathLength: 0 }}
-            animate={{ pathLength: 1 }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-          />
-        )}
+        {arcs.map(({ id, d }, i) => {
+          const focused = active !== null;
+          const isActiveArc = active === id;
+          // Rest: all arcs faint. Focused: active arc bright, the rest fade out.
+          const opacity = !focused ? 0.34 : isActiveArc ? 0.95 : 0;
+          return (
+            <motion.path
+              key={id}
+              d={d}
+              stroke="url(#vfl-arc-gradient)"
+              strokeDasharray="1.4 2.4"
+              initial={
+                reduce
+                  ? { pathLength: 1, opacity: 0.34 }
+                  : { pathLength: 0, opacity: 0 }
+              }
+              animate={{
+                pathLength: 1,
+                opacity,
+                strokeWidth: isActiveArc ? 0.7 : 0.4,
+              }}
+              transition={{
+                pathLength: {
+                  duration: reduce ? 0 : 0.9,
+                  delay: reduce ? 0 : revealDelay + i * 0.12,
+                  ease: "easeOut",
+                },
+                opacity: { duration: 0.45, ease: "easeOut" },
+                strokeWidth: { duration: 0.2 },
+              }}
+            />
+          );
+        })}
       </svg>
 
       <div className="vfl-pin-layer">

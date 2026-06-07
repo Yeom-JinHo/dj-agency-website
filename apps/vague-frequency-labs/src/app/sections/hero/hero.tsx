@@ -28,7 +28,11 @@ function Hero() {
         animate={{ opacity: 1 }}
         transition={reduce ? undefined : { duration: 1.1, delay: 2.2 }}
       >
-        <WorldMap cities={hero.cities} homeId={hero.homeId} />
+        <WorldMap
+          cities={hero.cities}
+          homeId={hero.homeId}
+          revealDelay={2.4}
+        />
       </motion.div>
 
       <div className="vfl-vignette" aria-hidden />
