@@ -23,6 +23,9 @@ interface WorldMapProps {
   lineColor?: string;
   /** Seconds to delay the standing arcs' staggered draw-in (sync with entrance). */
   revealDelay?: number;
+  /** Gate ONLY the arcs' draw-in. The base map + pins always render immediately,
+      so the map is never blocked on a timer (decoupled from the loader). */
+  play?: boolean;
 }
 
 interface PlacedCity {
@@ -45,6 +48,7 @@ export function WorldMap({
   dotColor = "#E8E2D085",
   lineColor = "#E8E2D0",
   revealDelay = 0,
+  play = true,
 }: WorldMapProps) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
@@ -127,7 +131,7 @@ export function WorldMap({
                   : { pathLength: 0, opacity: 0 }
               }
               animate={{
-                pathLength: 1,
+                pathLength: reduce || play ? 1 : 0,
                 opacity,
                 strokeWidth: isActiveArc ? 0.7 : 0.4,
               }}
