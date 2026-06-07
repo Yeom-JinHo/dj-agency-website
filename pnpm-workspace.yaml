@@ -14,6 +14,7 @@ catalog:
   motion: ^12.23.24
   class-variance-authority: ^0.7.1
   "@tabler/icons-react": ^3.35.0
+  ogl: ^1.0.11
 
   # Dev
   typescript: 5.9.2
