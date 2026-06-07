@@ -22,6 +22,8 @@ interface WorldMapProps {
   dotColor?: string;
   /** Stroke color of the arc + pins. */
   lineColor?: string;
+  /** Signal accent applied to the focused arc (kept in sync with --vfl-accent). */
+  accentColor?: string;
   /** Seconds to delay the standing arcs' staggered draw-in (sync with entrance). */
   revealDelay?: number;
 }
@@ -40,11 +42,49 @@ function curvedPath(a: PlacedCity, b: PlacedCity) {
   return `M ${a.x} ${a.y} Q ${midX} ${midY} ${b.x} ${b.y}`;
 }
 
+// Taegeuk (음양) mark for the Seoul home pin.
+//
+// Path geometry is transplanted verbatim from the official kr.svg (flagcdn.com):
+//   viewBox="-72 -48 144 96", taegeuk center = origin (0,0), big circle r=24.
+// We map that into our viewBox "0 0 100 100" (center 50,50, big circle r≈50)
+// with a single <g transform="translate(50 50) scale(2.0833)"> (50÷24 ≈ 2.0833).
+//
+// Draw order matches kr.svg — red (yang) first, blue (eum) on top:
+//   red  M9.985 6.656A18 18 0 1 1-19.97-13.313a24 24 0 1 1 39.938 26.626
+//   blue M0 0a12 12 0 1 1 19.97 13.313 24 24 0 1 1-39.94-26.626A12 12 0 1 0 0 0
+//
+// The ~33.7° axis tilt is baked into the path coordinates — no CSS rotate needed.
+// Small-circle : big-circle = 12:24 = 1:2, producing the authentic S boundary.
+function TaegeukMark() {
+  return (
+    <svg
+      className="vfl-taegeuk"
+      viewBox="0 0 100 100"
+      aria-hidden
+      focusable="false"
+    >
+      <g transform="translate(50 50) scale(2.0833)">
+        {/* yang (빨강) — drawn first, sits underneath */}
+        <path
+          d="M9.985 6.656A18 18 0 1 1-19.97-13.313a24 24 0 1 1 39.938 26.626"
+          fill="var(--vfl-accent)"
+        />
+        {/* eum (파랑) — drawn second, overlaps red along the shared S boundary */}
+        <path
+          d="M0 0a12 12 0 1 1 19.97 13.313 24 24 0 1 1-39.94-26.626A12 12 0 1 0 0 0"
+          fill="var(--vfl-accent-blue)"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function WorldMap({
   cities,
   homeId,
   dotColor = "#E8E2D085",
   lineColor = "#E8E2D0",
+  accentColor = "#DA2F3D",
   revealDelay = 0,
 }: WorldMapProps) {
   const reduce = useReducedMotion();
@@ -110,6 +150,19 @@ export function WorldMap({
             <stop offset="85%" stopColor={lineColor} stopOpacity="0.7" />
             <stop offset="100%" stopColor={lineColor} stopOpacity="0" />
           </linearGradient>
+          {/* Focused arc lights up in the signal accent — the one "live" route. */}
+          <linearGradient
+            id="vfl-arc-gradient-active"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="0%"
+          >
+            <stop offset="0%" stopColor={accentColor} stopOpacity="0" />
+            <stop offset="15%" stopColor={accentColor} stopOpacity="0.95" />
+            <stop offset="85%" stopColor={accentColor} stopOpacity="0.95" />
+            <stop offset="100%" stopColor={accentColor} stopOpacity="0" />
+          </linearGradient>
         </defs>
         {arcs.map(({ id, d }, i) => {
           const focused = active !== null;
@@ -120,7 +173,11 @@ export function WorldMap({
             <motion.path
               key={id}
               d={d}
-              stroke="url(#vfl-arc-gradient)"
+              stroke={
+                isActiveArc
+                  ? "url(#vfl-arc-gradient-active)"
+                  : "url(#vfl-arc-gradient)"
+              }
               strokeDasharray="1.4 2.4"
               initial={
                 reduce
@@ -179,7 +236,9 @@ export function WorldMap({
                   />
                 </>
               )}
-              <span className={`vfl-pin-core${isHome ? " home" : ""}`} />
+              <span className={`vfl-pin-core${isHome ? " home" : ""}`}>
+                {isHome && <TaegeukMark />}
+              </span>
 
               {/* Flag badge floats on the opposite side of the pin from the
                   tooltip, so the two never overlap (bottom-third cities flip

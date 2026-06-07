@@ -473,6 +473,10 @@
   --vfl-faint: rgba(236, 234, 227, 0.3);
   --vfl-line: rgba(236, 234, 227, 0.12);
   --vfl-line-strong: rgba(236, 234, 227, 0.22);
+  /* Taegeuk accent pair — red over blue marks Seoul as the Korean home base.
+     Red also lights the active arc; the cream monotone stays intact otherwise. */
+  --vfl-accent: #da2f3d;
+  --vfl-accent-blue: #2e6be6;
   background: var(--vfl-bg);
   color: var(--vfl-fg);
 }
@@ -565,13 +569,29 @@
     0 0 10px rgba(232, 226, 208, 0.6);
 }
 .vfl-pin-core.home {
-  width: 10px;
-  height: 10px;
+  width: 13px;
+  height: 13px;
+  /* The inline taegeuk SVG carries the red/blue; the core is just its frame:
+     a dark contour rim plus a balanced red+blue glow so neither half — least
+     of all the blue — sinks into the #0a0a0b backdrop. */
   background: var(--vfl-bg);
   box-shadow:
-    0 0 0 2px var(--vfl-bg),
-    0 0 0 3px var(--vfl-cream),
-    0 0 14px rgba(232, 226, 208, 0.8);
+    0 0 0 1px rgba(10, 10, 11, 0.95),
+    0 0 0 1.5px rgba(236, 234, 227, 0.18),
+    0 0 10px rgba(218, 47, 61, 0.55),
+    0 0 14px rgba(46, 107, 230, 0.5);
+}
+/* Inline taegeuk SVG fills the core disc. The ~33.7° axis tilt is baked into
+   the path coordinates transplanted from kr.svg — no CSS rotation applied. */
+.vfl-taegeuk {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  /* Hairline interior contour separates the disc from its own dark frame. */
+  box-shadow: inset 0 0 0 0.5px rgba(10, 10, 11, 0.55);
 }
 .vfl-pin-pulse {
   position: absolute;
@@ -588,9 +608,17 @@
 .vfl-pin-pulse.delay {
   animation-delay: 1.4s;
 }
+/* Two ripples echo the taegeuk's two halves — red leads, blue answers. The
+   blue is pushed brighter than the red since #2e6be6 reads dimmer on #0a0a0b. */
 .vfl-pin-pulse.home {
-  border-color: rgba(232, 226, 208, 0.7);
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  border-color: rgba(218, 47, 61, 0.75);
   animation-duration: 2.2s;
+}
+.vfl-pin-pulse.delay.home {
+  border-color: rgba(70, 128, 240, 0.78);
 }
 @keyframes vfl-pin-pulse {
   0% {
@@ -724,12 +752,19 @@
     0 2px 26px rgba(10, 10, 11, 0.92),
     0 0 70px rgba(10, 10, 11, 0.7);
 }
-.vfl-h-intro {
+/* Eyebrow "We are": the supporting line carries the outline treatment so the
+   brand name reads as the solid, high-contrast lead over the busy map. */
+.vfl-h-eyebrow {
   display: block;
-}
-.vfl-h-big .stroke {
+  font-family: var(--font-anton), var(--font-pretendard), sans-serif;
+  font-weight: 400;
+  font-size: clamp(26px, 3.4vw, 48px);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  margin-bottom: clamp(10px, 1.3vw, 20px);
   color: transparent;
-  -webkit-text-stroke: 1.4px var(--vfl-fg);
+  -webkit-text-stroke: 1px var(--vfl-fg);
+  text-shadow: 0 2px 18px rgba(10, 10, 11, 0.85);
 }
 .vfl-h-en {
   margin-top: clamp(14px, 1.8vw, 26px);
@@ -780,9 +815,11 @@
     width: 5px;
     height: 5px;
   }
+  /* The taegeuk's S needs a little more room than a plain dot to read, so the
+     home beacon stays a touch larger than the desktop downscale would give. */
   .vfl-pin-core.home {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
   .vfl-pin-pulse:not(.home) {
     display: none;

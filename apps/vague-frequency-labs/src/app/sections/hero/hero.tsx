@@ -7,11 +7,13 @@ import { hero } from "./config";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 function Hero() {
-  const rise = {
+  // Staggered rise so the headline reads in order — eyebrow, brand, subline —
+  // instead of arriving as one flat block. Mount-driven only (no loader delay).
+  const rise = (delay = 0) => ({
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.65, ease: EASE },
-  };
+    transition: { duration: 0.65, ease: EASE, delay },
+  });
 
   return (
     <MotionConfig reducedMotion="user">
@@ -28,19 +30,21 @@ function Hero() {
         {/* Headline brackets the map: on mobile "We are" sits above the map band
             and the brand name below it; on desktop both stack bottom-left. */}
         <div className="vfl-headline">
-          <motion.span {...rise} className="vfl-h-big vfl-h-intro">
+          {/* Eyebrow: the connective phrase plays the supporting role — small and
+              outline-cut — so the brand name below can be the solid lead. */}
+          <motion.span {...rise(0)} className="vfl-h-eyebrow">
             {hero.headline.line1}
           </motion.span>
           <div className="vfl-h-bottom">
-            <motion.h1 {...rise} className="vfl-h-big vfl-h-brand">
+            <motion.h1 {...rise(0.08)} className="vfl-h-big vfl-h-brand">
               {hero.headline.line2.split(" ").map((word, i, arr) => (
-                <span key={word} className="stroke vfl-h-word">
+                <span key={word} className="vfl-h-word">
                   {word}
                   {i < arr.length - 1 ? " " : ""}
                 </span>
               ))}
             </motion.h1>
-            <motion.div {...rise} className="vfl-h-en">
+            <motion.div {...rise(0.16)} className="vfl-h-en">
               {hero.subline}
             </motion.div>
           </div>
