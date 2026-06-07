@@ -212,6 +212,34 @@
 }
 
 @theme inline {
+  /*
+    Preloader intro text (CSS-first). The visible "Are you ready?" must start
+    animating on the very first paint — before hydration — so there is no frozen
+    black frame. fade-in (~0.4s) → breathe loop. The overlay slide-up and its
+    SVG curve are driven by motion in Preloader.tsx (they need window dimensions
+    and must stay in sync), not by CSS.
+  */
+  --animate-loader-fade-in: loader-fade-in 0.4s ease-out forwards;
+  --animate-loader-breathe: loader-breathe 3s ease-in-out 0.4s infinite;
+
+  @keyframes loader-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.85;
+    }
+  }
+  @keyframes loader-breathe {
+    0%,
+    100% {
+      opacity: 0.85;
+    }
+    50% {
+      opacity: 0.65;
+    }
+  }
+
   --animate-shine: shine var(--duration) infinite linear;
 
   @keyframes shine {
@@ -236,6 +264,18 @@
       background-position: bottom center;
     }
   }
+}
+
+/* ── Preloader intro (CSS-first, no hydration stall) ───────────────
+   .vfl-loader-intro fades the "Are you ready?" text in on first paint, then
+   loops a subtle breathe — both run from CSS so the intro is alive before
+   hydration (no frozen black frame). The overlay slide-up itself is driven by
+   motion in Preloader.tsx. */
+.vfl-loader-intro {
+  opacity: 0;
+  animation:
+    var(--animate-loader-fade-in),
+    var(--animate-loader-breathe);
 }
 
 /* ── Globe orbit ring (default showcase) ─────────────── */
