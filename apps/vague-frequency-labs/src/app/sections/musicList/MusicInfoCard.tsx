@@ -21,6 +21,16 @@ interface MusicInfoProps {
   musicInfo: MusicInfo;
 }
 
+// 소셜 아이콘 hover 시 각 플랫폼 브랜드 컬러로 점등 (payday-records 패턴과 정합)
+const SOCIAL_BRAND_HOVER: Record<string, string> = {
+  SiYoutube: "group-hover/social:text-[#FF0000]",
+  SiInstagram: "group-hover/social:text-[#E1306C]",
+  SiSoundcloud: "group-hover/social:text-[#FF5500]",
+  SiSpotify: "group-hover/social:text-[#1ED760]",
+  SiApple: "group-hover/social:text-white",
+  SiBeatport: "group-hover/social:text-[#A8FF04]",
+};
+
 function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   const texture = useMemo(() => {
     // musicInfo.name을 기반으로 결정적 랜덤 생성
@@ -123,7 +133,12 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
                     key={`contact-social_${index}`}
                   >
                     {social.iconName && (
-                      <Icon name={social.iconName} className="size-5" />
+                      <Icon
+                        name={social.iconName}
+                        className={`size-5 transition-colors ${
+                          SOCIAL_BRAND_HOVER[social.iconName] ?? ""
+                        }`}
+                      />
                     )}
                     <span className="text-sm">{social.name}</span>
                     <Icon
