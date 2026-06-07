@@ -77,7 +77,7 @@ export function WorldMap({
   const arcs = home
     ? placed
         .filter((p) => p.city.id !== homeId)
-        .map((p) => ({ id: p.city.id, d: curvedPath(p, home) }))
+        .map((p) => ({ id: p.city.id, d: curvedPath(home, p) }))
     : [];
 
   return (
