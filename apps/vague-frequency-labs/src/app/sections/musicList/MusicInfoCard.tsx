@@ -65,7 +65,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
       </DialogTrigger>
       <DialogContainer>
         <DialogContent
-          className="bg-popover text-popover-foreground border-border pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto rounded-lg border p-4 shadow-lg sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
+          className="bg-popover/60 text-popover-foreground pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto rounded-lg border border-white/10 p-4 shadow-xl backdrop-blur-xl backdrop-saturate-150 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
         >
           <motion.div
             animate={{
