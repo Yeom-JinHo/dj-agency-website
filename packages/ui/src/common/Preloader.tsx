@@ -12,11 +12,11 @@ interface PreloaderProps {
 
 export const opacity: Variants = {
   initial: {
-    opacity: 0.35,
+    opacity: 0.25,
   },
   enter: {
     opacity: 0.75,
-    transition: { duration: 0.35 },
+    transition: { duration: 0.5 },
   },
 };
 
@@ -32,9 +32,15 @@ export const slideUp: Variants = {
 
 export function Preloader({ children }: PreloaderProps) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
+  // Until hydration, motion's enter/count animations haven't run yet, so the
+  // SSR markup would otherwise sit frozen and near-invisible (a "black screen").
+  // A pure-CSS pulse keeps the loader visibly alive in that pre-hydration gap;
+  // once mounted we drop it and hand back to the motion-driven timeline.
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setDimension({ width: window.innerWidth, height: window.innerHeight });
+    setMounted(true);
   }, []);
 
   const initialPath = `M0 0 L${dimension.width} 0 L${dimension.width} ${dimension.height} Q${dimension.width / 2} ${dimension.height + 300} 0 ${dimension.height}  L0 0`;
@@ -56,6 +62,7 @@ export function Preloader({ children }: PreloaderProps) {
       variants={slideUp}
       initial="initial"
       exit="exit"
+      aria-hidden="true"
       className="bg-background fixed z-999 flex h-[100dvh] w-[100dvw] cursor-wait items-center justify-center px-[60px] pb-[40px]"
     >
       <motion.div
@@ -64,6 +71,7 @@ export function Preloader({ children }: PreloaderProps) {
         animate="enter"
         className={cn(
           "text-foreground absolute z-1 flex items-center text-[192px]",
+          !mounted && "animate-loader-breathe",
         )}
       >
         {children}

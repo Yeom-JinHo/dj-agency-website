@@ -207,6 +207,13 @@
 }
 
 @theme inline {
+  --animate-loader-breathe: loader-breathe 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes loader-breathe {
+    0%, 100% { opacity: 0.6; }
+    50%       { opacity: 0.25; }
+  }
+
   --animate-shine: shine var(--duration) infinite linear;
 
   @keyframes shine {
@@ -799,6 +806,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-loader-breathe {
+    animation: none;
+    opacity: 0.5;
+  }
   .vfl-map-img {
     animation: none;
     opacity: 1;
