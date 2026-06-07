@@ -600,8 +600,8 @@
 .vfl-pin-flag {
   position: absolute;
   left: 50%;
-  width: 24px;
-  height: 18px;
+  width: 28px;
+  height: 21px;
   /* Tailwind preflight sets img{max-width:100%}; since this badge is absolute
      its containing block is ~0px wide, which would clamp the 24px to nothing. */
   max-width: none;
