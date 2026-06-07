@@ -65,14 +65,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
       </DialogTrigger>
       <DialogContainer>
         <DialogContent
-          style={{
-            backdropFilter: "blur(11px) saturate(200%)",
-            WebkitBackdropFilter: "blur(11px) saturate(200%)",
-            backgroundColor: "rgba(17, 25, 40, 0.27)",
-            borderRadius: "12px",
-            border: "1px solid rgba(255, 255, 255, 0.125)",
-          }}
-          className="pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto p-4 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
+          className="bg-popover text-popover-foreground border-border pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto rounded-lg border p-4 shadow-lg sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
         >
           <motion.div
             animate={{
@@ -103,7 +96,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
           </motion.div>
 
           <div className="mt-8">
-            <h3 className="truncate text-2xl font-bold">{musicInfo.name}</h3>
+            <h3 className="truncate text-xl font-semibold">{musicInfo.name}</h3>
             <div className="flex items-center justify-between gap-3">
               <h3 className="text-muted-foreground truncate text-sm">
                 {musicInfo.artist}
