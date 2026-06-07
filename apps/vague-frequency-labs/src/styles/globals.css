@@ -774,6 +774,12 @@
   color: var(--vfl-muted);
   text-shadow: 0 1px 12px rgba(10, 10, 11, 0.9);
 }
+/* Stack the brand words vertically as a deliberate poster column — one word per
+   line on every breakpoint, so the wrap point is intentional, not left to the
+   container width. */
+.vfl-h-word {
+  display: block;
+}
 
 @media (max-width: 640px) {
   /* Portrait: show the WHOLE map (Seoul + every pin/arc) as a centered band
@@ -796,12 +802,23 @@
       clamp(26px, 5vh, 44px);
   }
   .vfl-h-big {
-    font-size: clamp(46px, 16vw, 84px);
+    /* Lowered from 16vw: the longest brand word ("Frequency", 9 condensed
+       glyphs) overran the viewport edge at 16vw on a 390px screen. 13vw keeps
+       it inside the safe column while staying poster-large. */
+    font-size: clamp(40px, 13vw, 76px);
     line-height: 0.96;
   }
-  /* Stack the brand words vertically as a deliberate poster column. */
-  .vfl-h-word {
-    display: block;
+  /* Thin the eyebrow's outline at the smaller portrait size — a full 1px stroke
+     reads heavy on 26px glyphs and erodes the airy "supporting line" feel. */
+  .vfl-h-eyebrow {
+    -webkit-text-stroke-width: 0.75px;
+  }
+  /* Tighten the subline tracking on narrow portrait: at 0.26em the full string
+     ("FROM SEOUL TO EVERYWHERE — EST. 2025") overran both edges on a 390px
+     screen. 0.12em keeps a wide mono mood while leaving margin for the wide em
+     dash and trailing letter-spacing. */
+  .vfl-h-en {
+    letter-spacing: 0.12em;
   }
 
   /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
