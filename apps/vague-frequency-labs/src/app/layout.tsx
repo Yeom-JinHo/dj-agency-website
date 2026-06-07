@@ -1,6 +1,12 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
-import { Fraunces, Geist } from "next/font/google";
+import {
+  Fraunces,
+  Geist,
+  Anton,
+  Black_Han_Sans,
+  Space_Mono,
+} from "next/font/google";
 import localFont from "next/font/local";
 
 import "@/styles/globals.css";
@@ -33,6 +39,30 @@ const pretendard = localFont({
   weight: "45 920",
 });
 
+// Worldwide hero typography (DJ Hero handoff): condensed poster English +
+// heavy Korean display + monospace labels. Black Han Sans renders Korean via
+// non-preloaded unicode-range; Pretendard is the Korean fallback.
+const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-anton",
+});
+
+const blackHanSans = Black_Han_Sans({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-han",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
+  variable: "--font-space-mono",
+});
+
 export const metadata = createMetadata({
   title: {
     absolute: meta.site.title,
@@ -62,7 +92,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${fraunces.variable} ${geist.variable} ${pretendard.variable} font-sans antialiased`}
+        className={`${fraunces.variable} ${geist.variable} ${pretendard.variable} ${anton.variable} ${blackHanSans.variable} ${spaceMono.variable} font-sans antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />
