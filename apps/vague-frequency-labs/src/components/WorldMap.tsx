@@ -7,7 +7,8 @@ import DottedMap from "dotted-map";
 export interface WorldMapCity {
   id: string;
   name: string;
-  country: string;
+  displayCountry: string;
+  flagCountryCode: string;
   venue: string;
   lat: number;
   lng: number;
@@ -29,14 +30,6 @@ interface PlacedCity {
   city: WorldMapCity;
   x: number;
   y: number;
-}
-
-// flagcdn serves flags by lowercase ISO 3166-1 alpha-2. Our data uses "UK"
-// (not a valid alpha-2 code — the UK's official code is "GB"), so remap it;
-// every other code lowercases cleanly.
-function flagCode(country: string) {
-  const c = country.toLowerCase();
-  return c === "uk" ? "gb" : c;
 }
 
 // A point on Seoul's side of the arc gets lifted to form the curve.
@@ -192,7 +185,7 @@ export function WorldMap({
                   the tooltip up, so their flag drops below). */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`https://flagcdn.com/${flagCode(p.city.country)}.svg`}
+                src={`https://flagcdn.com/${p.city.flagCountryCode.toLowerCase()}.svg`}
                 className={`vfl-pin-flag${isActive ? " show" : ""}`}
                 style={
                   flipUp
@@ -215,7 +208,7 @@ export function WorldMap({
               >
                 <div className="vfl-pin-tip-head">
                   <span className="vfl-pin-tip-name">{p.city.name}</span>
-                  <span className="vfl-pin-tip-cc">{p.city.country}</span>
+                  <span className="vfl-pin-tip-cc">{p.city.displayCountry}</span>
                 </div>
                 <div className="vfl-pin-tip-venue">
                   {isHome ? "★ " : ""}
