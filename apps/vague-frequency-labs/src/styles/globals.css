@@ -215,28 +215,35 @@
   /*
     Preloader intro text (CSS-first). The visible "Are you ready?" must start
     animating on the very first paint — before hydration — so there is no frozen
-    black frame. fade-in (~0.4s) → breathe loop. The overlay slide-up and its
-    SVG curve are driven by motion in Preloader.tsx (they need window dimensions
-    and must stay in sync), not by CSS.
+    black frame. fade-in (scale-pop + tracking-in to full opacity) → subtle
+    breathe loop that stays bright so the copy reads as a confident challenge,
+    not a faint placeholder. The overlay slide-up and its SVG curve are driven by
+    motion in Preloader.tsx (they need window dimensions and must stay in sync),
+    not by CSS.
   */
-  --animate-loader-fade-in: loader-fade-in 0.4s ease-out forwards;
-  --animate-loader-breathe: loader-breathe 3s ease-in-out 0.4s infinite;
+  --animate-loader-fade-in: loader-fade-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)
+    forwards;
+  --animate-loader-breathe: loader-breathe 3s ease-in-out 0.6s infinite;
 
   @keyframes loader-fade-in {
     from {
       opacity: 0;
+      transform: scale(0.82);
+      letter-spacing: -0.12em;
     }
     to {
-      opacity: 0.85;
+      opacity: 1;
+      transform: scale(1);
+      letter-spacing: 0;
     }
   }
   @keyframes loader-breathe {
     0%,
     100% {
-      opacity: 0.85;
+      opacity: 1;
     }
     50% {
-      opacity: 0.65;
+      opacity: 0.82;
     }
   }
 
