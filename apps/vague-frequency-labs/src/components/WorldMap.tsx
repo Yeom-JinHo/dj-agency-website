@@ -150,6 +150,7 @@ export function WorldMap({
         {placed.map((p) => {
           const isHome = p.city.id === homeId;
           const isActive = active === p.city.id || isHome;
+          const isHomeFocused = isHome && active === p.city.id;
           const flipUp = p.y / height > 0.62;
           return (
             <div
@@ -186,7 +187,7 @@ export function WorldMap({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`https://flagcdn.com/${p.city.flagCountryCode.toLowerCase()}.svg`}
-                className={`vfl-pin-flag${isActive ? " show" : ""}`}
+                className={`vfl-pin-flag${isActive ? " show" : ""}${isHomeFocused ? " home-focus" : ""}`}
                 style={
                   flipUp
                     ? { top: "calc(100% + 8px)" }

@@ -598,6 +598,7 @@
 
 /* ── pin flag badge ── */
 .vfl-pin-flag {
+  --vfl-flag-scale: 1;
   position: absolute;
   left: 50%;
   width: 28px;
@@ -605,7 +606,8 @@
   /* Tailwind preflight sets img{max-width:100%}; since this badge is absolute
      its containing block is ~0px wide, which would clamp the 24px to nothing. */
   max-width: none;
-  transform: translateX(-50%) translateY(4px);
+  transform: translateX(-50%) translateY(4px) scale(var(--vfl-flag-scale));
+  transform-origin: 50% 50%;
   object-fit: cover;
   border: 1px solid var(--vfl-line-strong);
   border-radius: 2px;
@@ -621,7 +623,10 @@
 }
 .vfl-pin-flag.show {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) translateY(0) scale(var(--vfl-flag-scale));
+}
+.vfl-pin-flag.home-focus {
+  --vfl-flag-scale: 1.16;
 }
 
 /* ── pin tooltip ── */
