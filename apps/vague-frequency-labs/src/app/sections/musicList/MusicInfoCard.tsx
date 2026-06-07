@@ -6,9 +6,11 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   MorphingDialog as Dialog,
+  MorphingDialogClose as DialogClose,
   MorphingDialogContainer as DialogContainer,
   MorphingDialogContent as DialogContent,
   MorphingDialogImage as DialogImage,
+  MorphingDialogTitle as DialogTitle,
   MorphingDialogTrigger as DialogTrigger,
 } from "@/components/MorphingDialog";
 import { motion } from "motion/react";
@@ -65,6 +67,7 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
         <DialogContent
           className="bg-popover/60 text-popover-foreground pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto rounded-lg border border-white/10 p-4 shadow-xl backdrop-blur-xl backdrop-saturate-150 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
         >
+          <DialogClose className="text-muted-foreground hover:text-foreground z-10" />
           <motion.div
             animate={{
               rotate: [0, 360],
@@ -94,9 +97,11 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
           </motion.div>
 
           <div className="mt-6">
-            <h3 className="line-clamp-2 text-xl font-semibold">
-              {musicInfo.name}
-            </h3>
+            <DialogTitle>
+              <h3 className="line-clamp-2 text-xl font-semibold">
+                {musicInfo.name}
+              </h3>
+            </DialogTitle>
             <div className="mt-0.5 flex items-center justify-between gap-3">
               <p className="text-muted-foreground truncate text-sm">
                 {musicInfo.artist}
