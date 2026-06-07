@@ -24,7 +24,7 @@ function Hero() {
       </div>
       <a
         href="#about"
-        aria-label="다음 섹션으로 스크롤"
+        aria-label="Scroll to next section"
         className="absolute bottom-[8vh] left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 p-2 text-white/55 transition-colors hover:text-white/85 focus-visible:text-white/85 focus-visible:outline-none"
       >
         <span className="font-display text-[10px] tracking-[0.3em] uppercase">
