@@ -729,6 +729,36 @@
   .vfl-h-word {
     display: block;
   }
+
+  /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
+     apart), so on mobile the pins are decorative — the standing arcs carry the
+     "Seoul → everywhere" story, and only the Seoul home beacon is labelled.
+     Pin/tooltip sizes are scaled down to match the smaller map. */
+  .vfl-pin {
+    pointer-events: none;
+  }
+  .vfl-pin-core {
+    width: 5px;
+    height: 5px;
+  }
+  .vfl-pin-core.home {
+    width: 8px;
+    height: 8px;
+  }
+  .vfl-pin-pulse:not(.home) {
+    display: none;
+  }
+  .vfl-pin-tip {
+    min-width: 104px;
+    padding: 6px 9px 7px;
+  }
+  .vfl-pin-tip-name {
+    font-size: 10px;
+  }
+  .vfl-pin-tip-cc,
+  .vfl-pin-tip-venue {
+    font-size: 9px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
