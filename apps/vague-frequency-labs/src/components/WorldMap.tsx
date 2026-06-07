@@ -31,6 +31,14 @@ interface PlacedCity {
   y: number;
 }
 
+// flagcdn serves flags by lowercase ISO 3166-1 alpha-2. Our data uses "UK"
+// (not a valid alpha-2 code — the UK's official code is "GB"), so remap it;
+// every other code lowercases cleanly.
+function flagCode(country: string) {
+  const c = country.toLowerCase();
+  return c === "uk" ? "gb" : c;
+}
+
 // A point on Seoul's side of the arc gets lifted to form the curve.
 function curvedPath(a: PlacedCity, b: PlacedCity) {
   const midX = (a.x + b.x) / 2;
@@ -178,6 +186,24 @@ export function WorldMap({
                 </>
               )}
               <span className={`vfl-pin-core${isHome ? " home" : ""}`} />
+
+              {/* Flag badge floats on the opposite side of the pin from the
+                  tooltip, so the two never overlap (bottom-third cities flip
+                  the tooltip up, so their flag drops below). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://flagcdn.com/${flagCode(p.city.country)}.svg`}
+                className={`vfl-pin-flag${isActive ? " show" : ""}`}
+                style={
+                  flipUp
+                    ? { top: "calc(100% + 8px)" }
+                    : { bottom: "calc(100% + 8px)" }
+                }
+                alt=""
+                aria-hidden
+                draggable={false}
+                loading="lazy"
+              />
 
               <div
                 className={`vfl-pin-tip${isActive ? " show" : ""}`}
