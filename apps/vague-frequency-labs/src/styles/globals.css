@@ -596,6 +596,32 @@
   }
 }
 
+/* ── pin flag badge ── */
+.vfl-pin-flag {
+  position: absolute;
+  left: 50%;
+  width: 28px;
+  height: 21px;
+  max-width: none;
+  transform: translateX(-50%) translateY(4px);
+  object-fit: cover;
+  border: 1px solid var(--vfl-line-strong);
+  border-radius: 2px;
+  box-shadow:
+    0 0 0 1px rgba(10, 10, 11, 0.6),
+    0 3px 9px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  z-index: 45;
+}
+.vfl-pin-flag.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* ── pin tooltip ── */
 .vfl-pin-tip {
   position: absolute;
@@ -748,6 +774,10 @@
   .vfl-pin-pulse:not(.home) {
     display: none;
   }
+  .vfl-pin-flag {
+    width: 20px;
+    height: 15px;
+  }
   .vfl-pin-tip {
     min-width: 104px;
     padding: 6px 9px 7px;
@@ -771,4 +801,3 @@
     opacity: 0.25;
   }
 }
-

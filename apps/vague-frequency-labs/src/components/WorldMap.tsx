@@ -7,7 +7,8 @@ import DottedMap from "dotted-map";
 export interface WorldMapCity {
   id: string;
   name: string;
-  country: string;
+  displayCountry: string;
+  flagCountryCode: string;
   venue: string;
   lat: number;
   lng: number;
@@ -183,6 +184,22 @@ export function WorldMap({
               )}
               <span className={`vfl-pin-core${isHome ? " home" : ""}`} />
 
+              {/* Keep the flag badge opposite the tooltip so the two don't stack. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://flagcdn.com/${p.city.flagCountryCode.toLowerCase()}.svg`}
+                className={`vfl-pin-flag${isActive ? " show" : ""}`}
+                style={
+                  flipUp
+                    ? { top: "calc(100% + 8px)" }
+                    : { bottom: "calc(100% + 8px)" }
+                }
+                alt=""
+                aria-hidden
+                draggable={false}
+                loading="lazy"
+              />
+
               <div
                 className={`vfl-pin-tip${isActive ? " show" : ""}`}
                 style={
@@ -193,7 +210,7 @@ export function WorldMap({
               >
                 <div className="vfl-pin-tip-head">
                   <span className="vfl-pin-tip-name">{p.city.name}</span>
-                  <span className="vfl-pin-tip-cc">{p.city.country}</span>
+                  <span className="vfl-pin-tip-cc">{p.city.displayCountry}</span>
                 </div>
                 <div className="vfl-pin-tip-venue">
                   {isHome ? "★ " : ""}
