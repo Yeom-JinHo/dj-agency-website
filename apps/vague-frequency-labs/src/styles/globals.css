@@ -7,19 +7,23 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Font tokens reference runtime CSS variables (--font-geist / --font-fraunces)
-  injected by next/font on <body>. In Tailwind v4 these must live in
-  `@theme inline` so the generated utilities emit `var(--font-*)` literally
-  instead of being resolved (to empty) at build time.
+  Font tokens reference runtime CSS variables (--font-geist / --font-anton /
+  --font-space-mono) injected by next/font on <body>. In Tailwind v4 these must
+  live in `@theme inline` so the generated utilities emit `var(--font-*)`
+  literally instead of being resolved (to empty) at build time.
+
+  - sans (body): Geist → Pretendard (Korean)
+  - display (headings): Anton → Black Han Sans (Korean) → Pretendard
+  - mono (sub: kickers, labels, meta, captions): Space Mono
 */
 @theme inline {
   --font-sans:
     var(--font-geist), var(--font-pretendard), system-ui, -apple-system,
     BlinkMacSystemFont, sans-serif;
-  --font-serif:
-    var(--font-fraunces), var(--font-pretendard), ui-serif, Georgia, serif;
   --font-display:
-    var(--font-fraunces), var(--font-pretendard), ui-serif, Georgia, serif;
+    var(--font-anton), var(--font-han), var(--font-pretendard), sans-serif;
+  --font-mono:
+    var(--font-space-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @theme {
@@ -446,6 +450,325 @@
   }
   .showcase-default-label::after {
     border-width: 7px;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────
+   V.F. LABS — Worldwide hero (DJ Hero handoff)
+   Minimal monochrome poster: full-bleed dotted world map backdrop,
+   warm-cream single accent, heavy Korean display, film grain + vignette.
+   ─────────────────────────────────────────────────────────────── */
+.vfl-hero {
+  --vfl-bg: #0a0a0b;
+  --vfl-fg: #eceae3;
+  --vfl-cream: #e8e2d0;
+  --vfl-muted: rgba(236, 234, 227, 0.52);
+  --vfl-faint: rgba(236, 234, 227, 0.3);
+  --vfl-line: rgba(236, 234, 227, 0.12);
+  --vfl-line-strong: rgba(236, 234, 227, 0.22);
+  background: var(--vfl-bg);
+  color: var(--vfl-fg);
+}
+
+/* ── map backdrop ── */
+.vfl-map-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+}
+.vfl-map-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* cover the hero: width large enough that height (= width / 1.98) ≥ 100svh */
+  width: max(100%, calc(100svh * 1.98));
+}
+.vfl-map-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  user-select: none;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+  animation: vfl-map-breathe 6s ease-in-out infinite;
+}
+.vfl-map-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+@keyframes vfl-map-breathe {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── city pins ── */
+.vfl-pin-layer {
+  position: absolute;
+  inset: 0;
+}
+.vfl-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+}
+/* Transparent hit area so the tiny pin is comfortably tappable (≥44px). */
+.vfl-pin::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+.vfl-pin-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--vfl-cream);
+  box-shadow:
+    0 0 0 1px rgba(10, 10, 11, 0.9),
+    0 0 10px rgba(232, 226, 208, 0.6);
+}
+.vfl-pin-core.home {
+  width: 10px;
+  height: 10px;
+  background: var(--vfl-bg);
+  box-shadow:
+    0 0 0 2px var(--vfl-bg),
+    0 0 0 3px var(--vfl-cream),
+    0 0 14px rgba(232, 226, 208, 0.8);
+}
+.vfl-pin-pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  border-radius: 50%;
+  border: 1px solid rgba(232, 226, 208, 0.5);
+  animation: vfl-pin-pulse 2.8s ease-out infinite;
+  pointer-events: none;
+}
+.vfl-pin-pulse.delay {
+  animation-delay: 1.4s;
+}
+.vfl-pin-pulse.home {
+  border-color: rgba(232, 226, 208, 0.7);
+  animation-duration: 2.2s;
+}
+@keyframes vfl-pin-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(7);
+    opacity: 0;
+  }
+}
+
+/* ── pin tooltip ── */
+.vfl-pin-tip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  min-width: 150px;
+  padding: 8px 11px 9px;
+  background: rgba(12, 12, 14, 0.92);
+  border: 1px solid var(--vfl-line-strong);
+  backdrop-filter: blur(6px);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+  z-index: 50;
+}
+.vfl-pin-tip.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.vfl-pin-tip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.vfl-pin-tip-name {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--vfl-fg);
+  font-weight: 700;
+}
+.vfl-pin-tip-cc {
+  font-size: 10px;
+  color: var(--vfl-faint);
+  letter-spacing: 0.1em;
+}
+.vfl-pin-tip-venue {
+  font-size: 10px;
+  color: var(--vfl-cream);
+  letter-spacing: 0.14em;
+}
+
+/* ── grain + vignette overlays ── */
+.vfl-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.vfl-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(
+    120% 90% at 50% 42%,
+    transparent 45%,
+    rgba(0, 0, 0, 0.55) 100%
+  );
+}
+
+/* ── headline ── */
+.vfl-headline {
+  position: absolute;
+  left: clamp(20px, 4vw, 64px);
+  bottom: clamp(30px, 6vh, 64px);
+  z-index: 5;
+  pointer-events: none;
+  max-width: min(720px, 84%);
+}
+.vfl-h-big {
+  font-family:
+    var(--font-anton), var(--font-han), var(--font-pretendard), sans-serif;
+  font-weight: 400;
+  font-size: clamp(38px, 6.4vw, 108px);
+  line-height: 0.92;
+  letter-spacing: 0.005em;
+  color: var(--vfl-fg);
+  text-shadow:
+    0 2px 26px rgba(10, 10, 11, 0.92),
+    0 0 70px rgba(10, 10, 11, 0.7);
+}
+.vfl-h-intro {
+  display: block;
+}
+.vfl-h-big .stroke {
+  color: transparent;
+  -webkit-text-stroke: 1.4px var(--vfl-fg);
+}
+.vfl-h-en {
+  margin-top: clamp(14px, 1.8vw, 26px);
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: clamp(11px, 1.1vw, 14px);
+  letter-spacing: 0.26em;
+  color: var(--vfl-muted);
+  text-shadow: 0 1px 12px rgba(10, 10, 11, 0.9);
+}
+
+@media (max-width: 640px) {
+  /* Portrait: show the WHOLE map (Seoul + every pin/arc) as a centered band
+     instead of the desktop height-cover, which would zoom in and crop the hub. */
+  .vfl-map-inner {
+    width: 100%;
+    top: 43%;
+  }
+  /* Bracket the map: "We are" pinned to the top, brand + subline to the bottom,
+     map band visible in the gap between them. */
+  .vfl-headline {
+    inset: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    padding: clamp(84px, 13vh, 116px) clamp(20px, 5vw, 28px)
+      clamp(26px, 5vh, 44px);
+  }
+  .vfl-h-big {
+    font-size: clamp(46px, 16vw, 84px);
+    line-height: 0.96;
+  }
+  /* Stack the brand words vertically as a deliberate poster column. */
+  .vfl-h-word {
+    display: block;
+  }
+
+  /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
+     apart), so on mobile the pins are decorative — the standing arcs carry the
+     "Seoul → everywhere" story, and only the Seoul home beacon is labelled.
+     Pin/tooltip sizes are scaled down to match the smaller map. */
+  .vfl-pin {
+    pointer-events: none;
+  }
+  .vfl-pin-core {
+    width: 5px;
+    height: 5px;
+  }
+  .vfl-pin-core.home {
+    width: 8px;
+    height: 8px;
+  }
+  .vfl-pin-pulse:not(.home) {
+    display: none;
+  }
+  .vfl-pin-tip {
+    min-width: 104px;
+    padding: 6px 9px 7px;
+  }
+  .vfl-pin-tip-name {
+    font-size: 10px;
+  }
+  .vfl-pin-tip-cc,
+  .vfl-pin-tip-venue {
+    font-size: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vfl-map-img {
+    animation: none;
+    opacity: 1;
+  }
+  .vfl-pin-pulse {
+    animation: none;
+    opacity: 0.25;
   }
 }
 

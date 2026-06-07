@@ -1,58 +1,84 @@
 "use client";
 
 import { motion, useReducedMotion } from "motion/react";
-import Globe from "@/components/Globe";
+import { WorldMap } from "@/components/WorldMap";
+import { hero } from "./config";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 function Hero() {
   const reduce = useReducedMotion();
 
-  // 로더가 hero를 fixed로 덮은 채 약 3초간 떠 있으므로, 진입 모션이
-  // 로더 뒤에서 소모되지 않도록 로더 종료 즈음에 시작하도록 delay를 준다.
+  // The loader covers the hero for ~3s on load, so the entrance is delayed to
+  // start as the loader lifts rather than being consumed behind it.
   const rise = (delay: number) =>
     reduce
       ? { initial: { opacity: 1, y: 0 } }
       : {
-          initial: { opacity: 0, y: 24 },
+          initial: { opacity: 0, y: 20 },
           animate: { opacity: 1, y: 0 },
           transition: { duration: 0.7, delay, ease: EASE },
         };
 
   return (
-    <section className="relative h-[100svh] overflow-x-hidden pt-16">
-      <div className="flex h-full flex-col items-center justify-center gap-2 pb-4 sm:gap-4 md:gap-6">
-        <motion.p
-          {...rise(2.6)}
-          className="font-display w-full text-center text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl 2xl:text-7xl"
-        >
-          We are
-        </motion.p>
-        <Globe className="h-[min(78vw,calc(100svh-13rem))] w-[min(78vw,calc(100svh-13rem))] md:h-[min(70vw,calc(100svh-14rem))] md:w-[min(70vw,calc(100svh-14rem))] lg:h-[min(55vw,calc(100svh-16rem))] lg:w-[min(55vw,calc(100svh-16rem))] 2xl:h-[min(50vw,calc(100svh-18rem))] 2xl:w-[min(50vw,calc(100svh-18rem))]" />
-        <motion.h1
-          {...rise(2.8)}
-          className="w-full text-center text-2xl font-bold sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl"
-        >
-          Vague Frequency Labs
-        </motion.h1>
+    <section className="vfl-hero relative h-[100svh] overflow-hidden">
+      <motion.div
+        className="vfl-map-wrap"
+        initial={reduce ? { opacity: 1 } : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={reduce ? undefined : { duration: 1.1, delay: 2.2 }}
+      >
+        <WorldMap
+          cities={hero.cities}
+          homeId={hero.homeId}
+          revealDelay={2.4}
+        />
+      </motion.div>
+
+      <div className="vfl-vignette" aria-hidden />
+      <div className="vfl-grain" aria-hidden />
+
+      {/* Headline brackets the map: on mobile "We are" sits above the map band
+          and the brand name below it; on desktop both stack bottom-left. */}
+      <div className="vfl-headline">
+        <motion.span {...rise(2.6)} className="vfl-h-big vfl-h-intro">
+          {hero.headline.line1}
+        </motion.span>
+        <div className="vfl-h-bottom">
+          <motion.h1 {...rise(2.65)} className="vfl-h-big vfl-h-brand">
+            {hero.headline.line2.split(" ").map((word, i, arr) => (
+              <span key={word} className="stroke vfl-h-word">
+                {word}
+                {i < arr.length - 1 ? " " : ""}
+              </span>
+            ))}
+          </motion.h1>
+          <motion.div {...rise(2.75)} className="vfl-h-en">
+            {hero.subline}
+          </motion.div>
+        </div>
       </div>
 
+      {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline. */}
       <motion.div
         aria-hidden
         initial={reduce ? { opacity: 1 } : { opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={reduce ? undefined : { duration: 0.6, delay: 3.3 }}
-        className="text-foreground/50 pointer-events-none absolute inset-x-0 bottom-6 flex justify-center"
+        className="pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-cream)]"
       >
+        <span className="hidden font-mono text-[10px] tracking-[0.34em] opacity-55 sm:block">
+          SCROLL
+        </span>
         <motion.svg
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth={2}
+          strokeWidth={1.5}
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="h-6 w-6"
-          animate={reduce ? undefined : { y: [0, 8, 0] }}
+          className="h-5 w-5 opacity-70"
+          animate={reduce ? undefined : { y: [0, 6, 0] }}
           transition={
             reduce
               ? undefined
