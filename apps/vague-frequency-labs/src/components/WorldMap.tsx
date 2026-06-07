@@ -7,7 +7,8 @@ import DottedMap from "dotted-map";
 export interface WorldMapCity {
   id: string;
   name: string;
-  country: string;
+  displayCountry: string;
+  flagCountryCode: string;
   venue: string;
   lat: number;
   lng: number;
@@ -149,6 +150,7 @@ export function WorldMap({
         {placed.map((p) => {
           const isHome = p.city.id === homeId;
           const isActive = active === p.city.id || isHome;
+          const isHomeFocused = isHome && active === p.city.id;
           const flipUp = p.y / height > 0.62;
           return (
             <div
@@ -179,6 +181,24 @@ export function WorldMap({
               )}
               <span className={`vfl-pin-core${isHome ? " home" : ""}`} />
 
+              {/* Flag badge floats on the opposite side of the pin from the
+                  tooltip, so the two never overlap (bottom-third cities flip
+                  the tooltip up, so their flag drops below). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`https://flagcdn.com/${p.city.flagCountryCode.toLowerCase()}.svg`}
+                className={`vfl-pin-flag${isActive ? " show" : ""}${isHomeFocused ? " home-focus" : ""}`}
+                style={
+                  flipUp
+                    ? { top: "calc(100% + 8px)" }
+                    : { bottom: "calc(100% + 8px)" }
+                }
+                alt=""
+                aria-hidden
+                draggable={false}
+                loading="lazy"
+              />
+
               <div
                 className={`vfl-pin-tip${isActive ? " show" : ""}`}
                 style={
@@ -189,7 +209,7 @@ export function WorldMap({
               >
                 <div className="vfl-pin-tip-head">
                   <span className="vfl-pin-tip-name">{p.city.name}</span>
-                  <span className="vfl-pin-tip-cc">{p.city.country}</span>
+                  <span className="vfl-pin-tip-cc">{p.city.displayCountry}</span>
                 </div>
                 <div className="vfl-pin-tip-venue">
                   {isHome ? "★ " : ""}
