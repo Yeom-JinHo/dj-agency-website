@@ -10,11 +10,10 @@ interface PreloaderProps {
 }
 
 // When (ms, from navigation start) the overlay starts sweeping up. The CSS intro
-// beats ("Hey" → "Are you ready?") are self-timed and land well before this, so
-// the payoff line is on screen when the sweep begins. Floored on hydration: on a
-// slow load the sweep waits for mount (it needs window dimensions), but it never
-// fires earlier than this so the beats always get their moment.
-const SWEEP_AT_MS = 2200;
+// line ("Are you ready?") rises in and settles well before this, so it has its
+// moment on screen. Floored on hydration: on a slow load the sweep waits for
+// mount (it needs window dimensions), but never fires earlier than this.
+const SWEEP_AT_MS = 1150;
 
 export function Preloader({ children }: PreloaderProps) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
@@ -47,7 +46,7 @@ export function Preloader({ children }: PreloaderProps) {
       aria-hidden="true"
       initial={{ y: 0 }}
       animate={sweep ? { y: "-100dvh" } : { y: 0 }}
-      transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+      transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
       onAnimationComplete={() => {
         if (sweep) setDismissed(true);
       }}
@@ -67,7 +66,7 @@ export function Preloader({ children }: PreloaderProps) {
           <motion.path
             initial={{ d: initialPath }}
             animate={sweep ? { d: targetPath } : { d: initialPath }}
-            transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
+            transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
             className="fill-background"
           ></motion.path>
         </svg>
