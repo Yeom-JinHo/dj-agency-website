@@ -493,8 +493,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  /* cover the hero: width large enough that height (= width / 1.98) ≥ 100svh */
-  width: max(100%, calc(100svh * 1.98));
+  /* contain: show the whole map as a centered band — width fits the viewport,
+     capped so a very wide (21:9+) viewport never crops the map vertically. */
+  width: min(100%, calc(100svh * 1.98));
 }
 .vfl-map-img {
   display: block;
