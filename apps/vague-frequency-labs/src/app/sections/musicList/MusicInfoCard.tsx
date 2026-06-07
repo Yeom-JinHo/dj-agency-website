@@ -22,13 +22,15 @@ interface MusicInfoProps {
 }
 
 // 소셜 아이콘 hover 시 각 플랫폼 브랜드 컬러로 점등 (payday-records 패턴과 정합)
+// 색은 아이콘을 감싸는 span에 부여 — react-icons가 svg에 인라인 color:currentColor를
+// 박으므로, 아이콘 자체에 text-[색]을 주면 인라인에 덮인다. 부모 span 색을 상속시켜 해결.
 const SOCIAL_BRAND_HOVER: Record<string, string> = {
-  SiYoutube: "group-hover/social:text-[#FF0000]",
-  SiInstagram: "group-hover/social:text-[#E1306C]",
-  SiSoundcloud: "group-hover/social:text-[#FF5500]",
-  SiSpotify: "group-hover/social:text-[#1ED760]",
-  SiApple: "group-hover/social:text-white",
-  SiBeatport: "group-hover/social:text-[#A8FF04]",
+  SiYoutube: "group-hover:text-[#FF0000]",
+  SiInstagram: "group-hover:text-[#E1306C]",
+  SiSoundcloud: "group-hover:text-[#FF5500]",
+  SiSpotify: "group-hover:text-[#1ED760]",
+  SiApple: "group-hover:text-white",
+  SiBeatport: "group-hover:text-[#A8FF04]",
 };
 
 function MusicInfoCard({ musicInfo }: MusicInfoProps) {
@@ -129,21 +131,22 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
                     target="_blank"
                     rel="noopener noreferrer"
                     href={social.href}
-                    className="group/social text-muted-foreground hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-white/5"
+                    className="group text-muted-foreground hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-white/5"
                     key={`contact-social_${index}`}
                   >
                     {social.iconName && (
-                      <Icon
-                        name={social.iconName}
-                        className={`size-5 transition-colors ${
+                      <span
+                        className={`inline-flex transition-colors ${
                           SOCIAL_BRAND_HOVER[social.iconName] ?? ""
                         }`}
-                      />
+                      >
+                        <Icon name={social.iconName} className="size-5" />
+                      </span>
                     )}
                     <span className="text-sm">{social.name}</span>
                     <Icon
                       name="LuArrowRight"
-                      className="ml-auto size-4 opacity-60 transition-transform group-hover/social:translate-x-0.5"
+                      className="ml-auto size-4 opacity-60 transition-transform group-hover:translate-x-0.5"
                     />
                   </Link>
                 ))}
