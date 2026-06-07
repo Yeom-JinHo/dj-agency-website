@@ -12,11 +12,11 @@ interface PreloaderProps {
 
 export const opacity: Variants = {
   initial: {
-    opacity: 0,
+    opacity: 0.35,
   },
   enter: {
     opacity: 0.75,
-    transition: { duration: 1, delay: 0.2 },
+    transition: { duration: 0.35 },
   },
 };
 
@@ -58,18 +58,18 @@ export function Preloader({ children }: PreloaderProps) {
       exit="exit"
       className="bg-background fixed z-999 flex h-[100dvh] w-[100dvw] cursor-wait items-center justify-center px-[60px] pb-[40px]"
     >
+      <motion.div
+        variants={opacity}
+        initial="initial"
+        animate="enter"
+        className={cn(
+          "text-foreground absolute z-1 flex items-center text-[192px]",
+        )}
+      >
+        {children}
+      </motion.div>
+
       {dimension.width > 0 && (
-        <>
-          <motion.div
-            variants={opacity}
-            initial="initial"
-            animate="enter"
-            className={cn(
-              "text-foreground absolute z-1 flex items-center text-[192px]",
-            )}
-          >
-            {children}
-          </motion.div>
           <svg className="absolute top-0 h-[calc(100%+300px)] w-full">
             <motion.path
               variants={curve}
@@ -78,7 +78,6 @@ export function Preloader({ children }: PreloaderProps) {
               className={"fill-background"}
             ></motion.path>
           </svg>
-        </>
       )}
     </motion.div>
   );
