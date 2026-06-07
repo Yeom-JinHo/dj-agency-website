@@ -28,7 +28,7 @@ function MusicList() {
         </div>
 
         <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
-          <div className="flex flex-wrap justify-center gap-16">
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 xl:gap-16">
             {musicInfos.map((info, index) => (
               <BlurFade key={info.name + index} inView duration={0.6}>
                 <MusicInfoCard musicInfo={info} />
