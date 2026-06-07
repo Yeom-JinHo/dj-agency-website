@@ -140,7 +140,7 @@ function ArtistProfiles() {
               {firstRow.map((artist, index) => (
                 <CarouselItem
                   key={`artist_${index}`}
-                  className="basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                  className="basis-1/2 md:basis-1/3 xl:basis-1/4"
                 >
                   <div className="h-full p-1 relative">
                     <Link
