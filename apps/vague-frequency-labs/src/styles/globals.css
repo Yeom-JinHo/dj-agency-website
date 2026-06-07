@@ -602,6 +602,9 @@
   left: 50%;
   width: 24px;
   height: 18px;
+  /* Tailwind preflight sets img{max-width:100%}; since this badge is absolute
+     its containing block is ~0px wide, which would clamp the 24px to nothing. */
+  max-width: none;
   transform: translateX(-50%) translateY(4px);
   object-fit: cover;
   border: 1px solid var(--vfl-line-strong);
