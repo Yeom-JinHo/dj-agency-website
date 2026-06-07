@@ -534,6 +534,16 @@
   transform: translate(-50%, -50%);
   cursor: pointer;
 }
+/* Transparent hit area so the tiny pin is comfortably tappable (≥44px). */
+.vfl-pin::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
 .vfl-pin-core {
   position: absolute;
   left: 50%;
@@ -675,6 +685,9 @@
     0 2px 26px rgba(10, 10, 11, 0.92),
     0 0 70px rgba(10, 10, 11, 0.7);
 }
+.vfl-h-intro {
+  display: block;
+}
 .vfl-h-big .stroke {
   color: transparent;
   -webkit-text-stroke: 1.4px var(--vfl-fg);
@@ -689,12 +702,30 @@
 }
 
 @media (max-width: 640px) {
+  /* Portrait: show the WHOLE map (Seoul + every pin/arc) as a centered band
+     instead of the desktop height-cover, which would zoom in and crop the hub. */
+  .vfl-map-inner {
+    width: 100%;
+    top: 43%;
+  }
+  /* Bracket the map: "We are" pinned to the top, brand + subline to the bottom,
+     map band visible in the gap between them. */
   .vfl-headline {
-    max-width: 90%;
-    bottom: clamp(26px, 5vh, 48px);
+    inset: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(84px, 13vh, 116px) clamp(20px, 5vw, 28px)
+      clamp(26px, 5vh, 44px);
   }
   .vfl-h-big {
-    font-size: clamp(46px, 14vw, 84px);
+    font-size: clamp(46px, 16vw, 84px);
+    line-height: 0.96;
+  }
+  /* Stack the brand words vertically as a deliberate poster column. */
+  .vfl-h-word {
+    display: block;
   }
 }
 
