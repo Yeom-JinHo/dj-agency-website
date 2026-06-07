@@ -1,12 +1,6 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
-import {
-  Fraunces,
-  Geist,
-  Anton,
-  Black_Han_Sans,
-  Space_Mono,
-} from "next/font/google";
+import { Geist, Anton, Black_Han_Sans, Space_Mono } from "next/font/google";
 import localFont from "next/font/local";
 
 import "@/styles/globals.css";
@@ -19,12 +13,6 @@ import { organization, website } from "@/app/jsonLd";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
-
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-fraunces",
-});
 
 const geist = Geist({
   subsets: ["latin"],
@@ -92,7 +80,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${fraunces.variable} ${geist.variable} ${pretendard.variable} ${anton.variable} ${blackHanSans.variable} ${spaceMono.variable} font-sans antialiased`}
+        className={`${geist.variable} ${pretendard.variable} ${anton.variable} ${blackHanSans.variable} ${spaceMono.variable} font-sans antialiased`}
       >
         <JsonLd items={[organization, website]} />
         <ReactScan />

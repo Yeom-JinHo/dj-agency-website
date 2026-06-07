@@ -5,7 +5,7 @@ import { cn } from "@repo/ui";
 const headingVariants = {
   /** 섹션 내부 제목 (h2) */
   section:
-    "text-4xl leading-tight font-bold tracking-tighter sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight",
+    "text-4xl leading-tight font-bold tracking-tight sm:text-5xl md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight",
   /** 페이지 최상단 대제목 (h1) */
   page: "text-5xl leading-tight tracking-tight sm:text-6xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl",
 } as const;

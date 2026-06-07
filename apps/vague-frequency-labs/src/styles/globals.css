@@ -7,19 +7,23 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  Font tokens reference runtime CSS variables (--font-geist / --font-fraunces)
-  injected by next/font on <body>. In Tailwind v4 these must live in
-  `@theme inline` so the generated utilities emit `var(--font-*)` literally
-  instead of being resolved (to empty) at build time.
+  Font tokens reference runtime CSS variables (--font-geist / --font-anton /
+  --font-space-mono) injected by next/font on <body>. In Tailwind v4 these must
+  live in `@theme inline` so the generated utilities emit `var(--font-*)`
+  literally instead of being resolved (to empty) at build time.
+
+  - sans (body): Geist → Pretendard (Korean)
+  - display (headings): Anton → Black Han Sans (Korean) → Pretendard
+  - mono (sub: kickers, labels, meta, captions): Space Mono
 */
 @theme inline {
   --font-sans:
     var(--font-geist), var(--font-pretendard), system-ui, -apple-system,
     BlinkMacSystemFont, sans-serif;
-  --font-serif:
-    var(--font-fraunces), var(--font-pretendard), ui-serif, Georgia, serif;
   --font-display:
-    var(--font-fraunces), var(--font-pretendard), ui-serif, Georgia, serif;
+    var(--font-anton), var(--font-han), var(--font-pretendard), sans-serif;
+  --font-mono:
+    var(--font-space-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @theme {
