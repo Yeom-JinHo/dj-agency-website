@@ -6,20 +6,32 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   MorphingDialog as Dialog,
+  MorphingDialogClose as DialogClose,
   MorphingDialogContainer as DialogContainer,
   MorphingDialogContent as DialogContent,
   MorphingDialogImage as DialogImage,
+  MorphingDialogTitle as DialogTitle,
   MorphingDialogTrigger as DialogTrigger,
 } from "@/components/MorphingDialog";
 import { motion } from "motion/react";
 
-import { cn } from "@repo/ui";
 import { Icon } from "@repo/ui/common/Icon";
-import { buttonVariants } from "@repo/ui/common/Button";
 
 interface MusicInfoProps {
   musicInfo: MusicInfo;
 }
+
+// 소셜 아이콘 hover 시 각 플랫폼 브랜드 컬러로 점등 (payday-records 패턴과 정합)
+// 색은 아이콘을 감싸는 span에 부여 — react-icons가 svg에 인라인 color:currentColor를
+// 박으므로, 아이콘 자체에 text-[색]을 주면 인라인에 덮인다. 부모 span 색을 상속시켜 해결.
+const SOCIAL_BRAND_HOVER: Record<string, string> = {
+  SiYoutube: "group-hover:text-[#FF0000]",
+  SiInstagram: "group-hover:text-[#E1306C]",
+  SiSoundcloud: "group-hover:text-[#FF5500]",
+  SiSpotify: "group-hover:text-[#1ED760]",
+  SiApple: "group-hover:text-white",
+  SiBeatport: "group-hover:text-[#A8FF04]",
+};
 
 function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   const texture = useMemo(() => {
@@ -65,15 +77,9 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
       </DialogTrigger>
       <DialogContainer>
         <DialogContent
-          style={{
-            backdropFilter: "blur(11px) saturate(200%)",
-            WebkitBackdropFilter: "blur(11px) saturate(200%)",
-            backgroundColor: "rgba(17, 25, 40, 0.27)",
-            borderRadius: "12px",
-            border: "1px solid rgba(255, 255, 255, 0.125)",
-          }}
-          className="pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto p-4 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
+          className="bg-popover/60 text-popover-foreground pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto rounded-lg border border-white/10 p-4 shadow-xl backdrop-blur-xl backdrop-saturate-150 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
         >
+          <DialogClose className="text-muted-foreground hover:text-foreground z-10" />
           <motion.div
             animate={{
               rotate: [0, 360],
@@ -102,42 +108,50 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             />
           </motion.div>
 
-          <div className="mt-8">
-            <h3 className="truncate text-2xl font-bold">{musicInfo.name}</h3>
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-muted-foreground truncate text-sm">
-                {musicInfo.artist}
+          <div className="mt-6">
+            <DialogTitle>
+              <h3 className="line-clamp-2 text-xl font-semibold">
+                {musicInfo.name}
               </h3>
+            </DialogTitle>
+            <div className="mt-0.5 flex items-center justify-between gap-3">
+              <p className="text-muted-foreground truncate text-sm">
+                {musicInfo.artist}
+              </p>
               {musicInfo.label && (
                 <p className="text-muted-foreground shrink-0 text-xs">
                   {musicInfo.label}
                 </p>
               )}
             </div>
-            <div className="mt-4 flex flex-col gap-2 border-t border-border pt-2">
-              {musicInfo.socials?.map((social, index) => {
-                return (
+            {musicInfo.socials && musicInfo.socials.length > 0 && (
+              <div className="border-border mt-6 flex flex-col gap-1 border-t pt-4">
+                {musicInfo.socials.map((social, index) => (
                   <Link
                     target="_blank"
                     rel="noopener noreferrer"
                     href={social.href}
-                    className={cn(
-                      buttonVariants({ variant: "link" }),
-                      "mt-2 h-min w-full gap-1 p-0",
-                    )}
+                    className="group text-muted-foreground hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-white/5"
                     key={`contact-social_${index}`}
                   >
                     {social.iconName && (
-                      <Icon name={social.iconName} className="size-6" />
+                      <span
+                        className={`inline-flex transition-colors ${
+                          SOCIAL_BRAND_HOVER[social.iconName] ?? ""
+                        }`}
+                      >
+                        <Icon name={social.iconName} className="size-5" />
+                      </span>
                     )}
-                    <h3 className="text-muted-foreground text-sm">
-                      {social.name}
-                    </h3>
-                    <Icon name="LuArrowRight" className="ml-auto size-4" />
+                    <span className="text-sm">{social.name}</span>
+                    <Icon
+                      name="LuArrowRight"
+                      className="ml-auto size-4 opacity-60 transition-transform group-hover:translate-x-0.5"
+                    />
                   </Link>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </DialogContent>
       </DialogContainer>
