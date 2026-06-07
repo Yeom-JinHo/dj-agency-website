@@ -34,13 +34,13 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
   return (
     <Dialog>
       <DialogTrigger>
-        <motion.div className="group relative h-[150px] w-[150px] overflow-hidden md:h-[240px] md:w-[240px] xl:h-[360px] xl:w-[360px]">
+        <motion.div className="group relative h-[150px] w-[150px] overflow-hidden md:h-[240px] md:w-[240px] lg:h-[300px] lg:w-[300px] xl:h-[360px] xl:w-[360px] 2xl:h-[400px] 2xl:w-[400px]">
           <DialogImage
-            width={360}
-            height={360}
+            width={400}
+            height={400}
             src={musicInfo.image}
             alt={musicInfo.name}
-            sizes="(max-width: 768px) 150px, (max-width: 1280px) 240px, 360px"
+            sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           />
           <Image
@@ -48,11 +48,11 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             alt=""
             aria-hidden="true"
             fill
-            sizes="(max-width: 768px) 150px, (max-width: 1280px) 240px, 360px"
+            sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
         </motion.div>
-        <div className="mt-3 w-[150px] text-left md:w-[240px] xl:w-[360px]">
+        <div className="mt-3 w-[150px] text-left md:w-[240px] lg:w-[300px] xl:w-[360px] 2xl:w-[400px]">
           <h4 className="truncate text-sm font-semibold md:text-base">
             {musicInfo.name}
           </h4>
