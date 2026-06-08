@@ -79,7 +79,7 @@ function MusicList() {
 
           {/* 모바일: 2열 미니 collage */}
           <div className="flex w-full justify-center lg:hidden">
-            <div className="flex max-w-[360px] flex-wrap items-start justify-center">
+            <div className="flex max-w-[380px] flex-wrap items-start justify-center sm:max-w-[440px]">
               {mobileCards.map((c, i) => (
                 <div
                   key={c.info.name + i}
@@ -95,7 +95,7 @@ function MusicList() {
                     <MusicInfoCard
                       musicInfo={c.info}
                       variant="collage"
-                      cardClassName="h-[150px] w-[150px] shadow-[0_18px_40px_rgba(0,0,0,0.55)] outline outline-1 outline-white/[0.06] sm:h-[170px] sm:w-[170px]"
+                      cardClassName="h-[172px] w-[172px] shadow-[0_18px_40px_rgba(0,0,0,0.55)] outline outline-1 outline-white/[0.06] sm:h-[196px] sm:w-[196px]"
                     />
                   </BlurFade>
                 </div>
@@ -105,7 +105,7 @@ function MusicList() {
 
           <Link
             href="/music"
-            className="group mt-16 inline-flex items-center gap-3 border border-white/40 px-8 py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-black"
+            className="group mt-14 inline-flex items-center gap-3 border border-white/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-black md:px-8 md:py-3.5 md:text-sm"
           >
             More
             <Icon
