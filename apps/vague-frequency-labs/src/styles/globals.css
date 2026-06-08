@@ -777,14 +777,19 @@
 }
 
 @media (max-width: 640px) {
-  /* Portrait: show the WHOLE map (Seoul + every pin/arc) as a centered band
-     instead of the desktop height-cover, which would zoom in and crop the hub. */
+  /* Portrait: scale the band up (~+18%, the most that keeps every pin — Seoul
+     and Sydney sit at the far-right edge) and centre it, so the map fills more
+     of the column and the bracketed headline hugs it instead of floating in a
+     void. Capped in px so a wide (~600px) phone doesn't over-grow it. */
   .vfl-map-inner {
-    width: 100%;
-    top: 43%;
+    width: min(118%, 520px);
+    top: 40%;
   }
-  /* Bracket the map: "We are" pinned to the top, brand + subline to the bottom,
-     map band visible in the gap between them. */
+  /* Pull BOTH anchors in toward the map so "We are", the map, and the brand
+     read as one compact, vertically-centred cluster — "We are" sits above the
+     map, the brand + subline below, with even breathing space to the band. The
+     symmetric padding sends the unavoidable negative space to the outer margins
+     (balanced top/bottom) instead of a hole inside the composition. */
   .vfl-headline {
     inset: 0;
     max-width: none;
@@ -793,16 +798,45 @@
     justify-content: space-between;
     align-items: center;
     text-align: center;
-    padding: clamp(84px, 13vh, 116px) clamp(20px, 5vw, 28px)
-      clamp(26px, 5vh, 44px);
+    padding: clamp(48px, 11vh, 112px) clamp(20px, 5vw, 28px);
   }
   .vfl-h-big {
-    font-size: clamp(46px, 16vw, 84px);
+    /* Eased down from 16vw: at ~62px the three-line column crowded the bottom
+       and pinched the subline; ~55px keeps the poster weight with breathing
+       room. */
+    font-size: clamp(44px, 14vw, 76px);
     line-height: 0.96;
   }
   /* Stack the brand words vertically as a deliberate poster column. */
   .vfl-h-word {
     display: block;
+  }
+  /* On mobile the eyebrow grows to nearly the brand's scale (it stays the
+     outline cut, so the solid brand still leads) — a big outlined "We are"
+     balances the wordmark across the map instead of reading as a tiny kicker. */
+  .vfl-h-eyebrow {
+    font-size: clamp(38px, 12vw, 64px);
+    letter-spacing: 0.01em;
+  }
+  /* The subline's desktop margin collapses to its 14px floor on phones (1.8vw
+     is tiny), gluing the caption to "Labs" right where the type is largest.
+     Give it real separation on mobile. The 0.26em desktop tracking also makes
+     the full string overflow ≤375px screens, wrapping a lone "2025" orphan —
+     tighten it so the caption holds one line down to 360px. */
+  .vfl-h-en {
+    margin-top: clamp(20px, 6vw, 30px);
+    letter-spacing: 0.16em;
+  }
+  /* Seoul sits at the far-right of the band, so its always-on tooltip —
+     center-anchored — spilled ~4px past the viewport. Anchor it to the pin's
+     right edge so it opens leftward and stays on-screen. */
+  .vfl-pin.home .vfl-pin-tip {
+    left: auto;
+    right: 50%;
+    transform: translateX(14px) translateY(4px);
+  }
+  .vfl-pin.home .vfl-pin-tip.show {
+    transform: translateX(14px) translateY(0);
   }
 
   /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
