@@ -15,10 +15,15 @@ import {
 } from "@/components/MorphingDialog";
 import { motion } from "motion/react";
 
+import { cn } from "@repo/ui";
 import { Icon } from "@repo/ui/common/Icon";
 
 interface MusicInfoProps {
   musicInfo: MusicInfo;
+  /** "collage": 라벨을 hover에만 노출하는 콜라주용. "default": 카드 아래 라벨 상시 노출. */
+  variant?: "default" | "collage";
+  /** collage variant일 때 카드(정사각형) 크기 클래스 */
+  cardClassName?: string;
 }
 
 // 소셜 아이콘 hover 시 각 플랫폼 브랜드 컬러로 점등 (payday-records 패턴과 정합)
@@ -33,7 +38,11 @@ const SOCIAL_BRAND_HOVER: Record<string, string> = {
   SiBeatport: "group-hover:text-[#A8FF04]",
 };
 
-function MusicInfoCard({ musicInfo }: MusicInfoProps) {
+function MusicInfoCard({
+  musicInfo,
+  variant = "default",
+  cardClassName,
+}: MusicInfoProps) {
   const texture = useMemo(() => {
     // musicInfo.name을 기반으로 결정적 랜덤 생성
     const hash = musicInfo.name.split("").reduce((acc, char) => {
@@ -43,10 +52,19 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
     return `/images/texture/${textureNumber}.webp`;
   }, [musicInfo.name]);
 
+  const isCollage = variant === "collage";
+
   return (
     <Dialog>
       <DialogTrigger>
-        <motion.div className="group relative h-[150px] w-[150px] overflow-hidden md:h-[240px] md:w-[240px] lg:h-[300px] lg:w-[300px] xl:h-[360px] xl:w-[360px] 2xl:h-[400px] 2xl:w-[400px]">
+        <motion.div
+          className={cn(
+            "group relative overflow-hidden",
+            isCollage
+              ? cardClassName
+              : "h-[150px] w-[150px] md:h-[240px] md:w-[240px] lg:h-[300px] lg:w-[300px] xl:h-[360px] xl:w-[360px] 2xl:h-[400px] 2xl:w-[400px]",
+          )}
+        >
           <DialogImage
             width={400}
             height={400}
@@ -63,17 +81,32 @@ function MusicInfoCard({ musicInfo }: MusicInfoProps) {
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
           />
-        </motion.div>
-        <div className="mt-3 w-[150px] text-left md:w-[240px] lg:w-[300px] xl:w-[360px] 2xl:w-[400px]">
-          <h4 className="truncate text-sm font-semibold md:text-base">
-            {musicInfo.name}
-          </h4>
-          {musicInfo.artist && (
-            <p className="text-muted-foreground truncate text-xs md:text-sm">
-              {musicInfo.artist}
-            </p>
+          {isCollage && (
+            // 콜라주에서는 라벨을 카드 하단 오버레이로 hover 시에만 노출
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <h4 className="truncate text-sm font-semibold text-white">
+                {musicInfo.name}
+              </h4>
+              {musicInfo.artist && (
+                <p className="truncate text-xs text-neutral-300">
+                  {musicInfo.artist}
+                </p>
+              )}
+            </div>
           )}
-        </div>
+        </motion.div>
+        {!isCollage && (
+          <div className="mt-3 w-[150px] text-left md:w-[240px] lg:w-[300px] xl:w-[360px] 2xl:w-[400px]">
+            <h4 className="truncate text-sm font-semibold md:text-base">
+              {musicInfo.name}
+            </h4>
+            {musicInfo.artist && (
+              <p className="text-muted-foreground truncate text-xs md:text-sm">
+                {musicInfo.artist}
+              </p>
+            )}
+          </div>
+        )}
       </DialogTrigger>
       <DialogContainer>
         <DialogContent

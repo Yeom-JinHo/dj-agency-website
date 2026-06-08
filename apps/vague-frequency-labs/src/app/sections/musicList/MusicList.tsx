@@ -1,19 +1,42 @@
+import type { MusicInfo } from "@/types/music";
 import Link from "next/link";
 import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import MusicInfoCard from "./MusicInfoCard";
 import SectionHeading from "@/components/SectionHeading";
 
-import { Button } from "@repo/ui/common/Button";
 import { Icon } from "@repo/ui/common/Icon";
 
 const baseMusicInfos = musicInfo.getInfos();
-const musicInfos =
-  baseMusicInfos.length === 0
-    ? []
-    : Array.from({ length: 9 }, (_, index) => {
-        return baseMusicInfos[index % baseMusicInfos.length]!;
-      });
+
+// 카드별 리듬 값 (인덱스 기반, deterministic)
+const ROTS = [-3, 2.5, -2, 3, -2.5, 2, -3.5, 2, -2, 3];
+const DYS = [0, 40, 14, 46, 24, -6, 36, 12, 44, 18, -4, 30, 8, 50, 20];
+
+interface CollageCard {
+  info: MusicInfo;
+  rot: number;
+  dy: number;
+  z: number;
+}
+
+// cols×rows 콜라주 카드 생성.
+// 곡은 (열 + 행×2) 로 배치해 같은 곡이 가로·세로로 인접하지 않게 분산.
+function buildCards(cols: number, rows: number): CollageCard[] {
+  if (baseMusicInfos.length === 0) return [];
+  const count = cols * rows;
+  return Array.from({ length: count }, (_, i) => ({
+    info: baseMusicInfos[
+      ((i % cols) + Math.floor(i / cols) * 2) % baseMusicInfos.length
+    ]!,
+    rot: ROTS[i % ROTS.length]!,
+    dy: DYS[i % DYS.length]!,
+    z: 2 + ((i * 5) % 6),
+  }));
+}
+
+const desktopCards = buildCards(5, 3); // 15
+const mobileCards = buildCards(2, 4); // 8
 
 function MusicList() {
   return (
@@ -27,19 +50,68 @@ function MusicList() {
           </div>
         </div>
 
-        <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12 xl:gap-16">
-            {musicInfos.map((info, index) => (
-              <BlurFade key={info.name + index} inView duration={0.6}>
-                <MusicInfoCard musicInfo={info} />
-              </BlurFade>
-            ))}
+        <div className="relative flex flex-col items-center justify-center gap-4">
+          {/* 데스크톱: 5열 overlapping collage */}
+          <div className="hidden w-full justify-center lg:flex">
+            <div className="flex max-w-[860px] flex-wrap items-start justify-center xl:max-w-[1000px]">
+              {desktopCards.map((c, i) => (
+                <div
+                  key={c.info.name + i}
+                  className="relative transition-transform duration-300 ease-out hover:!z-[60] hover:!rotate-0 hover:scale-[1.05]"
+                  style={{
+                    margin: "0 -24px -22px",
+                    marginTop: c.dy,
+                    zIndex: c.z,
+                    transform: `rotate(${c.rot}deg)`,
+                  }}
+                >
+                  <BlurFade inView duration={0.6}>
+                    <MusicInfoCard
+                      musicInfo={c.info}
+                      variant="collage"
+                      cardClassName="h-[200px] w-[200px] shadow-[0_24px_60px_rgba(0,0,0,0.55)] outline outline-1 outline-white/[0.06] xl:h-[240px] xl:w-[240px]"
+                    />
+                  </BlurFade>
+                </div>
+              ))}
+            </div>
           </div>
-          <Link href="/music">
-            <Button variant="outline" className="mt-12">
-              <Icon name="LuPlus" className="mr-2 h-4 w-4" />
-              More
-            </Button>
+
+          {/* 모바일: 2열 미니 collage */}
+          <div className="flex w-full justify-center lg:hidden">
+            <div className="flex max-w-[360px] flex-wrap items-start justify-center">
+              {mobileCards.map((c, i) => (
+                <div
+                  key={c.info.name + i}
+                  className="relative transition-transform duration-300 ease-out active:!z-[60] active:!rotate-0 active:scale-[1.05]"
+                  style={{
+                    margin: "0 -12px -14px",
+                    marginTop: Math.round(c.dy * 0.5),
+                    zIndex: c.z,
+                    transform: `rotate(${c.rot}deg)`,
+                  }}
+                >
+                  <BlurFade inView duration={0.6}>
+                    <MusicInfoCard
+                      musicInfo={c.info}
+                      variant="collage"
+                      cardClassName="h-[150px] w-[150px] shadow-[0_18px_40px_rgba(0,0,0,0.55)] outline outline-1 outline-white/[0.06] sm:h-[170px] sm:w-[170px]"
+                    />
+                  </BlurFade>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Link
+            href="/music"
+            className="group mt-16 inline-flex items-center gap-3 border border-white/40 px-8 py-3.5 text-sm font-bold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-black"
+          >
+            More
+            <Icon
+              name="LuArrowRight"
+              className="size-4 transition-transform duration-300 ease-out group-hover:translate-x-1"
+            />
           </Link>
         </div>
       </div>
