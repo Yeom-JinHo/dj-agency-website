@@ -212,7 +212,7 @@ export function WorldMap({
           return (
             <div
               key={p.city.id}
-              className="vfl-pin"
+              className={`vfl-pin${isHome ? " home" : ""}`}
               style={{
                 left: `${(p.x / width) * 100}%`,
                 top: `${(p.y / height) * 100}%`,
