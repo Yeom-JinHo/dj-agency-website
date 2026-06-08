@@ -10,10 +10,11 @@ interface PreloaderProps {
 }
 
 // When (ms, from navigation start) the overlay starts sweeping up. The CSS intro
-// line ("Are you ready?") rises in and settles well before this, so it has its
-// moment on screen. Floored on hydration: on a slow load the sweep waits for
-// mount (it needs window dimensions), but never fires earlier than this.
-const SWEEP_AT_MS = 1150;
+// (0→100 counter → "Are you ready?") finishes its hand-off and settles before
+// this, so the payoff has its moment on screen. Floored on hydration: on a slow
+// load the sweep waits for mount (it needs window dimensions), but never fires
+// earlier than this.
+const SWEEP_AT_MS = 2400;
 
 export function Preloader({ children }: PreloaderProps) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });

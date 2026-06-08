@@ -213,27 +213,15 @@
 
 @theme inline {
   /*
-    Preloader intro: a single line, "Are you ready?", that rises into place on
-    CSS from the very first paint — so it is alive before hydration (no frozen
-    black frame) at full opacity (an opacity fade reads as a murky grey ghost on
-    big display type). It then breathes until the overlay slide-up and its SVG
-    curve sweep it off-screen (driven by motion in Preloader.tsx, which need
-    window dimensions and must stay in sync).
+    Preloader intro: a CSS-only 0→100 counter that runs from the very first
+    paint (an animated @property integer — see the .vfl-loader-count block
+    below), so the count is alive before hydration with no frozen black frame.
+    At 100 it hands off to the "Are you ready?" payoff, which then breathes until
+    the overlay slide-up and its SVG curve sweep it off-screen (driven by motion
+    in Preloader.tsx, which need window dimensions and must stay in sync).
   */
-  --animate-loader-intro-in: loader-intro-in 0.6s cubic-bezier(0.22, 1, 0.36, 1)
-    forwards;
-  --animate-loader-breathe: loader-breathe 3s ease-in-out 0.6s infinite;
+  --animate-loader-breathe: loader-breathe 3s ease-in-out infinite;
 
-  @keyframes loader-intro-in {
-    from {
-      transform: translateY(0.45em);
-      letter-spacing: -0.1em;
-    }
-    to {
-      transform: translateY(0);
-      letter-spacing: 0;
-    }
-  }
   @keyframes loader-breathe {
     0%,
     100% {
@@ -271,14 +259,82 @@
 }
 
 /* ── Preloader intro (CSS-first, no hydration stall) ───────────────
-   "Are you ready?" rises into place at full opacity on first paint, then
-   breathes until the motion-driven overlay sweep carries it off. */
+   Stage 1 is a pure-CSS 0→100 counter (animated @property integer fed into a
+   CSS counter() pseudo-element); stage 2 is the "Are you ready?" payoff. Both
+   stack in one centered cell and run from first paint, so the count is alive
+   before hydration. Animatable @property is supported in Chrome/Edge, Safari
+   16.4+, and Firefox 128+. */
+@property --loader-count {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
 .vfl-loader-intro {
+  display: grid;
+  place-items: center;
+}
+.vfl-loader-intro > * {
+  grid-area: 1 / 1;
+}
+
+/* Stage 1 — 0→100 counter. tabular-nums + a reserved min-width keep the digits
+   from jittering the loader's center as the number widens. */
+.vfl-loader-count {
+  min-width: 2em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  counter-reset: lc var(--loader-count);
+  /* linear so the count does not crawl into 100 (a decel ease makes 100 feel
+     late). 100 lands at 1.3s and holds ~0.3s so it actually registers, then
+     count-out leaves with ready-in overlapping it (no sequential gap). */
+  animation:
+    loader-count 1.3s linear forwards,
+    loader-count-out 0.3s cubic-bezier(0.76, 0, 0.24, 1) 1.6s forwards;
+}
+.vfl-loader-count::after {
+  content: counter(lc);
+}
+@keyframes loader-count {
+  from {
+    --loader-count: 0;
+  }
+  to {
+    --loader-count: 100;
+  }
+}
+@keyframes loader-count-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.4em);
+  }
+}
+
+/* Stage 2 — "Are you ready?": rises in as the counter leaves, then breathes
+   until the motion-driven overlay sweep carries it off. */
+.vfl-loader-ready {
   display: flex;
   align-items: center;
+  opacity: 0;
   animation:
-    var(--animate-loader-intro-in),
-    var(--animate-loader-breathe);
+    loader-ready-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1.6s forwards,
+    var(--animate-loader-breathe) 2.05s;
+}
+@keyframes loader-ready-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    letter-spacing: -0.1em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    letter-spacing: 0;
+  }
 }
 
 /* ── Globe orbit ring (default showcase) ─────────────── */
@@ -844,7 +900,7 @@
     max-width: none;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     text-align: center;
     padding: clamp(48px, 11vh, 112px) clamp(20px, 5vw, 28px);
@@ -879,17 +935,6 @@
      remain visible. */
   .vfl-pin.home .vfl-pin-tip {
     display: none;
-  }
-  /* Seoul sits at the far-right of the band, so its always-on tooltip —
-     center-anchored — spilled ~4px past the viewport. Anchor it to the pin's
-     right edge so it opens leftward and stays on-screen. */
-  .vfl-pin.home .vfl-pin-tip {
-    left: auto;
-    right: 50%;
-    transform: translateX(14px) translateY(4px);
-  }
-  .vfl-pin.home .vfl-pin-tip.show {
-    transform: translateX(14px) translateY(0);
   }
 
   /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
