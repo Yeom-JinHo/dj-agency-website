@@ -830,16 +830,12 @@
     margin-top: clamp(20px, 6vw, 30px);
     letter-spacing: 0.16em;
   }
-  /* Seoul sits at the far-right of the band, so its always-on tooltip —
-     center-anchored — spilled ~4px past the viewport. Anchor it to the pin's
-     right edge so it opens leftward and stays on-screen. */
+  /* Every pin (Seoul included) stays on the band, but Seoul's always-on
+     "HOME BASE" tooltip panel crowds the small frame and spilled past the
+     right edge — so hide just the panel. The home beacon and all other pins
+     remain visible. */
   .vfl-pin.home .vfl-pin-tip {
-    left: auto;
-    right: 50%;
-    transform: translateX(14px) translateY(4px);
-  }
-  .vfl-pin.home .vfl-pin-tip.show {
-    transform: translateX(14px) translateY(0);
+    display: none;
   }
 
   /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
