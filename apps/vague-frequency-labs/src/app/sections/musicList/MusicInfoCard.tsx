@@ -110,9 +110,10 @@ function MusicInfoCard({
       </DialogTrigger>
       <DialogContainer>
         <DialogContent
-          className="bg-popover/60 text-popover-foreground pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto rounded-lg border border-white/10 p-4 shadow-xl backdrop-blur-xl backdrop-saturate-150 sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
+          className="vfl-music-modal pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto overflow-x-hidden rounded-[2px] border border-[rgba(236,234,227,0.22)] bg-[#0a0a0b] p-4 text-[#eceae3] shadow-2xl sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
         >
-          <DialogClose className="text-muted-foreground hover:text-foreground z-10" />
+          <div className="vfl-music-grain" aria-hidden="true" />
+          <DialogClose className="z-10 rounded-none text-[rgba(236,234,227,0.52)] transition-colors hover:bg-transparent hover:text-[#eceae3]" />
           <motion.div
             animate={{
               rotate: [0, 360],
@@ -129,7 +130,7 @@ function MusicInfoCard({
               scale: { duration: 0.4 },
             }}
             style={{ borderRadius: "50%" }}
-            className="aspect-square w-full max-w-[360px] shrink-0 self-center overflow-hidden"
+            className="relative z-10 aspect-square w-[88%] max-w-[320px] shrink-0 self-center overflow-hidden"
           >
             <DialogImage
               width={360}
@@ -141,48 +142,53 @@ function MusicInfoCard({
             />
           </motion.div>
 
-          <div className="mt-6">
+          <div className="relative z-10 mt-6">
             <DialogTitle>
-              <h3 className="line-clamp-2 text-xl font-semibold">
+              <h3 className="line-clamp-2 text-2xl uppercase leading-[1.1] tracking-tight text-[#eceae3]">
                 {musicInfo.name}
               </h3>
             </DialogTitle>
-            <div className="mt-0.5 flex items-center justify-between gap-3">
-              <p className="text-muted-foreground truncate text-sm">
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <p className="truncate text-sm font-medium text-[rgba(236,234,227,0.86)] md:text-base">
                 {musicInfo.artist}
               </p>
               {musicInfo.label && (
-                <p className="text-muted-foreground shrink-0 text-xs">
+                <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-[rgba(236,234,227,0.5)]">
                   {musicInfo.label}
-                </p>
+                </span>
               )}
             </div>
             {musicInfo.socials && musicInfo.socials.length > 0 && (
-              <div className="border-border mt-6 flex flex-col gap-1 border-t pt-4">
-                {musicInfo.socials.map((social, index) => (
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={social.href}
-                    className="group text-muted-foreground hover:text-foreground flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-white/5"
-                    key={`contact-social_${index}`}
-                  >
-                    {social.iconName && (
-                      <span
-                        className={`inline-flex transition-colors ${
-                          SOCIAL_BRAND_HOVER[social.iconName] ?? ""
-                        }`}
-                      >
-                        <Icon name={social.iconName} className="size-5" />
-                      </span>
-                    )}
-                    <span className="text-sm">{social.name}</span>
-                    <Icon
-                      name="LuArrowRight"
-                      className="ml-auto size-4 opacity-60 transition-transform group-hover:translate-x-0.5"
-                    />
-                  </Link>
-                ))}
+              <div className="mt-6 border-t border-[rgba(236,234,227,0.14)] pt-4">
+                <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[rgba(236,234,227,0.45)]">
+                  Listen on
+                </p>
+                <div className="flex flex-col">
+                  {musicInfo.socials.map((social, index) => (
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={social.href}
+                      className="group flex items-center gap-3 rounded-[2px] px-2 py-2.5 text-[rgba(236,234,227,0.72)] transition-colors hover:bg-white/5 hover:text-[#eceae3]"
+                      key={`contact-social_${index}`}
+                    >
+                      {social.iconName && (
+                        <span
+                          className={`inline-flex transition-colors ${
+                            SOCIAL_BRAND_HOVER[social.iconName] ?? ""
+                          }`}
+                        >
+                          <Icon name={social.iconName} className="size-5" />
+                        </span>
+                      )}
+                      <span className="text-sm font-medium">{social.name}</span>
+                      <Icon
+                        name="LuArrowRight"
+                        className="ml-auto size-4 opacity-60 transition-transform group-hover:translate-x-0.5"
+                      />
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>

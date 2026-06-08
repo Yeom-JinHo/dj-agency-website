@@ -818,3 +818,26 @@
     opacity: 0.25;
   }
 }
+
+/* ───────────────────────────────────────────────────────────────
+   Music modal — hero poster tone
+   The hero's --vfl-* palette lives only inside .vfl-hero, so the
+   open Music modal mirrors the same cream/black/grain language in a
+   self-contained scope: solid #0a0a0b panel + film grain.
+   ─────────────────────────────────────────────────────────────── */
+.vfl-music-modal {
+  --vfl-bg: #0a0a0b;
+  --vfl-fg: #eceae3;
+}
+
+/* Film grain — same fractal-noise recipe as the hero, modal-scoped.
+   Sits under the content (z-1); content blocks ride above at z-10. */
+.vfl-music-grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
