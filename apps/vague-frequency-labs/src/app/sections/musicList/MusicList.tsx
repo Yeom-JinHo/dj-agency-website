@@ -53,13 +53,13 @@ function MusicList() {
         <div className="relative flex flex-col items-center justify-center gap-4">
           {/* 데스크톱: 5열 overlapping collage */}
           <div className="hidden w-full justify-center lg:flex">
-            <div className="flex max-w-[860px] flex-wrap items-start justify-center xl:max-w-[1000px]">
+            <div className="flex max-w-[940px] flex-wrap items-start justify-center xl:max-w-[1140px] 2xl:max-w-[1280px]">
               {desktopCards.map((c, i) => (
                 <div
                   key={c.info.name + i}
                   className="relative transition-transform duration-300 ease-out hover:!z-[60] hover:!rotate-0 hover:scale-[1.05]"
                   style={{
-                    margin: "0 -24px -22px",
+                    margin: "0 -28px -26px",
                     marginTop: c.dy,
                     zIndex: c.z,
                     transform: `rotate(${c.rot}deg)`,
@@ -69,7 +69,7 @@ function MusicList() {
                     <MusicInfoCard
                       musicInfo={c.info}
                       variant="collage"
-                      cardClassName="h-[200px] w-[200px] shadow-[0_24px_60px_rgba(0,0,0,0.55)] outline outline-1 outline-white/[0.06] xl:h-[240px] xl:w-[240px]"
+                      cardClassName="h-[228px] w-[228px] shadow-[0_24px_60px_rgba(0,0,0,0.55)] outline outline-1 outline-white/[0.06] xl:h-[272px] xl:w-[272px] 2xl:h-[300px] 2xl:w-[300px]"
                     />
                   </BlurFade>
                 </div>
