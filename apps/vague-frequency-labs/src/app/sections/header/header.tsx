@@ -97,7 +97,7 @@ export default function Header() {
         <div className="flex w-full justify-between">
           <Link
             href="/"
-            className="inline-flex items-center justify-center text-2xl font-semibold"
+            className="font-display inline-flex items-center justify-center text-2xl tracking-[0.02em] text-[#eceae3]"
           >
             v.f.labs
           </Link>
@@ -125,11 +125,11 @@ export default function Header() {
                   return (
                     <Link
                       className={[
-                        "flex items-center rounded-sm px-2 py-1.5 text-xl font-medium underline-offset-4 transition-colors duration-200",
+                        "font-mono flex items-center rounded-sm px-2 py-1.5 text-[13px] uppercase tracking-[0.18em] underline-offset-4 transition-colors duration-200",
                         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current",
                         isActive
-                          ? "text-foreground"
-                          : "text-foreground/65 hover:text-foreground",
+                          ? "text-[#eceae3]"
+                          : "text-[#eceae3]/55 hover:text-[#eceae3]",
                       ].join(" ")}
                       aria-current={isActive ? "page" : undefined}
                       href={href}
@@ -172,7 +172,7 @@ export default function Header() {
         <div className="flex flex-col gap-4 p-4">
           {links.map(({ title, href }, index) => (
             <Link
-              className="flex items-center text-xl font-medium underline-offset-4 hover:underline"
+              className="font-mono flex items-center text-base uppercase tracking-[0.18em] text-[#eceae3] underline-offset-4 hover:underline"
               href={href}
               onClick={toggleMenu}
               key={`header-mobile-link_${index}`}
