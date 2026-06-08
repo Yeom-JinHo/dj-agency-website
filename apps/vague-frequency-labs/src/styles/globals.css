@@ -839,9 +839,11 @@
   }
 
   /* The 197px band can't host 9 individually-tappable pins (cities sit ~15px
-     apart), so on mobile the pins are decorative — the standing arcs carry the
-     "Seoul → everywhere" story, and only the Seoul home beacon is labelled.
-     Pin/tooltip sizes are scaled down to match the smaller map. */
+     apart), so on mobile the pins are decorative (pointer-events off) and carry
+     no labels — the standing arcs carry the "Seoul → everywhere" story. Pin
+     sizes are scaled down to match the smaller map. (No tooltip ever renders on
+     mobile: non-home pins can't activate and the home panel is hidden above, so
+     the tooltip sizing rules are intentionally absent here.) */
   .vfl-pin {
     pointer-events: none;
   }
@@ -861,17 +863,6 @@
   .vfl-pin-flag {
     width: 20px;
     height: 15px;
-  }
-  .vfl-pin-tip {
-    min-width: 104px;
-    padding: 6px 9px 7px;
-  }
-  .vfl-pin-tip-name {
-    font-size: 10px;
-  }
-  .vfl-pin-tip-cc,
-  .vfl-pin-tip-venue {
-    font-size: 9px;
   }
 }
 
