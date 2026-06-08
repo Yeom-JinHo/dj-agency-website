@@ -4,7 +4,7 @@ packages:
 
 catalog:
   # Runtime
-  next: 15.5.18
+  next: 16.2.7
   react: ^19.2.0
   react-dom: ^19.2.0
   "@vercel/analytics": ^1.6.1
@@ -25,4 +25,4 @@ catalog:
   "@tailwindcss/postcss": ^4.2.4
   postcss: ^8.5.15
   tailwindcss-animate: ^1.0.7
-  react-scan: ^0.5.3
+  react-scan: ^0.5.7
