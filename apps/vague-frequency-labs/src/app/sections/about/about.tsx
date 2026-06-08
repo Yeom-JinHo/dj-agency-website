@@ -5,7 +5,7 @@ function About() {
   return (
     <section className="w-full py-24 lg:py-32" id="about">
       <div className="grid gap-10">
-        <div className="flex w-full flex-col items-center justify-center px-4 text-center md:px-6 lg:flex-row lg:items-start lg:justify-between lg:text-left">
+        <div className="flex w-full flex-col items-center justify-center px-6 text-center md:px-10 lg:flex-row lg:items-start lg:justify-between lg:px-16 lg:text-left">
           <div className="flex flex-col items-center lg:items-start">
             <SectionHeading as="h2">About</SectionHeading>
           </div>
