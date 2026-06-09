@@ -66,19 +66,26 @@ export default async function ProjectPage(props0: {
           {artist.name}
         </SectionHeading>
         <div className="mt-12 h-[280px] w-[210px] sm:h-[340px] sm:w-[255px] md:h-96 md:w-72">
-          <ArtistImage artist={artist} backgroundLogo={false} />
+          <ArtistImage
+            artist={artist}
+            backgroundLogo={false}
+            priority
+            sizes="(max-width: 768px) 210px, 288px"
+          />
         </div>
 
-        <div className="my-8 flex gap-1">
+        <div className="my-8 flex gap-2">
           {artist.socials?.map(({ iconName, href }, index) => {
             return (
               <Link
                 target="_blank"
                 rel="noopener noreferrer"
                 href={href}
+                aria-label={`${artist.name}${iconName ? ` ${iconName}` : ""}`}
                 className={cn(
                   buttonVariants({ variant: "link" }),
-                  "h-min w-min gap-1 p-0"
+                  // ≥44px touch target for the brand's one-handed-mobile frame.
+                  "grid size-11 place-items-center p-0"
                 )}
                 key={`contact-social_${index}`}
               >
