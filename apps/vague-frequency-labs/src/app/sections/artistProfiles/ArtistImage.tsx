@@ -7,8 +7,9 @@ const ArtistImage = ({
   artist,
   backgroundLogo,
   priority = false,
-  // 고정폭 카드(ArtistSimpleCard)는 caller가 px sizes로 좁힐 수 있게 한다.
-  // 기본값은 carousel(basis-1/4)·디테일 페이지의 표시 폭에 맞춘 vw.
+  // 고정폭 카드(ArtistSimpleCard)·디테일 페이지(~288px 프레임)는 caller가
+  // px sizes로 좁혀 과해상도 요청을 막을 수 있게 한다.
+  // 기본값은 carousel(basis-1/4)·그리드 표시 폭에 맞춘 vw.
   sizes = "(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw",
 }: {
   artist: ArtistProfile;
