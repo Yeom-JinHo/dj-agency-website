@@ -7,10 +7,14 @@ const ArtistImage = ({
   artist,
   backgroundLogo,
   priority = false,
+  // 고정폭 카드(ArtistSimpleCard)는 caller가 px sizes로 좁힐 수 있게 한다.
+  // 기본값은 carousel(basis-1/4)·디테일 페이지의 표시 폭에 맞춘 vw.
+  sizes = "(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw",
 }: {
   artist: ArtistProfile;
   backgroundLogo: boolean;
   priority?: boolean;
+  sizes?: string;
 }) => {
   return (
     <div className="group relative h-full w-full overflow-hidden object-cover">
@@ -22,7 +26,7 @@ const ArtistImage = ({
         alt={`Image of ${artist.name}`}
         className={`h-full w-full object-cover object-center transition-all duration-200 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
         priority={priority}
-        sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 25vw"
+        sizes={sizes}
         placeholder="blur"
         blurDataURL={artist.imagePlaceholder}
       />
