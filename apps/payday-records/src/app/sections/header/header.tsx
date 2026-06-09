@@ -52,8 +52,8 @@ export default function Header() {
       >
         <div
           className={[
-            "flex items-center justify-between px-4 transition-all duration-500 ease-out md:px-6",
-            scrolled ? "h-14" : "h-20 md:h-24",
+            "mx-auto flex w-full max-w-[1280px] items-center gap-6 px-6 transition-all duration-500 ease-out md:gap-10 md:px-10",
+            scrolled ? "h-14" : "h-20",
           ].join(" ")}
         >
           <Link
@@ -69,10 +69,10 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex md:items-center">
-            <div className="flex -translate-y-[2px] items-center gap-4 lg:gap-6">
+            <div className="flex -translate-y-[2px] items-center gap-7 lg:gap-8">
               {navLinks.map(({ title, href }, index) => (
                 <Link
-                  className="flex items-center text-sm font-semibold tracking-[0.12em] uppercase underline-offset-4 transition-opacity hover:underline"
+                  className="flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:underline"
                   href={href}
                   key={`header-desktop-link_${index}`}
                 >
@@ -89,7 +89,7 @@ export default function Header() {
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             onClick={() => setMenuOpen((v) => !v)}
-            className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none md:hidden"
+            className="-mr-2 ml-auto inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none md:hidden"
           >
             {menuOpen ? (
               <IconX className="h-6 w-6" stroke={2} />
