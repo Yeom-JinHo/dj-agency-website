@@ -69,10 +69,10 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex md:items-center">
-            <div className="flex items-center gap-4 lg:gap-6">
+            <div className="flex translate-y-px items-center gap-4 lg:gap-6 md:translate-y-[3px]">
               {navLinks.map(({ title, href }, index) => (
                 <Link
-                  className="flex items-center text-sm font-medium tracking-[0.12em] uppercase underline-offset-4 transition-opacity hover:underline"
+                  className="flex items-center text-sm font-semibold tracking-[0.12em] uppercase underline-offset-4 transition-opacity hover:underline"
                   href={href}
                   key={`header-desktop-link_${index}`}
                 >
