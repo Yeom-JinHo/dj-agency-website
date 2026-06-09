@@ -32,7 +32,7 @@ export default function MusicContent(): ReactElement {
 
           <FancyLine className={"m-16"} />
           <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
-            <div className="flex flex-wrap justify-center gap-16">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-10 px-5 sm:px-6 md:gap-16 md:px-0">
               {musicInfos.map((info, index) => (
                 <BlurFade key={info.name + index} inView duration={0.6}>
                   <MusicInfoCard musicInfo={info} />
