@@ -126,7 +126,7 @@ export default function Header() {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col justify-center gap-1 px-6 pb-24">
+        <nav className="flex flex-1 flex-col justify-center px-4 pb-24">
           {navLinks.map(({ title, href }, index) => (
             <Link
               key={`header-mobile-link_${index}`}
@@ -134,7 +134,7 @@ export default function Header() {
               onClick={() => setMenuOpen(false)}
               style={{ transitionDelay: menuOpen ? `${index * 60 + 80}ms` : "0ms" }}
               className={[
-                "font-display py-3 text-5xl leading-none tracking-[0.02em] text-white/90 uppercase",
+                "font-display py-4 text-5xl leading-none tracking-[0.02em] text-white/90 uppercase",
                 "transition-all duration-500 ease-out hover:text-white focus-visible:text-white focus-visible:outline-none",
                 "motion-reduce:transition-none",
                 menuOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
