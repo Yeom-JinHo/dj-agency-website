@@ -35,6 +35,12 @@ export default function Header() {
   }, [menuOpen]);
 
   const navLinks = links.slice(0, linkLimit);
+  const half = Math.ceil(navLinks.length / 2);
+  const leftLinks = navLinks.slice(0, half);
+  const rightLinks = navLinks.slice(half);
+
+  const navLinkClass =
+    "flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:underline";
 
   return (
     <>
@@ -50,53 +56,64 @@ export default function Header() {
           "motion-reduce:transform-none motion-reduce:opacity-100",
         ].join(" ")}
       >
+        {/* Mobile: logo (left) + toggle (right). Desktop: split nav around a
+            centered wordmark via a 3-column grid (1fr · auto · 1fr). */}
         <div
           className={[
-            "mx-auto flex w-full max-w-[1280px] items-center gap-6 px-6 transition-all duration-500 ease-out md:gap-10 md:px-10",
+            "mx-auto grid w-full max-w-[1280px] grid-cols-[auto_1fr_auto] items-center px-6 transition-all duration-500 ease-out md:grid-cols-[1fr_auto_1fr] md:px-10",
             scrolled ? "h-14" : "h-20",
           ].join(" ")}
         >
-          <Link
-            href="/"
-            onClick={() => setMenuOpen(false)}
-            className={[
-              "font-display inline-flex items-center leading-none tracking-[0.04em] whitespace-nowrap uppercase transition-all duration-500 ease-out",
-              scrolled ? "text-xl md:text-2xl" : "text-2xl md:text-4xl",
-            ].join(" ")}
-          >
-            Payday Records
-          </Link>
-
-          {/* Desktop nav */}
-          <nav className="hidden md:flex md:items-center">
-            <div className="flex -translate-y-[2px] items-center gap-7 lg:gap-8">
-              {navLinks.map(({ title, href }, index) => (
-                <Link
-                  className="flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:underline"
-                  href={href}
-                  key={`header-desktop-link_${index}`}
-                >
+          {/* Left nav (desktop only) — clustered toward the centered logo. */}
+          <nav className="hidden -translate-y-[2px] md:flex md:items-center md:justify-self-end">
+            <div className="flex items-center gap-7 lg:gap-8">
+              {leftLinks.map(({ title, href }, index) => (
+                <Link className={navLinkClass} href={href} key={`hl_${index}`}>
                   {title}
                 </Link>
               ))}
             </div>
           </nav>
 
-          {/* Mobile menu toggle */}
-          <button
-            type="button"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            onClick={() => setMenuOpen((v) => !v)}
-            className="-mr-2 ml-auto inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none md:hidden"
+          {/* Wordmark — left on mobile, centered on desktop. */}
+          <Link
+            href="/"
+            onClick={() => setMenuOpen(false)}
+            className={[
+              "font-display inline-flex items-center justify-self-start leading-none tracking-[0.04em] whitespace-nowrap uppercase transition-all duration-500 ease-out md:justify-self-center md:px-10",
+              scrolled ? "text-xl md:text-2xl" : "text-2xl md:text-4xl",
+            ].join(" ")}
           >
-            {menuOpen ? (
-              <IconX className="h-6 w-6" stroke={2} />
-            ) : (
-              <IconMenu2 className="h-6 w-6" stroke={2} />
-            )}
-          </button>
+            Payday Records
+          </Link>
+
+          {/* Right cell: nav (desktop, clustered toward logo) + mobile toggle. */}
+          <div className="flex items-center justify-self-end md:justify-self-start">
+            <nav className="hidden -translate-y-[2px] md:flex md:items-center">
+              <div className="flex items-center gap-7 lg:gap-8">
+                {rightLinks.map(({ title, href }, index) => (
+                  <Link className={navLinkClass} href={href} key={`hr_${index}`}>
+                    {title}
+                  </Link>
+                ))}
+              </div>
+            </nav>
+
+            <button
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none md:hidden"
+            >
+              {menuOpen ? (
+                <IconX className="h-6 w-6" stroke={2} />
+              ) : (
+                <IconMenu2 className="h-6 w-6" stroke={2} />
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
