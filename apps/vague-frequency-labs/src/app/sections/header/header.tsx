@@ -161,28 +161,29 @@ export default function Header() {
         </div>
       </div>
       <div
-        className="overflow-hidden bg-transparent md:hidden"
-        style={{
-          maxHeight: isOpen ? "60vh" : 0,
-          transition: "max-height 300ms ease-in-out",
-          pointerEvents: isOpen ? "auto" : "none",
-          visibility: isOpen ? "visible" : "hidden",
-        }}
+        className={[
+          "grid bg-transparent transition-[grid-template-rows] duration-300 ease-in-out md:hidden",
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+        ].join(" ")}
+        style={{ pointerEvents: isOpen ? "auto" : "none" }}
+        aria-hidden={!isOpen}
       >
-        <div className="flex flex-col gap-4 p-4">
-          {links.map(({ title, href }, index) => (
-            <Link
-              className="font-mono flex items-center text-base uppercase tracking-[0.18em] text-[#eceae3] underline-offset-4 hover:underline"
-              href={href}
-              onClick={toggleMenu}
-              key={`header-mobile-link_${index}`}
-            >
-              {title}
-            </Link>
-          ))}
-          {/* <div className="flex w-full items-center justify-end">
-            <ThemeToggle />
-          </div> */}
+        <div className="overflow-hidden">
+          <div className="flex flex-col gap-4 p-4">
+            {links.map(({ title, href }, index) => (
+              <Link
+                className="font-mono flex items-center text-base uppercase tracking-[0.18em] text-[#eceae3] underline-offset-4 hover:underline"
+                href={href}
+                onClick={toggleMenu}
+                key={`header-mobile-link_${index}`}
+              >
+                {title}
+              </Link>
+            ))}
+            {/* <div className="flex w-full items-center justify-end">
+              <ThemeToggle />
+            </div> */}
+          </div>
         </div>
       </div>
     </header>
