@@ -62,7 +62,7 @@ function MusicInfoCard({
             "group relative overflow-hidden",
             isCollage
               ? cardClassName
-              : "h-[150px] w-[150px] md:h-[240px] md:w-[240px] lg:h-[300px] lg:w-[300px] xl:h-[360px] xl:w-[360px] 2xl:h-[400px] 2xl:w-[400px]",
+              : "h-[150px] w-[150px] md:h-[240px] md:w-[240px] lg:h-[300px] lg:w-[300px] xl:h-[360px] xl:w-[360px] 2xl:h-[400px] 2xl:w-[400px]"
           )}
         >
           <DialogImage
@@ -109,58 +109,92 @@ function MusicInfoCard({
         )}
       </DialogTrigger>
       <DialogContainer>
-        <DialogContent
-          className="vfl-music-modal pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto overflow-x-hidden rounded-[2px] border border-[rgba(236,234,227,0.22)] bg-[#0a0a0b] p-4 text-[#eceae3] shadow-2xl sm:basis-3/4 sm:p-6 md:max-h-none md:basis-1/4 md:overflow-hidden md:p-8"
-        >
+        <DialogContent className="vfl-music-modal pointer-events-auto relative flex h-auto max-h-[calc(100dvh-5rem)] w-full basis-[90%] flex-col overflow-y-auto overflow-x-hidden rounded-[2px] border border-[rgba(236,234,227,0.22)] bg-[#0a0a0b] text-[#eceae3] shadow-2xl sm:basis-3/4 md:max-h-none md:basis-1/4 md:overflow-hidden">
           <div className="vfl-music-grain" aria-hidden="true" />
-          <DialogClose className="z-10 rounded-none text-[rgba(236,234,227,0.52)] transition-colors hover:bg-transparent hover:text-[#eceae3]" />
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              borderRadius: "50%",
-              scale: 1,
-            }}
-            transition={{
-              rotate: {
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              },
-              borderRadius: { duration: 0.4 },
-              scale: { duration: 0.4 },
-            }}
-            style={{ borderRadius: "50%" }}
-            className="relative z-10 aspect-square w-[88%] max-w-[320px] shrink-0 self-center overflow-hidden"
-          >
-            <DialogImage
-              width={360}
-              height={360}
-              src={musicInfo.image}
-              alt={musicInfo.name}
-              sizes="(max-width: 768px) 150px, 360px"
-              className="h-full w-full object-cover"
-            />
-          </motion.div>
 
-          <div className="relative z-10 mt-6">
+          {/* Record — 슬리브 없이 도는 LP 단독. 구조 반전:
+              바깥(디스크 전체 면) = 커버 이미지, 안쪽 센터 = 바이닐(다크+그루브+스핀들). */}
+          <div className="relative z-10 shrink-0 px-6 pt-8 sm:px-8">
+            <motion.div
+              className="relative mx-auto aspect-square w-[80%] max-w-[300px] overflow-hidden rounded-full shadow-[0_12px_44px_rgba(0,0,0,0.6)] ring-1 ring-white/5"
+              initial={{ scale: 0.92, opacity: 0, rotate: 0 }}
+              animate={{ scale: 1, opacity: 1, rotate: 360 }}
+              transition={{
+                scale: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
+                opacity: { duration: 0.4 },
+                rotate: {
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "linear",
+                  delay: 0.45,
+                },
+              }}
+            >
+              {/* 바깥 = 커버 이미지 (디스크 전체 면) */}
+              <Image
+                src={musicInfo.image}
+                alt={musicInfo.name}
+                fill
+                sizes="300px"
+                className="object-cover"
+              />
+              {/* 픽처 디스크 광택 */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(125deg, rgba(255,255,255,0.14), transparent 42%)",
+                }}
+              />
+              {/* 안쪽 센터 = 바이닐 캡 (다크 + 그루브 + 스핀들 홀) */}
+              <div
+                aria-hidden="true"
+                className="absolute left-1/2 top-1/2 aspect-square w-[28%] -translate-x-1/2 -translate-y-1/2 rounded-full ring-1 ring-black/50"
+                style={{
+                  background:
+                    "radial-gradient(circle at 50% 50%, #1b1b1d 0%, #101011 55%, #0a0a0b 100%)",
+                }}
+              >
+                {/* 그루브 링 */}
+                <div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background:
+                      "repeating-radial-gradient(circle at 50% 50%, rgba(236,234,227,0.06) 0px, rgba(236,234,227,0.06) 1px, transparent 1px, transparent 3px)",
+                  }}
+                />
+                {/* 스핀들 홀 */}
+                <div className="absolute left-1/2 top-1/2 size-[10%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0a0a0b] ring-1 ring-white/25" />
+              </div>
+            </motion.div>
+          </div>
+
+          <DialogClose className="z-20 rounded-full bg-black/35 text-white/85 backdrop-blur-sm transition-colors hover:bg-black/60 hover:text-white" />
+
+          {/* Metadata — 커버 아래 컴팩트 블록. 아트의 자체 타이포와 충돌하지 않는다. */}
+          <div className="relative z-10 px-4 pb-4 pt-5 sm:px-6 sm:pb-6">
             <DialogTitle>
-              <h3 className="line-clamp-2 text-2xl uppercase leading-[1.1] tracking-tight text-[#eceae3]">
+              <h3 className="line-clamp-2 text-2xl uppercase leading-[1.05] tracking-tight text-[#eceae3]">
                 {musicInfo.name}
               </h3>
             </DialogTitle>
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <p className="truncate text-sm font-medium text-[rgba(236,234,227,0.86)] md:text-base">
-                {musicInfo.artist}
-              </p>
+            <div className="mt-1.5 flex items-baseline justify-between gap-3">
+              {musicInfo.artist && (
+                <p className="truncate text-sm font-medium text-[rgba(236,234,227,0.86)] md:text-base">
+                  {musicInfo.artist}
+                </p>
+              )}
               {musicInfo.label && (
                 <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-[rgba(236,234,227,0.5)]">
                   {musicInfo.label}
                 </span>
               )}
             </div>
+
             {musicInfo.socials && musicInfo.socials.length > 0 && (
-              <div className="mt-6 border-t border-[rgba(236,234,227,0.14)] pt-4">
-                <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[rgba(236,234,227,0.45)]">
+              <div className="mt-5 border-t border-[rgba(236,234,227,0.14)] pt-4">
+                <p className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[rgba(236,234,227,0.55)]">
                   Listen on
                 </p>
                 <div className="flex flex-col">
