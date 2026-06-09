@@ -17,6 +17,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
           alt="Vague Frequency Laboratory"
           width={400}
           height={400}
+          sizes="400px"
           priority
         />
         <div className="space-y-4 p-8">
