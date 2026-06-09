@@ -48,20 +48,26 @@ export default function Header() {
         className={[
           "fixed top-0 z-[900] w-full transition-all duration-500 ease-out will-change-transform",
           // Transparent over the hero, frosted + divider once scrolled.
+          // Scrolled: frosted bar. On desktop the frost moves to the inner
+          // pill, so the header itself goes transparent and gains a top gap.
           scrolled
-            ? "bg-background/80 border-b border-white/10 backdrop-blur-md"
+            ? "bg-background/80 border-b border-white/10 backdrop-blur-md md:border-b-transparent md:bg-transparent md:pt-3 md:backdrop-blur-none"
             : "border-b border-transparent bg-transparent backdrop-blur-0",
           // Entrance animation.
           mounted ? "translate-y-0 opacity-100" : "-translate-y-20 opacity-0",
-          "motion-reduce:transform-none motion-reduce:opacity-100",
+          "motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none",
         ].join(" ")}
       >
         {/* Mobile: logo (left) + toggle (right). Desktop: split nav around a
             centered wordmark via a 3-column grid (1fr · auto · 1fr). */}
         <div
           className={[
-            "mx-auto grid w-full max-w-[1280px] grid-cols-[auto_1fr_auto] items-center px-6 transition-all duration-500 ease-out md:grid-cols-[1fr_auto_1fr] md:px-10",
-            scrolled ? "h-14" : "h-20",
+            "mx-auto grid w-full max-w-[1280px] grid-cols-[auto_1fr_auto] items-center px-6 transition-all duration-500 ease-out motion-reduce:transition-none md:grid-cols-[1fr_auto_1fr] md:px-10",
+            // Desktop scrolled → centered floating pill (shrink toward content,
+            // rounded, hairline border, subtle shadow). Mobile keeps the bar.
+            scrolled
+              ? "h-14 md:max-w-[780px] md:rounded-2xl md:border md:border-white/10 md:bg-background/80 md:shadow-[0_14px_44px_-16px_rgba(0,0,0,0.6)] md:backdrop-blur-md"
+              : "h-20",
           ].join(" ")}
         >
           {/* Left nav (desktop only) — clustered toward the centered logo. */}
