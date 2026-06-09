@@ -119,9 +119,6 @@ function ArtistProfiles() {
               Artist Profiles
             </SectionHeading>
           </div>
-          <p className="mt-4 hidden text-muted-foreground lg:mt-0 lg:block lg:w-[35%]">
-            Vague Frequency Laboratory
-          </p>
         </div>
 
         <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
