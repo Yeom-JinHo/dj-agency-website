@@ -66,8 +66,8 @@ export default function Roster() {
       className="border-t border-ca-line pt-20 pb-0 lg:pt-[120px]"
     >
       <SectionHead
-        num="02"
-        numLabel="ROSTER"
+        num="01"
+        numLabel="TALENT"
         title="Roster"
         aside={`${ARTISTS.length} artists · By invitation.`}
       />

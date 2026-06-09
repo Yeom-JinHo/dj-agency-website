@@ -9,7 +9,7 @@ export default function Work() {
       className="border-t border-ca-line py-20 lg:py-[120px]"
     >
       <SectionHead
-        num="03"
+        num="02"
         numLabel="SELECTED WORK"
         title="Work"
         aside={

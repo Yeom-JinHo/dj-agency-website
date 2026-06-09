@@ -15,7 +15,7 @@ export default function Footer() {
         <div>
           <div className="mb-8 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
             <span className="text-ca-red">●</span>
-            &nbsp; [ 04 ] &nbsp; / &nbsp; CONTACT
+            &nbsp; [ 03 ] &nbsp; / &nbsp; CONTACT
           </div>
           <a
             href={`mailto:${BOOKING_EMAIL}`}
@@ -47,9 +47,6 @@ export default function Footer() {
             >
               {BOOKING_EMAIL}
             </a>
-            <span className="mt-3 block font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
-              +82 2 000 0000
-            </span>
           </Block>
           <Block title="Studios">
             Seoul — {AGENCY_ADDRESS.streetAddress}
