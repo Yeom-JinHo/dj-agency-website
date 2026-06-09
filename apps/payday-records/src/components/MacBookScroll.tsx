@@ -188,6 +188,7 @@ export const Lid = ({
             src={src}
             alt="macbook image"
             fill
+            sizes="512px"
             className="absolute inset-0 h-full w-full rounded-lg object-cover object-left-top"
           />
         )}

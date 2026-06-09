@@ -10,7 +10,11 @@ export default function ArtistSimpleCard({ artist }: ArtistSimpleCardProps) {
   return (
     <div>
       <div className="h-[400px] w-[300px] md:h-[520px] md:w-[350px]">
-        <ArtistImage artist={artist} backgroundLogo={true} />
+        <ArtistImage
+          artist={artist}
+          backgroundLogo={true}
+          sizes="(max-width: 768px) 300px, 350px"
+        />
       </div>
       <div className="flex grow flex-col items-end justify-between gap-4 p-4">
         <div className="flex w-full flex-col gap-2">
