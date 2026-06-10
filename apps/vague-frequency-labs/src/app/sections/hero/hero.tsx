@@ -55,7 +55,7 @@ function Hero() {
           aria-hidden
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.45, ease: "easeOut" }}
+          transition={{ duration: 0.45, ease: "easeOut", delay: 0.5 }}
           className="pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-cream)]"
         >
           <span className="hidden font-mono text-[10px] tracking-[0.34em] opacity-55 sm:block">
