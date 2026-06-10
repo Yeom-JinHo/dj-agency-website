@@ -22,7 +22,9 @@ const Copyright = () => {
         v.f.labs
       </p>
       <p className="mt-4 text-xs sm:mt-0 sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">
-        © {copyright.startYear}{" "}
+        © {copyright.startYear} {meta.site.title}
+        <br />
+        Built by{" "}
         <SignatureLink
           href="https://www.instagram.com/ye0m_2/"
           ariaLabel={`${meta.author.name} — Connect on Instagram`}
