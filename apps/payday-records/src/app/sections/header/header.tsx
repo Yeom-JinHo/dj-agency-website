@@ -66,7 +66,7 @@ export default function Header() {
           ].join(" ")}
         >
           {/* Left nav (desktop only) — clustered toward the centered logo. */}
-          <nav className="hidden -translate-y-[2px] md:flex md:items-center md:justify-self-end">
+          <nav className="hidden md:flex md:items-center md:justify-self-end">
             <div className="flex items-center gap-7 lg:gap-8">
               {leftLinks.map(({ title, href }, index) => (
                 <Link className={navLinkClass} href={href} key={`hl_${index}`}>
@@ -90,7 +90,7 @@ export default function Header() {
 
           {/* Right cell: nav (desktop, clustered toward logo) + mobile toggle. */}
           <div className="flex items-center justify-self-end md:justify-self-start">
-            <nav className="hidden -translate-y-[2px] md:flex md:items-center">
+            <nav className="hidden md:flex md:items-center">
               <div className="flex items-center gap-7 lg:gap-8">
                 {rightLinks.map(({ title, href }, index) => (
                   <Link className={navLinkClass} href={href} key={`hr_${index}`}>
