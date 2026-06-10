@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import SignatureLink from "@repo/ui/common/SignatureLink";
 
 import icon from "@/app/icon.png";
+import { metadata as meta } from "@/app/config";
 import { AGENCY_ADDRESS, ARROW_NE, BOOKING_EMAIL, SOCIALS } from "@/consts/brand";
 
 export default function Footer() {
@@ -94,7 +95,9 @@ export default function Footer() {
           </span>
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
-          © 2026{" "}
+          © 2026 {meta.site.title}
+          <br />
+          Built by{" "}
           <SignatureLink
             href={SOCIALS.instagram}
             ariaLabel="ye0m2 — Connect on Instagram"
@@ -102,8 +105,7 @@ export default function Footer() {
             tooltipClassName="text-ca-red font-mono text-[10px] uppercase tracking-[0.14em]"
           >
             ye0m2
-          </SignatureLink>{" "}
-          · All rights reserved
+          </SignatureLink>
         </div>
       </div>
     </footer>

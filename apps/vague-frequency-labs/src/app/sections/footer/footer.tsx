@@ -38,14 +38,14 @@ export default function Footer() {
   return (
     <div
       ref={containerRef}
-      className="relative h-[280px] sm:h-[350px] md:h-[380px] lg:h-[420px] xl:h-[480px] 2xl:h-[540px]"
+      className="relative h-[320px] sm:h-[350px] md:h-[380px] lg:h-[420px] xl:h-[480px] 2xl:h-[620px]"
       style={{
         clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)",
       }}
     >
       <div
         className={[
-          "fixed bottom-0 h-[280px] w-full sm:h-[350px] md:h-[380px] lg:h-[420px] xl:h-[480px] 2xl:h-[540px]",
+          "fixed bottom-0 h-[320px] w-full sm:h-[350px] md:h-[380px] lg:h-[420px] xl:h-[480px] 2xl:h-[620px]",
           "transition-opacity duration-700 ease-out",
           isVisible ? "opacity-100" : "opacity-50",
         ].join(" ")}
