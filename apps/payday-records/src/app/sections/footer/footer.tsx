@@ -7,9 +7,7 @@ export default function Footer() {
     <div className="bg-muted/20 flex h-full w-full flex-col justify-between px-8 py-4">
       <div className="flex flex-col items-start justify-between sm:flex-row sm:items-end">
         <p className="mt-4 font-mono text-xs tracking-[0.15em] text-white/55 sm:mt-0 sm:text-sm">
-          © 2026 {meta.site.title}
-          <br />
-          Built by{" "}
+          © 2026 {meta.site.title} · Built by{" "}
           <SignatureLink
             href="https://www.instagram.com/ye0m_2/"
             ariaLabel={`${meta.author.name} — Connect on Instagram`}
