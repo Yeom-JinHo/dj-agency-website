@@ -49,7 +49,7 @@ export default function ArtistCard({
       >
         <div className="relative w-full" style={{ aspectRatio: "16 / 9" }}>
           <DialogImage
-            src={image ?? "/placeholder.svg"}
+            src={image}
             alt={`${name} profile image`}
             className="h-full w-full object-cover"
             width={1280}
@@ -81,7 +81,7 @@ export default function ArtistCard({
             <DialogImage
               width={1280}
               height={600}
-              src={image ?? "/placeholder.svg"}
+              src={image}
               alt={`${name} profile image`}
               className="h-[300px] w-full object-cover md:h-[600px]"
               sizes="50vw"
