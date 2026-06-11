@@ -16,7 +16,7 @@ function Hero() {
             src="/images/logo/400_300/PAYDAY.webp"
             alt="Payday Records"
             width={900}
-            height={600}
+            height={675}
             sizes="(max-width: 640px) 320px, (max-width: 1024px) 600px, 900px"
             priority
           />

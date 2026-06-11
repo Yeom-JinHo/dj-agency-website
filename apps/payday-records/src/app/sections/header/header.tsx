@@ -130,7 +130,7 @@ export default function Header() {
           menuOpen ? "opacity-100" : "pointer-events-none opacity-0",
         ].join(" ")}
       >
-        <div className="flex h-20 items-center justify-between px-4">
+        <div className="flex h-20 items-center justify-between px-6">
           <span className="font-display text-2xl tracking-[0.04em] uppercase">
             Payday Records
           </span>
@@ -144,7 +144,7 @@ export default function Header() {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col justify-center px-4 pb-24">
+        <nav className="flex flex-1 flex-col justify-center px-6 pb-24">
           {navLinks.map(({ title, href }, index) => (
             <Link
               key={`header-mobile-link_${index}`}
