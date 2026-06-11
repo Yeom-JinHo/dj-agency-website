@@ -43,6 +43,10 @@
   --color-ca-line: #1f1f1f;
   --color-ca-red: #e63329;
   --color-ca-red-dim: #8a1f19;
+  /* 텍스트를 싣는 부킹 CTA 전용 레드. 브랜드 액센트(ca-red)는 흰 글자 대비
+     ≈3.9:1로 11px 라벨이 AA(4.5:1) 미달이라, 한 톤 깊은 #d62a20으로 ≈5:1 확보.
+     헤더 칩 + BookingFiller 타일이 공유한다. ca-red는 전역 액센트용으로 유지. */
+  --color-ca-red-cta: #d62a20;
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);

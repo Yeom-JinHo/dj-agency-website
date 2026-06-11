@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 import icon from "@/app/icon.png";
-import { ARROW_NE } from "@/consts/brand";
 
 const NAV_LINKS = [
   { href: "#roster", label: "Roster" },
@@ -45,14 +45,19 @@ export default function Header() {
             <span className="text-ca-red">●</span>
             Booking 2026
           </span>
-          {/* 11px 라벨이라 WCAG AA(4.5:1) 적용 대상: 브랜드 레드(ca-red, 흰색
-              대비 ≈3.9:1)보다 한 톤 깊은 #d62a20 + 순백 라벨로 ≈5:1 확보.
-              ca-red 토큰은 전역 액센트용으로 그대로 두고 CTA 칩만 보정. */}
+          {/* 11px 라벨이라 WCAG AA(4.5:1) 적용 대상: 텍스트용 CTA 레드 토큰
+              (ca-red-cta = #d62a20) + 순백 라벨로 ≈5:1 확보. ca-red는 전역
+              액센트용으로 유지. BookingFiller 타일과 같은 토큰을 공유한다. */}
           <Link
             href="#contact"
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#d62a20] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim"
+            className="inline-flex items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim"
           >
-            Book a Set <span aria-hidden="true">{ARROW_NE}</span>
+            Book a Set
+            <IconArrowUpRight
+              aria-hidden="true"
+              className="size-[15px]"
+              stroke={2.25}
+            />
           </Link>
         </div>
       </div>

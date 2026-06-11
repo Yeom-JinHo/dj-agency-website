@@ -17,9 +17,10 @@ export default function Hero() {
   return (
     <section
       id="top"
+      aria-labelledby="hero-heading"
       className="relative flex min-h-[100dvh] flex-col pt-[100px] pb-16"
     >
-      <h1 className="sr-only">
+      <h1 id="hero-heading" className="sr-only">
         Celebrate Agency — Talent · Production · Direction.
       </h1>
       <div className="flex flex-1 items-center justify-center px-6 lg:px-10">

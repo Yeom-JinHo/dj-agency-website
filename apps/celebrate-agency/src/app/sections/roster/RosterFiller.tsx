@@ -1,3 +1,4 @@
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { cn } from "@repo/ui";
 
 import { CornerFrame } from "@/components/Corner";
@@ -15,7 +16,7 @@ export function BookingFiller({ visibility }: BookingFillerProps) {
     <a
       href={`mailto:${BOOKING_EMAIL}`}
       className={cn(
-        "group relative bg-ca-red p-6 transition-colors hover:bg-ca-red-dim",
+        "group relative bg-ca-red-cta p-6 transition-colors hover:bg-ca-red-dim",
         visibility,
       )}
     >
@@ -23,13 +24,17 @@ export function BookingFiller({ visibility }: BookingFillerProps) {
         <span className="inline-block origin-bottom-left font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg transition-transform duration-500 ease-out group-hover:scale-125">
           Book
           <br />a Set
-          <span aria-hidden="true"> {ARROW_NE}</span>
+          <IconArrowUpRight
+            aria-hidden="true"
+            className="ml-[0.1em] inline-block size-[0.8em] align-[-0.02em]"
+            stroke={2.75}
+          />
         </span>
       </div>
       <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-fg">
         Booking
       </div>
-      <div className={`${META_LABEL} text-ca-fg/80`}>
+      <div className={`${META_LABEL} text-ca-fg`}>
         <span>Brief</span>
         <span>MAIL {ARROW_NE}</span>
       </div>
