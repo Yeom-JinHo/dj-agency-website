@@ -89,7 +89,7 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
               {release.artist}
             </p>
             {(release.label || release.catalogNo) && (
-              <p className="mt-1.5 truncate font-mono text-[10px] tracking-widest text-white/35 uppercase">
+              <p className="mt-1.5 truncate font-mono text-[10px] tracking-widest text-white/50 uppercase">
                 {[release.label, release.catalogNo].filter(Boolean).join(" · ")}
               </p>
             )}
@@ -113,7 +113,7 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
                     <span className="flex-1 text-sm font-medium text-white/90">
                       {label}
                     </span>
-                    <IconArrowUpRight className="h-4 w-4 text-white/35 transition-colors group-hover/row:text-white/80" />
+                    <IconArrowUpRight className="h-4 w-4 text-white/40 transition-colors group-hover/row:text-white/80" />
                   </a>
                 </li>
               );
