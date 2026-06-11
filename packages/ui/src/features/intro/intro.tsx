@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { preconnect } from "react-dom";
 import { motion } from "motion/react";
 import { COMPANY_NAME, type AppId } from "@repo/utils/company";
 import { useMobile } from "../../hooks/useMobile";
@@ -46,6 +47,18 @@ export function Intro({ currentApp, appUrls, notice }: IntroProps) {
       image: prLogo,
     },
   ];
+
+  // 외부 브랜드 origin을 마운트 시점에 미리 연결(DNS+TCP+TLS)해, 클릭 후
+  // cross-origin 풀 내비게이션의 콜드 핸드셰이크 지연을 제거한다. self(같은
+  // origin)는 제외. React가 동일 origin preconnect를 dedupe한다.
+  for (const entry of entries) {
+    if (entry.id === currentApp) continue;
+    try {
+      preconnect(new URL(appUrls[entry.id]).origin);
+    } catch {
+      // 잘못된 URL(env var 누락 등)은 조용히 건너뛴다.
+    }
+  }
 
   return (
     <section
