@@ -10,7 +10,12 @@ import caLogo from "../../assets/logos/ca.png";
 import prLogo from "../../assets/logos/pr.png";
 
 interface IntroProps {
-  currentApp: AppId;
+  /**
+   * 현재 앱이 세 브랜드 중 하나일 때 그 id. 브랜드 중립 포털(별도 도메인)처럼
+   * 세 항목을 모두 외부로 보내야 하는 경우 생략한다 — 어느 entry와도 매칭되지
+   * 않아 isSelf가 항상 false가 되고, 클릭 시 전부 외부 URL로 이동한다.
+   */
+  currentApp?: AppId;
   appUrls: Record<AppId, string>;
   /** not-found 컨텍스트에서만 노출되는 절제된 한 줄 힌트. 정상 /intro에서는 넘기지 않는다. */
   notice?: string;
