@@ -6,12 +6,14 @@ export default function Work() {
   return (
     <section
       id="work"
+      aria-labelledby="work-heading"
       className="border-t border-ca-line py-20 lg:py-[120px]"
     >
       <SectionHead
         num="02"
         numLabel="SELECTED WORK"
         title="Work"
+        headingId="work-heading"
         aside={
           <>
             Last 12 months.
@@ -33,7 +35,7 @@ export default function Work() {
               <span className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
                 {work.label}
               </span>
-              <span className="absolute top-4 right-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-red lg:text-[11px]">
+              <span className="absolute top-4 right-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-fg lg:text-[11px]">
                 {work.tag}
               </span>
             </div>

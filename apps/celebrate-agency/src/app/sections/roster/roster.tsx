@@ -63,12 +63,14 @@ export default function Roster() {
   return (
     <section
       id="roster"
+      aria-labelledby="roster-heading"
       className="border-t border-ca-line pt-20 pb-0 lg:pt-[120px]"
     >
       <SectionHead
         num="01"
         numLabel="TALENT"
         title="Roster"
+        headingId="roster-heading"
         aside={`${ARTISTS.length} artists · By invitation.`}
       />
       <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4">

@@ -15,7 +15,7 @@ export function BookingFiller({ visibility }: BookingFillerProps) {
     <a
       href={`mailto:${BOOKING_EMAIL}`}
       className={cn(
-        "group relative bg-ca-red p-6 transition-colors hover:bg-ca-red-dim",
+        "group relative bg-ca-red-cta p-6 transition-colors hover:bg-ca-red-dim",
         visibility,
       )}
     >
@@ -29,7 +29,7 @@ export function BookingFiller({ visibility }: BookingFillerProps) {
       <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] text-ca-fg">
         Booking
       </div>
-      <div className={`${META_LABEL} text-ca-fg/80`}>
+      <div className={`${META_LABEL} text-ca-fg`}>
         <span>Brief</span>
         <span>MAIL {ARROW_NE}</span>
       </div>
