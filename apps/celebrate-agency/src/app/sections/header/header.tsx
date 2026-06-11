@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 import icon from "@/app/icon.png";
-import { ARROW_NE } from "@/consts/brand";
 
 const NAV_LINKS = [
   { href: "#roster", label: "Roster" },
@@ -52,7 +52,12 @@ export default function Header() {
             href="#contact"
             className="inline-flex items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim"
           >
-            Book a Set <span aria-hidden="true">{ARROW_NE}</span>
+            Book a Set
+            <IconArrowUpRight
+              aria-hidden="true"
+              className="size-[15px]"
+              stroke={2.25}
+            />
           </Link>
         </div>
       </div>
