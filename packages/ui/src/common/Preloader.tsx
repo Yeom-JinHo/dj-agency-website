@@ -56,6 +56,10 @@ export function Preloader({ children }: PreloaderProps) {
       variants={slideUp}
       initial="initial"
       exit="exit"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      aria-label="Loading"
       className="bg-background fixed z-999 flex h-[100dvh] w-[100dvw] cursor-wait items-center justify-center px-[60px] pb-[40px]"
     >
       {dimension.width > 0 && (
@@ -64,6 +68,7 @@ export function Preloader({ children }: PreloaderProps) {
             variants={opacity}
             initial="initial"
             animate="enter"
+            aria-hidden="true"
             className={cn(
               "text-foreground absolute z-1 flex items-center text-[192px]",
             )}
