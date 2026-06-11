@@ -14,6 +14,8 @@ Run from repo root via Turbo; `pnpm <task>` fans out to all workspaces.
 
 Scope to one workspace with `--filter`, e.g. `pnpm build --filter=vague-frequency-labs`.
 
+No test framework yet — verify with `lint` + `check-types`.
+
 ## Layout
 
 ```
@@ -39,6 +41,13 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 - **Animation/icons**: `motion`, `@tabler/icons-react`.
 - **Catalog versions** pinned in `pnpm-workspace.yaml` — add shared deps there rather than per-app to keep versions in sync.
 - **Turbo**: `build` depends on `^build`, caches `.next/**` (excl. cache); `dev` is `cache: false, persistent: true`.
+
+## Environment
+
+See `.env.example`. All `.env*` files are gitignored.
+
+- **Cross-site URLs** (root `.env`): `NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL`, `NEXT_PUBLIC_PAYDAY_RECORDS_URL`, `NEXT_PUBLIC_CELEBRATE_AGENCY_URL` — used for inter-app links. Consumed by `packages/utils/src/app-urls.ts`; falls back to `http://localhost:{port}` when unset.
+- **VFL Maps** (`apps/vague-frequency-labs/.env.example`): `NEXT_PUBLIC_NAVER_CLIENT_ID` (NCP Maps, used by the contact page `KoreaCinematic`). Falls back to a Naver Map search link when the key is unset, the script fails to load, or it times out after 5s. Register deploy domains in the NCP console's domain allowlist.
 
 ## Assets
 
