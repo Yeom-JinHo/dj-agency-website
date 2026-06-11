@@ -23,7 +23,12 @@ function Contact() {
         <MacBookScroll
           title={<span className="hero-heading">Show me your dream</span>}
           badge={
-            <a href="https://www.instagram.com/samkor.br/">
+            <a
+              href="https://www.instagram.com/samkor.br/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="SAM on Instagram"
+            >
               <Image
                 src="/images/artist/sam/logo.webp"
                 alt="SAM"
