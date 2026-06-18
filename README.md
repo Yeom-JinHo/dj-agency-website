@@ -12,11 +12,49 @@ Independent Seoul electronic-music label spotlighting experimental tech house an
 
 ![Vague Frequency Laboratory homepage](docs/previews/vague-frequency-labs.webp)
 
+<details>
+<summary><strong>Browse pages</strong> — Artist · Music · Video</summary>
+
+**Artist**
+
+![VFL — Artist](docs/previews/vfl-artist.webp)
+
+**Music**
+
+![VFL — Music](docs/previews/vfl-music.webp)
+
+**Video**
+
+![VFL — Video](docs/previews/vfl-video.webp)
+
+</details>
+
 ### Payday Records · `:3002`
 
 Independent electronic label across deep house, melodic techno, and the textures between. A single-page calling card that establishes a point of view and routes visitors straight into listening — release cards, platform links, and embeds.
 
 ![Payday Records homepage](docs/previews/payday-records.webp)
+
+<details>
+<summary><strong>Browse sections</strong> — About · Release · Sound · Contact</summary>
+
+**About**
+
+![Payday — About](docs/previews/payday-about.webp)
+
+**Release**
+
+![Payday — Release](docs/previews/payday-release.webp)
+
+**Sound**
+
+![Payday — Sound](docs/previews/payday-sound.webp)
+
+**Contact**
+
+![Payday — Contact](docs/previews/payday-contact.webp)
+
+</details>
 
 ### Celebrate Agency · `:3003`
 
@@ -24,7 +62,24 @@ Seoul-based talent, production, and direction agency. A single-page site that pr
 
 ![Celebrate Agency homepage](docs/previews/celebrate-agency.webp)
 
-> Previews are desktop screenshots of each site's homepage running locally. Regenerate them after notable hero/landing changes.
+<details>
+<summary><strong>Browse sections</strong> — Roster · Work · Contact</summary>
+
+**Roster**
+
+![Celebrate — Roster](docs/previews/celebrate-roster.webp)
+
+**Work**
+
+![Celebrate — Work](docs/previews/celebrate-work.webp)
+
+**Contact**
+
+![Celebrate — Contact](docs/previews/celebrate-contact.webp)
+
+</details>
+
+> Previews are desktop screenshots running locally — the homepage above each site, with key pages/sections in the collapsible galleries. Regenerate them after notable layout changes.
 
 ## Getting started
 
