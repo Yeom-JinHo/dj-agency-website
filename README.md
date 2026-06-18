@@ -16,13 +16,11 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 ---
 
-## Vague Frequency Laboratory&ensp;<sub>`:3004`</sub>
+## [Vague Frequency Laboratory](https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 <a href="https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme">
   <img src="docs/previews/vague-frequency-labs.webp" alt="Vague Frequency Laboratory homepage" />
 </a>
-
-<sub>↗ [vague-frequency-labs.vercel.app](https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme)</sub>
 
 <details>
 <summary><strong>Sections</strong> — About · Artist Profiles · Music</summary>
@@ -33,13 +31,11 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 </details>
 
-## Payday Records&ensp;<sub>`:3002`</sub>
+## [Payday Records](https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 <a href="https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme">
   <img src="docs/previews/payday-records.webp" alt="Payday Records homepage" />
 </a>
-
-<sub>↗ [payday-records.vercel.app](https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme)</sub>
 
 <details>
 <summary><strong>Sections</strong> — About · Release · Sound · Contact</summary>
@@ -51,13 +47,11 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 </details>
 
-## Celebrate Agency&ensp;<sub>`:3003`</sub>
+## [Celebrate Agency](https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 <a href="https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme">
   <img src="docs/previews/celebrate-agency.webp" alt="Celebrate Agency homepage" />
 </a>
-
-<sub>↗ [celebrate-agency.vercel.app](https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme)</sub>
 
 <details>
 <summary><strong>Sections</strong> — Roster · Work · Contact</summary>
