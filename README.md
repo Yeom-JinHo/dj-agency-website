@@ -13,19 +13,19 @@ Independent Seoul electronic-music label spotlighting experimental tech house an
 ![Vague Frequency Laboratory homepage](docs/previews/vague-frequency-labs.webp)
 
 <details>
-<summary><strong>Browse pages</strong> — Artist · Music · Video</summary>
+<summary><strong>Browse sections</strong> — About · Artist Profiles · Music</summary>
 
-**Artist**
+**About**
 
-![VFL — Artist](docs/previews/vfl-artist.webp)
+![VFL — About](docs/previews/vfl-about.webp)
+
+**Artist Profiles**
+
+![VFL — Artist Profiles](docs/previews/vfl-artist-profiles.webp)
 
 **Music**
 
-![VFL — Music](docs/previews/vfl-music.webp)
-
-**Video**
-
-![VFL — Video](docs/previews/vfl-video.webp)
+![VFL — Music](docs/previews/vfl-music-list.webp)
 
 </details>
 
