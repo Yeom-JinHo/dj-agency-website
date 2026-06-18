@@ -38,22 +38,9 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  /* Brand accent — warm amber glow shared by Contact ShineBorder,
-     release-card no-artwork fallback bar, and platform-modal fallback. */
+  /* Brand accent — warm amber bar for the release-card no-artwork
+     fallback and the platform-modal fallback. */
   --color-pd-accent: #ffbe7b;
-  --color-pd-accent-soft: #ffd580;
-  --color-pd-accent-deep: #ff9a3c;
-}
-
-@utility container {
-  margin-inline: auto;
-  padding-inline: 2rem;
-  @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 1400px) {
-    max-width: 1400px;
-  }
 }
 
 /* Unified vertical rhythm shared across all main sections. */
