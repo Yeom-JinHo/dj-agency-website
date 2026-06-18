@@ -1,135 +1,86 @@
-# Turborepo starter
+# v.f.labs
 
-This Turborepo starter is maintained by the Turborepo core team.
+A Turborepo monorepo housing three independent Next.js sites for a Seoul-based electronic-music and creative collective — the flagship label brand, a sister label, and a talent agency — plus the shared packages they build on.
 
-## Using this example
+Built with **Next.js 15** (App Router) · **React 19** · **TypeScript 5.9** · **Tailwind CSS v4** · **pnpm workspaces** · **Turborepo**.
 
-Run the following command:
+## Sites
+
+### Vague Frequency Laboratory · `:3004`
+
+Independent Seoul electronic-music label spotlighting experimental tech house and bass house. The site is the label's flagship identity surface — a poster, not a catalog: cream-on-black monotone, a single taegeuk accent, and a dotted world map tracing "Seoul to everywhere."
+
+![Vague Frequency Laboratory homepage](docs/previews/vague-frequency-labs.webp)
+
+### Payday Records · `:3002`
+
+Independent electronic label across deep house, melodic techno, and the textures between. A single-page calling card that establishes a point of view and routes visitors straight into listening — release cards, platform links, and embeds.
+
+![Payday Records homepage](docs/previews/payday-records.webp)
+
+### Celebrate Agency · `:3003`
+
+Seoul-based talent, production, and direction agency. A single-page site that proves the roster and the work without a pitch — dark editorial craft where the site itself signals the agency's.
+
+![Celebrate Agency homepage](docs/previews/celebrate-agency.webp)
+
+> Previews are desktop screenshots of each site's homepage running locally. Regenerate them after notable hero/landing changes.
+
+## Getting started
+
+Requires **Node 18+** and **pnpm**.
 
 ```sh
-npx create-turbo@latest
+pnpm install     # install all workspaces
+pnpm dev         # run all three apps in dev (3002 / 3003 / 3004)
 ```
 
-## What's inside?
+Scope to a single app with a Turbo filter:
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```sh
+pnpm dev --filter=vague-frequency-labs
+pnpm dev --filter=payday-records
+pnpm dev --filter=celebrate-agency
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+## Tasks
+
+Run from the repo root; Turbo fans each task out across workspaces.
+
+| Command | Description |
+| --- | --- |
+| `pnpm dev` | Run all apps in dev (persistent, not cached) |
+| `pnpm build` | Build all apps and packages |
+| `pnpm lint` | ESLint across workspaces (`--max-warnings 0`) |
+| `pnpm check-types` | `next typegen && tsc --noEmit` per app |
+| `pnpm format` | Prettier on `**/*.{ts,tsx,md}` |
+
+> There is no test framework yet — verify changes with `pnpm lint` and `pnpm check-types`.
+
+## Layout
 
 ```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+apps/
+  vague-frequency-labs/   Next.js app, port 3004 (main brand site)
+  payday-records/         Next.js app, port 3002
+  celebrate-agency/       Next.js app, port 3003
+packages/
+  ui/                     @repo/ui — shared React components
+  next-config/            @repo/next-config — shared Next.js base config
+  utils/                  shared utilities (incl. cross-site URL resolution)
+  types/                  shared TS types
+  eslint-config/          @repo/eslint-config
+  typescript-config/      @repo/typescript-config
+docs/
+  previews/               site preview screenshots used in this README
 ```
 
-### Develop
+Each app consumes `@repo/ui` via `workspace:*`. Shared dependency versions are pinned in `pnpm-workspace.yaml` (catalog) to keep them in sync across the monorepo.
 
-To develop all apps and packages, run the following command:
+## Conventions
 
-```
-cd my-turborepo
+- **Images**: webp only, ≤1MB per file (convert with `sharp`). Next.js metadata files (`opengraph-image.*`, `icon.*`, etc.) and SVGs are left as-is.
+- **Environment**: cross-site URLs and the VFL Naver Maps key live in `.env*` (gitignored); see `CLAUDE.md` for the full list and fallbacks.
+- **Git**: branch from an up-to-date `origin/master`; PRs target `master`.
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+See [`CLAUDE.md`](CLAUDE.md) for the full contributor reference.
