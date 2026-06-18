@@ -4,9 +4,9 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 ## Sites
 
-### Vague Frequency Laboratory · `:3004`
+### [Vague Frequency Laboratory ↗](https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme) · `:3004`
 
-![Vague Frequency Laboratory homepage](docs/previews/vague-frequency-labs.webp)
+[![Vague Frequency Laboratory homepage](docs/previews/vague-frequency-labs.webp)](https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 <details>
 <summary><strong>Sections</strong> — About · Artist Profiles · Music</summary>
@@ -17,9 +17,9 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 </details>
 
-### Payday Records · `:3002`
+### [Payday Records ↗](https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme) · `:3002`
 
-![Payday Records homepage](docs/previews/payday-records.webp)
+[![Payday Records homepage](docs/previews/payday-records.webp)](https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 <details>
 <summary><strong>Sections</strong> — About · Release · Sound · Contact</summary>
@@ -31,9 +31,9 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 </details>
 
-### Celebrate Agency · `:3003`
+### [Celebrate Agency ↗](https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme) · `:3003`
 
-![Celebrate Agency homepage](docs/previews/celebrate-agency.webp)
+[![Celebrate Agency homepage](docs/previews/celebrate-agency.webp)](https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 <details>
 <summary><strong>Sections</strong> — Roster · Work · Contact</summary>
