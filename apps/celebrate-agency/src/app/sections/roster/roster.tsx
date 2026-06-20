@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import Image from "next/image";
 
 import { SectionHead } from "@/components/SectionHead";
 import { TapeCorners } from "@/components/Tape";
 import { ARTIST_ROLE_LABEL, ARTISTS } from "@/consts/artists";
 
 import { ArtistModal } from "./ArtistModal";
+import { ArtistPortrait } from "./ArtistPortrait";
 import { BookingFiller, ReservedFiller } from "./RosterFiller";
 
 const MOBILE_COLS = 2;
@@ -88,12 +88,11 @@ export default function Roster() {
           >
             <div className="relative mb-[18px] aspect-[3/4]">
               <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">
-                <Image
-                  src={artist.image}
-                  alt={artist.name}
-                  fill
+                <ArtistPortrait
+                  image={artist.image}
+                  name={artist.name}
+                  variant="card"
                   sizes="(max-width: 1024px) 50vw, 25vw"
-                  className="transform-gpu object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                 />
               </div>
               <TapeCorners />

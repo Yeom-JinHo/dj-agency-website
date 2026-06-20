@@ -12,7 +12,7 @@ const COMING_SOON_SOCIALS: ArtistSocial[] = [
   { platform: "spotify", url: "https://open.spotify.com/" },
 ];
 
-const comingSoon = (id: string, name: string, image: string): Artist => ({
+const comingSoon = (id: string, name: string, image?: string): Artist => ({
   id,
   name,
   image,
@@ -260,8 +260,8 @@ export const ARTISTS: Artist[] = [
     ],
   },
   comingSoon("raver", "RAVER", "/images/artist/raver/profile.webp"),
-  // RUBATO has logo assets only (no profile yet); image path is a placeholder
-  comingSoon("rubato", "RUBATO", "/images/artist/rubato/profile.webp"),
+  // RUBATO has logo assets only (no profile yet); no portrait image available
+  comingSoon("rubato", "RUBATO"),
   comingSoon("smasher", "Smasher", "/images/artist/smasher/profile.webp"),
   comingSoon("stefano", "STEFANO", "/images/artist/stefano/profile.webp"),
   comingSoon("varo", "VARO", "/images/artist/varo/profile.webp"),
