@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { ARTISTS } from "@/consts/artists";
 
 // Each set must exceed viewport width so the -50% translate (= one set)
@@ -15,7 +17,15 @@ export default function Marquee() {
       aria-hidden="true"
       className="mt-10 overflow-hidden border-y border-ca-line bg-ca-bg py-5 lg:mt-[60px] lg:py-6"
     >
-      <div className="flex w-max animate-marquee whitespace-nowrap">
+      <div
+        className="flex w-max animate-marquee whitespace-nowrap"
+        // Duration = per-artist base (responsive, from CSS) × artist count, so
+        // px/s stays constant as the roster grows. Resolved on the element so
+        // the inherited --marquee-base picks up the breakpoint value.
+        style={
+          { animationDuration: `calc(var(--marquee-base) * ${ARTISTS.length})` } as CSSProperties
+        }
+      >
         {loop.map((item, i) => (
           <span
             key={`${item}-${i}`}
