@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
-import Image from "next/image";
 import {
   IconBrandInstagram,
   IconBrandSoundcloud,
@@ -15,6 +14,8 @@ import {
 
 import { ARTIST_ROLE_LABEL } from "@/consts/artists";
 import type { Artist, ArtistSocialPlatform } from "@/types/artist";
+
+import { ArtistPortrait } from "./ArtistPortrait";
 
 const SOCIAL_ICONS: Record<ArtistSocialPlatform, TablerIcon> = {
   soundcloud: IconBrandSoundcloud,
@@ -182,14 +183,13 @@ export function ArtistModal({
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
             <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
-              <div className="ca-stripe-ph-lg relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden lg:w-full lg:max-w-none">
-                <Image
+              <div className="relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none">
+                <ArtistPortrait
                   key={artist.id}
-                  src={artist.image}
-                  alt={artist.name}
-                  fill
+                  image={artist.image}
+                  name={artist.name}
+                  variant="modal"
                   sizes="(max-width: 1024px) 60vw, 600px"
-                  className="object-cover"
                   priority
                 />
               </div>
@@ -280,29 +280,33 @@ export function ArtistModal({
             </button>
           </div>
 
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
-          >
-            <div className="relative aspect-[3/4] w-[600px]">
-              <Image
-                src={prevArtist.image}
-                alt=""
-                fill
-                sizes="(max-width: 1024px) 60vw, 600px"
-                loading="eager"
-              />
+          {(prevArtist.image ?? nextArtist.image) ? (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
+            >
+              {prevArtist.image ? (
+                <div className="relative aspect-[3/4] w-[600px]">
+                  <ArtistPortrait
+                    image={prevArtist.image}
+                    name={prevArtist.name}
+                    variant="modal"
+                    sizes="(max-width: 1024px) 60vw, 600px"
+                  />
+                </div>
+              ) : null}
+              {nextArtist.image ? (
+                <div className="relative aspect-[3/4] w-[600px]">
+                  <ArtistPortrait
+                    image={nextArtist.image}
+                    name={nextArtist.name}
+                    variant="modal"
+                    sizes="(max-width: 1024px) 60vw, 600px"
+                  />
+                </div>
+              ) : null}
             </div>
-            <div className="relative aspect-[3/4] w-[600px]">
-              <Image
-                src={nextArtist.image}
-                alt=""
-                fill
-                sizes="(max-width: 1024px) 60vw, 600px"
-                loading="eager"
-              />
-            </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </div>

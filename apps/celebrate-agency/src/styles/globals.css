@@ -42,10 +42,16 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  /* Track is one SET (REPEATS_PER_SET names) wide per -50% cycle, so duration
-     scales with the track. 123s over the mobile track ≈ 37px/s — slow enough
-     to read on a narrow viewport. Desktop eases up to ≈50px/s below. */
-  --animate-marquee: marquee 123s linear infinite;
+  /* Marquee speed is count-driven: one -50% cycle scrolls past one SET whose
+     width grows with the roster, so duration = per-artist base × artist count
+     keeps px/s constant as artists are added (no manual retune). The element
+     sets --marquee-count inline (= ARTISTS.length); base is per-breakpoint.
+     Mobile 12.3s/artist ≈ 37px/s; desktop 10.3s/artist ≈ 50px/s — preserved
+     from the original 10-artist tuning. */
+  --marquee-base: 12.3s;
+  --marquee-count: 10;
+  --animate-marquee: marquee calc(var(--marquee-base) * var(--marquee-count))
+    linear infinite;
   --animate-hero-fade-in: hero-fade-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
   --animate-modal-fade: modal-fade 0.2s ease-out;
@@ -235,10 +241,10 @@
 
 @layer base {
   /* Desktop has a larger display font and room to read, so ease the marquee up
-     to ≈50px/s. Mobile stays slower (see --animate-marquee). */
+     to ≈50px/s. Mobile stays slower (see --marquee-base). */
   @media (width >= 64rem) {
     :root {
-      --animate-marquee: marquee 103s linear infinite;
+      --marquee-base: 10.3s;
     }
   }
 }

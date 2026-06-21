@@ -21,7 +21,7 @@ export interface ArtistWork {
 export interface Artist {
   id: string;
   name: string;
-  image: string;
+  image?: string;
   bio: string;
   city: string;
   selectedWorks: ArtistWork[];
