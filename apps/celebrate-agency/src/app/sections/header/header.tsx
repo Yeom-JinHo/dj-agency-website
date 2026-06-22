@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IconArrowUpRight } from "@tabler/icons-react";
 
 import icon from "@/app/icon.png";
+import { BOOKING_MAILTO } from "@/consts/brand";
 
 const NAV_LINKS = [
   { href: "#roster", label: "Roster" },
@@ -48,8 +49,8 @@ export default function Header() {
           {/* 11px 라벨이라 WCAG AA(4.5:1) 적용 대상: 텍스트용 CTA 레드 토큰
               (ca-red-cta = #d62a20) + 순백 라벨로 ≈5:1 확보. ca-red는 전역
               액센트용으로 유지. BookingFiller 타일과 같은 토큰을 공유한다. */}
-          <Link
-            href="#contact"
+          <a
+            href={BOOKING_MAILTO}
             className="inline-flex items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim"
           >
             Book a Set
@@ -58,7 +59,7 @@ export default function Header() {
               className="size-[15px]"
               stroke={2.25}
             />
-          </Link>
+          </a>
         </div>
       </div>
     </nav>
