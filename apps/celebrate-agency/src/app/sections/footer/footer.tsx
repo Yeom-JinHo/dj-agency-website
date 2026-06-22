@@ -4,7 +4,13 @@ import SignatureLink from "@repo/ui/common/SignatureLink";
 
 import icon from "@/app/icon.png";
 import { metadata as meta } from "@/app/config";
-import { AGENCY_ADDRESS, ARROW_NE, BOOKING_EMAIL, SOCIALS } from "@/consts/brand";
+import {
+  AGENCY_ADDRESS,
+  ARROW_NE,
+  BOOKING_EMAIL,
+  BOOKING_MAILTO,
+  SOCIALS,
+} from "@/consts/brand";
 
 export default function Footer() {
   return (
@@ -19,7 +25,7 @@ export default function Footer() {
             &nbsp; [ 03 ] &nbsp; / &nbsp; CONTACT
           </div>
           <a
-            href={`mailto:${BOOKING_EMAIL}`}
+            href={BOOKING_MAILTO}
             className="group block transition-colors hover:text-ca-red active:text-ca-red"
           >
             <h2 className="font-display text-[clamp(72px,11vw,168px)] uppercase leading-[0.88] tracking-[-0.005em]">
@@ -43,7 +49,7 @@ export default function Footer() {
         <div className="flex flex-col justify-end gap-10">
           <Block title="Bookings">
             <a
-              href={`mailto:${BOOKING_EMAIL}`}
+              href={BOOKING_MAILTO}
               className="block font-display text-[clamp(32px,4vw,48px)] uppercase leading-[0.95] tracking-[0.01em] transition-colors hover:text-ca-red"
             >
               {BOOKING_EMAIL}

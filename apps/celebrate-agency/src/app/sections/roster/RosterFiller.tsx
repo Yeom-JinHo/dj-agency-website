@@ -2,7 +2,7 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import { cn } from "@repo/ui";
 
 import { CornerFrame } from "@/components/Corner";
-import { ARROW_NE, BOOKING_EMAIL } from "@/consts/brand";
+import { ARROW_NE, BOOKING_MAILTO } from "@/consts/brand";
 
 const FRAME_BASE = "relative mb-[18px] aspect-[3/4]";
 const META_LABEL = "flex justify-between font-mono text-[11px] uppercase tracking-[0.08em] lg:text-[13px]";
@@ -14,7 +14,7 @@ interface BookingFillerProps {
 export function BookingFiller({ visibility }: BookingFillerProps) {
   return (
     <a
-      href={`mailto:${BOOKING_EMAIL}`}
+      href={BOOKING_MAILTO}
       className={cn(
         "group relative bg-ca-red-cta p-6 transition-colors hover:bg-ca-red-dim",
         visibility,
