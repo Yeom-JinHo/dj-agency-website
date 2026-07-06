@@ -451,10 +451,12 @@
     black 88%,
     transparent
   );
-  animation: vfl-map-breathe 6s ease-in-out infinite;
 }
 .vfl-map-img.revealed {
   opacity: 1;
+  /* breathe는 reveal 이후에만 — 베이스에 두면 keyframe이 mount 직후부터
+     opacity를 강제해 loader의 착지 크로스페이드 게이팅(opacity: 0)을 깨뜨린다. */
+  animation: vfl-map-breathe 6s ease-in-out infinite;
 }
 .vfl-map-overlay {
   position: absolute;
@@ -811,7 +813,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vfl-map-img {
+  /* .revealed까지 명시 — breathe가 .vfl-map-img.revealed로 이동해 특이도가
+     높아졌으므로, 베이스 선택자만으론 reduce에서 animation을 못 끈다. */
+  .vfl-map-img,
+  .vfl-map-img.revealed {
     animation: none;
     opacity: 1;
   }
