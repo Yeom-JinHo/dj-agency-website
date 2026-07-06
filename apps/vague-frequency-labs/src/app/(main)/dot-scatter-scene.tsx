@@ -6,10 +6,11 @@ import DottedMap from "dotted-map";
 
 import { LOADER_TIMELINE, useLoaderMarkDone } from "./loader-context";
 
-// 오프닝 씬: 단일 fullscreen canvas에서 font-display "VFL" 글리프를 픽셀 샘플링해
-// dot들로 형성하고(0.8s) → 유지(0.7s) → dotted-map의 실제 지도 dot 좌표로 1:1
-// 트윈 착지(1.0s)시킨다. WorldMap.tsx와 동일한 DottedMap 파라미터를 공유해
-// 착지 정합을 구조적으로 보장한다.
+// 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
+// 등장(0.5s) → 유지(0.7s) → 같은 자리의 dot 입자로 해체(0.3s)된 뒤, dot들이
+// dotted-map의 실제 지도 dot 좌표로 1:1 트윈 착지(1.0s)한다. 솔리드 텍스트와
+// dot 샘플이 같은 글리프 래스터를 공유하므로 해체 정렬이 어긋나지 않고,
+// WorldMap.tsx와 동일한 DottedMap 파라미터로 착지 정합을 구조적으로 보장한다.
 
 // 착지 dot 색 — WorldMap 베이스 dot과 동일(globals.css .vfl-map-img 기본값).
 const DOT_COLOR = "#E8E2D0";
@@ -31,15 +32,17 @@ const BAND_TOP = 0.12;
 const BAND_BOTTOM = 0.88;
 
 // 타임라인 절대 시각(초) — LOADER_TIMELINE에서 유도(하드코딩 금지).
-const FORM_END = LOADER_TIMELINE.form; // 0.8
-const HOLD_END = LOADER_TIMELINE.form + LOADER_TIMELINE.hold; // 1.5
-const SCENE_END = HOLD_END + LOADER_TIMELINE.scatter; // 2.5
+const REVEAL_END = LOADER_TIMELINE.reveal; // 0.5 — 워드마크 등장 완료
+const DISSOLVE_START = REVEAL_END + LOADER_TIMELINE.hold; // 1.2 — 해체 시작
+const SCATTER_START = DISSOLVE_START + LOADER_TIMELINE.dissolve; // 1.5 — 흩어짐 시작
+const SCENE_END = SCATTER_START + LOADER_TIMELINE.scatter; // 2.5
 // 배경(솔리드)은 흩어짐 시작(1.5s)부터 0.6s에 걸쳐 걷힌다.
-const BG_FADE_START = HOLD_END;
+const BG_FADE_START = SCATTER_START;
 const BG_FADE_DUR = 0.6;
-// per-dot stagger — 형성은 0.3s 안에, 흩어짐은 0.15s 안에 분산.
-const FORM_STAGGER = 0.3;
+// per-dot stagger — 흩어짐을 0.15s 안에 분산.
 const SCATTER_STAGGER = 0.15;
+// 워드마크 등장 시 아래에서 살짝 떠오르는 거리 — hero rise(y:20)와 같은 문법.
+const REVEAL_RISE_PX = 16;
 
 // cubic-bezier(0.22, 1, 0.36, 1) — hero.tsx의 EASE와 동일. rAF에서 쓰려고 수식 구현.
 function makeCubicBezier(x1: number, y1: number, x2: number, y2: number) {
@@ -72,13 +75,10 @@ interface ScreenPoint {
 }
 
 interface Dot {
-  sx0: number; // 무작위 시작 x
-  sy0: number; // 무작위 시작 y
-  gx: number; // 글리프 좌표 x (화면)
+  gx: number; // 글리프 좌표 x (화면) — 해체 시 dot이 태어나는 자리
   gy: number; // 글리프 좌표 y (화면)
   tx: number; // 지도 착지 좌표 x (화면)
   ty: number; // 지도 착지 좌표 y (화면)
-  fd: number; // 형성 stagger delay
   sd: number; // 흩어짐 stagger delay
 }
 
@@ -104,19 +104,26 @@ function resolveDisplayFont(): string {
 
 // 오프스크린 canvas에 "VFL"을 렌더해 alpha 그리드 샘플링 → 화면 좌표 글리프 dot.
 // targetN: 목표 dot 수 — 가시 지도 dot 수를 넘겨 받아 1:1 매칭 밀도로 샘플한다.
-function sampleGlyph(fontFamily: string, targetN: number): ScreenPoint[] {
+// 반환하는 font 문자열은 씬의 솔리드 워드마크 렌더에 그대로 재사용 —
+// 같은 폰트·크기·기준선을 쓰므로 해체 시 텍스트와 dot의 정렬이 픽셀 단위로 일치한다.
+interface GlyphSample {
+  points: ScreenPoint[];
+  font: string;
+}
+
+function sampleGlyph(fontFamily: string, targetN: number): GlyphSample {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const targetW = Math.min(vw * 0.7, 900);
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
-  if (!ctx) return [];
+  if (!ctx) return { points: [], font: "" };
 
   // 100px 기준으로 폭을 재고 targetW에 맞춰 폰트 크기 스케일.
   ctx.font = `100px ${fontFamily}`;
   const baseW = ctx.measureText("VFL").width;
-  if (!baseW) return [];
+  if (!baseW) return { points: [], font: "" };
   const fontSize = (100 * targetW) / baseW;
 
   const pad = Math.round(fontSize * 0.15);
@@ -156,7 +163,7 @@ function sampleGlyph(fontFamily: string, targetN: number): ScreenPoint[] {
   );
   const points = step === SAMPLE_STEP ? rough : collect(step);
   console.debug(`[loader] glyph step ${step}, ${points.length} dots`);
-  return points;
+  return { points, font: `${fontSize}px ${fontFamily}` };
 }
 
 export default function DotScatterScene() {
@@ -191,21 +198,22 @@ export default function DotScatterScene() {
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     sceneStartRef.current = performance.now();
 
-    // 강등: 정적 "VFL"을 form 시간 표시 후 페이드아웃, 그 뒤 markDone·언마운트.
+    // 강등: 정적 "VFL"을 reveal+hold 시간 표시 후 페이드아웃, 그 뒤 markDone·언마운트.
     const degrade = () => {
       if (!mounted) return;
       setDegraded(true);
+      const showFor = LOADER_TIMELINE.reveal + LOADER_TIMELINE.hold;
       timeouts.push(
         setTimeout(() => {
           if (mounted) setFallbackFading(true);
-        }, LOADER_TIMELINE.form * 1000),
+        }, showFor * 1000),
       );
       timeouts.push(
         setTimeout(() => {
           if (!mounted) return;
           markOnce();
           setVisible(false);
-        }, (LOADER_TIMELINE.form + 0.4) * 1000),
+        }, (showFor + 0.4) * 1000),
       );
     };
 
@@ -277,8 +285,11 @@ export default function DotScatterScene() {
       // 글리프 샘플링 — 가시 지도 dot 전체와 1:1 매칭이 목표라 safe 수를 밀도 타깃으로 넘긴다.
       // (모바일은 MIN_GLYPH_STEP 캡에 걸려 부분 1:1 — 잔여 지도 dot은 페이드인으로 등장.)
       let glyph: ScreenPoint[];
+      let glyphFont: string;
       try {
-        glyph = sampleGlyph(resolveDisplayFont(), Math.min(safe.length, MAX_DOTS));
+        const sampled = sampleGlyph(resolveDisplayFont(), Math.min(safe.length, MAX_DOTS));
+        glyph = sampled.points;
+        glyphFont = sampled.font;
       } catch {
         return degrade();
       }
@@ -297,13 +308,10 @@ export default function DotScatterScene() {
       const targetN = subsample(safe, N).sort(byX);
 
       const dots: Dot[] = glyphN.map((g, i) => ({
-        sx0: Math.random() * window.innerWidth,
-        sy0: Math.random() * window.innerHeight,
         gx: g.x,
         gy: g.y,
         tx: targetN[i]!.x,
         ty: targetN[i]!.y,
-        fd: Math.random() * FORM_STAGGER,
         sd: Math.random() * SCATTER_STAGGER,
       }));
 
@@ -317,7 +325,9 @@ export default function DotScatterScene() {
       if (!ctx) return degrade();
       ctx.scale(dpr, dpr);
 
-      const formRadius = Math.max(landRadius * 1.7, 1.6);
+      // 해체 직후 dot 반지름 — 살짝 크게 시작해 "부서진 파편" 질감을 주고,
+      // 최초 착지가 시작되기 전(SCENE_END - SCATTER_STAGGER)까지 지도 dot 크기로 수렴.
+      const dissolveRadius = Math.max(landRadius * 1.7, 1.6);
       let pointerCleared = false;
       if (started) return;
       started = true;
@@ -340,42 +350,73 @@ export default function DotScatterScene() {
         }
 
         ctx.clearRect(0, 0, vw, vh);
-        ctx.fillStyle = DOT_COLOR;
-        // 착지 구간에 알파를 지도 dot(#E8E2D085)로 수렴 — 크로스페이드가 밝기 점프 없이 이어진다.
-        ctx.globalAlpha =
-          t <= HOLD_END
-            ? 1
-            : 1 + (LAND_ALPHA - 1) * Math.min(1, (t - HOLD_END) / LOADER_TIMELINE.scatter);
-        // 반지름은 형성 구간에 약간 크게 시작해 착지(hold 시점)까지 수렴.
-        const radius = formRadius + (landRadius - formRadius) * Math.min(1, t / HOLD_END);
 
-        // 수천 개 dot을 개별 beginPath/fill하면 프레임 예산이 깨진다 — 단일 Path2D로 배칭.
-        const path = new Path2D();
-        for (let i = 0; i < dots.length; i++) {
-          const d = dots[i]!;
-          let px: number;
-          let py: number;
-          if (t < FORM_END) {
-            const p = Math.min(1, Math.max(0, (t - d.fd) / (FORM_END - FORM_STAGGER)));
-            const e = ease(p);
-            px = d.sx0 + (d.gx - d.sx0) * e;
-            py = d.sy0 + (d.gy - d.sy0) * e;
-          } else if (t < HOLD_END) {
-            px = d.gx;
-            py = d.gy;
-          } else {
-            const p = Math.min(
-              1,
-              Math.max(0, (t - HOLD_END - d.sd) / (LOADER_TIMELINE.scatter - SCATTER_STAGGER)),
-            );
-            const e = ease(p);
-            px = d.gx + (d.tx - d.gx) * e;
-            py = d.gy + (d.ty - d.gy) * e;
+        // 1) 솔리드 워드마크 — 등장(rise+fade) → 유지 → 해체(fade out).
+        //    샘플링과 동일한 font 문자열·중앙 기준선을 쓰므로 dot과 픽셀 정렬이 일치.
+        if (t < SCATTER_START) {
+          const textAlpha =
+            t < REVEAL_END
+              ? ease(t / REVEAL_END)
+              : t < DISSOLVE_START
+                ? 1
+                : 1 - (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve;
+          if (textAlpha > 0) {
+            const rise =
+              t < REVEAL_END ? (1 - ease(t / REVEAL_END)) * REVEAL_RISE_PX : 0;
+            ctx.globalAlpha = Math.min(1, Math.max(0, textAlpha));
+            ctx.font = glyphFont;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = DOT_COLOR;
+            ctx.fillText("VFL", vw / 2, vh / 2 + rise);
           }
-          path.moveTo(px + radius, py);
-          path.arc(px, py, radius, 0, Math.PI * 2);
         }
-        ctx.fill(path);
+
+        // 2) dot 입자 — 해체 구간에 같은 자리에서 알파 인 → 흩어짐·착지.
+        //    착지 구간엔 알파를 지도 dot(#E8E2D085)로 수렴시켜 크로스페이드 밝기 점프 제거.
+        if (t >= DISSOLVE_START) {
+          ctx.fillStyle = DOT_COLOR;
+          ctx.globalAlpha =
+            t < SCATTER_START
+              ? (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve
+              : 1 +
+                (LAND_ALPHA - 1) *
+                  Math.min(1, (t - SCATTER_START) / LOADER_TIMELINE.scatter);
+          const rq = Math.min(
+            1,
+            (t - DISSOLVE_START) /
+              (SCENE_END - SCATTER_STAGGER - DISSOLVE_START),
+          );
+          const radius = dissolveRadius + (landRadius - dissolveRadius) * rq;
+
+          // 수천 개 dot을 개별 beginPath/fill하면 프레임 예산이 깨진다 — 단일 Path2D로 배칭.
+          const path = new Path2D();
+          for (let i = 0; i < dots.length; i++) {
+            const d = dots[i]!;
+            let px: number;
+            let py: number;
+            if (t < SCATTER_START) {
+              px = d.gx;
+              py = d.gy;
+            } else {
+              const p = Math.min(
+                1,
+                Math.max(
+                  0,
+                  (t - SCATTER_START - d.sd) /
+                    (LOADER_TIMELINE.scatter - SCATTER_STAGGER),
+                ),
+              );
+              const e = ease(p);
+              px = d.gx + (d.tx - d.gx) * e;
+              py = d.gy + (d.ty - d.gy) * e;
+            }
+            path.moveTo(px + radius, py);
+            path.arc(px, py, radius, 0, Math.PI * 2);
+          }
+          ctx.fill(path);
+        }
+        ctx.globalAlpha = 1;
 
         if (t >= SCENE_END) {
           markOnce();
