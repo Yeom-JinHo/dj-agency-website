@@ -2,26 +2,41 @@
 
 import { motion, MotionConfig } from "motion/react";
 import { WorldMap } from "@/components/WorldMap";
+import { useLoaderDone } from "@/app/(main)/loader-context";
 import { hero } from "./config";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 function Hero() {
+  // Gated on the loader's landing signal (useLoaderDone) rather than a client
+  // timer: LoaderProvider's unconditional watchdog guarantees `done` fires
+  // even if the dot-scatter scene fails, so this never hangs (fail-open).
+  const done = useLoaderDone();
+
   // Staggered rise so the headline reads in order — eyebrow, brand, subline —
-  // instead of arriving as one flat block. Mount-driven only (no loader delay).
+  // instead of arriving as one flat block. Held at `initial` until the loader
+  // lands, then plays with the existing stagger delays.
   const rise = (delay = 0) => ({
     initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
+    animate: done ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 },
     transition: { duration: 0.65, ease: EASE, delay },
   });
 
   return (
     <MotionConfig reducedMotion="user">
       <section className="vfl-hero relative h-[100svh] overflow-hidden">
-        {/* Start the hero motion on mount so it always draws in, but never waits
-            on a client timer or loader-driven delay. */}
+        {/* The map mounts immediately (its .vfl-map-inner rect is measured by
+            the loader's dot-scatter scene while it's still running) but stays
+            visually gated — revealed only once the loader signals `done` —
+            so the landing dots crossfade into it instead of popping in early. */}
         <div className="vfl-map-wrap">
-          <WorldMap cities={hero.cities} homeId={hero.homeId} revealDelay={0} />
+          <WorldMap
+            cities={hero.cities}
+            homeId={hero.homeId}
+            revealed={done}
+            mapRevealDelay={0}
+            revealDelay={0.2}
+          />
         </div>
 
         <div className="vfl-vignette" aria-hidden />
@@ -50,11 +65,12 @@ function Hero() {
           </div>
         </div>
 
-        {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline. */}
+        {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline.
+            Same loader-gated reveal as the headline above. */}
         <motion.div
           aria-hidden
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          animate={{ opacity: done ? 1 : 0 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.5 }}
           className="pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-cream)]"
         >
