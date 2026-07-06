@@ -13,8 +13,13 @@ import { LOADER_TIMELINE, useLoaderMarkDone } from "./loader-context";
 
 // 착지 dot 색 — WorldMap 베이스 dot과 동일(globals.css .vfl-map-img 기본값).
 const DOT_COLOR = "#E8E2D0";
-// 형성 dot 목표 상한. 안전 영역/글리프 dot 수가 부족하면 이보다 줄어든다.
-const MAX_DOTS = 350;
+// 성능 안전 상한 — 가시 지도 dot 전체(~6.5k)와 1:1 매칭하되 이 위로는 늘리지 않는다.
+const MAX_DOTS = 8000;
+// 글리프 샘플 최소 간격(px). 작은 뷰포트에서 dot이 겹쳐 글자가 뭉개지는 것을 방지 —
+// 이 캡에 걸리면 글리프 dot이 지도 dot보다 적어져 부분 1:1로 동작한다(잔여는 지도 페이드인).
+const MIN_GLYPH_STEP = 4;
+// 착지 시점 dot 알파 — 지도 dot 색 #E8E2D085의 0x85와 일치시켜 크로스페이드를 무봉제로.
+const LAND_ALPHA = 0x85 / 255;
 // 오프스크린 글리프 샘플링의 최소 그리드 간격(px). 실제 간격은 글자 크기에
 // 맞춰 적응 — 고정 간격은 큰 뷰포트에서 후보가 수만 개로 불어나고, 이를
 // uniform stride로 서브샘플하면 스캔 순서와 간섭해 모아레 물결이 생긴다.
@@ -98,7 +103,8 @@ function resolveDisplayFont(): string {
 }
 
 // 오프스크린 canvas에 "VFL"을 렌더해 alpha 그리드 샘플링 → 화면 좌표 글리프 dot.
-function sampleGlyph(fontFamily: string): ScreenPoint[] {
+// targetN: 목표 dot 수 — 가시 지도 dot 수를 넘겨 받아 1:1 매칭 밀도로 샘플한다.
+function sampleGlyph(fontFamily: string, targetN: number): ScreenPoint[] {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
   const targetW = Math.min(vw * 0.7, 900);
@@ -140,13 +146,13 @@ function sampleGlyph(fontFamily: string): ScreenPoint[] {
     }
     return pts;
   };
-  // 1차 러프 샘플로 글리프 픽셀 면적을 추정한 뒤, 결과가 MAX_DOTS 근처의
-  // 균등 그리드가 되도록 step을 키워 재샘플. 이러면 이후 N개 서브샘플이
+  // 1차 러프 샘플로 글리프 픽셀 면적을 추정한 뒤, 결과가 targetN 근처의
+  // 균등 그리드가 되도록 step을 조정해 재샘플. 이러면 이후 N개 서브샘플이
   // 항등에 가까워져 모아레가 사라지고 dot 커버리지가 글자 크기와 무관해진다.
   const rough = collect(SAMPLE_STEP);
   const step = Math.max(
-    SAMPLE_STEP,
-    Math.ceil(SAMPLE_STEP * Math.sqrt(rough.length / MAX_DOTS)),
+    MIN_GLYPH_STEP,
+    Math.round(SAMPLE_STEP * Math.sqrt(rough.length / targetN)),
   );
   const points = step === SAMPLE_STEP ? rough : collect(step);
   console.debug(`[loader] glyph step ${step}, ${points.length} dots`);
@@ -228,15 +234,6 @@ export default function DotScatterScene() {
       const bg = bgRef.current;
       if (!canvas || !bg) return degrade();
 
-      // 글리프 샘플링
-      let glyph: ScreenPoint[];
-      try {
-        glyph = sampleGlyph(resolveDisplayFont());
-      } catch {
-        return degrade();
-      }
-      if (glyph.length === 0) return degrade();
-
       // 지도 착지 좌표 — WorldMap.tsx:97과 동일 파라미터.
       const inner = document.querySelector<HTMLElement>(".vfl-map-inner");
       const wrap = document.querySelector<HTMLElement>(".vfl-map-wrap");
@@ -276,6 +273,16 @@ export default function DotScatterScene() {
       }
       // 착지 반지름 = 지도 dot 화면 반지름(getSVG radius:0.22 → 화면 스케일).
       const landRadius = (0.22 / vbW) * rect.width;
+
+      // 글리프 샘플링 — 가시 지도 dot 전체와 1:1 매칭이 목표라 safe 수를 밀도 타깃으로 넘긴다.
+      // (모바일은 MIN_GLYPH_STEP 캡에 걸려 부분 1:1 — 잔여 지도 dot은 페이드인으로 등장.)
+      let glyph: ScreenPoint[];
+      try {
+        glyph = sampleGlyph(resolveDisplayFont(), Math.min(safe.length, MAX_DOTS));
+      } catch {
+        return degrade();
+      }
+      if (glyph.length === 0) return degrade();
 
       // 불변식: 안전 영역 dot 수 ≥ N. 부족하면 N을 줄여 미매칭 글리프 dot을 남기지 않음.
       const N = Math.min(MAX_DOTS, glyph.length, safe.length);
@@ -334,9 +341,16 @@ export default function DotScatterScene() {
 
         ctx.clearRect(0, 0, vw, vh);
         ctx.fillStyle = DOT_COLOR;
+        // 착지 구간에 알파를 지도 dot(#E8E2D085)로 수렴 — 크로스페이드가 밝기 점프 없이 이어진다.
+        ctx.globalAlpha =
+          t <= HOLD_END
+            ? 1
+            : 1 + (LAND_ALPHA - 1) * Math.min(1, (t - HOLD_END) / LOADER_TIMELINE.scatter);
         // 반지름은 형성 구간에 약간 크게 시작해 착지(hold 시점)까지 수렴.
         const radius = formRadius + (landRadius - formRadius) * Math.min(1, t / HOLD_END);
 
+        // 수천 개 dot을 개별 beginPath/fill하면 프레임 예산이 깨진다 — 단일 Path2D로 배칭.
+        const path = new Path2D();
         for (let i = 0; i < dots.length; i++) {
           const d = dots[i]!;
           let px: number;
@@ -358,10 +372,10 @@ export default function DotScatterScene() {
             px = d.gx + (d.tx - d.gx) * e;
             py = d.gy + (d.ty - d.gy) * e;
           }
-          ctx.beginPath();
-          ctx.arc(px, py, radius, 0, Math.PI * 2);
-          ctx.fill();
+          path.moveTo(px + radius, py);
+          path.arc(px, py, radius, 0, Math.PI * 2);
         }
+        ctx.fill(path);
 
         if (t >= SCENE_END) {
           markOnce();
