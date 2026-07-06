@@ -27,27 +27,26 @@ function Hero() {
         <div className="vfl-vignette" aria-hidden />
         <div className="vfl-grain" aria-hidden />
 
-        {/* Headline brackets the map: on mobile "We are" sits above the map band
-            and the brand name below it; on desktop both stack bottom-left. */}
+        {/* Headline: a name-lockup cascade — solid brand column, outlined
+            ENTERTAINMENT suffix, mono subline — bottom-left on desktop,
+            centred below the map band on mobile. */}
         <div className="vfl-headline">
-          {/* Eyebrow: the connective phrase plays the supporting role — small and
-              outline-cut — so the brand name below can be the solid lead. */}
-          <motion.span {...rise(0)} className="vfl-h-eyebrow">
-            {hero.headline.line1}
+          <motion.h1 {...rise(0)} className="vfl-h-big vfl-h-brand">
+            {hero.headline.split(" ").map((word, i, arr) => (
+              <span key={word} className="vfl-h-word">
+                {word}
+                {i < arr.length - 1 ? " " : ""}
+              </span>
+            ))}
+          </motion.h1>
+          {/* Suffix: the outline cut keeps the category word part of the name
+              lockup without competing with the solid brand lead. */}
+          <motion.span {...rise(0.08)} className="vfl-h-suffix">
+            {hero.suffix}
           </motion.span>
-          <div className="vfl-h-bottom">
-            <motion.h1 {...rise(0.08)} className="vfl-h-big vfl-h-brand">
-              {hero.headline.line2.split(" ").map((word, i, arr) => (
-                <span key={word} className="vfl-h-word">
-                  {word}
-                  {i < arr.length - 1 ? " " : ""}
-                </span>
-              ))}
-            </motion.h1>
-            <motion.div {...rise(0.16)} className="vfl-h-en">
-              {hero.subline}
-            </motion.div>
-          </div>
+          <motion.div {...rise(0.16)} className="vfl-h-en">
+            {hero.subline}
+          </motion.div>
         </div>
 
         {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline. */}

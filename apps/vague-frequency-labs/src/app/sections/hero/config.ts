@@ -26,8 +26,11 @@ const cities: HeroCity[] = [
 ];
 
 const hero = {
-  // Two-line headline; the second line is the outline (stroke) cut.
-  headline: { line1: "We are", line2: "Vague Frequency Laboratory" },
+  headline: "Vague Frequency Laboratory",
+  // The outline-cut suffix sits under the brand as a corporate name lockup —
+  // "Vague Frequency Laboratory ENTERTAINMENT" reads as the full company name
+  // (name first, category suffix after), not a category tag above it.
+  suffix: "ENTERTAINMENT",
   subline: "FROM SEOUL TO EVERYWHERE · EST. 2025",
   homeId: "seoul",
   cities,
