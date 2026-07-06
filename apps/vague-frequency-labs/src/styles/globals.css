@@ -682,16 +682,17 @@
     0 2px 26px rgba(10, 10, 11, 0.92),
     0 0 70px rgba(10, 10, 11, 0.7);
 }
-/* Eyebrow "ENTERTAINMENT": the category kicker carries the outline treatment
-   so the brand name reads as the solid, high-contrast lead over the busy map. */
-.vfl-h-eyebrow {
+/* Suffix "ENTERTAINMENT": the outline treatment keeps the category word in the
+   name lockup — under the solid brand, above the mono subline — so the weight
+   cascades solid → outline → mono without competing with the lead. */
+.vfl-h-suffix {
   display: block;
   font-family: var(--font-anton), var(--font-pretendard), sans-serif;
   font-weight: 400;
   font-size: clamp(26px, 3.4vw, 48px);
   line-height: 1;
   letter-spacing: 0.04em;
-  margin-bottom: clamp(10px, 1.3vw, 20px);
+  margin-top: clamp(10px, 1.3vw, 20px);
   color: transparent;
   -webkit-text-stroke: 1px var(--vfl-fg);
   text-shadow: 0 2px 18px rgba(10, 10, 11, 0.85);
@@ -720,21 +721,16 @@
     width: min(118%, 520px);
     top: 40%;
   }
-  /* Pull BOTH anchors in toward the map so the kicker, the map, and the brand
-     read as one compact, vertically-centred cluster — "ENTERTAINMENT" sits
-     above the map, the brand + subline below, with even breathing space to the
-     band. The symmetric padding sends the unavoidable negative space to the
-     outer margins (balanced top/bottom) instead of a hole inside the
-     composition. */
+  /* The whole lockup anchors as one centred cluster below the map — mirroring
+     the desktop bottom anchor — so the cascade (brand → suffix → subline)
+     stays intact on the narrow column. */
   .vfl-headline {
-    inset: 0;
+    left: 0;
+    right: 0;
+    bottom: clamp(44px, 9vh, 88px);
     max-width: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     text-align: center;
-    padding: clamp(48px, 11vh, 112px) clamp(20px, 5vw, 28px);
+    padding: 0 clamp(20px, 5vw, 28px);
   }
   .vfl-h-big {
     /* Eased down from 16vw: at ~62px the three-line column crowded the bottom
@@ -743,13 +739,13 @@
     font-size: clamp(44px, 14vw, 76px);
     line-height: 0.96;
   }
-  /* The kicker grows toward the brand's scale so it balances the wordmark
-     across the map band — but at 13 characters it's capped near the brand
-     column's widest line (~10vw, vs 12vw for the old 6-char "We are") and the
-     stroke thins to 0.75px so the long outline doesn't read heavy. */
-  .vfl-h-eyebrow {
+  /* The suffix grows toward the brand's scale so the lockup reads as one name —
+     capped near the brand column's widest line (~10vw; 13 characters) with the
+     stroke thinned to 0.75px so the long outline doesn't read heavy. */
+  .vfl-h-suffix {
     font-size: clamp(30px, 10vw, 54px);
     letter-spacing: 0.01em;
+    margin-top: clamp(8px, 2.6vw, 14px);
     -webkit-text-stroke-width: 0.75px;
   }
   /* Give the subline real separation on mobile (the desktop 1.8vw margin

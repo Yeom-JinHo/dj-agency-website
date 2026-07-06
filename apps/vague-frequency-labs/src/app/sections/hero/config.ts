@@ -26,10 +26,11 @@ const cities: HeroCity[] = [
 ];
 
 const hero = {
-  // The outline-cut kicker states the entertainment identity above the solid
-  // brand lead — category tag first, name second.
-  eyebrow: "ENTERTAINMENT",
   headline: "Vague Frequency Laboratory",
+  // The outline-cut suffix sits under the brand as a corporate name lockup —
+  // "Vague Frequency Laboratory ENTERTAINMENT" reads as the full company name
+  // (name first, category suffix after), not a category tag above it.
+  suffix: "ENTERTAINMENT",
   subline: "FROM SEOUL TO EVERYWHERE · EST. 2025",
   homeId: "seoul",
   cities,
