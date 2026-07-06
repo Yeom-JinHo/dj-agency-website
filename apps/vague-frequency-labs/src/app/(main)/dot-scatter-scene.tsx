@@ -7,12 +7,12 @@ import DottedMap from "dotted-map";
 import { LOADER_TIMELINE, useLoaderMarkDone } from "./loader-context";
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
-// 등장(0.5s) → 유지(0.7s)된 뒤, 해체 파면(wave)이 글자를 좌→우로 훑으며
-// 지나간 자리의 텍스트를 지우고 그 자리에서 dot 입자를 깨운다. 태어난 dot은
-// 잠깐의 lift 후 곧바로 dotted-map의 실제 지도 dot 좌표로 1:1 비행 — 해체와
-// 확산이 per-dot 연속 타임라인으로 이어져 박자 단절이 없다. 솔리드 텍스트와
-// dot 샘플이 같은 글리프 래스터를 공유하므로 해체 정렬이 어긋나지 않고,
-// WorldMap.tsx와 동일한 DottedMap 파라미터로 착지 정합을 구조적으로 보장한다.
+// 등장(0.5s) → 유지(0.7s)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
+// 전원이 동시에 dotted-map의 실제 지도 dot 좌표로 1:1 비행(1.0s)한다.
+// 해체의 탁한 중간 구간은 비대칭 이징으로 회피 — 텍스트는 늦게 빠지고(1-p²)
+// dot은 빨리 들어와 커버리지가 유지된다. 솔리드 텍스트와 dot 샘플이 같은
+// 글리프 래스터를 공유하므로 해체 정렬이 어긋나지 않고, WorldMap.tsx와
+// 동일한 DottedMap 파라미터로 착지 정합을 구조적으로 보장한다.
 
 // 착지 dot 색 — WorldMap 베이스 dot과 동일(globals.css .vfl-map-img 기본값).
 const DOT_COLOR = "#E8E2D0";
@@ -43,10 +43,10 @@ const BG_FADE_START = SCATTER_START;
 const BG_FADE_DUR = 0.6;
 // 워드마크 등장 시 아래에서 살짝 떠오르는 거리 — hero rise(y:20)와 같은 문법.
 const REVEAL_RISE_PX = 16;
-// 해체 파면의 페더 폭(px) — 텍스트가 지워지는 경계를 부드럽게.
-const WAVE_FEATHER_PX = 60;
-// 파면 통과 후 dot이 나타나는 알파 램프 시간.
+// dot이 나타나는 알파 램프 시간.
 const DOT_IN = 0.12;
+// 해체 시작의 미세 지터 — 전면 동시 해체가 기계적으로 보이지 않게 하는 미세 반짝임.
+const DISSOLVE_JITTER = 0.06;
 // 비행 시작의 미세 지터 — 전원이 SCATTER_START에 "한번에" 출발하되 로봇 같지 않게.
 const SCATTER_JITTER = 0.1;
 // per-dot 비행 시간 — 지터가 최대인 dot도 SCENE_END에 착지하도록 유도.
@@ -89,7 +89,7 @@ interface Dot {
   gy: number; // 글리프 좌표 y (화면)
   tx: number; // 지도 착지 좌표 x (화면)
   ty: number; // 지도 착지 좌표 y (화면)
-  tb: number; // 탄생 시각(초) — 파면이 이 dot의 x를 통과하는 순간
+  tb: number; // 탄생 시각(초) — 해체 시작 + 미세 지터 (전면 동시)
   tf: number; // 비행 시작 시각(초) — 전원 SCATTER_START 기준 + 미세 지터(동시 출발)
 }
 
@@ -318,37 +318,16 @@ export default function DotScatterScene() {
       const glyphN = subsample(glyph, N).sort(byX);
       const targetN = subsample(safe, N).sort(byX);
 
-      // 해체 파면 좌표계 — 글리프 bbox 좌우에 페더만큼 여유를 둬 시작·끝이 부드럽다.
-      let minGX = Infinity;
-      let maxGX = -Infinity;
-      for (const g of glyphN) {
-        if (g.x < minGX) minGX = g.x;
-        if (g.x > maxGX) maxGX = g.x;
-      }
-      const waveL = minGX - WAVE_FEATHER_PX;
-      const waveR = maxGX + WAVE_FEATHER_PX;
-      const waveSpan = Math.max(1, waveR - waveL);
-
-      const dots: Dot[] = glyphN.map((g, i) => {
-        // 파면(waveL→waveR, dissolve 동안 이동)이 이 dot의 x를 지나는 순간 태어난다.
-        // 지터는 음수 방향만 — 마지막 dot도 SCENE_END 안에 착지를 마치도록.
-        const tb = Math.max(
-          DISSOLVE_START,
-          DISSOLVE_START +
-            ((g.x - waveL) / waveSpan) * LOADER_TIMELINE.dissolve -
-            Math.random() * 0.04,
-        );
-        return {
-          gx: g.x,
-          gy: g.y,
-          tx: targetN[i]!.x,
-          ty: targetN[i]!.y,
-          tb,
-          // 비행은 파면 순서와 무관하게 전원 동시 출발 — 해체가 끝난 완전한
-          // dot 워드마크가 한 호흡에 세계로 흩어진다.
-          tf: SCATTER_START + Math.random() * SCATTER_JITTER,
-        };
-      });
+      const dots: Dot[] = glyphN.map((g, i) => ({
+        gx: g.x,
+        gy: g.y,
+        tx: targetN[i]!.x,
+        ty: targetN[i]!.y,
+        // 글자 전체가 한번에 입자화 — 미세 지터만으로 반짝이며 태어나는 질감.
+        tb: DISSOLVE_START + Math.random() * DISSOLVE_JITTER,
+        // 해체가 끝난 완전한 dot 워드마크가 한 호흡에 세계로 흩어진다.
+        tf: SCATTER_START + Math.random() * SCATTER_JITTER,
+      }));
 
       // canvas 백킹 스토어(DPR 대응).
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -399,23 +378,14 @@ export default function DotScatterScene() {
           ctx.fillStyle = DOT_COLOR;
           ctx.fillText("VFL", vw / 2, vh / 2 + rise);
         } else if (t < SCATTER_START) {
-          // 파면 x — waveL→waveR를 dissolve 동안 통과. 지나간 왼쪽은 침식, 오른쪽은 유지.
-          // 텍스트 자체를 좌→우 그라디언트 알파로 채워 파면 경계를 페더링한다.
+          // 전면 동시 해체 — 텍스트는 1-p²로 늦게 빠지고 dot은 DOT_IN으로 빨리
+          // 들어와, 크로스페이드 중간의 탁한 커버리지 딥이 생기지 않는다.
           const wp = Math.min(1, (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve);
-          const fx = waveL + wp * waveSpan;
-          const grad = ctx.createLinearGradient(
-            fx - WAVE_FEATHER_PX,
-            0,
-            fx + WAVE_FEATHER_PX,
-            0,
-          );
-          grad.addColorStop(0, "rgba(232, 226, 208, 0)"); // DOT_COLOR의 투명판
-          grad.addColorStop(1, DOT_COLOR);
-          ctx.globalAlpha = 1;
+          ctx.globalAlpha = Math.max(0, 1 - wp * wp);
           ctx.font = glyphFont;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillStyle = grad;
+          ctx.fillStyle = DOT_COLOR;
           ctx.fillText("VFL", vw / 2, vh / 2);
         }
 
