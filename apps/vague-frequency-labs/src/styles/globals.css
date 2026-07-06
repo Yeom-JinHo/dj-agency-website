@@ -682,20 +682,6 @@
     0 2px 26px rgba(10, 10, 11, 0.92),
     0 0 70px rgba(10, 10, 11, 0.7);
 }
-/* Eyebrow "We are": the supporting line carries the outline treatment so the
-   brand name reads as the solid, high-contrast lead over the busy map. */
-.vfl-h-eyebrow {
-  display: block;
-  font-family: var(--font-anton), var(--font-pretendard), sans-serif;
-  font-weight: 400;
-  font-size: clamp(26px, 3.4vw, 48px);
-  line-height: 1;
-  letter-spacing: 0.04em;
-  margin-bottom: clamp(10px, 1.3vw, 20px);
-  color: transparent;
-  -webkit-text-stroke: 1px var(--vfl-fg);
-  text-shadow: 0 2px 18px rgba(10, 10, 11, 0.85);
-}
 .vfl-h-en {
   margin-top: clamp(14px, 1.8vw, 26px);
   font-family: var(--font-space-mono), ui-monospace, monospace;
@@ -703,6 +689,12 @@
   letter-spacing: 0.26em;
   color: var(--vfl-muted);
   text-shadow: 0 1px 12px rgba(10, 10, 11, 0.9);
+}
+/* Subline segments join into one dot-separated line on desktop; on mobile each
+   segment takes its own line so the wrap point is a deliberate boundary, never
+   mid-phrase. */
+.vfl-h-en-seg + .vfl-h-en-seg::before {
+  content: " · ";
 }
 /* Stack the brand words vertically as a deliberate poster column — one word per
    line on every breakpoint, so the wrap point is intentional, not left to the
@@ -720,20 +712,16 @@
     width: min(118%, 520px);
     top: 40%;
   }
-  /* Pull BOTH anchors in toward the map so "We are", the map, and the brand
-     read as one compact, vertically-centred cluster — "We are" sits above the
-     map, the brand + subline below, with even breathing space to the band. The
-     symmetric padding sends the unavoidable negative space to the outer margins
-     (balanced top/bottom) instead of a hole inside the composition. */
+  /* With no eyebrow above the band, the brand + subline anchor as one centred
+     cluster below the map — mirroring the desktop bottom anchor — instead of
+     bracketing it from both sides. */
   .vfl-headline {
-    inset: 0;
+    left: 0;
+    right: 0;
+    bottom: clamp(44px, 9vh, 88px);
     max-width: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     text-align: center;
-    padding: clamp(48px, 11vh, 112px) clamp(20px, 5vw, 28px);
+    padding: 0 clamp(20px, 5vw, 28px);
   }
   .vfl-h-big {
     /* Eased down from 16vw: at ~62px the three-line column crowded the bottom
@@ -742,22 +730,22 @@
     font-size: clamp(44px, 14vw, 76px);
     line-height: 0.96;
   }
-  /* On mobile the eyebrow grows to nearly the brand's scale (it stays the
-     outline cut, so the solid brand still leads) — a big outlined "We are"
-     balances the wordmark across the map instead of reading as a tiny kicker.
-     Thin the stroke to 0.75px so the now-large outline doesn't read heavy. */
-  .vfl-h-eyebrow {
-    font-size: clamp(38px, 12vw, 64px);
-    letter-spacing: 0.01em;
-    -webkit-text-stroke-width: 0.75px;
-  }
   /* Give the subline real separation on mobile (the desktop 1.8vw margin
      collapses to its 14px floor where the type is largest), and tighten the
-     0.26em desktop tracking to 0.16em so the full string holds one line down to
-     360px instead of orphaning a lone "2025". */
+     0.26em desktop tracking to 0.16em. Segments stack one per line — the full
+     dot-joined string can't hold a single line on phone widths. */
   .vfl-h-en {
     margin-top: clamp(20px, 6vw, 30px);
     letter-spacing: 0.16em;
+  }
+  .vfl-h-en-seg {
+    display: block;
+  }
+  .vfl-h-en-seg + .vfl-h-en-seg {
+    margin-top: 6px;
+  }
+  .vfl-h-en-seg + .vfl-h-en-seg::before {
+    content: none;
   }
   /* Every pin (Seoul included) stays on the band, but Seoul's always-on
      "HOME BASE" tooltip panel crowds the small frame and spilled past the

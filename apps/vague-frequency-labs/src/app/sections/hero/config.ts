@@ -26,9 +26,11 @@ const cities: HeroCity[] = [
 ];
 
 const hero = {
-  // Two-line headline; the second line is the outline (stroke) cut.
-  headline: { line1: "We are", line2: "Vague Frequency Laboratory" },
-  subline: "FROM SEOUL TO EVERYWHERE · EST. 2025",
+  headline: "Vague Frequency Laboratory",
+  // The mono subline carries the entertainment identity. Segments render as
+  // one dot-joined line on desktop and wrap at segment boundaries on mobile —
+  // the full string can't hold a single mobile line.
+  subline: ["ENTERTAINMENT", "FROM SEOUL TO EVERYWHERE · EST. 2025"],
   homeId: "seoul",
   cities,
 };
