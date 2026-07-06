@@ -1,6 +1,6 @@
 import { createMetadata } from "@/utils/index";
 import About from "../sections/about/about";
-import ArtistProfiles from "../sections/artistProfiles/artistProfiles";
+import MediaGridWork from "../sections/mediaGrid/MediaGridWork";
 import MusicList from "../sections/musicList/MusicList";
 import Hero from "../sections/hero/hero";
 
@@ -27,7 +27,7 @@ export default function Home() {
     <main className="flex-1">
       <Hero />
       <About />
-      <ArtistProfiles />
+      <MediaGridWork />
       <MusicList />
     </main>
   );

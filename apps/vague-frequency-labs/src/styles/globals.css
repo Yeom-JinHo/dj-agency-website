@@ -886,3 +886,16 @@
   letter-spacing: 0.02em;
   transition: opacity 0.4s ease;
 }
+
+/* ───────────────────────────────────────────────────────────────
+   Media grid placeholder
+   콘텐츠(영상/이미지) 준비 전까지 타일을 채우는 대각 스트라이프 —
+   celebrate Work 문법을 VFL 다크 팔레트로 이식.
+   ─────────────────────────────────────────────────────────────── */
+.vfl-media-ph-stripe {
+  background: repeating-linear-gradient(
+    45deg,
+    hsl(0 0% 100% / 0.045) 0 10px,
+    transparent 10px 20px
+  );
+}
