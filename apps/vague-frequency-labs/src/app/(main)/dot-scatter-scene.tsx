@@ -85,7 +85,7 @@ interface ScreenPoint {
 }
 
 interface Dot {
-  gx: number; // 글리프 좌표 x (화면) — 해체 파면이 지나며 dot이 태어나는 자리
+  gx: number; // 글리프 좌표 x (화면) — 해체 시 dot이 태어나는 자리
   gy: number; // 글리프 좌표 y (화면)
   tx: number; // 지도 착지 좌표 x (화면)
   ty: number; // 지도 착지 좌표 y (화면)
@@ -120,21 +120,28 @@ function resolveDisplayFont(): string {
 interface GlyphSample {
   points: ScreenPoint[];
   font: string;
+  /** 광학 중심 보정 오프셋(px) — 라이브 텍스트도 같은 값으로 그려야 정렬 유지. */
+  inkShift: number;
 }
 
-function sampleGlyph(fontFamily: string, targetN: number): GlyphSample {
+// centerY: 워드마크 잉크의 광학 중심을 놓을 화면 y — 지도 밴드 중심을 넘기면
+// 착지 목적지와 같은 축에 자리해 모바일(top:40%)에서도 구도가 조여진다.
+function sampleGlyph(
+  fontFamily: string,
+  targetN: number,
+  centerY: number,
+): GlyphSample {
   const vw = window.innerWidth;
-  const vh = window.innerHeight;
   const targetW = Math.min(vw * 0.7, 900);
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
-  if (!ctx) return { points: [], font: "" };
+  if (!ctx) return { points: [], font: "", inkShift: 0 };
 
   // 100px 기준으로 폭을 재고 targetW에 맞춰 폰트 크기 스케일.
   ctx.font = `100px ${fontFamily}`;
   const baseW = ctx.measureText("VFL").width;
-  if (!baseW) return { points: [], font: "" };
+  if (!baseW) return { points: [], font: "", inkShift: 0 };
   const fontSize = (100 * targetW) / baseW;
 
   const pad = Math.round(fontSize * 0.15);
@@ -146,13 +153,21 @@ function sampleGlyph(fontFamily: string, targetN: number): GlyphSample {
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  // 광학 중심 보정 — "VFL"은 디센더가 없어 middle 베이스라인(em 박스 기준)으로
+  // 그리면 잉크가 위로 쏠린다. 잉크 bbox의 중심이 박스 중앙에 오도록 내린다.
+  const m = ctx.measureText("VFL");
+  const inkShift =
+    Number.isFinite(m.actualBoundingBoxAscent) &&
+    Number.isFinite(m.actualBoundingBoxDescent)
+      ? (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2
+      : fontSize * 0.06;
   ctx.fillStyle = "#fff";
-  ctx.fillText("VFL", boxW / 2, boxH / 2);
+  ctx.fillText("VFL", boxW / 2, boxH / 2 + inkShift);
 
   const { data } = ctx.getImageData(0, 0, boxW, boxH);
-  // 글리프 박스를 뷰포트 중앙에 배치.
+  // 글리프 박스를 잉크의 광학 중심이 centerY에 오도록 배치.
   const originX = vw / 2 - boxW / 2;
-  const originY = vh / 2 - boxH / 2;
+  const originY = centerY - boxH / 2;
   const collect = (step: number): ScreenPoint[] => {
     const pts: ScreenPoint[] = [];
     for (let y = 0; y < boxH; y += step) {
@@ -173,8 +188,10 @@ function sampleGlyph(fontFamily: string, targetN: number): GlyphSample {
     Math.round(SAMPLE_STEP * Math.sqrt(rough.length / targetN)),
   );
   const points = step === SAMPLE_STEP ? rough : collect(step);
-  console.debug(`[loader] glyph step ${step}, ${points.length} dots`);
-  return { points, font: `${fontSize}px ${fontFamily}` };
+  if (process.env.NODE_ENV !== "production") {
+    console.debug(`[loader] glyph step ${step}, ${points.length} dots`);
+  }
+  return { points, font: `${fontSize}px ${fontFamily}`, inkShift };
 }
 
 export default function DotScatterScene() {
@@ -196,16 +213,17 @@ export default function DotScatterScene() {
     if (markedRef.current) return;
     markedRef.current = true;
     // 계획 Verification: loader 총 시간 2.3–2.7s 확인용 (씬 시작~완료 실측).
-    console.debug(
-      `[loader] total ${(performance.now() - sceneStartRef.current).toFixed(0)}ms`,
-    );
+    if (process.env.NODE_ENV !== "production") {
+      console.debug(
+        `[loader] total ${(performance.now() - sceneStartRef.current).toFixed(0)}ms`,
+      );
+    }
     markDone();
   };
 
   useEffect(() => {
     let mounted = true;
     let raf = 0;
-    let started = false; // rAF 단일 시작 가드(StrictMode 이중 이펙트 대비)
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     sceneStartRef.current = performance.now();
 
@@ -295,12 +313,21 @@ export default function DotScatterScene() {
 
       // 글리프 샘플링 — 가시 지도 dot 전체와 1:1 매칭이 목표라 safe 수를 밀도 타깃으로 넘긴다.
       // (모바일은 MIN_GLYPH_STEP 캡에 걸려 부분 1:1 — 잔여 지도 dot은 페이드인으로 등장.)
+      // 워드마크는 지도 밴드의 광학 중심에 정렬 — 데스크톱(top:50%)은 뷰포트 중앙과
+      // 동일하고, 모바일(top:40%)은 착지 목적지와 같은 축으로 구도가 조여진다.
+      const glyphCenterY = rect.top + rect.height / 2;
       let glyph: ScreenPoint[];
       let glyphFont: string;
+      let inkShift: number;
       try {
-        const sampled = sampleGlyph(resolveDisplayFont(), Math.min(safe.length, MAX_DOTS));
+        const sampled = sampleGlyph(
+          resolveDisplayFont(),
+          Math.min(safe.length, MAX_DOTS),
+          glyphCenterY,
+        );
         glyph = sampled.points;
         glyphFont = sampled.font;
+        inkShift = sampled.inkShift;
       } catch {
         return degrade();
       }
@@ -308,9 +335,11 @@ export default function DotScatterScene() {
 
       // 불변식: 안전 영역 dot 수 ≥ N. 부족하면 N을 줄여 미매칭 글리프 dot을 남기지 않음.
       const N = Math.min(MAX_DOTS, glyph.length, safe.length);
-      console.debug(
-        `[loader] map dots: ${rawCount} → safe ${safe.length}, glyph ${glyph.length}, N=${N}`,
-      );
+      if (process.env.NODE_ENV !== "production") {
+        console.debug(
+          `[loader] map dots: ${rawCount} → safe ${safe.length}, glyph ${glyph.length}, N=${N}`,
+        );
+      }
       if (N === 0) return degrade();
 
       // x-우선 정렬 매칭(궤적 교차 최소화).
@@ -343,8 +372,6 @@ export default function DotScatterScene() {
       // 각 dot의 비행 진행도에 따라 착지 순간 지도 dot 크기로 정확히 수렴.
       const dissolveRadius = Math.max(landRadius * 1.7, 1.6);
       let pointerCleared = false;
-      if (started) return;
-      started = true;
       const startTs = performance.now();
 
       const frame = (now: number) => {
@@ -365,7 +392,7 @@ export default function DotScatterScene() {
 
         ctx.clearRect(0, 0, vw, vh);
 
-        // 1) 솔리드 워드마크 — 등장(rise+fade) → 유지 → 해체 파면에 좌→우로 침식.
+        // 1) 솔리드 워드마크 — 등장(rise+fade) → 유지 → 전면 동시 해체로 소멸.
         //    샘플링과 동일한 font 문자열·중앙 기준선을 쓰므로 dot과 픽셀 정렬이 일치.
         if (t < DISSOLVE_START) {
           const a = t < REVEAL_END ? ease(t / REVEAL_END) : 1;
@@ -376,7 +403,7 @@ export default function DotScatterScene() {
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillStyle = DOT_COLOR;
-          ctx.fillText("VFL", vw / 2, vh / 2 + rise);
+          ctx.fillText("VFL", vw / 2, glyphCenterY + inkShift + rise);
         } else if (t < SCATTER_START) {
           // 전면 동시 해체 — 텍스트는 1-p²로 늦게 빠지고 dot은 DOT_IN으로 빨리
           // 들어와, 크로스페이드 중간의 탁한 커버리지 딥이 생기지 않는다.
@@ -386,10 +413,10 @@ export default function DotScatterScene() {
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillStyle = DOT_COLOR;
-          ctx.fillText("VFL", vw / 2, vh / 2);
+          ctx.fillText("VFL", vw / 2, glyphCenterY + inkShift);
         }
 
-        // 2) dot 입자 — 파면이 깨운 dot이 알파 인(DOT_IN) → lift → 지도 좌표로 비행·착지.
+        // 2) dot 입자 — 전면 동시 해체(미세 지터)로 태어나 알파 인(DOT_IN) → 동시 출발로 비행·착지.
         //    비행 진행도에 따라 알파를 지도 dot(#E8E2D085)로 수렴시켜 크로스페이드 밝기 점프 제거.
         //    per-dot 알파는 ALPHA_BUCKETS 단계로 양자화해 버킷당 Path2D 1회 fill로 배칭 —
         //    수천 개 dot을 개별 fill하면 프레임 예산이 깨진다.
@@ -397,7 +424,7 @@ export default function DotScatterScene() {
           const buckets: (Path2D | undefined)[] = new Array(ALPHA_BUCKETS + 1);
           for (let i = 0; i < dots.length; i++) {
             const d = dots[i]!;
-            if (t < d.tb) continue; // 아직 파면이 도달하지 않은 dot
+            if (t < d.tb) continue; // 아직 태어나지 않은 dot (해체 지터)
             const aIn = Math.min(1, (t - d.tb) / DOT_IN);
             const p = Math.min(1, Math.max(0, (t - d.tf) / FLIGHT));
             const alpha = aIn * (1 + (LAND_ALPHA - 1) * p);
