@@ -27,35 +27,37 @@ function Hero() {
         <div className="vfl-vignette" aria-hidden />
         <div className="vfl-grain" aria-hidden />
 
-        {/* Headline: the solid brand column leads, the mono subline follows —
-            bottom-left on desktop, centred below the map band on mobile. */}
+        {/* Headline brackets the map: on mobile the outlined "ENTERTAINMENT"
+            kicker sits above the map band and the brand name below it; on
+            desktop both stack bottom-left. */}
         <div className="vfl-headline">
-          <motion.h1 {...rise(0)} className="vfl-h-big vfl-h-brand">
-            {hero.headline.split(" ").map((word, i, arr) => (
-              <span key={word} className="vfl-h-word">
-                {word}
-                {i < arr.length - 1 ? " " : ""}
-              </span>
-            ))}
-          </motion.h1>
-          <motion.div {...rise(0.08)} className="vfl-h-en">
-            {hero.subline.map((segment) => (
-              <span key={segment} className="vfl-h-en-seg">
-                {segment}
-              </span>
-            ))}
-          </motion.div>
+          {/* Eyebrow: the category kicker carries the outline cut so the brand
+              name below stays the solid, high-contrast lead. */}
+          <motion.span {...rise(0)} className="vfl-h-eyebrow">
+            {hero.eyebrow}
+          </motion.span>
+          <div className="vfl-h-bottom">
+            <motion.h1 {...rise(0.08)} className="vfl-h-big vfl-h-brand">
+              {hero.headline.split(" ").map((word, i, arr) => (
+                <span key={word} className="vfl-h-word">
+                  {word}
+                  {i < arr.length - 1 ? " " : ""}
+                </span>
+              ))}
+            </motion.h1>
+            <motion.div {...rise(0.16)} className="vfl-h-en">
+              {hero.subline}
+            </motion.div>
+          </div>
         </div>
 
-        {/* Scroll wayfinding — bottom-center on mobile; bottom-right on desktop
-            (mirroring the headline's left offset) so the widened subline never
-            runs into it. */}
+        {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline. */}
         <motion.div
           aria-hidden
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45, ease: "easeOut", delay: 0.5 }}
-          className="pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-cream)] sm:inset-x-auto sm:right-[clamp(20px,4vw,64px)]"
+          className="pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-cream)]"
         >
           <span className="hidden font-mono text-[10px] tracking-[0.34em] opacity-55 sm:block">
             SCROLL

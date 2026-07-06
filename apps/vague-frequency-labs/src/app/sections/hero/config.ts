@@ -26,11 +26,11 @@ const cities: HeroCity[] = [
 ];
 
 const hero = {
+  // The outline-cut kicker states the entertainment identity above the solid
+  // brand lead — category tag first, name second.
+  eyebrow: "ENTERTAINMENT",
   headline: "Vague Frequency Laboratory",
-  // The mono subline carries the entertainment identity. Segments render as
-  // one dot-joined line on desktop and wrap at segment boundaries on mobile —
-  // the full string can't hold a single mobile line.
-  subline: ["ENTERTAINMENT", "FROM SEOUL TO EVERYWHERE · EST. 2025"],
+  subline: "FROM SEOUL TO EVERYWHERE · EST. 2025",
   homeId: "seoul",
   cities,
 };
