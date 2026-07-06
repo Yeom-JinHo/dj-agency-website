@@ -7,8 +7,10 @@ import DottedMap from "dotted-map";
 import { LOADER_TIMELINE, useLoaderMarkDone } from "./loader-context";
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
-// 등장(0.5s) → 유지(0.7s) → 같은 자리의 dot 입자로 해체(0.3s)된 뒤, dot들이
-// dotted-map의 실제 지도 dot 좌표로 1:1 트윈 착지(1.0s)한다. 솔리드 텍스트와
+// 등장(0.5s) → 유지(0.7s)된 뒤, 해체 파면(wave)이 글자를 좌→우로 훑으며
+// 지나간 자리의 텍스트를 지우고 그 자리에서 dot 입자를 깨운다. 태어난 dot은
+// 잠깐의 lift 후 곧바로 dotted-map의 실제 지도 dot 좌표로 1:1 비행 — 해체와
+// 확산이 per-dot 연속 타임라인으로 이어져 박자 단절이 없다. 솔리드 텍스트와
 // dot 샘플이 같은 글리프 래스터를 공유하므로 해체 정렬이 어긋나지 않고,
 // WorldMap.tsx와 동일한 DottedMap 파라미터로 착지 정합을 구조적으로 보장한다.
 
@@ -39,10 +41,18 @@ const SCENE_END = SCATTER_START + LOADER_TIMELINE.scatter; // 2.5
 // 배경(솔리드)은 흩어짐 시작(1.5s)부터 0.6s에 걸쳐 걷힌다.
 const BG_FADE_START = SCATTER_START;
 const BG_FADE_DUR = 0.6;
-// per-dot stagger — 흩어짐을 0.15s 안에 분산.
-const SCATTER_STAGGER = 0.15;
 // 워드마크 등장 시 아래에서 살짝 떠오르는 거리 — hero rise(y:20)와 같은 문법.
 const REVEAL_RISE_PX = 16;
+// 해체 파면의 페더 폭(px) — 텍스트가 지워지는 경계를 부드럽게.
+const WAVE_FEATHER_PX = 60;
+// 파면 통과 후 dot이 나타나는 알파 램프 시간.
+const DOT_IN = 0.12;
+// dot 탄생 → 비행 시작까지의 체공 — 해체 에너지가 확산으로 이어지는 숨.
+const LIFT_DELAY = 0.15;
+// per-dot 비행 시간 — 마지막에 태어난 dot(파면 끝)도 SCENE_END에 착지하도록 유도.
+const FLIGHT = LOADER_TIMELINE.scatter - LIFT_DELAY; // 0.85
+// per-dot 알파는 배칭을 위해 이 단계 수로 양자화(Path2D 버킷당 1 fill).
+const ALPHA_BUCKETS = 10;
 
 // cubic-bezier(0.22, 1, 0.36, 1) — hero.tsx의 EASE와 동일. rAF에서 쓰려고 수식 구현.
 function makeCubicBezier(x1: number, y1: number, x2: number, y2: number) {
@@ -75,11 +85,12 @@ interface ScreenPoint {
 }
 
 interface Dot {
-  gx: number; // 글리프 좌표 x (화면) — 해체 시 dot이 태어나는 자리
+  gx: number; // 글리프 좌표 x (화면) — 해체 파면이 지나며 dot이 태어나는 자리
   gy: number; // 글리프 좌표 y (화면)
   tx: number; // 지도 착지 좌표 x (화면)
   ty: number; // 지도 착지 좌표 y (화면)
-  sd: number; // 흩어짐 stagger delay
+  tb: number; // 탄생 시각(초) — 파면이 이 dot의 x를 통과하는 순간
+  tf: number; // 비행 시작 시각(초) = tb + LIFT_DELAY
 }
 
 // 배열에서 균등 간격으로 n개 서브샘플.
@@ -307,13 +318,35 @@ export default function DotScatterScene() {
       const glyphN = subsample(glyph, N).sort(byX);
       const targetN = subsample(safe, N).sort(byX);
 
-      const dots: Dot[] = glyphN.map((g, i) => ({
-        gx: g.x,
-        gy: g.y,
-        tx: targetN[i]!.x,
-        ty: targetN[i]!.y,
-        sd: Math.random() * SCATTER_STAGGER,
-      }));
+      // 해체 파면 좌표계 — 글리프 bbox 좌우에 페더만큼 여유를 둬 시작·끝이 부드럽다.
+      let minGX = Infinity;
+      let maxGX = -Infinity;
+      for (const g of glyphN) {
+        if (g.x < minGX) minGX = g.x;
+        if (g.x > maxGX) maxGX = g.x;
+      }
+      const waveL = minGX - WAVE_FEATHER_PX;
+      const waveR = maxGX + WAVE_FEATHER_PX;
+      const waveSpan = Math.max(1, waveR - waveL);
+
+      const dots: Dot[] = glyphN.map((g, i) => {
+        // 파면(waveL→waveR, dissolve 동안 이동)이 이 dot의 x를 지나는 순간 태어난다.
+        // 지터는 음수 방향만 — 마지막 dot도 SCENE_END 안에 착지를 마치도록.
+        const tb = Math.max(
+          DISSOLVE_START,
+          DISSOLVE_START +
+            ((g.x - waveL) / waveSpan) * LOADER_TIMELINE.dissolve -
+            Math.random() * 0.04,
+        );
+        return {
+          gx: g.x,
+          gy: g.y,
+          tx: targetN[i]!.x,
+          ty: targetN[i]!.y,
+          tb,
+          tf: tb + LIFT_DELAY,
+        };
+      });
 
       // canvas 백킹 스토어(DPR 대응).
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -326,7 +359,7 @@ export default function DotScatterScene() {
       ctx.scale(dpr, dpr);
 
       // 해체 직후 dot 반지름 — 살짝 크게 시작해 "부서진 파편" 질감을 주고,
-      // 최초 착지가 시작되기 전(SCENE_END - SCATTER_STAGGER)까지 지도 dot 크기로 수렴.
+      // 각 dot의 비행 진행도에 따라 착지 순간 지도 dot 크기로 정확히 수렴.
       const dissolveRadius = Math.max(landRadius * 1.7, 1.6);
       let pointerCleared = false;
       if (started) return;
@@ -351,70 +384,68 @@ export default function DotScatterScene() {
 
         ctx.clearRect(0, 0, vw, vh);
 
-        // 1) 솔리드 워드마크 — 등장(rise+fade) → 유지 → 해체(fade out).
+        // 1) 솔리드 워드마크 — 등장(rise+fade) → 유지 → 해체 파면에 좌→우로 침식.
         //    샘플링과 동일한 font 문자열·중앙 기준선을 쓰므로 dot과 픽셀 정렬이 일치.
-        if (t < SCATTER_START) {
-          const textAlpha =
-            t < REVEAL_END
-              ? ease(t / REVEAL_END)
-              : t < DISSOLVE_START
-                ? 1
-                : 1 - (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve;
-          if (textAlpha > 0) {
-            const rise =
-              t < REVEAL_END ? (1 - ease(t / REVEAL_END)) * REVEAL_RISE_PX : 0;
-            ctx.globalAlpha = Math.min(1, Math.max(0, textAlpha));
-            ctx.font = glyphFont;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = DOT_COLOR;
-            ctx.fillText("VFL", vw / 2, vh / 2 + rise);
-          }
+        if (t < DISSOLVE_START) {
+          const a = t < REVEAL_END ? ease(t / REVEAL_END) : 1;
+          const rise =
+            t < REVEAL_END ? (1 - ease(t / REVEAL_END)) * REVEAL_RISE_PX : 0;
+          ctx.globalAlpha = Math.min(1, Math.max(0, a));
+          ctx.font = glyphFont;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = DOT_COLOR;
+          ctx.fillText("VFL", vw / 2, vh / 2 + rise);
+        } else if (t < SCATTER_START) {
+          // 파면 x — waveL→waveR를 dissolve 동안 통과. 지나간 왼쪽은 침식, 오른쪽은 유지.
+          // 텍스트 자체를 좌→우 그라디언트 알파로 채워 파면 경계를 페더링한다.
+          const wp = Math.min(1, (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve);
+          const fx = waveL + wp * waveSpan;
+          const grad = ctx.createLinearGradient(
+            fx - WAVE_FEATHER_PX,
+            0,
+            fx + WAVE_FEATHER_PX,
+            0,
+          );
+          grad.addColorStop(0, "rgba(232, 226, 208, 0)"); // DOT_COLOR의 투명판
+          grad.addColorStop(1, DOT_COLOR);
+          ctx.globalAlpha = 1;
+          ctx.font = glyphFont;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = grad;
+          ctx.fillText("VFL", vw / 2, vh / 2);
         }
 
-        // 2) dot 입자 — 해체 구간에 같은 자리에서 알파 인 → 흩어짐·착지.
-        //    착지 구간엔 알파를 지도 dot(#E8E2D085)로 수렴시켜 크로스페이드 밝기 점프 제거.
+        // 2) dot 입자 — 파면이 깨운 dot이 알파 인(DOT_IN) → lift → 지도 좌표로 비행·착지.
+        //    비행 진행도에 따라 알파를 지도 dot(#E8E2D085)로 수렴시켜 크로스페이드 밝기 점프 제거.
+        //    per-dot 알파는 ALPHA_BUCKETS 단계로 양자화해 버킷당 Path2D 1회 fill로 배칭 —
+        //    수천 개 dot을 개별 fill하면 프레임 예산이 깨진다.
         if (t >= DISSOLVE_START) {
-          ctx.fillStyle = DOT_COLOR;
-          ctx.globalAlpha =
-            t < SCATTER_START
-              ? (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve
-              : 1 +
-                (LAND_ALPHA - 1) *
-                  Math.min(1, (t - SCATTER_START) / LOADER_TIMELINE.scatter);
-          const rq = Math.min(
-            1,
-            (t - DISSOLVE_START) /
-              (SCENE_END - SCATTER_STAGGER - DISSOLVE_START),
-          );
-          const radius = dissolveRadius + (landRadius - dissolveRadius) * rq;
-
-          // 수천 개 dot을 개별 beginPath/fill하면 프레임 예산이 깨진다 — 단일 Path2D로 배칭.
-          const path = new Path2D();
+          const buckets: (Path2D | undefined)[] = new Array(ALPHA_BUCKETS + 1);
           for (let i = 0; i < dots.length; i++) {
             const d = dots[i]!;
-            let px: number;
-            let py: number;
-            if (t < SCATTER_START) {
-              px = d.gx;
-              py = d.gy;
-            } else {
-              const p = Math.min(
-                1,
-                Math.max(
-                  0,
-                  (t - SCATTER_START - d.sd) /
-                    (LOADER_TIMELINE.scatter - SCATTER_STAGGER),
-                ),
-              );
-              const e = ease(p);
-              px = d.gx + (d.tx - d.gx) * e;
-              py = d.gy + (d.ty - d.gy) * e;
-            }
+            if (t < d.tb) continue; // 아직 파면이 도달하지 않은 dot
+            const aIn = Math.min(1, (t - d.tb) / DOT_IN);
+            const p = Math.min(1, Math.max(0, (t - d.tf) / FLIGHT));
+            const alpha = aIn * (1 + (LAND_ALPHA - 1) * p);
+            const bi = Math.round(alpha * ALPHA_BUCKETS);
+            if (bi <= 0) continue;
+            const e = ease(p);
+            const px = d.gx + (d.tx - d.gx) * e;
+            const py = d.gy + (d.ty - d.gy) * e;
+            const radius = dissolveRadius + (landRadius - dissolveRadius) * e;
+            const path = (buckets[bi] ??= new Path2D());
             path.moveTo(px + radius, py);
             path.arc(px, py, radius, 0, Math.PI * 2);
           }
-          ctx.fill(path);
+          ctx.fillStyle = DOT_COLOR;
+          for (let bi = 1; bi <= ALPHA_BUCKETS; bi++) {
+            const path = buckets[bi];
+            if (!path) continue;
+            ctx.globalAlpha = bi / ALPHA_BUCKETS;
+            ctx.fill(path);
+          }
         }
         ctx.globalAlpha = 1;
 
