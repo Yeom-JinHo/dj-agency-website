@@ -47,10 +47,10 @@ const REVEAL_RISE_PX = 16;
 const WAVE_FEATHER_PX = 60;
 // 파면 통과 후 dot이 나타나는 알파 램프 시간.
 const DOT_IN = 0.12;
-// dot 탄생 → 비행 시작까지의 체공 — 해체 에너지가 확산으로 이어지는 숨.
-const LIFT_DELAY = 0.15;
-// per-dot 비행 시간 — 마지막에 태어난 dot(파면 끝)도 SCENE_END에 착지하도록 유도.
-const FLIGHT = LOADER_TIMELINE.scatter - LIFT_DELAY; // 0.85
+// 비행 시작의 미세 지터 — 전원이 SCATTER_START에 "한번에" 출발하되 로봇 같지 않게.
+const SCATTER_JITTER = 0.1;
+// per-dot 비행 시간 — 지터가 최대인 dot도 SCENE_END에 착지하도록 유도.
+const FLIGHT = LOADER_TIMELINE.scatter - SCATTER_JITTER; // 0.9
 // per-dot 알파는 배칭을 위해 이 단계 수로 양자화(Path2D 버킷당 1 fill).
 const ALPHA_BUCKETS = 10;
 
@@ -90,7 +90,7 @@ interface Dot {
   tx: number; // 지도 착지 좌표 x (화면)
   ty: number; // 지도 착지 좌표 y (화면)
   tb: number; // 탄생 시각(초) — 파면이 이 dot의 x를 통과하는 순간
-  tf: number; // 비행 시작 시각(초) = tb + LIFT_DELAY
+  tf: number; // 비행 시작 시각(초) — 전원 SCATTER_START 기준 + 미세 지터(동시 출발)
 }
 
 // 배열에서 균등 간격으로 n개 서브샘플.
@@ -344,7 +344,9 @@ export default function DotScatterScene() {
           tx: targetN[i]!.x,
           ty: targetN[i]!.y,
           tb,
-          tf: tb + LIFT_DELAY,
+          // 비행은 파면 순서와 무관하게 전원 동시 출발 — 해체가 끝난 완전한
+          // dot 워드마크가 한 호흡에 세계로 흩어진다.
+          tf: SCATTER_START + Math.random() * SCATTER_JITTER,
         };
       });
 
