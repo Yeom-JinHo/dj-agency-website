@@ -12,7 +12,7 @@ import {
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
 // 등장(0.5s) → 유지(0.9s — 이 구간에 아웃라인 "ENTERTAINMENT" 서브카피가 스태거
-// 등장했다 해체 전에 소등)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
+// 등장해 씬 끝까지 남는다)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
 // 전원이 동시에 dotted-map의 실제 지도 dot 좌표로 1:1 비행(1.0s)한다.
 // 해체의 탁한 중간 구간은 비대칭 이징으로 회피 — 텍스트는 늦게 빠지고(1-p²)
 // dot은 빨리 들어와 커버리지가 유지된다. 솔리드 텍스트와 dot 샘플이 같은
@@ -57,23 +57,20 @@ const REVEAL_RISE_PX = 16;
 // ── ENTERTAINMENT 서브카피 ──
 // hero .vfl-h-suffix의 아웃라인 락업을 loader에서 예고하는 레이어 — loader 락업이
 // 입자로 흩어졌다가 hero에서 지도 위 락업으로 재조립되는 서사. VFL보다 늦게 스태거
-// 등장하고 해체 시작 전에 완전히 소등(0.1s 여유)해, 해체(입자)와 페이드(알파)가 한
-// 화면에 공존하지 않고 시선이 VFL의 해체 드라마에만 남는다. dot 해체에는 불참.
+// 등장한 뒤 자체 퇴장 없이 씬 끝까지 남아 오버레이 exit(크로스페이드)와 함께
+// 사라진다 — 솔리드(본체)는 세계로 흩어지고 아웃라인(카테고리)은 끝까지 남는 구도.
+// 짧은 왕복(등장→즉시 소등)은 연출이 아니라 깜빡임으로 지각되어 배제했다.
+// dot 해체에는 불참.
 const ENT_TEXT = "ENTERTAINMENT";
 const ENT_IN_START = REVEAL_END + 0.1; // 0.6 — VFL 등장 직후 한 박자만 띄운 스태거
 const ENT_IN_DUR = 0.2;
-const ENT_OUT_END = DISSOLVE_START - 0.1; // 1.3 — 해체 전 완전 소등
-const ENT_OUT_DUR = 0.2;
-const ENT_OUT_START = ENT_OUT_END - ENT_OUT_DUR; // 1.1
-// 피크 가독 구간(완전한 알파) = 0.8–1.1s(0.3s). 13글자 인지에 필요한 최소 구간이라
-// 오프셋을 줄여 확보했다 — 아래 불변식이 이 구간의 존재를 지킨다.
 if (process.env.NODE_ENV !== "production") {
-  // 불변식: 등장 완료 < 소등 시작. ENT 오프셋(0.1/0.2/0.1)은 hold=0.9에 튜닝된
-  // 하드코딩 — LOADER_TIMELINE.hold를 줄이면 ENT가 최대 알파에 도달하지 못하는
-  // 조용한 회귀가 생기므로 dev에서 즉시 잡는다.
+  // 불변식: 등장 완료 < 해체 시작. ENT 오프셋(0.1/0.2)은 hold=0.9에 튜닝된
+  // 하드코딩 — LOADER_TIMELINE.hold를 줄이면 VFL 해체가 시작된 뒤에야 ENT가
+  // 등장을 마치는 조용한 회귀가 생기므로 dev에서 즉시 잡는다.
   console.assert(
-    ENT_IN_START + ENT_IN_DUR < ENT_OUT_START,
-    `[loader] ENT 타임라인 불변식 위반: in 완료 ${ENT_IN_START + ENT_IN_DUR}s ≥ out 시작 ${ENT_OUT_START}s`,
+    ENT_IN_START + ENT_IN_DUR < DISSOLVE_START,
+    `[loader] ENT 타임라인 불변식 위반: in 완료 ${ENT_IN_START + ENT_IN_DUR}s ≥ 해체 시작 ${DISSOLVE_START}s`,
   );
 }
 // 등장 rise — VFL과 같은 이징 문법, 종속된 진폭(절반).
@@ -575,16 +572,15 @@ export default function DotScatterScene() {
         }
 
         // 1.5) ENTERTAINMENT 서브카피 — VFL 유지 중 스태거 등장(동일 이징, 절반
-        //      진폭) → 해체 시작 전 완전 소등. hero .vfl-h-suffix와 같은 1px
-        //      아웃라인 스트로크로, 솔리드→아웃라인 위계를 loader에서 예고한다.
-        if (t >= ENT_IN_START && t < ENT_OUT_END) {
+        //      진폭) 후 씬 끝까지 유지 — 퇴장은 오버레이 exit가 맡는다. hero
+        //      .vfl-h-suffix와 같은 1px 아웃라인 스트로크로, 솔리드→아웃라인
+        //      위계를 loader에서 예고한다.
+        if (t >= ENT_IN_START) {
           const aIn =
             t < ENT_IN_START + ENT_IN_DUR
               ? ease((t - ENT_IN_START) / ENT_IN_DUR)
               : 1;
-          const aOut =
-            t >= ENT_OUT_START ? 1 - ease((t - ENT_OUT_START) / ENT_OUT_DUR) : 1;
-          ctx.globalAlpha = Math.max(0, Math.min(1, ENT_ALPHA * aIn * aOut));
+          ctx.globalAlpha = Math.max(0, Math.min(1, ENT_ALPHA * aIn));
           ctx.font = entFont;
           ctx.textAlign = "left";
           ctx.textBaseline = "alphabetic";
