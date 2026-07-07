@@ -84,7 +84,7 @@ export default function Roster() {
             onClick={() => open(index)}
             aria-haspopup="dialog"
             aria-label={`View ${artist.name} profile`}
-            className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-ca-bg-hover"
+            className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-ca-bg-hover active:bg-ca-bg-hover focus-visible:z-10"
           >
             <div className="relative mb-[18px] aspect-[3/4]">
               <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">
@@ -97,7 +97,7 @@ export default function Roster() {
               </div>
               <TapeCorners />
             </div>
-            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red">
+            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red group-active:text-ca-red">
               {artist.name}
             </div>
             <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">

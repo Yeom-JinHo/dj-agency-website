@@ -16,17 +16,19 @@ export function BookingFiller({ visibility }: BookingFillerProps) {
     <a
       href={BOOKING_MAILTO}
       className={cn(
-        "group relative bg-ca-red-cta p-6 transition-colors hover:bg-ca-red-dim",
+        "group relative bg-ca-red-cta p-6 transition-colors hover:bg-ca-red-dim active:bg-ca-red-dim focus-visible:z-10 focus-visible:outline-ca-fg",
         visibility,
       )}
     >
       <div className={`${FRAME_BASE} flex flex-col justify-end overflow-hidden border border-ca-fg/20 p-4`}>
-        <span className="inline-block origin-bottom-left font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg transition-transform duration-500 ease-out group-hover:scale-125">
+        {/* 인터랙션 스케일 규칙: 텍스트류는 큰 확대 대신 미세 스케일 + 화살표 넛지.
+            (기존 1.25는 규칙 밖 과대 배율이라 하향) */}
+        <span className="inline-block origin-bottom-left font-display text-[clamp(40px,4.5vw,64px)] uppercase leading-[0.86] tracking-[-0.005em] text-ca-fg transition-transform duration-300 ease-out group-hover:scale-[1.04] group-active:scale-[1.04]">
           Book
           <br />a Set
           <IconArrowUpRight
             aria-hidden="true"
-            className="ml-[0.1em] inline-block size-[0.8em] align-[-0.02em]"
+            className="ml-[0.1em] inline-block size-[0.8em] align-[-0.02em] transition-transform duration-300 ease-out group-hover:translate-x-[0.06em] group-hover:-translate-y-[0.06em] group-active:translate-x-[0.06em] group-active:-translate-y-[0.06em]"
             stroke={2.75}
           />
         </span>

@@ -27,10 +27,10 @@ export default function Work() {
           <a
             key={work.id}
             href="#"
-            className={`relative cursor-pointer ${work.spanClassName}`}
+            className={`group relative cursor-pointer ${work.spanClassName}`}
           >
             <div
-              className={`ca-stripe-ph-lg relative overflow-hidden border border-ca-line ${work.aspectClassName}`}
+              className={`ca-stripe-ph-lg relative overflow-hidden border border-ca-line transition-[filter,border-color] duration-300 group-hover:border-ca-red/40 group-hover:brightness-125 group-active:border-ca-red/40 group-active:brightness-125 ${work.aspectClassName}`}
             >
               <span className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
                 {work.label}
@@ -40,7 +40,7 @@ export default function Work() {
               </span>
             </div>
             <div className="flex items-end justify-between pt-4">
-              <h3 className="font-display text-3xl uppercase leading-none tracking-[0.01em]">
+              <h3 className="font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red group-active:text-ca-red">
                 {work.title}
               </h3>
               <div className="text-right font-mono text-[11px] uppercase tracking-[0.1em] text-ca-muted lg:text-[13px]">

@@ -39,7 +39,7 @@ export default function Footer() {
                 .
               </span>
             </h2>
-            <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red lg:text-[13px]">
+            <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red group-active:text-ca-red lg:text-[13px]">
               <span className="inline-block h-2 w-2 bg-ca-red" />
               {BOOKING_EMAIL}
               <span aria-hidden="true">{ARROW_NE}</span>
@@ -50,7 +50,7 @@ export default function Footer() {
           <Block title="Bookings">
             <a
               href={BOOKING_MAILTO}
-              className="block font-display text-[clamp(32px,4vw,48px)] uppercase leading-[0.95] tracking-[0.01em] transition-colors hover:text-ca-red"
+              className="block font-display text-[clamp(32px,4vw,48px)] uppercase leading-[0.95] tracking-[0.01em] transition-colors hover:text-ca-red active:text-ca-red"
             >
               {BOOKING_EMAIL}
             </a>
@@ -84,7 +84,7 @@ export default function Footer() {
             href={SOCIALS.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-ca-red"
+            className="transition-colors hover:text-ca-red active:text-ca-red"
           >
             Instagram <span aria-hidden="true">{ARROW_NE}</span>
           </a>
@@ -92,7 +92,7 @@ export default function Footer() {
             href={SOCIALS.youtube}
             target="_blank"
             rel="noopener noreferrer"
-            className="transition-colors hover:text-ca-red"
+            className="transition-colors hover:text-ca-red active:text-ca-red"
           >
             Youtube <span aria-hidden="true">{ARROW_NE}</span>
           </a>
@@ -107,7 +107,7 @@ export default function Footer() {
           <SignatureLink
             href={SOCIALS.instagram}
             ariaLabel="ye0m2 — Connect on Instagram"
-            className="text-ca-muted hover:text-ca-red focus-visible:text-ca-red"
+            className="text-ca-muted hover:text-ca-red active:text-ca-red focus-visible:text-ca-red"
             tooltipClassName="text-ca-red font-mono text-[10px] uppercase tracking-[0.14em]"
           >
             ye0m2

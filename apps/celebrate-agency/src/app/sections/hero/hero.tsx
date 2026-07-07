@@ -110,19 +110,19 @@ export default function Hero() {
             className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-red lg:text-[13px]"
           >
             <span aria-hidden>↓</span>
-            <a href="#roster" className="transition-colors hover:text-ca-fg">
+            <a href="#roster" className="transition-colors hover:text-ca-fg active:text-ca-fg">
               Roster
             </a>
             <span aria-hidden className="text-ca-muted">
               /
             </span>
-            <a href="#work" className="transition-colors hover:text-ca-fg">
+            <a href="#work" className="transition-colors hover:text-ca-fg active:text-ca-fg">
               Work
             </a>
             <span aria-hidden className="text-ca-muted">
               /
             </span>
-            <a href="#contact" className="transition-colors hover:text-ca-fg">
+            <a href="#contact" className="transition-colors hover:text-ca-fg active:text-ca-fg">
               Contact
             </a>
           </nav>

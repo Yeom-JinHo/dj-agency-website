@@ -237,6 +237,13 @@
     color: inherit;
     text-decoration: none;
   }
+
+  /* 전역 포커스 링: 다크 배경·사진 위에서도 읽히도록 ca-red + offset 틈.
+     배경이 빨간 요소(헤더 CTA, BookingFiller)만 focus-visible:outline-ca-fg로 반전. */
+  :focus-visible {
+    outline: 2px solid var(--color-ca-red);
+    outline-offset: 2px;
+  }
 }
 
 @layer base {

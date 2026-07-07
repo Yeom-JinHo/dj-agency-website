@@ -34,7 +34,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs uppercase tracking-[0.14em] text-ca-fg/80 transition-opacity hover:opacity-100 lg:text-[13px]"
+              className="text-xs uppercase tracking-[0.14em] text-ca-fg/80 transition-opacity hover:opacity-100 active:opacity-100 lg:text-[13px]"
             >
               {link.label}
             </Link>
@@ -49,9 +49,12 @@ export default function Header() {
           {/* 11px 라벨이라 WCAG AA(4.5:1) 적용 대상: 텍스트용 CTA 레드 토큰
               (ca-red-cta = #d62a20) + 순백 라벨로 ≈5:1 확보. ca-red는 전역
               액센트용으로 유지. BookingFiller 타일과 같은 토큰을 공유한다. */}
+          {/* 형태: 전역 각진 시스템에서 유일한 곡선 — 형태 대비로 최상위 CTA를
+              강조하는 의도적 예외(사선 컷 시안 검토 후 pill 유지 결정).
+              포커스 링은 빨간 배경이라 ca-fg로 반전, radius를 따라 그려진다. */}
           <a
             href={BOOKING_MAILTO}
-            className="inline-flex items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim active:bg-ca-red-dim focus-visible:outline-ca-fg"
           >
             Book a Set
             <IconArrowUpRight

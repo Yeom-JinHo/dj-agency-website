@@ -14,7 +14,7 @@ export function Tape({ pos }: Readonly<{ pos: TapePos }>) {
     <span
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute h-2.5 w-10 bg-ca-red/45 opacity-100 transition-opacity duration-500 ease-out group-hover:opacity-0",
+        "pointer-events-none absolute h-2.5 w-10 bg-ca-red/45 opacity-100 transition-opacity duration-500 ease-out group-hover:opacity-0 group-active:opacity-0",
         POSITIONS[pos]
       )}
     />
