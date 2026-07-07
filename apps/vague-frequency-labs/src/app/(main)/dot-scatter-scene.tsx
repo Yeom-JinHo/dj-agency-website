@@ -149,6 +149,65 @@ function subsample<T>(arr: T[], n: number): T[] {
   return out;
 }
 
+// 락업 세로 레이아웃 — VFL은 폭 기준(targetW)만으로 크기가 정해져 높이를 보장하지
+// 못하고, ENT는 잉크 하단 아래로 추가 배치만 되므로 세로가 짧은 뷰포트(1366×768,
+// 모바일 가로 등)에서 서브카피가 화면 아래로 밀린다. 여기서 두 가지를 보정한다:
+// (1) 락업 전체 높이(VFL 잉크 + ENT 확장분)에 뷰포트 비례 상한을 걸어 targetW 축소,
+// (2) ENT 확장분의 절반만큼 중심을 올려 VFL+ENT 락업의 광학 중심을 밴드 중심에 정렬.
+// 반환 centerY를 글리프 샘플링과 라이브 렌더가 함께 쓰므로 해체 정렬은 유지된다.
+// 상한 0.88 = 상하 6% 여유 — 포스터 스케일이 아트 디렉션이라 일반 데스크톱
+// (1080p 최대화 창 포함)에서는 발동하지 않고, 실제로 넘치는 짧은 뷰포트
+// (1366×768, 모바일 가로 등)에서만 워드마크를 줄인다.
+const MAX_LOCKUP_VH = 0.88;
+
+interface LockupLayout {
+  /** 높이 상한 반영 후의 워드마크 목표 폭 — sampleGlyph에 그대로 전달. */
+  targetW: number;
+  /** VFL 잉크 광학 중심 y — ENT 확장분 절반만큼 밴드 중심에서 올라간 값. */
+  centerY: number;
+}
+
+function layoutLockup(
+  fontFamily: string,
+  bandCenterY: number,
+): LockupLayout | null {
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  ctx.font = `100px ${fontFamily}`;
+  const baseW = ctx.measureText("VFL").width;
+  if (!baseW) return null;
+  let targetW = Math.min(window.innerWidth * 0.7, 900);
+
+  // 잉크 높이(ascent+descent 합은 baseline 선택과 무관)와 ENT 확장분을 측정.
+  const measure = (tw: number) => {
+    const f = (100 * tw) / baseW;
+    ctx.font = `${f}px ${fontFamily}`;
+    const m = ctx.measureText("VFL");
+    const inkH =
+      Number.isFinite(m.actualBoundingBoxAscent) &&
+      Number.isFinite(m.actualBoundingBoxDescent)
+        ? m.actualBoundingBoxAscent + m.actualBoundingBoxDescent
+        : f * 0.72;
+    ctx.font = `${f * ENT_FONT_RATIO}px ${fontFamily}`;
+    const em = ctx.measureText(ENT_TEXT);
+    const entAsc = Number.isFinite(em.actualBoundingBoxAscent)
+      ? em.actualBoundingBoxAscent
+      : f * ENT_FONT_RATIO * 0.72;
+    return { inkH, entExtent: f * ENT_GAP_RATIO + entAsc };
+  };
+
+  const first = measure(targetW);
+  let entExtent = first.entExtent;
+  const maxH = window.innerHeight * MAX_LOCKUP_VH;
+  if (first.inkH + entExtent > maxH) {
+    // 모든 측정치가 폰트 크기에 선형이라 1회 스케일로 상한에 수렴한다.
+    targetW *= maxH / (first.inkH + entExtent);
+    entExtent = measure(targetW).entExtent;
+  }
+  return { targetW, centerY: bandCenterY - entExtent / 2 };
+}
+
 // font-display Tailwind 클래스가 참조하는 폰트 스택을 런타임에서 해석.
 // (raw CSS는 var(--font-display)를 못 읽으므로 유틸리티 클래스로 우회.)
 function resolveDisplayFont(): string {
@@ -174,13 +233,14 @@ interface GlyphSample {
 
 // centerY: 워드마크 잉크의 광학 중심을 놓을 화면 y — 지도 밴드 중심을 넘기면
 // 착지 목적지와 같은 축에 자리해 모바일(top:40%)에서도 구도가 조여진다.
+// targetW: layoutLockup이 높이 상한까지 반영해 산정한 워드마크 목표 폭.
 function sampleGlyph(
   fontFamily: string,
   targetN: number,
   centerY: number,
+  targetW: number,
 ): GlyphSample {
   const vw = window.innerWidth;
-  const targetW = Math.min(vw * 0.7, 900);
 
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -365,19 +425,25 @@ export default function DotScatterScene() {
 
       // 글리프 샘플링 — 가시 지도 dot 전체와 1:1 매칭이 목표라 safe 수를 밀도 타깃으로 넘긴다.
       // (모바일은 MIN_GLYPH_STEP 캡에 걸려 부분 1:1 — 잔여 지도 dot은 페이드인으로 등장.)
-      // 워드마크는 지도 밴드의 광학 중심에 정렬 — 데스크톱(top:50%)은 뷰포트 중앙과
-      // 동일하고, 모바일(top:40%)은 착지 목적지와 같은 축으로 구도가 조여진다.
-      const glyphCenterY = rect.top + rect.height / 2;
+      // VFL+ENT 락업의 광학 중심을 지도 밴드 중심에 정렬 — layoutLockup이 ENT
+      // 확장분의 절반만큼 올린 centerY와 높이 상한 반영 targetW를 산정하고,
+      // 샘플링·라이브 렌더가 같은 값을 쓰므로 해체 정렬과 착지 정합이 유지된다.
+      const bandCenterY = rect.top + rect.height / 2;
       let glyph: ScreenPoint[];
       let glyphFont: string;
       let inkShift: number;
       let fontFamily: string;
+      let glyphCenterY: number;
       try {
         fontFamily = resolveDisplayFont();
+        const lockup = layoutLockup(fontFamily, bandCenterY);
+        if (!lockup) return degrade();
+        glyphCenterY = lockup.centerY;
         const sampled = sampleGlyph(
           fontFamily,
           Math.min(safe.length, MAX_DOTS),
           glyphCenterY,
+          lockup.targetW,
         );
         glyph = sampled.points;
         glyphFont = sampled.font;
