@@ -3,7 +3,7 @@ import { mediaTiles } from "./config";
 
 /**
  * celebrate Work 섹션의 12-col 혼합 그리드 문법을 VFL 다크 팔레트로 이식.
- * 타일은 전부 placeholder(대각 스트라이프), 콘텐츠 유형은 코너 메타 라벨로 구분.
+ * 타일은 전부 placeholder(대각 스트라이프), 콘텐츠 유형은 타일 제목이 말해준다.
  */
 function MediaGridWork() {
   return (
@@ -24,11 +24,7 @@ function MediaGridWork() {
             <div key={tile.id} className={`relative ${tile.spanClassName}`}>
               <div
                 className={`vfl-media-ph-stripe relative overflow-hidden border border-white/10 ${tile.aspectClassName}`}
-              >
-                <span className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-white/45 lg:text-[11px]">
-                  [ {tile.meta} ]
-                </span>
-              </div>
+              />
               <div className="flex items-end justify-between gap-4 pt-4">
                 <h3 className="font-display text-2xl uppercase leading-none tracking-tight lg:text-3xl">
                   {tile.title}
