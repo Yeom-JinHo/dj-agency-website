@@ -1,27 +1,21 @@
 import type { ReactNode } from "react";
 import { Footer, Header } from "../sections";
-import Loader from "./loader";
-import { LoaderProvider } from "./loader-context";
-import { getWorldMapData } from "@/utils/world-map-data";
 
+// 오프닝 로더는 여기 두지 않는다 — layout에 두면 지도 없는 서브페이지 라우트의
+// 공통 청크·RSC payload에 씬 코드와 좌표(~78KB)가 함께 실린다. 로더(+LoaderProvider)는
+// 지도가 있는 홈 page가 직접 렌더한다 (page.tsx 참고).
 export default function MainLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
-  // Built server-side; only the landing points/dims reach the client, so the
-  // loader scene needs no dotted-map import.
-  const { pointsFlat, width, height } = getWorldMapData();
   return (
-    <LoaderProvider mapData={{ pointsFlat, width, height }}>
-      <div className="flex min-h-[100dvh] flex-col">
-        <Loader />
-        <Header />
-        {children}
-        <footer>
-          <Footer />
-        </footer>
-      </div>
-    </LoaderProvider>
+    <div className="flex min-h-[100dvh] flex-col">
+      <Header />
+      {children}
+      <footer>
+        <Footer />
+      </footer>
+    </div>
   );
 }

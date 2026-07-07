@@ -6,8 +6,8 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { MAP_DOT_RADIUS } from "@/consts/map";
 import {
   LOADER_TIMELINE,
-  useLoaderMapData,
   useLoaderMarkDone,
+  type SceneMapData,
 } from "./loader-context";
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
@@ -301,12 +301,23 @@ function sampleGlyph(
   return { points, font: `${fontSize}px ${fontFamily}`, inkShift };
 }
 
-export default function DotScatterScene() {
+// 오프닝은 SPA 세션당 1회 — 모듈 스코프라 소프트 내비게이션으로 홈에 재진입해도
+// 유지된다(하드 리로드 시에만 리셋). markOnce(완주) 시점에 기록하므로 StrictMode의
+// 미완주 이중 마운트에서는 찍히지 않아 dev에서도 첫 재생이 정상 동작한다.
+let hasPlayed = false;
+
+export default function DotScatterScene({
+  mapData,
+}: {
+  mapData: SceneMapData;
+}) {
   const reduce = useReducedMotion();
   const markDone = useLoaderMarkDone();
-  const mapData = useLoaderMapData();
 
-  const [visible, setVisible] = useState(true);
+  // 마운트 시점 스냅샷 — 재생 도중 hasPlayed가 true로 바뀌어도 이번 마운트의
+  // 스킵 여부는 변하지 않는다.
+  const skipped = useRef(hasPlayed).current;
+  const [visible, setVisible] = useState(!skipped);
   const [degraded, setDegraded] = useState(false);
   const [fallbackFading, setFallbackFading] = useState(false);
 
@@ -320,6 +331,7 @@ export default function DotScatterScene() {
   const markOnce = () => {
     if (markedRef.current) return;
     markedRef.current = true;
+    hasPlayed = true; // 완주(정상·강등 공통) 기록 — 이후 소프트 내비 재진입은 스킵
     // 계획 Verification: loader 총 시간 2.5–2.9s 확인용 (씬 시작~완료 실측).
     if (process.env.NODE_ENV !== "production") {
       console.debug(
@@ -330,6 +342,15 @@ export default function DotScatterScene() {
   };
 
   useEffect(() => {
+    // 소프트 내비게이션 재진입: 오프닝은 이미 완주 — 씬 없이 즉시 done만 발화해
+    // hero 게이트를 풀어준다 (visible 초기값이 false라 오버레이도 안 그려짐).
+    // markOnce가 아닌 markDone 직접 호출 — 계측 로그(씬 소요시간)가 이 경로에선
+    // 무의미하기 때문. markDone은 provider에서 멱등이라 중복 걱정 없음.
+    if (skipped) {
+      markDone();
+      return;
+    }
+
     let mounted = true;
     let raf = 0;
     const timeouts: ReturnType<typeof setTimeout>[] = [];
@@ -379,10 +400,9 @@ export default function DotScatterScene() {
       const bg = bgRef.current;
       if (!canvas || !bg) return degrade();
 
-      // 착지 좌표 — 지도 dot은 서버에서 계산돼 loader-context로 주입된다
-      // (WorldMap과 동일한 {height:100, grid:"diagonal"} 산출물). 클라이언트는
-      // dotted-map을 로드하지 않는다.
-      if (!mapData) return degrade();
+      // 지도 DOM이 없거나 0 크기면 강등(fail-open). 착지 좌표는 서버에서 계산돼
+      // (WorldMap과 동일한 {height:100, grid:"diagonal"} 산출물) 홈 page가 prop으로
+      // 넘긴다 — 클라이언트는 dotted-map을 로드하지 않는다.
       const inner = document.querySelector<HTMLElement>(".vfl-map-inner");
       const wrap = document.querySelector<HTMLElement>(".vfl-map-wrap");
       if (!inner || !wrap) return degrade();
