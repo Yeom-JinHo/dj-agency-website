@@ -11,7 +11,8 @@ import {
 } from "./loader-context";
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
-// 등장(0.5s) → 유지(0.7s)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
+// 등장(0.5s) → 유지(0.9s — 이 구간에 아웃라인 "ENTERTAINMENT" 서브카피가 스태거
+// 등장했다 해체 전에 소등)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
 // 전원이 동시에 dotted-map의 실제 지도 dot 좌표로 1:1 비행(1.0s)한다.
 // 해체의 탁한 중간 구간은 비대칭 이징으로 회피 — 텍스트는 늦게 빠지고(1-p²)
 // dot은 빨리 들어와 커버리지가 유지된다. 솔리드 텍스트와 dot 샘플이 같은
@@ -44,14 +45,46 @@ const MIN_MASK_ALPHA = 0.05;
 
 // 타임라인 절대 시각(초) — LOADER_TIMELINE에서 유도(하드코딩 금지).
 const REVEAL_END = LOADER_TIMELINE.reveal; // 0.5 — 워드마크 등장 완료
-const DISSOLVE_START = REVEAL_END + LOADER_TIMELINE.hold; // 1.2 — 해체 시작
-const SCATTER_START = DISSOLVE_START + LOADER_TIMELINE.dissolve; // 1.5 — 흩어짐 시작
-const SCENE_END = SCATTER_START + LOADER_TIMELINE.scatter; // 2.5
-// 배경(솔리드)은 흩어짐 시작(1.5s)부터 0.6s에 걸쳐 걷힌다.
+const DISSOLVE_START = REVEAL_END + LOADER_TIMELINE.hold; // 1.4 — 해체 시작
+const SCATTER_START = DISSOLVE_START + LOADER_TIMELINE.dissolve; // 1.7 — 흩어짐 시작
+const SCENE_END = SCATTER_START + LOADER_TIMELINE.scatter; // 2.7
+// 배경(솔리드)은 흩어짐 시작(1.7s)부터 0.6s에 걸쳐 걷힌다.
 const BG_FADE_START = SCATTER_START;
 const BG_FADE_DUR = 0.6;
 // 워드마크 등장 시 아래에서 살짝 떠오르는 거리 — hero rise(y:20)와 같은 문법.
 const REVEAL_RISE_PX = 16;
+
+// ── ENTERTAINMENT 서브카피 ──
+// hero .vfl-h-suffix의 아웃라인 락업을 loader에서 예고하는 레이어 — loader 락업이
+// 입자로 흩어졌다가 hero에서 지도 위 락업으로 재조립되는 서사. VFL보다 늦게 스태거
+// 등장하고 해체 시작 전에 완전히 소등(0.1s 여유)해, 해체(입자)와 페이드(알파)가 한
+// 화면에 공존하지 않고 시선이 VFL의 해체 드라마에만 남는다. dot 해체에는 불참.
+const ENT_TEXT = "ENTERTAINMENT";
+const ENT_IN_START = REVEAL_END + 0.1; // 0.6 — VFL 등장 직후 한 박자만 띄운 스태거
+const ENT_IN_DUR = 0.2;
+const ENT_OUT_END = DISSOLVE_START - 0.1; // 1.3 — 해체 전 완전 소등
+const ENT_OUT_DUR = 0.2;
+const ENT_OUT_START = ENT_OUT_END - ENT_OUT_DUR; // 1.1
+// 피크 가독 구간(완전한 알파) = 0.8–1.1s(0.3s). 13글자 인지에 필요한 최소 구간이라
+// 오프셋을 줄여 확보했다 — 아래 불변식이 이 구간의 존재를 지킨다.
+if (process.env.NODE_ENV !== "production") {
+  // 불변식: 등장 완료 < 소등 시작. ENT 오프셋(0.1/0.2/0.1)은 hold=0.9에 튜닝된
+  // 하드코딩 — LOADER_TIMELINE.hold를 줄이면 ENT가 최대 알파에 도달하지 못하는
+  // 조용한 회귀가 생기므로 dev에서 즉시 잡는다.
+  console.assert(
+    ENT_IN_START + ENT_IN_DUR < ENT_OUT_START,
+    `[loader] ENT 타임라인 불변식 위반: in 완료 ${ENT_IN_START + ENT_IN_DUR}s ≥ out 시작 ${ENT_OUT_START}s`,
+  );
+}
+// 등장 rise — VFL과 같은 이징 문법, 종속된 진폭(절반).
+const ENT_RISE_PX = REVEAL_RISE_PX / 2;
+// 최대 알파 — 아웃라인 조연이 솔리드 주연과 같은 성량으로 붙지 않게 살짝 낮춘다.
+const ENT_ALPHA = 0.9;
+// 폰트 크기 — VFL fontSize 대비 비율. hero의 px 비율(48/108)을 그대로 이식하면
+// 거대한 loader 워드마크에서 과대해지므로, 광학 폭 매칭을 전제로 작게 쓴다.
+const ENT_FONT_RATIO = 0.12;
+// VFL 잉크 하단 ↔ 서브카피 간격 — VFL fontSize 대비(hero margin-top 비례 환산).
+const ENT_GAP_RATIO = 0.09;
 // dot이 나타나는 알파 램프 시간.
 const DOT_IN = 0.12;
 // 해체 시작의 미세 지터 — 전면 동시 해체가 기계적으로 보이지 않게 하는 미세 반짝임.
@@ -228,7 +261,7 @@ export default function DotScatterScene() {
   const markOnce = () => {
     if (markedRef.current) return;
     markedRef.current = true;
-    // 계획 Verification: loader 총 시간 2.3–2.7s 확인용 (씬 시작~완료 실측).
+    // 계획 Verification: loader 총 시간 2.5–2.9s 확인용 (씬 시작~완료 실측).
     if (process.env.NODE_ENV !== "production") {
       console.debug(
         `[loader] total ${(performance.now() - sceneStartRef.current).toFixed(0)}ms`,
@@ -338,9 +371,11 @@ export default function DotScatterScene() {
       let glyph: ScreenPoint[];
       let glyphFont: string;
       let inkShift: number;
+      let fontFamily: string;
       try {
+        fontFamily = resolveDisplayFont();
         const sampled = sampleGlyph(
-          resolveDisplayFont(),
+          fontFamily,
           Math.min(safe.length, MAX_DOTS),
           glyphCenterY,
         );
@@ -388,6 +423,43 @@ export default function DotScatterScene() {
       if (!ctx) return degrade();
       ctx.scale(dpr, dpr);
 
+      // ENTERTAINMENT 락업 레이아웃 — 트래킹을 벌려 VFL 워드마크와 광학 폭을
+      // 일치시키는 저스티파이. per-char x를 미리 계산해 매 프레임 strokeText만
+      // 수행한다(ctx.letterSpacing 브라우저 지원과 무관하게 폭 매칭이 성립).
+      ctx.font = glyphFont;
+      ctx.textBaseline = "middle"; // 잉크 하단을 VFL 실제 렌더 기준선으로 측정
+      const vflSize = parseFloat(glyphFont) || 100;
+      const vflMetrics = ctx.measureText("VFL");
+      const vflBottom =
+        glyphCenterY +
+        inkShift +
+        (Number.isFinite(vflMetrics.actualBoundingBoxDescent)
+          ? vflMetrics.actualBoundingBoxDescent
+          : vflSize * 0.36);
+      const entFont = `${vflSize * ENT_FONT_RATIO}px ${fontFamily}`;
+      ctx.font = entFont;
+      ctx.textBaseline = "alphabetic";
+      const entChars = [...ENT_TEXT];
+      const charWs = entChars.map((c) => ctx.measureText(c).width);
+      const naturalW = charWs.reduce((a, b) => a + b, 0);
+      const entGap = Math.max(
+        0,
+        (vflMetrics.width - naturalW) / (entChars.length - 1),
+      );
+      const entXs: number[] = [];
+      let entPen = vw / 2 - (naturalW + entGap * (entChars.length - 1)) / 2;
+      for (const w of charWs) {
+        entXs.push(entPen);
+        entPen += w + entGap;
+      }
+      const entM = ctx.measureText(ENT_TEXT);
+      const entBaselineY =
+        vflBottom +
+        vflSize * ENT_GAP_RATIO +
+        (Number.isFinite(entM.actualBoundingBoxAscent)
+          ? entM.actualBoundingBoxAscent
+          : vflSize * ENT_FONT_RATIO * 0.72);
+
       // 해체 직후 dot 반지름 — 살짝 크게 시작해 "부서진 파편" 질감을 주고,
       // 각 dot의 비행 진행도에 따라 착지 순간 지도 dot 크기로 정확히 수렴.
       const dissolveRadius = Math.max(landRadius * 1.7, 1.6);
@@ -398,7 +470,7 @@ export default function DotScatterScene() {
         if (!mounted) return;
         const t = (now - startTs) / 1000;
 
-        // 배경 페이드(1.5–2.1s opacity 1→0)는 별도 div opacity로.
+        // 배경 페이드(1.7–2.3s opacity 1→0)는 별도 div opacity로.
         const bgOpacity =
           t < BG_FADE_START
             ? 1
@@ -434,6 +506,28 @@ export default function DotScatterScene() {
           ctx.textBaseline = "middle";
           ctx.fillStyle = DOT_COLOR;
           ctx.fillText("VFL", vw / 2, glyphCenterY + inkShift);
+        }
+
+        // 1.5) ENTERTAINMENT 서브카피 — VFL 유지 중 스태거 등장(동일 이징, 절반
+        //      진폭) → 해체 시작 전 완전 소등. hero .vfl-h-suffix와 같은 1px
+        //      아웃라인 스트로크로, 솔리드→아웃라인 위계를 loader에서 예고한다.
+        if (t >= ENT_IN_START && t < ENT_OUT_END) {
+          const aIn =
+            t < ENT_IN_START + ENT_IN_DUR
+              ? ease((t - ENT_IN_START) / ENT_IN_DUR)
+              : 1;
+          const aOut =
+            t >= ENT_OUT_START ? 1 - ease((t - ENT_OUT_START) / ENT_OUT_DUR) : 1;
+          ctx.globalAlpha = Math.max(0, Math.min(1, ENT_ALPHA * aIn * aOut));
+          ctx.font = entFont;
+          ctx.textAlign = "left";
+          ctx.textBaseline = "alphabetic";
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = DOT_COLOR;
+          const entRise = (1 - aIn) * ENT_RISE_PX;
+          for (let i = 0; i < entChars.length; i++) {
+            ctx.strokeText(entChars[i]!, entXs[i]!, entBaselineY + entRise);
+          }
         }
 
         // 2) dot 입자 — 전면 동시 해체(미세 지터)로 태어나 알파 인(DOT_IN) → 동시 출발로 비행·착지.
@@ -509,6 +603,8 @@ export default function DotScatterScene() {
               aria-hidden
             >
               VFL
+              {/* 모션 여부와 무관하게 모든 사용자가 같은 락업을 보도록 폴백에도 표기. */}
+              <span className="vfl-loader-fallback-suffix">{ENT_TEXT}</span>
             </div>
           ) : (
             <canvas ref={canvasRef} className="vfl-loader-canvas" aria-hidden />

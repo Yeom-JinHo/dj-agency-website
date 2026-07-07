@@ -863,7 +863,7 @@
   justify-content: center;
   cursor: wait;
 }
-/* 솔리드 배경 — 씬이 opacity를 직접 제어(1.5–2.1s 1→0). 첫 페인트부터 불투명해
+/* 솔리드 배경 — 씬이 opacity를 직접 제어(1.7–2.3s 1→0). 첫 페인트부터 불투명해
    canvas가 첫 프레임을 그리기 전에도 hero가 비치지 않는다. */
 .vfl-loader-bg {
   position: absolute;
@@ -884,7 +884,23 @@
   font-size: clamp(64px, 18vw, 220px);
   line-height: 1;
   letter-spacing: 0.02em;
+  text-align: center;
   transition: opacity 0.4s ease;
+}
+/* 폴백의 ENTERTAINMENT — hero .vfl-h-suffix의 아웃라인 문법을 축소 재사용해
+   모션 여부와 무관하게 모든 사용자가 같은 락업을 본다. letter-spacing 0.5em은
+   canvas 씬의 VFL 폭 저스티파이 트래킹(≈0.5em) 근사 — 두 경로의 락업 비례를
+   맞춘다. text-indent는 letter-spacing이 마지막 글자 뒤에 남기는 트레일링
+   공백을 좌측에서 상쇄해 중앙 정렬을 지킨다. */
+.vfl-loader-fallback-suffix {
+  display: block;
+  margin-top: clamp(8px, 1.6vw, 20px);
+  font-size: clamp(11px, 2.2vw, 26px);
+  line-height: 1;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  color: transparent;
+  -webkit-text-stroke: 1px hsl(var(--foreground));
 }
 
 /* ───────────────────────────────────────────────────────────────
