@@ -157,6 +157,12 @@
 }
 
 @layer base {
+  /* 브랜드 액센트를 마이크로 인터랙션 층까지 확장 — 텍스트 선택도 앰버. */
+  ::selection {
+    background-color: var(--color-pd-accent);
+    color: #09090b;
+  }
+
   * {
     @apply border-border m-0 box-border p-0;
   }

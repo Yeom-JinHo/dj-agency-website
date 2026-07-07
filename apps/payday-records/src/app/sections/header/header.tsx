@@ -35,7 +35,7 @@ export default function Header() {
   const rightLinks = navLinks.slice(half);
 
   const navLinkClass =
-    "flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:underline";
+    "flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase transition-colors hover:text-pd-accent focus-visible:text-pd-accent focus-visible:outline-none";
 
   return (
     <>
@@ -153,7 +153,7 @@ export default function Header() {
               style={{ transitionDelay: menuOpen ? `${index * 60 + 80}ms` : "0ms" }}
               className={[
                 "font-display py-4 text-5xl leading-none tracking-[0.02em] text-white/90 uppercase",
-                "transition-all duration-500 ease-out hover:text-white focus-visible:text-white focus-visible:outline-none",
+                "transition-all duration-500 ease-out hover:text-pd-accent focus-visible:text-pd-accent focus-visible:outline-none",
                 "motion-reduce:transition-none",
                 menuOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
               ].join(" ")}
