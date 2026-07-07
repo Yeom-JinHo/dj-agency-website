@@ -20,7 +20,6 @@
     "class-variance-authority": "catalog:",
     "cobe": "^2.0.1",
     "dotted-map": "^3.1.0",
-    "embla-carousel-auto-scroll": "^8.6.0",
     "motion": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
