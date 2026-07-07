@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
+import { MAP_DOT_RADIUS } from "@/consts/map";
 import {
   LOADER_TIMELINE,
   useLoaderMapData,
@@ -326,8 +327,8 @@ export default function DotScatterScene() {
           safe.push({ x, y, m });
         }
       }
-      // 착지 반지름 = 지도 dot 화면 반지름(getSVG radius:0.22 → 화면 스케일).
-      const landRadius = (0.22 / vbW) * rect.width;
+      // 착지 반지름 = 지도 dot 화면 반지름(MAP_DOT_RADIUS → 화면 스케일).
+      const landRadius = (MAP_DOT_RADIUS / vbW) * rect.width;
 
       // 글리프 샘플링 — 가시 지도 dot 전체와 1:1 매칭이 목표라 safe 수를 밀도 타깃으로 넘긴다.
       // (모바일은 MIN_GLYPH_STEP 캡에 걸려 부분 1:1 — 잔여 지도 dot은 페이드인으로 등장.)

@@ -2,15 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { MAP_DOT_RADIUS } from "@/consts/map";
 import type { WorldMapData } from "@/utils/world-map-data";
 
 // Pins wait this long after `revealed` flips true before fading in — a fixed
 // beat after the map/arcs settle, matching the hero headline's own stagger style.
 const PIN_REVEAL_DELAY_S = 0.5;
-
-// Radius of each land dot in viewBox units — matches the value previously passed
-// to dotted-map's getSVG (kept in sync with the loader's landing-dot radius).
-const DOT_RADIUS = 0.22;
 
 // Build the dotted-map SVG string from precomputed points ([x0, y0, x1, y1, …]
 // flat pairs). This is the same circle markup dotted-map's getSVG emits, but
@@ -24,7 +21,7 @@ function pointsToSvg(
 ): string {
   let circles = "";
   for (let i = 0; i + 1 < pointsFlat.length; i += 2) {
-    circles += `<circle cx="${pointsFlat[i]}" cy="${pointsFlat[i + 1]}" r="${DOT_RADIUS}" fill="${color}" />`;
+    circles += `<circle cx="${pointsFlat[i]}" cy="${pointsFlat[i + 1]}" r="${MAP_DOT_RADIUS}" fill="${color}" />`;
   }
   return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="background-color: transparent">${circles}</svg>`;
 }

@@ -1,12 +1,14 @@
+import "server-only";
+
 import { cache } from "react";
 import DottedMap from "dotted-map";
 import { hero, type HeroCity } from "@/app/sections/hero/config";
 
 // Server-only: builds the dotted world map ONCE (this pulls dotted-map's ~350KB
 // country GeoJSON) and returns only serializable results, so the heavy library
-// never ships to the client. Import the VALUE (getWorldMapData) exclusively from
-// server components; client components must `import type` from here so the
-// dotted-map dependency is erased at compile time.
+// never ships to the client. The "server-only" import turns an accidental value
+// import from a client component into a build error; client components can
+// still `import type` from here (types are erased at compile time).
 
 /** A city pin already projected into the map's viewBox coordinate space. */
 export interface PlacedPin {
