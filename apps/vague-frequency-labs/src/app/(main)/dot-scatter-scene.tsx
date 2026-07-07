@@ -12,8 +12,9 @@ import {
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
 // 등장(0.5s) → 유지(0.9s — 이 구간에 아웃라인 "ENTERTAINMENT" 서브카피가 스태거
-// 등장해 씬 끝까지 남는다)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
-// 전원이 동시에 dotted-map의 실제 지도 dot 좌표로 1:1 비행(1.0s)한다.
+// 등장해 락업을 완성한다)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s, ENT는
+// 같은 커브로 페이드)되고 전원이 동시에 dotted-map의 실제 지도 dot 좌표로
+// 1:1 비행(1.0s)한다.
 // 해체의 탁한 중간 구간은 비대칭 이징으로 회피 — 텍스트는 늦게 빠지고(1-p²)
 // dot은 빨리 들어와 커버리지가 유지된다. 솔리드 텍스트와 dot 샘플이 같은
 // 글리프 래스터를 공유하므로 해체 정렬이 어긋나지 않고, WorldMap.tsx와
@@ -57,9 +58,10 @@ const REVEAL_RISE_PX = 16;
 // ── ENTERTAINMENT 서브카피 ──
 // hero .vfl-h-suffix의 아웃라인 락업을 loader에서 예고하는 레이어 — loader 락업이
 // 입자로 흩어졌다가 hero에서 지도 위 락업으로 재조립되는 서사. VFL보다 늦게 스태거
-// 등장한 뒤 자체 퇴장 없이 씬 끝까지 남아 오버레이 exit(크로스페이드)와 함께
-// 사라진다 — 솔리드(본체)는 세계로 흩어지고 아웃라인(카테고리)은 끝까지 남는 구도.
-// 짧은 왕복(등장→즉시 소등)은 연출이 아니라 깜빡임으로 지각되어 배제했다.
+// 등장하고, 해체(DISSOLVE_START)에서 VFL 텍스트와 같은 커브로 함께 사라진다 —
+// 락업은 한 몸으로 태어나 한 몸으로 죽는다. 종속 요소(크기·트래킹·위치 전부 VFL
+// 참조)가 앵커보다 오래 남으면 상관 잃은 고아로 읽히고, 반대로 hold 중간에 단독
+// 소등하면 깜빡임으로 읽힌다 — 둘 다 시도 후 이 지점으로 수렴했다(PR #198).
 // dot 해체에는 불참.
 const ENT_TEXT = "ENTERTAINMENT";
 const ENT_IN_START = REVEAL_END + 0.1; // 0.6 — VFL 등장 직후 한 박자만 띄운 스태거
@@ -77,12 +79,6 @@ if (process.env.NODE_ENV !== "production") {
 const ENT_RISE_PX = REVEAL_RISE_PX / 2;
 // 최대 알파 — 아웃라인 조연이 솔리드 주연과 같은 성량으로 붙지 않게 살짝 낮춘다.
 const ENT_ALPHA = 0.9;
-// 흩어짐 동안의 슬로우 스케일업 상한 — VFL이 떠난 무대를 이어받는 미세한 생기.
-// 눈치채기 어려운 수준(2.5%)이고 위치·트래킹은 불변이라 크로스페이드 구도가
-// 유지된다. 해체 순간의 별도 반응(알파 딥·반동)은 두지 않는다 — 해체는 폭발이
-// 아니라 제자리 변환이라 보이는 충격이 없고, 원인 없는 반응은 글리치로 읽히며
-// 크로스페이드 순간의 시선을 VFL에서 빼앗는다(시도 후 제거, PR #198).
-const ENT_SCALE_MAX = 1.025;
 // 폰트 크기 — VFL fontSize 대비 비율. hero의 px 비율(48/108)을 그대로 이식하면
 // 거대한 loader 워드마크에서 과대해지므로, 광학 폭 매칭을 전제로 작게 쓴다.
 const ENT_FONT_RATIO = 0.12;
@@ -526,8 +522,6 @@ export default function DotScatterScene() {
         ? entM.actualBoundingBoxAscent
         : vflSize * ENT_FONT_RATIO * 0.72;
       const entBaselineY = vflBottom + vflSize * ENT_GAP_RATIO + entAscentPx;
-      // 스케일 응답의 기준점 — 대문자 잉크의 광학 중심(세로 중앙).
-      const entMidY = entBaselineY - entAscentPx / 2;
 
       // 해체 직후 dot 반지름 — 살짝 크게 시작해 "부서진 파편" 질감을 주고,
       // 각 dot의 비행 진행도에 따라 착지 순간 지도 dot 크기로 정확히 수렴.
@@ -578,36 +572,33 @@ export default function DotScatterScene() {
         }
 
         // 1.5) ENTERTAINMENT 서브카피 — VFL 유지 중 스태거 등장(동일 이징, 절반
-        //      진폭) 후 씬 끝까지 유지 — 퇴장은 오버레이 exit가 맡는다. hero
-        //      .vfl-h-suffix와 같은 1px 아웃라인 스트로크로, 솔리드→아웃라인
-        //      위계를 loader에서 예고한다. 유지 중의 유일한 반응은 흩어짐 동안의
-        //      슬로우 스케일업 — 해체 순간엔 의도적으로 아무 반응도 하지 않는다.
-        if (t >= ENT_IN_START) {
+        //      진폭), 해체 구간에는 VFL 텍스트와 같은 1-p² 커브로 함께 소멸 —
+        //      락업이 하나의 사건으로 퇴장한다. hero .vfl-h-suffix와 같은 1px
+        //      아웃라인 스트로크로, 솔리드→아웃라인 위계를 loader에서 예고한다.
+        if (t >= ENT_IN_START && t < SCATTER_START) {
           const aIn =
             t < ENT_IN_START + ENT_IN_DUR
               ? ease((t - ENT_IN_START) / ENT_IN_DUR)
               : 1;
-          ctx.globalAlpha = Math.max(0, Math.min(1, ENT_ALPHA * aIn));
+          // 해체 페이드 — VFL 솔리드와 동일한 커브(늦게 빠짐)라 한 몸으로 읽힌다.
+          let out = 1;
+          if (t >= DISSOLVE_START) {
+            const wp = Math.min(
+              1,
+              (t - DISSOLVE_START) / LOADER_TIMELINE.dissolve,
+            );
+            out = Math.max(0, 1 - wp * wp);
+          }
+          ctx.globalAlpha = Math.max(0, Math.min(1, ENT_ALPHA * aIn * out));
           ctx.font = entFont;
           ctx.textAlign = "left";
           ctx.textBaseline = "alphabetic";
           ctx.lineWidth = 1;
           ctx.strokeStyle = DOT_COLOR;
           const entRise = (1 - aIn) * ENT_RISE_PX;
-          // 슬로우 스케일업 — 광학 중심 기준으로 흩어짐 진행도에 따라 확대.
-          const sp =
-            t >= SCATTER_START
-              ? Math.min(1, (t - SCATTER_START) / LOADER_TIMELINE.scatter)
-              : 0;
-          const entScale = 1 + (ENT_SCALE_MAX - 1) * ease(sp);
-          ctx.save();
-          ctx.translate(vw / 2, entMidY);
-          ctx.scale(entScale, entScale);
-          ctx.translate(-vw / 2, -entMidY);
           for (let i = 0; i < entChars.length; i++) {
             ctx.strokeText(entChars[i]!, entXs[i]!, entBaselineY + entRise);
           }
-          ctx.restore();
         }
 
         // 2) dot 입자 — 전면 동시 해체(미세 지터)로 태어나 알파 인(DOT_IN) → 동시 출발로 비행·착지.
