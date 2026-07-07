@@ -55,7 +55,7 @@ export default function Header() {
               포커스 링은 앵커가 담당한다(빨간 배경이라 ca-fg로 반전). */}
           <a
             href={BOOKING_MAILTO}
-            className="group inline-flex focus-visible:outline-ca-fg"
+            className="group inline-flex min-h-[44px] focus-visible:outline-ca-fg"
           >
             <span className="inline-flex items-center gap-1.5 bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors [clip-path:polygon(0_0,calc(100%-10px)_0,100%_10px,100%_100%,0_100%)] group-hover:bg-ca-red-dim group-active:bg-ca-red-dim">
               Book a Set

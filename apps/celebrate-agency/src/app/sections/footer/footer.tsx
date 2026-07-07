@@ -50,7 +50,7 @@ export default function Footer() {
           <Block title="Bookings">
             <a
               href={BOOKING_MAILTO}
-              className="block font-display text-[clamp(32px,4vw,48px)] uppercase leading-[0.95] tracking-[0.01em] transition-colors hover:text-ca-red"
+              className="block font-display text-[clamp(32px,4vw,48px)] uppercase leading-[0.95] tracking-[0.01em] transition-colors hover:text-ca-red active:text-ca-red"
             >
               {BOOKING_EMAIL}
             </a>

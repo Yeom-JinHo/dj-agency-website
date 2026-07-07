@@ -30,7 +30,7 @@ export default function Work() {
             className={`group relative cursor-pointer ${work.spanClassName}`}
           >
             <div
-              className={`ca-stripe-ph-lg relative overflow-hidden border border-ca-line transition-[filter] duration-300 group-hover:brightness-125 group-active:brightness-125 ${work.aspectClassName}`}
+              className={`ca-stripe-ph-lg relative overflow-hidden border border-ca-line transition-[filter,border-color] duration-300 group-hover:border-ca-red/40 group-hover:brightness-125 group-active:border-ca-red/40 group-active:brightness-125 ${work.aspectClassName}`}
             >
               <span className="absolute top-4 left-4 font-mono text-[10px] uppercase tracking-[0.14em] text-ca-muted lg:text-[11px]">
                 {work.label}
