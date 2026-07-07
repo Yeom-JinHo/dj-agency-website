@@ -863,7 +863,7 @@
   justify-content: center;
   cursor: wait;
 }
-/* 솔리드 배경 — 씬이 opacity를 직접 제어(1.7–2.3s 1→0). 첫 페인트부터 불투명해
+/* 솔리드 배경 — 씬이 opacity를 직접 제어(1.8–2.4s 1→0). 첫 페인트부터 불투명해
    canvas가 첫 프레임을 그리기 전에도 hero가 비치지 않는다. */
 .vfl-loader-bg {
   position: absolute;

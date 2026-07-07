@@ -14,10 +14,10 @@ import {
 // 타이밍을 한 곳에서 조정한다. 값 변경 시 씬·hero가 함께 따라간다.
 export const LOADER_TIMELINE = {
   reveal: 0.5, // 솔리드 "VFL" 워드마크 등장 (rise + fade-in)
-  hold: 0.9, // 워드마크 유지 — ENTERTAINMENT 서브카피의 스태거 등장·노출·소등 구간 포함
+  hold: 1.0, // 워드마크 유지 — ENTERTAINMENT 서브카피의 스태거 등장·노출 구간 포함
   dissolve: 0.3, // 해체 — 솔리드 텍스트가 같은 자리의 dot 입자로 크로스페이드
   scatter: 1.0, // 흩어짐 + 지도 좌표 착지
-  total: 2.7, // reveal + hold + dissolve + scatter
+  total: 2.8, // reveal + hold + dissolve + scatter
   // 착지 dot → 실제 지도 dot 크로스페이드 구간.
   // globals.css `.vfl-map-img { transition: opacity 0.4s }`와 반드시 동기 —
   // 한쪽을 바꾸면 다른 쪽도 함께 바꿀 것. 씬 오버레이 exit는 이 값에서 유도해

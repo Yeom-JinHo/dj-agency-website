@@ -11,7 +11,7 @@ import {
 } from "./loader-context";
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
-// 등장(0.5s) → 유지(0.9s — 이 구간에 아웃라인 "ENTERTAINMENT" 서브카피가 스태거
+// 등장(0.5s) → 유지(1.0s — 이 구간에 아웃라인 "ENTERTAINMENT" 서브카피가 스태거
 // 등장해 락업을 완성한다)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s, ENT는
 // 같은 커브로 페이드)되고 전원이 동시에 dotted-map의 실제 지도 dot 좌표로
 // 1:1 비행(1.0s)한다.
@@ -46,10 +46,10 @@ const MIN_MASK_ALPHA = 0.05;
 
 // 타임라인 절대 시각(초) — LOADER_TIMELINE에서 유도(하드코딩 금지).
 const REVEAL_END = LOADER_TIMELINE.reveal; // 0.5 — 워드마크 등장 완료
-const DISSOLVE_START = REVEAL_END + LOADER_TIMELINE.hold; // 1.4 — 해체 시작
-const SCATTER_START = DISSOLVE_START + LOADER_TIMELINE.dissolve; // 1.7 — 흩어짐 시작
-const SCENE_END = SCATTER_START + LOADER_TIMELINE.scatter; // 2.7
-// 배경(솔리드)은 흩어짐 시작(1.7s)부터 0.6s에 걸쳐 걷힌다.
+const DISSOLVE_START = REVEAL_END + LOADER_TIMELINE.hold; // 1.5 — 해체 시작
+const SCATTER_START = DISSOLVE_START + LOADER_TIMELINE.dissolve; // 1.8 — 흩어짐 시작
+const SCENE_END = SCATTER_START + LOADER_TIMELINE.scatter; // 2.8
+// 배경(솔리드)은 흩어짐 시작(1.8s)부터 0.6s에 걸쳐 걷힌다.
 const BG_FADE_START = SCATTER_START;
 const BG_FADE_DUR = 0.6;
 // 워드마크 등장 시 아래에서 살짝 떠오르는 거리 — hero rise(y:20)와 같은 문법.
@@ -67,7 +67,7 @@ const ENT_TEXT = "ENTERTAINMENT";
 const ENT_IN_START = REVEAL_END + 0.1; // 0.6 — VFL 등장 직후 한 박자만 띄운 스태거
 const ENT_IN_DUR = 0.2;
 if (process.env.NODE_ENV !== "production") {
-  // 불변식: 등장 완료 < 해체 시작. ENT 오프셋(0.1/0.2)은 hold=0.9에 튜닝된
+  // 불변식: 등장 완료 < 해체 시작. ENT 오프셋(0.1/0.2)은 hold=1.0에 튜닝된
   // 하드코딩 — LOADER_TIMELINE.hold를 줄이면 VFL 해체가 시작된 뒤에야 ENT가
   // 등장을 마치는 조용한 회귀가 생기므로 dev에서 즉시 잡는다.
   console.assert(
@@ -533,7 +533,7 @@ export default function DotScatterScene() {
         if (!mounted) return;
         const t = (now - startTs) / 1000;
 
-        // 배경 페이드(1.7–2.3s opacity 1→0)는 별도 div opacity로.
+        // 배경 페이드(1.8–2.4s opacity 1→0)는 별도 div opacity로.
         const bgOpacity =
           t < BG_FADE_START
             ? 1
