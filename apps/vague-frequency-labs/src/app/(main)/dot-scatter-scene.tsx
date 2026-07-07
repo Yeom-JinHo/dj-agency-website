@@ -77,16 +77,11 @@ if (process.env.NODE_ENV !== "production") {
 const ENT_RISE_PX = REVEAL_RISE_PX / 2;
 // 최대 알파 — 아웃라인 조연이 솔리드 주연과 같은 성량으로 붙지 않게 살짝 낮춘다.
 const ENT_ALPHA = 0.9;
-// 해체 충격파의 알파 최저점 — 입자 폭발 순간(해체 구간) 눌렸다 회복해 무대 위
-// 사건을 "인지"한다. 0.4 아래로 내리면 "꺼졌다 켜짐"(깜빡임)으로 읽히므로 금지.
-// 정지 상태가 고아처럼 보이지 않게 하는 미세 반응 1.
-const ENT_DIP_ALPHA = 0.55;
-// 충격 순간의 물리 반동 — 알파와 같은 포락선으로 스케일이 1.5% 눌렸다 복귀.
-// 빛(알파)과 몸(스케일)이 함께 반응해 폭발의 여파가 닿았다는 물리감을 만든다.
-const ENT_RECOIL = 0.015;
 // 흩어짐 동안의 슬로우 스케일업 상한 — VFL이 떠난 무대를 이어받는 미세한 생기.
 // 눈치채기 어려운 수준(2.5%)이고 위치·트래킹은 불변이라 크로스페이드 구도가
-// 유지된다. 미세 반응 2.
+// 유지된다. 해체 순간의 별도 반응(알파 딥·반동)은 두지 않는다 — 해체는 폭발이
+// 아니라 제자리 변환이라 보이는 충격이 없고, 원인 없는 반응은 글리치로 읽히며
+// 크로스페이드 순간의 시선을 VFL에서 빼앗는다(시도 후 제거, PR #198).
 const ENT_SCALE_MAX = 1.025;
 // 폰트 크기 — VFL fontSize 대비 비율. hero의 px 비율(48/108)을 그대로 이식하면
 // 거대한 loader 워드마크에서 과대해지므로, 광학 폭 매칭을 전제로 작게 쓴다.
@@ -585,43 +580,26 @@ export default function DotScatterScene() {
         // 1.5) ENTERTAINMENT 서브카피 — VFL 유지 중 스태거 등장(동일 이징, 절반
         //      진폭) 후 씬 끝까지 유지 — 퇴장은 오버레이 exit가 맡는다. hero
         //      .vfl-h-suffix와 같은 1px 아웃라인 스트로크로, 솔리드→아웃라인
-        //      위계를 loader에서 예고한다. 유지 중에도 무대의 사건에 미세하게
-        //      반응한다: 해체 순간 알파 딥(충격파) + 흩어짐 동안 슬로우 스케일업.
+        //      위계를 loader에서 예고한다. 유지 중의 유일한 반응은 흩어짐 동안의
+        //      슬로우 스케일업 — 해체 순간엔 의도적으로 아무 반응도 하지 않는다.
         if (t >= ENT_IN_START) {
           const aIn =
             t < ENT_IN_START + ENT_IN_DUR
               ? ease((t - ENT_IN_START) / ENT_IN_DUR)
               : 1;
-          // 해체 충격파 포락선(0→1→0) — 실제 충격의 문법대로 빠르게 눌리고
-          // (해체의 1/3) 천천히 회복(2/3)하는 비대칭. 알파와 스케일 반동이 공유.
-          let dip = 0;
-          if (t >= DISSOLVE_START && t < SCATTER_START) {
-            const hit = LOADER_TIMELINE.dissolve / 3;
-            dip =
-              t < DISSOLVE_START + hit
-                ? ease((t - DISSOLVE_START) / hit)
-                : 1 -
-                  ease(
-                    (t - DISSOLVE_START - hit) /
-                      (LOADER_TIMELINE.dissolve - hit),
-                  );
-          }
-          const alpha = ENT_ALPHA * aIn + (ENT_DIP_ALPHA - ENT_ALPHA) * dip;
-          ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+          ctx.globalAlpha = Math.max(0, Math.min(1, ENT_ALPHA * aIn));
           ctx.font = entFont;
           ctx.textAlign = "left";
           ctx.textBaseline = "alphabetic";
           ctx.lineWidth = 1;
           ctx.strokeStyle = DOT_COLOR;
           const entRise = (1 - aIn) * ENT_RISE_PX;
-          // 슬로우 스케일업(흩어짐 진행도) × 충격 반동(해체 포락선) — 광학 중심 기준.
-          // 반동은 1.7s에 0으로 수렴하고 스케일업이 그 지점에서 시작해 연속적이다.
+          // 슬로우 스케일업 — 광학 중심 기준으로 흩어짐 진행도에 따라 확대.
           const sp =
             t >= SCATTER_START
               ? Math.min(1, (t - SCATTER_START) / LOADER_TIMELINE.scatter)
               : 0;
-          const entScale =
-            (1 + (ENT_SCALE_MAX - 1) * ease(sp)) * (1 - ENT_RECOIL * dip);
+          const entScale = 1 + (ENT_SCALE_MAX - 1) * ease(sp);
           ctx.save();
           ctx.translate(vw / 2, entMidY);
           ctx.scale(entScale, entScale);
