@@ -77,9 +77,13 @@ if (process.env.NODE_ENV !== "production") {
 const ENT_RISE_PX = REVEAL_RISE_PX / 2;
 // 최대 알파 — 아웃라인 조연이 솔리드 주연과 같은 성량으로 붙지 않게 살짝 낮춘다.
 const ENT_ALPHA = 0.9;
-// 해체 충격파의 알파 최저점 — 입자 폭발 순간(해체 구간) 짧게 눌렸다 회복해
-// 무대 위 사건을 "인지"한다. 정지 상태가 고아처럼 보이지 않게 하는 미세 반응 1.
-const ENT_DIP_ALPHA = 0.7;
+// 해체 충격파의 알파 최저점 — 입자 폭발 순간(해체 구간) 눌렸다 회복해 무대 위
+// 사건을 "인지"한다. 0.4 아래로 내리면 "꺼졌다 켜짐"(깜빡임)으로 읽히므로 금지.
+// 정지 상태가 고아처럼 보이지 않게 하는 미세 반응 1.
+const ENT_DIP_ALPHA = 0.55;
+// 충격 순간의 물리 반동 — 알파와 같은 포락선으로 스케일이 1.5% 눌렸다 복귀.
+// 빛(알파)과 몸(스케일)이 함께 반응해 폭발의 여파가 닿았다는 물리감을 만든다.
+const ENT_RECOIL = 0.015;
 // 흩어짐 동안의 슬로우 스케일업 상한 — VFL이 떠난 무대를 이어받는 미세한 생기.
 // 눈치채기 어려운 수준(2.5%)이고 위치·트래킹은 불변이라 크로스페이드 구도가
 // 유지된다. 미세 반응 2.
@@ -588,16 +592,21 @@ export default function DotScatterScene() {
             t < ENT_IN_START + ENT_IN_DUR
               ? ease((t - ENT_IN_START) / ENT_IN_DUR)
               : 1;
-          // 해체 충격파 — 해체 전반부에 ENT_DIP_ALPHA까지 눌렸다가 후반부에 회복.
-          let alpha = ENT_ALPHA * aIn;
-          if (t >= DISSOLVE_START) {
-            const half = LOADER_TIMELINE.dissolve / 2;
-            const dp =
-              t < DISSOLVE_START + half
-                ? (t - DISSOLVE_START) / half
-                : Math.max(0, 1 - (t - DISSOLVE_START - half) / half);
-            alpha += (ENT_DIP_ALPHA - ENT_ALPHA) * ease(dp);
+          // 해체 충격파 포락선(0→1→0) — 실제 충격의 문법대로 빠르게 눌리고
+          // (해체의 1/3) 천천히 회복(2/3)하는 비대칭. 알파와 스케일 반동이 공유.
+          let dip = 0;
+          if (t >= DISSOLVE_START && t < SCATTER_START) {
+            const hit = LOADER_TIMELINE.dissolve / 3;
+            dip =
+              t < DISSOLVE_START + hit
+                ? ease((t - DISSOLVE_START) / hit)
+                : 1 -
+                  ease(
+                    (t - DISSOLVE_START - hit) /
+                      (LOADER_TIMELINE.dissolve - hit),
+                  );
           }
+          const alpha = ENT_ALPHA * aIn + (ENT_DIP_ALPHA - ENT_ALPHA) * dip;
           ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
           ctx.font = entFont;
           ctx.textAlign = "left";
@@ -605,12 +614,14 @@ export default function DotScatterScene() {
           ctx.lineWidth = 1;
           ctx.strokeStyle = DOT_COLOR;
           const entRise = (1 - aIn) * ENT_RISE_PX;
-          // 슬로우 스케일업 — 광학 중심 기준으로 흩어짐 진행도에 따라 확대.
+          // 슬로우 스케일업(흩어짐 진행도) × 충격 반동(해체 포락선) — 광학 중심 기준.
+          // 반동은 1.7s에 0으로 수렴하고 스케일업이 그 지점에서 시작해 연속적이다.
           const sp =
             t >= SCATTER_START
               ? Math.min(1, (t - SCATTER_START) / LOADER_TIMELINE.scatter)
               : 0;
-          const entScale = 1 + (ENT_SCALE_MAX - 1) * ease(sp);
+          const entScale =
+            (1 + (ENT_SCALE_MAX - 1) * ease(sp)) * (1 - ENT_RECOIL * dip);
           ctx.save();
           ctx.translate(vw / 2, entMidY);
           ctx.scale(entScale, entScale);
