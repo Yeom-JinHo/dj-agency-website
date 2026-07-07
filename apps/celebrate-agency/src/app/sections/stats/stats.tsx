@@ -30,7 +30,7 @@ export default function Stats() {
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="group bg-ca-bg px-6 py-10 transition-colors duration-300 hover:bg-ca-bg-2 lg:px-8 lg:py-12"
+          className="group bg-ca-bg px-6 py-10 transition-colors duration-300 hover:bg-ca-bg-hover lg:px-8 lg:py-12"
         >
           <div className="origin-bottom-left font-display text-[64px] leading-none tracking-[-0.01em] transition-transform duration-300 ease-out group-hover:scale-[1.03] lg:text-[88px]">
             {!stat.countUp ? (
