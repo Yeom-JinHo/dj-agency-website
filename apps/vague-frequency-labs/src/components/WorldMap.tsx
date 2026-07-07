@@ -1,8 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import DottedMap from "dotted-map";
+
+// Pins wait this long after `revealed` flips true before fading in — a fixed
+// beat after the map/arcs settle, matching the hero headline's own stagger style.
+const PIN_REVEAL_DELAY_S = 0.5;
 
 export interface WorldMapCity {
   id: string;
@@ -24,8 +28,16 @@ interface WorldMapProps {
   lineColor?: string;
   /** Signal accent applied to the focused arc (kept in sync with --vfl-accent). */
   accentColor?: string;
-  /** Seconds to delay the standing arcs' staggered draw-in (sync with entrance). */
+  /** Seconds to delay the standing arcs' staggered draw-in, counted from the
+   *  moment `revealed` flips true (not from mount). */
   revealDelay?: number;
+  /** Seconds to delay the base map image's crossfade-in, counted from the
+   *  moment `revealed` flips true (not from mount). */
+  mapRevealDelay?: number;
+  /** Gates the map image / arcs / pins reveal. Defaults to true so a
+   *  standalone (non-loader-gated) usage still reveals immediately on mount,
+   *  matching the map's prior always-on behavior. */
+  revealed?: boolean;
 }
 
 interface PlacedCity {
@@ -86,9 +98,20 @@ export function WorldMap({
   lineColor = "#E8E2D0",
   accentColor = "#DA2F3D",
   revealDelay = 0,
+  mapRevealDelay = 0,
+  revealed = true,
 }: WorldMapProps) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
+  // CSS transitions don't fire on first paint (there's no prior value to
+  // transition from), so the img/pin fade-in needs a genuine post-mount style
+  // change. Seed from `revealed` so a non-gated caller (default true) still
+  // renders fully visible with no dance; a gated caller (revealed starts
+  // false) flips this once the loader signals `revealed`.
+  const [entered, setEntered] = useState(revealed);
+  useEffect(() => {
+    if (revealed) setEntered(true);
+  }, [revealed]);
 
   // Build the dotted map once. dotted-map caches its grid internally, and
   // getPin projects lon/lat into the SAME coordinate space as the SVG viewBox,
@@ -132,7 +155,13 @@ export function WorldMap({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`}
-        className="vfl-map-img"
+        className={`vfl-map-img${entered ? " revealed" : ""}`}
+        style={{
+          transitionDelay: `${mapRevealDelay}s`,
+          // Keep the breathe keyframe from taking over opacity mid-crossfade —
+          // it only starts once the reveal transition has fully settled.
+          animationDelay: `${mapRevealDelay + 0.4}s`,
+        }}
         alt=""
         draggable={false}
       />
@@ -184,11 +213,14 @@ export function WorldMap({
                   ? { pathLength: 1, opacity: 0.34 }
                   : { pathLength: 0, opacity: 0 }
               }
-              animate={{
-                pathLength: 1,
-                opacity,
-                strokeWidth: isActiveArc ? 0.7 : 0.4,
-              }}
+              // Hold at the initial (undrawn) state until `revealed` flips —
+              // the arc then animates in using the `revealDelay` below, timed
+              // off the loader's landing signal rather than mount.
+              animate={
+                reduce || revealed
+                  ? { pathLength: 1, opacity, strokeWidth: isActiveArc ? 0.7 : 0.4 }
+                  : { pathLength: 0, opacity: 0, strokeWidth: 0.4 }
+              }
               transition={{
                 pathLength: {
                   duration: reduce ? 0 : 0.9,
@@ -203,7 +235,10 @@ export function WorldMap({
         })}
       </svg>
 
-      <div className="vfl-pin-layer">
+      <div
+        className={`vfl-pin-layer${entered ? " revealed" : ""}`}
+        style={{ transitionDelay: `${PIN_REVEAL_DELAY_S}s` }}
+      >
         {placed.map((p) => {
           const isHome = p.city.id === homeId;
           const isActive = active === p.city.id || isHome;
