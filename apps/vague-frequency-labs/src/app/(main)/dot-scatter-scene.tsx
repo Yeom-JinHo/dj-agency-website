@@ -16,8 +16,9 @@ import { LOADER_TIMELINE, useLoaderMarkDone } from "./loader-context";
 
 // 착지 dot 색 — WorldMap 베이스 dot과 동일(globals.css .vfl-map-img 기본값).
 const DOT_COLOR = "#E8E2D0";
-// 성능 안전 상한 — 가시 지도 dot 전체(~6.5k)와 1:1 매칭하되 이 위로는 늘리지 않는다.
-const MAX_DOTS = 8000;
+// 성능 안전 상한 — 가시 지도 dot 전체(페이드 밴드 포함 ~8.4k, 전체 그리드 8,476)와
+// 1:1 매칭이 목표라 그리드 총수보다 크게 잡는다. 초과분은 폭주 방지용 보루.
+const MAX_DOTS = 9000;
 // 글리프 샘플 최소 간격(px). 작은 뷰포트에서 dot이 겹쳐 글자가 뭉개지는 것을 방지 —
 // 이 캡에 걸리면 글리프 dot이 지도 dot보다 적어져 부분 1:1로 동작한다(잔여는 지도 페이드인).
 const MIN_GLYPH_STEP = 4;
@@ -29,9 +30,13 @@ const LAND_ALPHA = 0x85 / 255;
 const SAMPLE_STEP = 5;
 // Header(z-900, h-16=64px) 하단 여유 — 이 위로 착지하면 헤더에 가려 고아 dot이 됨.
 const HEADER_SAFE_PX = 80;
-// dotted-map mask-image가 상하 12%를 투명화(globals.css .vfl-map-img) → 가시 밴드.
+// dotted-map mask-image(globals.css .vfl-map-img)의 그라디언트 경계 —
+// 상하 12% 구간은 투명→불투명으로 감쇠한다. 하드 컷이 아니라 이 감쇠율을
+// 착지 알파에 복제해 페이드 밴드의 dot까지 입자가 커버한다.
 const BAND_TOP = 0.12;
 const BAND_BOTTOM = 0.88;
+// 마스크 감쇠가 이 미만인 dot은 사실상 안 보이므로 착지 대상에서 제외.
+const MIN_MASK_ALPHA = 0.05;
 
 // 타임라인 절대 시각(초) — LOADER_TIMELINE에서 유도(하드코딩 금지).
 const REVEAL_END = LOADER_TIMELINE.reveal; // 0.5 — 워드마크 등장 완료
@@ -84,6 +89,11 @@ interface ScreenPoint {
   y: number;
 }
 
+// 착지 후보 지도 dot — m은 그 위치의 마스크 감쇠율(0~1, 가시 알파 배율).
+interface TargetPoint extends ScreenPoint {
+  m: number;
+}
+
 interface Dot {
   gx: number; // 글리프 좌표 x (화면) — 해체 시 dot이 태어나는 자리
   gy: number; // 글리프 좌표 y (화면)
@@ -91,6 +101,7 @@ interface Dot {
   ty: number; // 지도 착지 좌표 y (화면)
   tb: number; // 탄생 시각(초) — 해체 시작 + 미세 지터 (전면 동시)
   tf: number; // 비행 시작 시각(초) — 전원 SCATTER_START 기준 + 미세 지터(동시 출발)
+  la: number; // 착지 알파 — 그 자리 지도 dot의 최종 가시 알파(LAND_ALPHA × 마스크 감쇠)
 }
 
 // 배열에서 균등 간격으로 n개 서브샘플.
@@ -281,7 +292,7 @@ export default function DotScatterScene() {
 
       let vbW: number;
       let vbH: number;
-      let safe: ScreenPoint[];
+      let safe: TargetPoint[];
       let rawCount: number;
       try {
         const map = new DottedMap({ height: 100, grid: "diagonal" });
@@ -289,22 +300,31 @@ export default function DotScatterScene() {
         vbW = map.image.width;
         vbH = map.image.height;
         rawCount = points.length;
-        // 화면 투영 + 안전 영역 필터(수평 wrap 가시 폭 ∩ 수직 12–88% ∩ header 하단).
+        // 화면 투영 + 안전 영역 필터(수평 wrap 가시 폭 ∩ 마스크 가시(감쇠 포함) ∩ header 하단).
+        // 상하 페이드 밴드의 dot도 마스크 감쇠율(m)을 계산해 착지 대상에 포함한다 —
+        // 크로스페이드 순간 입자 없이 나타나는 dot이 없도록 "모든 가시 dot은 입자에서 태어난다".
         safe = points
-          .map((p) => ({
-            x: rect.left + (p.x / vbW) * rect.width,
-            y: rect.top + (p.y / vbH) * rect.height,
-            band: p.y / vbH,
-          }))
+          .map((p) => {
+            const band = p.y / vbH;
+            const m =
+              band < BAND_TOP
+                ? band / BAND_TOP
+                : band > BAND_BOTTOM
+                  ? (1 - band) / (1 - BAND_BOTTOM)
+                  : 1;
+            return {
+              x: rect.left + (p.x / vbW) * rect.width,
+              y: rect.top + (p.y / vbH) * rect.height,
+              m,
+            };
+          })
           .filter(
             (p) =>
               p.x >= wrapRect.left &&
               p.x <= wrapRect.right &&
-              p.band >= BAND_TOP &&
-              p.band <= BAND_BOTTOM &&
+              p.m >= MIN_MASK_ALPHA &&
               p.y >= HEADER_SAFE_PX,
-          )
-          .map(({ x, y }) => ({ x, y }));
+          );
       } catch {
         return degrade();
       }
@@ -352,6 +372,7 @@ export default function DotScatterScene() {
         gy: g.y,
         tx: targetN[i]!.x,
         ty: targetN[i]!.y,
+        la: LAND_ALPHA * targetN[i]!.m,
         // 글자 전체가 한번에 입자화 — 미세 지터만으로 반짝이며 태어나는 질감.
         tb: DISSOLVE_START + Math.random() * DISSOLVE_JITTER,
         // 해체가 끝난 완전한 dot 워드마크가 한 호흡에 세계로 흩어진다.
@@ -427,7 +448,7 @@ export default function DotScatterScene() {
             if (t < d.tb) continue; // 아직 태어나지 않은 dot (해체 지터)
             const aIn = Math.min(1, (t - d.tb) / DOT_IN);
             const p = Math.min(1, Math.max(0, (t - d.tf) / FLIGHT));
-            const alpha = aIn * (1 + (LAND_ALPHA - 1) * p);
+            const alpha = aIn * (1 + (d.la - 1) * p);
             const bi = Math.round(alpha * ALPHA_BUCKETS);
             if (bi <= 0) continue;
             const e = ease(p);
