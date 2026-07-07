@@ -3,11 +3,12 @@
 import { motion, MotionConfig } from "motion/react";
 import { WorldMap } from "@/components/WorldMap";
 import { useLoaderDone } from "@/app/(main)/loader-context";
+import type { WorldMapData } from "@/utils/world-map-data";
 import { hero } from "./config";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-function Hero() {
+function Hero({ mapData }: { mapData: WorldMapData }) {
   // Gated on the loader's landing signal (useLoaderDone) rather than a client
   // timer: LoaderProvider's unconditional watchdog guarantees `done` fires
   // even if the dot-scatter scene fails, so this never hangs (fail-open).
@@ -31,6 +32,7 @@ function Hero() {
             so the landing dots crossfade into it instead of popping in early. */}
         <div className="vfl-map-wrap">
           <WorldMap
+            mapData={mapData}
             cities={hero.cities}
             homeId={hero.homeId}
             revealed={done}

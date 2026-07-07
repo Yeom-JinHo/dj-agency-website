@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import DottedMap from "dotted-map";
 
-import { LOADER_TIMELINE, useLoaderMarkDone } from "./loader-context";
+import {
+  LOADER_TIMELINE,
+  useLoaderMapData,
+  useLoaderMarkDone,
+} from "./loader-context";
 
 // 오프닝 씬: 단일 fullscreen canvas에서 솔리드 font-display "VFL" 워드마크가
 // 등장(0.5s) → 유지(0.7s)된 뒤, 글자 전체가 한번에 dot 입자로 해체(0.3s)되고
@@ -208,6 +211,7 @@ function sampleGlyph(
 export default function DotScatterScene() {
   const reduce = useReducedMotion();
   const markDone = useLoaderMarkDone();
+  const mapData = useLoaderMapData();
 
   const [visible, setVisible] = useState(true);
   const [degraded, setDegraded] = useState(false);
@@ -282,7 +286,10 @@ export default function DotScatterScene() {
       const bg = bgRef.current;
       if (!canvas || !bg) return degrade();
 
-      // 지도 착지 좌표 — WorldMap.tsx:97과 동일 파라미터.
+      // 착지 좌표 — 지도 dot은 서버에서 계산돼 loader-context로 주입된다
+      // (WorldMap과 동일한 {height:100, grid:"diagonal"} 산출물). 클라이언트는
+      // dotted-map을 로드하지 않는다.
+      if (!mapData) return degrade();
       const inner = document.querySelector<HTMLElement>(".vfl-map-inner");
       const wrap = document.querySelector<HTMLElement>(".vfl-map-wrap");
       if (!inner || !wrap) return degrade();
@@ -290,43 +297,34 @@ export default function DotScatterScene() {
       const wrapRect = wrap.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return degrade();
 
-      let vbW: number;
-      let vbH: number;
-      let safe: TargetPoint[];
-      let rawCount: number;
-      try {
-        const map = new DottedMap({ height: 100, grid: "diagonal" });
-        const points = map.getPoints();
-        vbW = map.image.width;
-        vbH = map.image.height;
-        rawCount = points.length;
-        // 화면 투영 + 안전 영역 필터(수평 wrap 가시 폭 ∩ 마스크 가시(감쇠 포함) ∩ header 하단).
-        // 상하 페이드 밴드의 dot도 마스크 감쇠율(m)을 계산해 착지 대상에 포함한다 —
-        // 크로스페이드 순간 입자 없이 나타나는 dot이 없도록 "모든 가시 dot은 입자에서 태어난다".
-        safe = points
-          .map((p) => {
-            const band = p.y / vbH;
-            const m =
-              band < BAND_TOP
-                ? band / BAND_TOP
-                : band > BAND_BOTTOM
-                  ? (1 - band) / (1 - BAND_BOTTOM)
-                  : 1;
-            return {
-              x: rect.left + (p.x / vbW) * rect.width,
-              y: rect.top + (p.y / vbH) * rect.height,
-              m,
-            };
-          })
-          .filter(
-            (p) =>
-              p.x >= wrapRect.left &&
-              p.x <= wrapRect.right &&
-              p.m >= MIN_MASK_ALPHA &&
-              p.y >= HEADER_SAFE_PX,
-          );
-      } catch {
-        return degrade();
+      const vbW = mapData.width;
+      const vbH = mapData.height;
+      const flat = mapData.pointsFlat; // [x0, y0, x1, y1, …]
+      const rawCount = flat.length / 2;
+      // 화면 투영 + 안전 영역 필터(수평 wrap 가시 폭 ∩ 마스크 가시(감쇠 포함) ∩ header 하단).
+      // 상하 페이드 밴드의 dot도 마스크 감쇠율(m)을 계산해 착지 대상에 포함한다 —
+      // 크로스페이드 순간 입자 없이 나타나는 dot이 없도록 "모든 가시 dot은 입자에서 태어난다".
+      const safe: TargetPoint[] = [];
+      for (let i = 0; i + 1 < flat.length; i += 2) {
+        const px = flat[i]!;
+        const py = flat[i + 1]!;
+        const band = py / vbH;
+        const m =
+          band < BAND_TOP
+            ? band / BAND_TOP
+            : band > BAND_BOTTOM
+              ? (1 - band) / (1 - BAND_BOTTOM)
+              : 1;
+        const x = rect.left + (px / vbW) * rect.width;
+        const y = rect.top + (py / vbH) * rect.height;
+        if (
+          x >= wrapRect.left &&
+          x <= wrapRect.right &&
+          m >= MIN_MASK_ALPHA &&
+          y >= HEADER_SAFE_PX
+        ) {
+          safe.push({ x, y, m });
+        }
       }
       // 착지 반지름 = 지도 dot 화면 반지름(getSVG radius:0.22 → 화면 스케일).
       const landRadius = (0.22 / vbW) * rect.width;
