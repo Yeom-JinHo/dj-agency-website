@@ -49,22 +49,19 @@ export default function Header() {
           {/* 11px 라벨이라 WCAG AA(4.5:1) 적용 대상: 텍스트용 CTA 레드 토큰
               (ca-red-cta = #d62a20) + 순백 라벨로 ≈5:1 확보. ca-red는 전역
               액센트용으로 유지. BookingFiller 타일과 같은 토큰을 공유한다. */}
-          {/* 형태: 전역 각진 시스템에 맞춘 사각 + 우상단 45° 사선 컷 — 히어로
-              스티치·푸터 red chip의 사선 언어를 CTA에 상속. 컷 방향은 ↗ 화살표와 일치.
-              clip-path는 outline까지 잘라내므로 시각 레이어(span)에만 적용하고
-              포커스 링은 앵커가 담당한다(빨간 배경이라 ca-fg로 반전). */}
+          {/* 형태: 전역 각진 시스템에서 유일한 곡선 — 형태 대비로 최상위 CTA를
+              강조하는 의도적 예외(사선 컷 시안 검토 후 pill 유지 결정).
+              포커스 링은 빨간 배경이라 ca-fg로 반전, radius를 따라 그려진다. */}
           <a
             href={BOOKING_MAILTO}
-            className="group inline-flex min-h-[44px] focus-visible:outline-ca-fg"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim active:bg-ca-red-dim focus-visible:outline-ca-fg"
           >
-            <span className="inline-flex items-center gap-1.5 bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors [clip-path:polygon(0_0,calc(100%-10px)_0,100%_10px,100%_100%,0_100%)] group-hover:bg-ca-red-dim group-active:bg-ca-red-dim">
-              Book a Set
-              <IconArrowUpRight
-                aria-hidden="true"
-                className="size-[15px]"
-                stroke={2.25}
-              />
-            </span>
+            Book a Set
+            <IconArrowUpRight
+              aria-hidden="true"
+              className="size-[15px]"
+              stroke={2.25}
+            />
           </a>
         </div>
       </div>
