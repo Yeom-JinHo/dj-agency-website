@@ -2,11 +2,33 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import DottedMap from "dotted-map";
+import type { WorldMapData } from "@/utils/world-map-data";
 
 // Pins wait this long after `revealed` flips true before fading in — a fixed
 // beat after the map/arcs settle, matching the hero headline's own stagger style.
 const PIN_REVEAL_DELAY_S = 0.5;
+
+// Radius of each land dot in viewBox units — matches the value previously passed
+// to dotted-map's getSVG (kept in sync with the loader's landing-dot radius).
+const DOT_RADIUS = 0.22;
+
+// Build the dotted-map SVG string from precomputed points. This is the same
+// circle markup dotted-map's getSVG emits, but with zero dependency on the
+// ~350KB country GeoJSON — the points are projected server-side.
+function pointsToSvg(
+  points: { x: number; y: number }[],
+  width: number,
+  height: number,
+  color: string,
+): string {
+  const circles = points
+    .map(
+      (p) =>
+        `<circle cx="${p.x}" cy="${p.y}" r="${DOT_RADIUS}" fill="${color}" />`,
+    )
+    .join("");
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="background-color: transparent">${circles}</svg>`;
+}
 
 export interface WorldMapCity {
   id: string;
@@ -19,6 +41,8 @@ export interface WorldMapCity {
 }
 
 interface WorldMapProps {
+  /** Precomputed dotted-map data (points/dims/pins) built server-side. */
+  mapData: WorldMapData;
   cities: WorldMapCity[];
   /** id of the home city all arcs route back to. */
   homeId: string;
@@ -92,6 +116,7 @@ function TaegeukMark() {
 }
 
 export function WorldMap({
+  mapData,
   cities,
   homeId,
   dotColor = "#E8E2D085",
@@ -113,26 +138,35 @@ export function WorldMap({
     if (revealed) setEntered(true);
   }, [revealed]);
 
-  // Build the dotted map once. dotted-map caches its grid internally, and
-  // getPin projects lon/lat into the SAME coordinate space as the SVG viewBox,
-  // so HTML pins placed by percentage line up exactly with the rendered dots.
-  const { svg, width, height, placed } = useMemo(() => {
-    const map = new DottedMap({ height: 100, grid: "diagonal" });
-    const svgMap = map.getSVG({
-      radius: 0.22,
-      color: dotColor,
-      shape: "circle",
-      backgroundColor: "transparent",
-    });
-    const { width: w, height: h } = map.image;
-    const placedCities = cities
-      .map((city) => {
-        const pin = map.getPin({ lat: city.lat, lng: city.lng });
-        return pin ? { city, x: pin.x, y: pin.y } : null;
-      })
-      .filter((p): p is PlacedCity => p !== null);
-    return { svg: svgMap, width: w, height: h, placed: placedCities };
-  }, [cities, dotColor]);
+  // The base map stays opacity:0 until `revealed` (loader done), so rendering
+  // its ~900KB dot SVG during SSR is invisible, wasted bytes in the HTML. Build
+  // it on the client only (after mount) so the coordinate data ships once — as
+  // the compact `points` array in the RSC payload — instead of also as a giant
+  // pre-rendered SVG string. Gating on `mounted` keeps SSR and the first client
+  // render identical (empty src), avoiding a hydration mismatch.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  // Map geometry is projected server-side (see getWorldMapData) and passed in,
+  // so this component ships no dotted-map dependency. The SVG is rebuilt from
+  // the precomputed points; pins join their static config metadata by id. Both
+  // share the same viewBox coordinate space, so percentage-placed HTML pins line
+  // up exactly with the rendered dots.
+  const { width, height, points } = mapData;
+  const svg = useMemo(
+    () => (mounted ? pointsToSvg(points, width, height, dotColor) : ""),
+    [mounted, points, width, height, dotColor],
+  );
+  const placed = useMemo<PlacedCity[]>(
+    () =>
+      mapData.placed
+        .map((pin) => {
+          const city = cities.find((c) => c.id === pin.id);
+          return city ? { city, x: pin.x, y: pin.y } : null;
+        })
+        .filter((p): p is PlacedCity => p !== null),
+    [mapData.placed, cities],
+  );
 
   const home = placed.find((p) => p.city.id === homeId) ?? null;
   // Every non-home city keeps a standing arc back to the home base so the
@@ -154,7 +188,9 @@ export function WorldMap({
       {/* Inline data-URI SVG — next/image offers no benefit and can't optimize it. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`}
+        src={
+          svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : undefined
+        }
         className={`vfl-map-img${entered ? " revealed" : ""}`}
         style={{
           transitionDelay: `${mapRevealDelay}s`,

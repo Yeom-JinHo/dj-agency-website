@@ -1,4 +1,5 @@
 import { createMetadata } from "@/utils/index";
+import { getWorldMapData } from "@/utils/world-map-data";
 import About from "../sections/about/about";
 import MediaGridWork from "../sections/mediaGrid/MediaGridWork";
 import MusicList from "../sections/musicList/MusicList";
@@ -23,9 +24,11 @@ export const metadata = createMetadata({
 });
 
 export default function Home() {
+  // Shared with the loader via React cache(); the dotted-map build runs once.
+  const mapData = getWorldMapData();
   return (
     <main className="flex-1">
-      <Hero />
+      <Hero mapData={mapData} />
       <About />
       <MediaGridWork />
       <MusicList />

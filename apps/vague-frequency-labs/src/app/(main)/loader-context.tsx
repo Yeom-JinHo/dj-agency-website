@@ -29,14 +29,29 @@ export const LOADER_TIMELINE = {
 // 하드코딩 금지 — 타임라인을 늘려도 watchdog이 씬보다 먼저 터지지 않는다.
 export const WATCHDOG_MS = (LOADER_TIMELINE.total + 0.5) * 1000;
 
+// Map data the loader scene needs for its landing coordinates. Computed on the
+// server and threaded in as a prop so the client never imports dotted-map.
+export interface SceneMapData {
+  points: { x: number; y: number }[];
+  width: number;
+  height: number;
+}
+
 interface LoaderContextValue {
   done: boolean;
   markDone: () => void;
+  mapData: SceneMapData | null;
 }
 
 const LoaderContext = createContext<LoaderContextValue | null>(null);
 
-export function LoaderProvider({ children }: { children: ReactNode }) {
+export function LoaderProvider({
+  children,
+  mapData = null,
+}: {
+  children: ReactNode;
+  mapData?: SceneMapData | null;
+}) {
   const [done, setDone] = useState(false);
 
   const markDone = useCallback(() => setDone(true), []);
@@ -50,7 +65,7 @@ export function LoaderProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <LoaderContext.Provider value={{ done, markDone }}>
+    <LoaderContext.Provider value={{ done, markDone, mapData }}>
       {children}
     </LoaderContext.Provider>
   );
@@ -70,4 +85,8 @@ export function useLoaderDone(): boolean {
 
 export function useLoaderMarkDone(): () => void {
   return useLoaderContext().markDone;
+}
+
+export function useLoaderMapData(): SceneMapData | null {
+  return useLoaderContext().mapData;
 }
