@@ -1,10 +1,7 @@
-export type MediaTileKind = "video" | "still";
-
 export type MediaTile = {
   id: string;
-  kind: MediaTileKind;
   title: string;
-  /** 코너 메타 라벨 (콘텐츠 준비 전 아트디렉션 힌트) */
+  /** 코너 메타 라벨 — 콘텐츠 유형(영상/스틸)과 비율을 예고 */
   meta: string;
   credit: string;
   spanClassName: string;
@@ -16,7 +13,6 @@ export type MediaTile = {
 export const mediaTiles: MediaTile[] = [
   {
     id: "live-set",
-    kind: "video",
     title: "Live Set",
     meta: "live set · 16:10",
     credit: "Seoul · 2026",
@@ -25,7 +21,6 @@ export const mediaTiles: MediaTile[] = [
   },
   {
     id: "studio-session",
-    kind: "still",
     title: "Studio Session",
     meta: "still · 4:3",
     credit: "VFL Studio",
@@ -34,7 +29,6 @@ export const mediaTiles: MediaTile[] = [
   },
   {
     id: "visualizer",
-    kind: "video",
     title: "Visualizer",
     meta: "visual · 4:3",
     credit: "In Rotation",
@@ -43,7 +37,6 @@ export const mediaTiles: MediaTile[] = [
   },
   {
     id: "backstage",
-    kind: "still",
     title: "Backstage",
     meta: "still · 16:10",
     credit: "Tour Archive",
