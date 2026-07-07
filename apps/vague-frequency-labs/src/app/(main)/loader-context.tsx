@@ -30,8 +30,10 @@ export const LOADER_TIMELINE = {
 export const WATCHDOG_MS = (LOADER_TIMELINE.total + 0.5) * 1000;
 
 // Map data the loader scene needs for its landing coordinates. Computed on the
-// server and threaded in as a prop so the client never imports dotted-map.
-// pointsFlat is [x0, y0, x1, y1, …] — same compact format as WorldMapData.
+// server and passed as a plain prop (home page → Loader → scene) — the loader
+// lives on the home page only, so map-less subpage routes ship neither the
+// coordinates nor the scene code. pointsFlat is [x0, y0, x1, y1, …] — same
+// compact format as WorldMapData.
 export interface SceneMapData {
   pointsFlat: number[];
   width: number;
@@ -41,18 +43,11 @@ export interface SceneMapData {
 interface LoaderContextValue {
   done: boolean;
   markDone: () => void;
-  mapData: SceneMapData | null;
 }
 
 const LoaderContext = createContext<LoaderContextValue | null>(null);
 
-export function LoaderProvider({
-  children,
-  mapData = null,
-}: {
-  children: ReactNode;
-  mapData?: SceneMapData | null;
-}) {
+export function LoaderProvider({ children }: { children: ReactNode }) {
   const [done, setDone] = useState(false);
 
   const markDone = useCallback(() => setDone(true), []);
@@ -66,7 +61,7 @@ export function LoaderProvider({
   }, []);
 
   return (
-    <LoaderContext.Provider value={{ done, markDone, mapData }}>
+    <LoaderContext.Provider value={{ done, markDone }}>
       {children}
     </LoaderContext.Provider>
   );
@@ -88,6 +83,3 @@ export function useLoaderMarkDone(): () => void {
   return useLoaderContext().markDone;
 }
 
-export function useLoaderMapData(): SceneMapData | null {
-  return useLoaderContext().mapData;
-}
