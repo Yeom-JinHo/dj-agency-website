@@ -113,7 +113,8 @@
     /* hero 타이포(--vfl-fg #eceae3)와 같은 웜 화이트 축 — 헤더·본문·제목이 hero와 한 흰색으로 읽힌다 */
     --foreground: 47 19% 91%;
     --card: 240 10% 3.9%;
-    --primary: 0 0% 98%;
+    /* foreground와 같은 웜 축 — 아이콘·언더라인·버튼이 텍스트와 한 흰색으로 읽힌다 */
+    --primary: 47 19% 91%;
     --primary-foreground: 240 5.9% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;

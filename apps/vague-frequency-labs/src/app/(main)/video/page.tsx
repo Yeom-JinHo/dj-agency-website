@@ -61,7 +61,6 @@ export default function VideoPage(): ReactElement {
                   className="relative w-full md:w-[640px]"
                 >
                   <YoutubeCard
-                    key={index}
                     id={index % 2 === 0 ? "1lAXNqA25Bs" : "bikTSiNr08w"}
                     title={
                       index % 2 === 0

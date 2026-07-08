@@ -103,7 +103,10 @@ export default async function ProjectPage(props0: {
         </div>
       </section>
       <section className="mx-auto mb-12 w-full max-w-7xl px-8">
-        <SectionHeading as="h2" className="mb-2">
+        <SectionHeading
+          as="h2"
+          className="mb-2 text-3xl sm:text-4xl lg:text-5xl"
+        >
           About
         </SectionHeading>
         <p className="whitespace-pre-line text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
@@ -111,7 +114,10 @@ export default async function ProjectPage(props0: {
         </p>
       </section>
       <section className="mx-auto mb-12 w-full max-w-7xl px-8">
-        <SectionHeading as="h2" className="mb-2">
+        <SectionHeading
+          as="h2"
+          className="mb-2 text-3xl sm:text-4xl lg:text-5xl"
+        >
           Photos
         </SectionHeading>
         <TextReveal
