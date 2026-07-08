@@ -392,18 +392,19 @@
 /* ───────────────────────────────────────────────────────────────
    V.F. LABS — Worldwide hero (DJ Hero handoff)
    Minimal monochrome poster: full-bleed dotted world map backdrop,
-   warm-cream single accent, heavy Korean display, film grain + vignette.
+   warm text over pure-white map ink, heavy Korean display, film grain + vignette.
    ─────────────────────────────────────────────────────────────── */
 .vfl-hero {
   --vfl-bg: #0a0a0b;
   --vfl-fg: #eceae3;
-  --vfl-cream: #e8e2d0;
+  /* Map-scene ink — loader particles, map dots/arcs, pins, scroll cue. */
+  --vfl-ink: #ffffff;
   --vfl-muted: rgba(236, 234, 227, 0.52);
   --vfl-faint: rgba(236, 234, 227, 0.3);
   --vfl-line: rgba(236, 234, 227, 0.12);
   --vfl-line-strong: rgba(236, 234, 227, 0.22);
   /* Taegeuk accent pair — red over blue marks Seoul as the Korean home base.
-     Red also lights the active arc; the cream monotone stays intact otherwise. */
+     Red also lights the active arc; the white-ink monotone stays intact otherwise. */
   --vfl-accent: #da2f3d;
   --vfl-accent-blue: #2e6be6;
   background: var(--vfl-bg);
@@ -510,10 +511,10 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--vfl-cream);
+  background: var(--vfl-ink);
   box-shadow:
     0 0 0 1px rgba(10, 10, 11, 0.9),
-    0 0 10px rgba(232, 226, 208, 0.6);
+    0 0 10px rgba(255, 255, 255, 0.6);
 }
 .vfl-pin-core.home {
   width: 13px;
@@ -548,7 +549,7 @@
   height: 7px;
   margin: -3.5px 0 0 -3.5px;
   border-radius: 50%;
-  border: 1px solid rgba(232, 226, 208, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   animation: vfl-pin-pulse 2.8s ease-out infinite;
   pointer-events: none;
 }
@@ -653,7 +654,7 @@
 }
 .vfl-pin-tip-venue {
   font-size: 10px;
-  color: var(--vfl-cream);
+  color: var(--vfl-ink);
   letter-spacing: 0.14em;
 }
 
