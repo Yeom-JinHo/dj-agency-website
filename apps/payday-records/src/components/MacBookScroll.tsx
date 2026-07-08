@@ -64,7 +64,9 @@ export const MacBookScroll = ({
     [0, 0.3],
     [0.6, isMobile ? 1 : 1.5]
   );
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
+  // 상한을 컨테이너 높이(md 1600px)보다 충분히 안쪽으로 유지해야
+  // 최하단 스크롤에서 화면(lid)이 뒤따르는 Contact 카드와 겹치지 않는다.
+  const translate = useTransform(scrollYProgress, [0, 1], [0, isMobile ? 760 : 880]);
   const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
   const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -72,7 +74,7 @@ export const MacBookScroll = ({
   return (
     <div
       ref={ref}
-      className="flex min-h-[1200px] shrink-0 scale-[0.6] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:min-h-[2000px] md:scale-100 md:py-80 [@media(max-width:375px)]:min-h-[1100px]"
+      className="flex min-h-[850px] shrink-0 scale-[0.6] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:min-h-[1600px] md:scale-100 md:pt-40 md:pb-0 [@media(max-width:375px)]:min-h-[780px]"
     >
       <motion.div
         style={{

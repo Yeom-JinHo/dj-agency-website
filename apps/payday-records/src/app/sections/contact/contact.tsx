@@ -42,13 +42,15 @@ function Contact() {
         />
         <div
           style={{
-            backdropFilter: "blur(16px) saturate(140%)",
-            WebkitBackdropFilter: "blur(16px) saturate(140%)",
-            backgroundColor: "rgba(9, 9, 11, 0.55)",
+            /* 뒤의 DAW 스크린샷(보라 플러그인 창)이 비치면 카드가 팔레트 밖
+               색을 얻으므로, 유리를 어둡게 조여 뉴트럴 다크 글래스로 유지. */
+            backdropFilter: "blur(24px) saturate(120%)",
+            WebkitBackdropFilter: "blur(24px) saturate(120%)",
+            backgroundColor: "rgba(9, 9, 11, 0.9)",
             borderRadius: "16px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
-          className="pointer-events-auto relative mb-[200px] flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] [@media(max-width:375px)]:mb-40"
+          className="pointer-events-auto relative flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw]"
         >
           <ShineBorder
             borderWidth={2}

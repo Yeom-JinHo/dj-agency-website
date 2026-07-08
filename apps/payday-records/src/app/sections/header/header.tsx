@@ -35,7 +35,7 @@ export default function Header() {
   const rightLinks = navLinks.slice(half);
 
   const navLinkClass =
-    "flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase underline-offset-4 transition-opacity hover:underline";
+    "flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase transition-colors hover:text-pd-accent";
 
   return (
     <>
@@ -106,7 +106,7 @@ export default function Header() {
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
               onClick={() => setMenuOpen((v) => !v)}
-              className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none md:hidden"
+              className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white md:hidden"
             >
               {menuOpen ? (
                 <IconX className="h-6 w-6" stroke={2} />
@@ -138,7 +138,7 @@ export default function Header() {
             type="button"
             aria-label="Close menu"
             onClick={() => setMenuOpen(false)}
-            className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white focus-visible:text-white focus-visible:outline-none"
+            className="-mr-2 inline-flex h-11 w-11 items-center justify-center text-white/85 transition-colors hover:text-white"
           >
             <IconX className="h-6 w-6" stroke={2} />
           </button>
@@ -153,7 +153,7 @@ export default function Header() {
               style={{ transitionDelay: menuOpen ? `${index * 60 + 80}ms` : "0ms" }}
               className={[
                 "font-display py-4 text-5xl leading-none tracking-[0.02em] text-white/90 uppercase",
-                "transition-all duration-500 ease-out hover:text-white focus-visible:text-white focus-visible:outline-none",
+                "transition-all duration-500 ease-out hover:text-pd-accent",
                 "motion-reduce:transition-none",
                 menuOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
               ].join(" ")}

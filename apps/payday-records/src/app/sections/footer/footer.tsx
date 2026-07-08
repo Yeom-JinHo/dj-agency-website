@@ -14,7 +14,7 @@ export default function Footer() {
           <SignatureLink
             href="https://www.instagram.com/ye0m_2/"
             ariaLabel={`${meta.author.name} — Connect on Instagram`}
-            className="hover:text-white focus-visible:text-white"
+            className="hover:text-pd-accent focus-visible:text-pd-accent"
             tooltipClassName="text-white font-mono uppercase tracking-[0.15em]"
           >
             {meta.author.name}
