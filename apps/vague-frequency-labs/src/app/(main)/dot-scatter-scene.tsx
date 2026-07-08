@@ -622,7 +622,9 @@ export default function DotScatterScene({
         }
 
         // 2) dot 입자 — 전면 동시 해체(미세 지터)로 태어나 알파 인(DOT_IN) → 동시 출발로 비행·착지.
-        //    비행 진행도에 따라 알파를 지도 dot(#FFFFFF85)로 수렴시켜 크로스페이드 밝기 점프 제거.
+        //    알파는 위치와 같은 이징(e)으로 지도 dot(#FFFFFF85)에 수렴 — 위치만 ease-out이면
+        //    dot이 공간적으로는 도착했는데 알파는 선형이라 최종보다 밝은 지도가 먼저 그려졌다가
+        //    제자리에서 어두워진다(순백 전환으로 과노출처럼 드러난 크림 시절의 잔재).
         //    per-dot 알파는 ALPHA_BUCKETS 단계로 양자화해 버킷당 Path2D 1회 fill로 배칭 —
         //    수천 개 dot을 개별 fill하면 프레임 예산이 깨진다.
         if (t >= DISSOLVE_START) {
@@ -632,10 +634,10 @@ export default function DotScatterScene({
             if (t < d.tb) continue; // 아직 태어나지 않은 dot (해체 지터)
             const aIn = Math.min(1, (t - d.tb) / DOT_IN);
             const p = Math.min(1, Math.max(0, (t - d.tf) / FLIGHT));
-            const alpha = aIn * (1 + (d.la - 1) * p);
+            const e = ease(p);
+            const alpha = aIn * (1 + (d.la - 1) * e);
             const bi = Math.round(alpha * ALPHA_BUCKETS);
             if (bi <= 0) continue;
-            const e = ease(p);
             const px = d.gx + (d.tx - d.gx) * e;
             const py = d.gy + (d.ty - d.gy) * e;
             const radius = dissolveRadius + (landRadius - dissolveRadius) * e;
