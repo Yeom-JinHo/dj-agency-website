@@ -105,7 +105,7 @@ function MusicList() {
 
           <Link
             href="/music"
-            className="group mt-14 inline-flex items-center gap-3 border border-white/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-black md:px-8 md:py-3.5 md:text-sm"
+            className="group mt-14 inline-flex items-center gap-3 border border-white/40 px-6 py-3 font-mono text-xs uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-white hover:bg-white hover:text-black md:px-8 md:py-3.5 md:text-sm"
           >
             More
             <Icon
