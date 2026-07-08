@@ -93,7 +93,7 @@ export default function Header() {
       ].join(" ")}
       onMouseLeave={() => setHoveredLink(null)}
     >
-      <div className="flex h-16 items-center justify-between px-4 md:px-6">
+      <div className="flex h-16 items-center justify-between px-4 md:px-10 lg:px-16">
         <div className="flex w-full justify-between">
           <Link
             href="/"

@@ -1,3 +1,4 @@
+import { BlurFade } from "@repo/ui/common/BlurFade";
 import SectionHeading from "@/components/SectionHeading";
 import { mediaTiles } from "./config";
 
@@ -8,8 +9,8 @@ import { mediaTiles } from "./config";
 function MediaGridWork() {
   return (
     <section className="w-full py-24 lg:py-32" id="media">
-      <div className="grid gap-10">
-        <div className="flex w-full flex-col items-center justify-center px-6 text-center md:px-10 lg:flex-row lg:items-end lg:justify-between lg:px-16 lg:text-left">
+      <div className="grid gap-10 px-6 md:px-10 lg:px-16">
+        <div className="flex w-full flex-col items-center justify-center text-center lg:flex-row lg:items-end lg:justify-between lg:text-left">
           <SectionHeading as="h2" className="flex flex-col -space-y-4">
             Media
           </SectionHeading>
@@ -19,9 +20,21 @@ function MediaGridWork() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 px-6 md:px-10 lg:grid-cols-12 lg:px-16">
-          {mediaTiles.map((tile) => (
-            <div key={tile.id} className={`relative ${tile.spanClassName}`}>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {mediaTiles.map((tile, index) => (
+            <BlurFade
+              key={tile.id}
+              className={`relative ${tile.spanClassName}`}
+              inView
+              direction="up"
+              offset={12}
+              blur="0px"
+              transition={{
+                delay: 0.08 * (index % 2),
+                duration: 0.65,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
               <div
                 className={`vfl-media-ph-stripe relative overflow-hidden border border-white/10 ${tile.aspectClassName}`}
               />
@@ -33,7 +46,7 @@ function MediaGridWork() {
                   {tile.credit}
                 </span>
               </div>
-            </div>
+            </BlurFade>
           ))}
         </div>
       </div>
