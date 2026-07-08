@@ -21,14 +21,14 @@ import {
 // 동일한 DottedMap 파라미터로 착지 정합을 구조적으로 보장한다.
 
 // 착지 dot 색 — WorldMap 베이스 dot과 동일(globals.css .vfl-map-img 기본값).
-const DOT_COLOR = "#E8E2D0";
+const DOT_COLOR = "#FFFFFF";
 // 성능 안전 상한 — 가시 지도 dot 전체(페이드 밴드 포함 ~8.4k, 전체 그리드 8,476)와
 // 1:1 매칭이 목표라 그리드 총수보다 크게 잡는다. 초과분은 폭주 방지용 보루.
 const MAX_DOTS = 9000;
 // 글리프 샘플 최소 간격(px). 작은 뷰포트에서 dot이 겹쳐 글자가 뭉개지는 것을 방지 —
 // 이 캡에 걸리면 글리프 dot이 지도 dot보다 적어져 부분 1:1로 동작한다(잔여는 지도 페이드인).
 const MIN_GLYPH_STEP = 4;
-// 착지 시점 dot 알파 — 지도 dot 색 #E8E2D085의 0x85와 일치시켜 크로스페이드를 무봉제로.
+// 착지 시점 dot 알파 — 지도 dot 색 #FFFFFF85의 0x85와 일치시켜 크로스페이드를 무봉제로.
 const LAND_ALPHA = 0x85 / 255;
 // 오프스크린 글리프 샘플링의 최소 그리드 간격(px). 실제 간격은 글자 크기에
 // 맞춰 적응 — 고정 간격은 큰 뷰포트에서 후보가 수만 개로 불어나고, 이를
@@ -622,7 +622,7 @@ export default function DotScatterScene({
         }
 
         // 2) dot 입자 — 전면 동시 해체(미세 지터)로 태어나 알파 인(DOT_IN) → 동시 출발로 비행·착지.
-        //    비행 진행도에 따라 알파를 지도 dot(#E8E2D085)로 수렴시켜 크로스페이드 밝기 점프 제거.
+        //    비행 진행도에 따라 알파를 지도 dot(#FFFFFF85)로 수렴시켜 크로스페이드 밝기 점프 제거.
         //    per-dot 알파는 ALPHA_BUCKETS 단계로 양자화해 버킷당 Path2D 1회 fill로 배칭 —
         //    수천 개 dot을 개별 fill하면 프레임 예산이 깨진다.
         if (t >= DISSOLVE_START) {
