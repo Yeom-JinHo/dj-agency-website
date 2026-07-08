@@ -64,7 +64,9 @@ export const MacBookScroll = ({
     [0, 0.3],
     [0.6, isMobile ? 1 : 1.5]
   );
-  const translate = useTransform(scrollYProgress, [0, 1], [0, 1500]);
+  // 상한을 컨테이너 높이(md 1600px)보다 충분히 안쪽으로 유지해야
+  // 최하단 스크롤에서 화면(lid)이 뒤따르는 Contact 카드와 겹치지 않는다.
+  const translate = useTransform(scrollYProgress, [0, 1], [0, isMobile ? 760 : 880]);
   const rotate = useTransform(scrollYProgress, [0.1, 0.12, 0.3], [-28, -28, 0]);
   const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
