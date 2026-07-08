@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import React from "react";
 import { musicInfo } from "@/source";
+import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import { createMetadata } from "@/utils/index";
@@ -44,16 +45,21 @@ export default function VideoPage(): ReactElement {
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="video"
       >
-        <div className="flex flex-col items-center md:max-w-7xl">
+        <div className="flex w-full flex-col items-center md:max-w-7xl">
           <SectionHeading as="h1" variant="page">
             Video
           </SectionHeading>
 
-          <FancyLine className={"m-16"} />
-          <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
+          <FancyLine className={"mt-16"} />
+          <div className="relative mt-16 flex flex-col items-center justify-center gap-4 overflow-hidden">
             <div className="flex flex-wrap justify-center">
               {musicInfos.map((info, index) => (
-                <div key={index} className="relative w-full md:w-[640px]">
+                <BlurFade
+                  key={index}
+                  inView
+                  duration={0.6}
+                  className="relative w-full md:w-[640px]"
+                >
                   <YoutubeCard
                     key={index}
                     id={index % 2 === 0 ? "1lAXNqA25Bs" : "bikTSiNr08w"}
@@ -63,7 +69,7 @@ export default function VideoPage(): ReactElement {
                         : "DJ 믹스 플레이리스트 - Tech House , Afro house : SIELO | PM MU:SE / MIXMIX"
                     }
                   />
-                </div>
+                </BlurFade>
               ))}
             </div>
           </div>

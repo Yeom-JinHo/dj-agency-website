@@ -59,7 +59,7 @@ const Nav = () => {
         })}
       </div> */}
       <div className="flex flex-col gap-2">
-        <h3 className="mb-2 text-lg text-muted-foreground uppercase md:text-xl lg:text-2xl">
+        <h3 className="mb-2 font-mono text-base uppercase tracking-[0.14em] text-muted-foreground md:text-lg lg:text-xl">
           Socials
         </h3>
         {contact.socials.map((link, index) => {

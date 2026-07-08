@@ -21,16 +21,15 @@ export default function ParallaxGlobeLogo(): ReactElement {
           priority
         />
         <div className="space-y-4 p-8">
-          <SectionHeading as="h2">About</SectionHeading>
+          <SectionHeading as="h2">Story</SectionHeading>
           <div className="space-y-4">
             <TextReveal
               as="p"
               className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
             >
-              Vague Frequency Laboratory의 소개 Vague Frequency Laboratory
-              Vague Frequency Laboratory Vague Frequency LaboratoryVague
+              Vague Frequency Laboratory의 소개 Vague Frequency Laboratory Vague
               Frequency Laboratory Vague Frequency LaboratoryVague Frequency
-              Laboratory
+              Laboratory Vague Frequency LaboratoryVague Frequency Laboratory
             </TextReveal>
           </div>
         </div>
@@ -41,10 +40,9 @@ export default function ParallaxGlobeLogo(): ReactElement {
               as="p"
               className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
             >
-              Vague Frequency Laboratory의 소개 Vague Frequency Laboratory
-              Vague Frequency Laboratory Vague Frequency LaboratoryVague
+              Vague Frequency Laboratory의 소개 Vague Frequency Laboratory Vague
               Frequency Laboratory Vague Frequency LaboratoryVague Frequency
-              Laboratory
+              Laboratory Vague Frequency LaboratoryVague Frequency Laboratory
             </TextReveal>
           </div>
         </div>
