@@ -61,7 +61,7 @@ export default function Header() {
             Book a Set
             <IconArrowUpRight
               aria-hidden="true"
-              className="size-[15px] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              className="size-[15px] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-active:translate-x-0.5 group-active:-translate-y-0.5"
               stroke={2.25}
             />
           </a>
