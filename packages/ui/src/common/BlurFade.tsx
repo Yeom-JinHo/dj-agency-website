@@ -59,9 +59,12 @@ export function BlurFade({
   const combinedVariants = variant ?? defaultVariants;
   return (
     <AnimatePresence>
+      {/* initial은 마운트 시점에만 소비되고 그 시점엔 reduceMotion이 항상
+          false(SSR-safe 훅)이므로 "hidden" 고정 — reduce 사용자도 첫 프레임은
+          hidden이었다가 마운트 직후 duration 0으로 즉시 visible이 된다. */}
       <motion.div
         ref={ref}
-        initial={reduceMotion ? "visible" : "hidden"}
+        initial="hidden"
         animate={reduceMotion || isInView ? "visible" : "hidden"}
         exit="hidden"
         variants={combinedVariants}
