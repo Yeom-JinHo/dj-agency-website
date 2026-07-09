@@ -36,7 +36,7 @@ function MediaGridWork() {
               }}
             >
               <div
-                className={`vfl-media-ph-stripe relative overflow-hidden border border-white/10 ${tile.aspectClassName}`}
+                className={`vfl-media-ph-stripe relative overflow-hidden border border-border ${tile.aspectClassName}`}
               />
               <div className="flex items-end justify-between gap-4 pt-4">
                 <h3 className="font-display text-2xl uppercase leading-none tracking-tight lg:text-3xl">

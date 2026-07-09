@@ -40,26 +40,8 @@ const Copyright = () => {
 const Nav = () => {
   return (
     <div className="flex shrink-0 gap-8 sm:gap-12 md:gap-20">
-      {/* <div className="flex flex-col gap-2">
-        <h3 className="mb-2 text-muted-foreground uppercase">
-          About
-        </h3>
-        {links.map((link, index) => {
-          const { title, href } = link;
-
-          return (
-            <Link
-              className="underline-offset-4 hover:underline"
-              href={href}
-              key={`ft-l_about_${index}`}
-            >
-              {title}
-            </Link>
-          );
-        })}
-      </div> */}
       <div className="flex flex-col gap-2">
-        <h3 className="mb-2 text-lg text-muted-foreground uppercase md:text-xl lg:text-2xl">
+        <h3 className="mb-2 font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground md:text-sm">
           Socials
         </h3>
         {contact.socials.map((link, index) => {
@@ -80,24 +62,6 @@ const Nav = () => {
           );
         })}
       </div>
-      {/* <div className="flex flex-col gap-2">
-        <h3 className="mb-2 text-muted-foreground uppercase">
-          More
-        </h3>
-        {footer.map((link, index) => {
-          const { title, href } = link;
-
-          return (
-            <Link
-              className="underline-offset-4 hover:underline"
-              href={href}
-              key={`ft-l_more_${index}`}
-            >
-              {title}
-            </Link>
-          );
-        })}
-      </div> */}
     </div>
   );
 };

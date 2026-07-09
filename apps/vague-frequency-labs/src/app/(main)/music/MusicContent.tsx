@@ -25,13 +25,13 @@ export default function MusicContent(): ReactElement {
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="hero"
       >
-        <div className="flex flex-col items-center md:max-w-7xl">
+        <div className="flex w-full flex-col items-center md:max-w-7xl">
           <SectionHeading as="h1" variant="page">
             Music
           </SectionHeading>
 
-          <FancyLine className={"m-16"} />
-          <div className="relative flex flex-col items-center justify-center gap-4 overflow-hidden">
+          <FancyLine className={"mt-16"} />
+          <div className="relative mt-16 flex flex-col items-center justify-center gap-4 overflow-hidden">
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-10 px-5 sm:px-6 md:gap-16 md:px-0">
               {musicInfos.map((info, index) => (
                 <BlurFade key={info.name + index} inView duration={0.6}>

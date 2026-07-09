@@ -3,6 +3,7 @@ import React, { ReactElement } from "react";
 import Link from "next/link";
 import { metadata as meta } from "@/app/config";
 import { artistProfile } from "@/source";
+import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import { JsonLd } from "@repo/ui/common/JsonLd";
@@ -60,21 +61,22 @@ export default function ArtistPage(): ReactElement {
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="hero"
       >
-        <div className="flex flex-col items-center md:max-w-7xl">
+        <div className="flex w-full flex-col items-center md:max-w-7xl">
           <SectionHeading as="h1" variant="page">
             Artist
           </SectionHeading>
 
-          <FancyLine className={"m-16"} />
-          <div className="flex flex-wrap justify-center gap-16">
+          <FancyLine className={"mt-16"} />
+          <div className="mt-16 flex flex-wrap justify-center gap-16">
             {artistProfile.getPages().map((artist, index) => (
-              <Link
-                key={index}
-                href={`/artist/${artist.name}`}
-                className="cursor-pointer"
-              >
-                <ArtistSimpleCard artist={artist} />
-              </Link>
+              <BlurFade key={index} inView duration={0.6}>
+                <Link
+                  href={`/artist/${artist.name}`}
+                  className="cursor-pointer"
+                >
+                  <ArtistSimpleCard artist={artist} />
+                </Link>
+              </BlurFade>
             ))}
           </div>
         </div>
