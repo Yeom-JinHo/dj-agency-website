@@ -53,7 +53,7 @@ export default function Header() {
   // Active 상태만 앰버 언더라인으로 표시 — hover는 기존 색 전환을 유지해
   // 위치 표시(밑줄)와 조작 피드백(색)의 문법을 분리한다.
   const navLinkClass =
-    "relative flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase transition-colors hover:text-pd-accent after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:bg-pd-accent after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none";
+    "relative flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase transition-colors hover:text-pd-accent after:absolute after:-bottom-1.5 after:left-0 after:right-[0.18em] after:h-px after:origin-left after:bg-pd-accent after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none";
   const navLinkStateClass = (href: string) =>
     activeId === href.slice(1)
       ? "text-pd-accent after:scale-x-100"
@@ -93,7 +93,7 @@ export default function Header() {
               {leftLinks.map(({ title, href }, index) => (
                 <Link
                   className={`${navLinkClass} ${navLinkStateClass(href)}`}
-                  aria-current={activeId === href.slice(1) ? "true" : undefined}
+                  aria-current={activeId === href.slice(1) ? "location" : undefined}
                   href={href}
                   key={`hl_${index}`}
                 >
@@ -123,7 +123,7 @@ export default function Header() {
                   <Link
                     className={`${navLinkClass} ${navLinkStateClass(href)}`}
                     aria-current={
-                      activeId === href.slice(1) ? "true" : undefined
+                      activeId === href.slice(1) ? "location" : undefined
                     }
                     href={href}
                     key={`hr_${index}`}
@@ -185,7 +185,7 @@ export default function Header() {
               href={href}
               onClick={() => setMenuOpen(false)}
               style={{ transitionDelay: menuOpen ? `${index * 60 + 80}ms` : "0ms" }}
-              aria-current={activeId === href.slice(1) ? "true" : undefined}
+              aria-current={activeId === href.slice(1) ? "location" : undefined}
               className={[
                 "font-display py-4 text-5xl leading-none tracking-[0.02em] uppercase",
                 "transition-all duration-500 ease-out hover:text-pd-accent",

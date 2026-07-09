@@ -52,7 +52,7 @@ function Contact() {
             borderRadius: "16px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
-          className="pointer-events-auto relative -mt-12 flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] md:mt-0"
+          className="pointer-events-auto relative -mt-12 flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:-mt-32 sm:w-[40vw] md:mt-0"
         >
           <ShineBorder
             borderWidth={2}
