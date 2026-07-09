@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { useRef } from "react";
 import { AnimatePresence, motion, useInView } from "motion/react";
 
+import { useReducedMotionSafe } from "../hooks/useReducedMotionSafe";
+
 type MarginType = UseInViewOptions["margin"];
 
 interface BlurFadeProps extends MotionProps {
@@ -39,6 +41,8 @@ export function BlurFade({
   const ref = useRef(null);
   const inViewResult = useInView(ref, { once: true, margin: inViewMargin });
   const isInView = !inView || inViewResult;
+  // prefers-reduced-motion: 이동/블러 엔트런스 없이 즉시 표시.
+  const reduceMotion = useReducedMotionSafe();
   const defaultVariants: Variants = {
     hidden: {
       [direction === "left" || direction === "right" ? "x" : "y"]:
@@ -57,13 +61,13 @@ export function BlurFade({
     <AnimatePresence>
       <motion.div
         ref={ref}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
+        initial={reduceMotion ? "visible" : "hidden"}
+        animate={reduceMotion || isInView ? "visible" : "hidden"}
         exit="hidden"
         variants={combinedVariants}
         transition={{
           delay: 0.04 + delay,
-          duration,
+          duration: reduceMotion ? 0 : duration,
           ease: "easeOut",
         }}
         className={className}
