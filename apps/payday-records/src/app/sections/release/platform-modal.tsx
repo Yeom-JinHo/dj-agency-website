@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import { IconArrowUpRight, IconX } from "@tabler/icons-react";
 import { motion } from "motion/react";
+import { useReducedMotionSafe } from "@repo/ui/hooks/useReducedMotionSafe";
 
 import type { Release } from "@/types/release";
 import { PLATFORM_META, PLATFORM_ORDER } from "./platform-meta";
@@ -17,6 +18,8 @@ type PlatformModalProps = {
 function PlatformModal({ release, onClose }: PlatformModalProps) {
   const availablePlatforms = PLATFORM_ORDER.filter((p) => release.links[p]);
   const panelRef = useRef<HTMLDivElement>(null);
+  // prefers-reduced-motion: 스프링 scale/이동 없이 페이드만 남긴다.
+  const reduceMotion = useReducedMotionSafe();
 
   // On open: move focus into the panel; on close: restore it to the element
   // that opened the modal. (Esc-to-close lives in the parent Release section.)
@@ -47,10 +50,14 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
       <motion.div
         ref={panelRef}
         className="relative z-10 w-full max-w-[360px] overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-2xl"
-        initial={{ opacity: 0, scale: 0.96, y: 8 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.96, y: 8 }}
-        transition={{ type: "spring", damping: 26, stiffness: 320 }}
+        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+        animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+        exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+        transition={
+          reduceMotion
+            ? { duration: 0.18 }
+            : { type: "spring", damping: 26, stiffness: 320 }
+        }
       >
         <div className="flex max-h-[88vh] flex-col overflow-y-auto">
           <div className="relative aspect-square w-full flex-shrink-0 overflow-hidden bg-[#1a1a1a]">

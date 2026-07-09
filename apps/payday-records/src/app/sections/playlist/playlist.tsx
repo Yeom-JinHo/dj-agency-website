@@ -1,4 +1,5 @@
 import TextReveal from "@repo/ui/common/TextReveal";
+import { BlurFade } from "@repo/ui/common/BlurFade";
 
 import { playlist } from "./config";
 
@@ -15,7 +16,12 @@ function Playlist() {
         >
           Curated by Payday Records
         </TextReveal>
-        <div className="mt-12 w-full max-w-[1160px] rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-6">
+        {/* Release 카드와 동일한 BlurFade 엔트런스 — 카드 문법의 모션 일관성 유지. */}
+        <BlurFade
+          inView
+          duration={0.6}
+          className="mt-12 w-full max-w-[1160px] rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:p-6"
+        >
           <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
             <div className="overflow-hidden rounded-xl ring-1 ring-white/10">
               <iframe
@@ -42,7 +48,7 @@ function Playlist() {
               />
             </div>
           </div>
-        </div>
+        </BlurFade>
       </div>
     </section>
   );

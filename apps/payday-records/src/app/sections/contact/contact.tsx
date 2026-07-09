@@ -40,6 +40,8 @@ function Contact() {
           src={"/images/mac/image.webp"}
           showGradient={false}
         />
+        {/* 모바일 -mt-12: 스크롤 종료 시점 lid 하단~카드 갭(146px)을
+            섹션 리듬(~96px)에 맞춰 당긴다. 데스크탑은 이미 리듬에 맞음. */}
         <div
           style={{
             /* 뒤의 DAW 스크린샷(보라 플러그인 창)이 비치면 카드가 팔레트 밖
@@ -50,7 +52,7 @@ function Contact() {
             borderRadius: "16px",
             border: "1px solid rgba(255, 255, 255, 0.125)",
           }}
-          className="pointer-events-auto relative flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw]"
+          className="pointer-events-auto relative -mt-12 flex h-auto min-w-[300px] flex-col items-center justify-center overflow-hidden p-8 sm:w-[40vw] md:mt-0"
         >
           <ShineBorder
             borderWidth={2}

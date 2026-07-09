@@ -9,11 +9,27 @@ export default function Header() {
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
 
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 40);
+
+      // Scrollspy: 뷰포트 45% 지점을 지난 마지막 섹션이 현재 위치.
+      // 히어로에서는 어떤 섹션도 못 지나므로 null(하이라이트 없음)이 된다.
+      const marker = window.innerHeight * 0.45;
+      let current: string | null = null;
+      for (const { href } of links) {
+        if (!href.startsWith("#")) continue;
+        const el = document.getElementById(href.slice(1));
+        if (el && el.getBoundingClientRect().top <= marker) {
+          current = href.slice(1);
+        }
+      }
+      setActiveId(current);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -34,8 +50,14 @@ export default function Header() {
   const leftLinks = navLinks.slice(0, half);
   const rightLinks = navLinks.slice(half);
 
+  // Active 상태만 앰버 언더라인으로 표시 — hover는 기존 색 전환을 유지해
+  // 위치 표시(밑줄)와 조작 피드백(색)의 문법을 분리한다.
   const navLinkClass =
-    "flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase transition-colors hover:text-pd-accent";
+    "relative flex items-center text-[15px] font-semibold tracking-[0.18em] uppercase transition-colors hover:text-pd-accent after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-full after:origin-left after:bg-pd-accent after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none";
+  const navLinkStateClass = (href: string) =>
+    activeId === href.slice(1)
+      ? "text-pd-accent after:scale-x-100"
+      : "after:scale-x-0";
 
   return (
     <>
@@ -69,7 +91,12 @@ export default function Header() {
           <nav className="hidden md:flex md:items-center md:justify-self-end">
             <div className="flex items-center gap-7 lg:gap-8">
               {leftLinks.map(({ title, href }, index) => (
-                <Link className={navLinkClass} href={href} key={`hl_${index}`}>
+                <Link
+                  className={`${navLinkClass} ${navLinkStateClass(href)}`}
+                  aria-current={activeId === href.slice(1) ? "true" : undefined}
+                  href={href}
+                  key={`hl_${index}`}
+                >
                   {title}
                 </Link>
               ))}
@@ -93,7 +120,14 @@ export default function Header() {
             <nav className="hidden md:flex md:items-center">
               <div className="flex items-center gap-7 lg:gap-8">
                 {rightLinks.map(({ title, href }, index) => (
-                  <Link className={navLinkClass} href={href} key={`hr_${index}`}>
+                  <Link
+                    className={`${navLinkClass} ${navLinkStateClass(href)}`}
+                    aria-current={
+                      activeId === href.slice(1) ? "true" : undefined
+                    }
+                    href={href}
+                    key={`hr_${index}`}
+                  >
                     {title}
                   </Link>
                 ))}
@@ -151,10 +185,12 @@ export default function Header() {
               href={href}
               onClick={() => setMenuOpen(false)}
               style={{ transitionDelay: menuOpen ? `${index * 60 + 80}ms` : "0ms" }}
+              aria-current={activeId === href.slice(1) ? "true" : undefined}
               className={[
-                "font-display py-4 text-5xl leading-none tracking-[0.02em] text-white/90 uppercase",
+                "font-display py-4 text-5xl leading-none tracking-[0.02em] uppercase",
                 "transition-all duration-500 ease-out hover:text-pd-accent",
                 "motion-reduce:transition-none",
+                activeId === href.slice(1) ? "text-pd-accent" : "text-white/90",
                 menuOpen ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
               ].join(" ")}
             >

@@ -55,7 +55,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark scroll-smooth motion-reduce:scroll-auto">
       <body
         className={`${bricolage_grotesque.variable} ${anton.variable} antialiased`}
       >
