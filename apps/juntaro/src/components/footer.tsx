@@ -24,7 +24,8 @@ export function Footer({ className }: FooterProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Juntaro on ${name}`}
-              className="block text-[#111111]/70 transition-colors duration-200 ease-out hover:text-[#111111]/100 focus-visible:text-[#111111]/100 motion-reduce:transition-none"
+              // p-1로 히트 영역을 16→24px(WCAG 2.5.8)로 키우고, -m-1로 상쇄해 시각 위치·간격은 불변.
+              className="-m-1 block p-1 text-[#111111]/70 transition-colors duration-200 ease-out hover:text-[#111111]/100 focus-visible:text-[#111111]/100 motion-reduce:transition-none"
             >
               <Icon name={iconName} size={16} />
             </a>
