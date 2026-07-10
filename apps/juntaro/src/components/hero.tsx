@@ -36,9 +36,9 @@ export function Hero() {
   return (
     <section className="h-dvh overflow-hidden bg-white select-none">
       <div ref={rootRef} className="atropos h-full w-full">
-        <span className="atropos-scale block h-full w-full">
-          <span className="atropos-rotate block h-full w-full">
-            <span className="atropos-inner relative block h-full w-full bg-white">
+        <span className="atropos-scale">
+          <span className="atropos-rotate">
+            <span className="atropos-inner bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element -- 장식용 블러 에코, 이미지 최적화 불필요 */}
               <img
                 src="/images/logo.webp"
