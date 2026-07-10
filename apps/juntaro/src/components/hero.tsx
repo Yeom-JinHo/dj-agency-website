@@ -34,7 +34,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="h-dvh overflow-hidden bg-white select-none">
+    <section className="relative h-dvh overflow-hidden bg-white select-none">
       <div ref={rootRef} className="atropos h-full w-full">
         <span className="atropos-scale">
           <span className="atropos-rotate">
@@ -45,7 +45,7 @@ export function Hero() {
                 alt=""
                 aria-hidden
                 data-atropos-offset="-4"
-                className="absolute top-[38%] left-1/2 w-[92vw] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.07] blur-[7px] invert"
+                className="absolute top-[38%] left-1/2 w-[min(92vw,130dvh)] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.07] blur-[7px] invert"
               />
               <Image
                 src="/images/profile.webp"
@@ -53,9 +53,9 @@ export function Hero() {
                 width={1686}
                 height={2528}
                 priority
-                sizes="(min-width: 768px) 45vw, 85vw"
+                sizes="min(52vh, 92vw)"
                 data-atropos-offset="2"
-                className="absolute top-1/2 left-1/2 h-[78dvh] w-auto -translate-x-1/2 -translate-y-1/2 mix-blend-multiply"
+                className="absolute top-1/2 left-1/2 h-[min(78dvh,138vw)] w-auto -translate-x-1/2 -translate-y-1/2 mix-blend-multiply"
               />
               <Image
                 src="/images/logo.webp"
@@ -66,16 +66,13 @@ export function Hero() {
                 data-atropos-offset="6"
                 className="absolute bottom-[10dvh] left-1/2 w-[min(60vw,480px)] -translate-x-1/2 invert"
               />
-              <p
-                data-atropos-offset="1"
-                className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[11px] tracking-[0.3em] text-[#111111] uppercase"
-              >
-                Tech House — Seoul
-              </p>
             </span>
           </span>
         </span>
       </div>
+      <p className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[11px] tracking-[0.3em] text-[#111111] uppercase">
+        Tech House — Seoul
+      </p>
     </section>
   );
 }
