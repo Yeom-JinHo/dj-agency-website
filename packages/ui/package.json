@@ -9,7 +9,8 @@
     "./hooks/useMobile": "./src/hooks/useMobile.ts",
     "./features/intro": "./src/features/intro/index.ts",
     "./common/*": "./src/common/*.tsx",
-    "./*": "./src/*.tsx"
+    "./*": "./src/*.tsx",
+    "./hooks/useReducedMotionSafe": "./src/hooks/useReducedMotionSafe.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

@@ -4,6 +4,8 @@ import type { ElementType } from "react";
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
 
+import { useReducedMotionSafe } from "../hooks/useReducedMotionSafe";
+
 interface RevealProps {
   phrases: string[];
   className?: string;
@@ -13,8 +15,23 @@ interface RevealProps {
 export function Reveal({ phrases, className = "", as = "div" }: RevealProps) {
   const body = useRef(null);
   const isInView = useInView(body, { once: true, margin: "0px" });
+  // prefers-reduced-motion: 단어별 y-슬라이드 없이 즉시 표시.
+  const reduceMotion = useReducedMotionSafe();
 
   const Tag = as;
+
+  if (reduceMotion) {
+    return (
+      <Tag ref={body} className={className}>
+        {phrases.map((phrase, index) => (
+          <span key={index} className="relative mr-1 inline-flex w-fit">
+            {phrase}
+          </span>
+        ))}
+      </Tag>
+    );
+  }
+
   return (
     <Tag ref={body} className={className}>
       {phrases.map((phrase, index) => (

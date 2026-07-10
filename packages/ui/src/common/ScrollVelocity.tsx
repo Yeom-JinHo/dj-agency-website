@@ -12,6 +12,8 @@ import {
   useVelocity,
 } from "motion/react";
 
+import { useReducedMotionSafe } from "../hooks/useReducedMotionSafe";
+
 interface VelocityMapping {
   input: [number, number];
   output: [number, number];
@@ -122,8 +124,12 @@ function VelocityText({
     return `${wrap(-copyWidth, 0, v)}px`;
   });
 
+  // prefers-reduced-motion: 마퀴 이동을 멈추고 정적 텍스트 띠로 둔다.
+  const reduceMotion = useReducedMotionSafe();
+
   const directionFactor = useRef<number>(1);
   useAnimationFrame((_, delta) => {
+    if (reduceMotion) return;
     const factor = velocityFactor.get();
     if (factor < 0) {
       directionFactor.current = -1;

@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 
 import { useClipboard } from "../hooks/useClipboard";
+import { useReducedMotionSafe } from "../hooks/useReducedMotionSafe";
 
 import { cn } from "../index";
 
@@ -14,6 +15,10 @@ export default function CopyButton({
   text: string;
 }) {
   const { copy, copied } = useClipboard();
+  // prefers-reduced-motion: scale 전환 없이 opacity 페이드만 남긴다.
+  const reduceMotion = useReducedMotionSafe();
+  const hiddenScale = reduceMotion ? 1 : 0.7;
+  const hiddenScaleSubtle = reduceMotion ? 1 : 0.85;
 
   return (
     <button
@@ -21,7 +26,7 @@ export default function CopyButton({
       onClick={() => copy(text)}
       aria-label={copied ? "Copied to clipboard" : "Copy to clipboard"}
       className={cn(
-        "relative inline-flex h-9 min-w-[88px] items-center justify-center gap-1.5 rounded-md px-2.5 text-white/55 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none active:scale-95",
+        "relative inline-flex h-9 min-w-[88px] items-center justify-center gap-1.5 rounded-md px-2.5 text-white/55 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none active:scale-95 motion-reduce:active:scale-100",
         className,
       )}
     >
@@ -33,9 +38,9 @@ export default function CopyButton({
           <motion.span
             key="check"
             className="inline-flex items-center gap-1.5 text-[#FFBE7B]"
-            initial={{ opacity: 0, scale: 0.7 }}
+            initial={{ opacity: 0, scale: hiddenScale }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.7 }}
+            exit={{ opacity: 0, scale: hiddenScale }}
             transition={{ duration: 0.18 }}
           >
             <svg
@@ -59,9 +64,9 @@ export default function CopyButton({
           <motion.span
             key="copy"
             className="inline-flex items-center gap-1.5"
-            initial={{ opacity: 0, scale: 0.85 }}
+            initial={{ opacity: 0, scale: hiddenScaleSubtle }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.85 }}
+            exit={{ opacity: 0, scale: hiddenScaleSubtle }}
             transition={{ duration: 0.18 }}
           >
             <svg

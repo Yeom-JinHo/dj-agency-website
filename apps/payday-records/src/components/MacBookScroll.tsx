@@ -26,6 +26,7 @@ import {
   IconWorld,
 } from "@tabler/icons-react";
 import { motion, useScroll, useTransform } from "motion/react";
+import { useReducedMotionSafe } from "@repo/ui/hooks/useReducedMotionSafe";
 
 import { cn } from "@repo/ui";
 
@@ -71,15 +72,26 @@ export const MacBookScroll = ({
   const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
   const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
+  // prefers-reduced-motion: 스크롤 구동 없이 정적 상태로 고정.
+  // lid는 progress 0.3 시점의 열린 자세 값, 타이틀은 가독을 위해
+  // progress 0 상태(완전 표시)를 유지한다.
+  const reduceMotion = useReducedMotionSafe();
+  const staticScale = isMobile ? 1 : 1.5;
+  const staticTranslate = isMobile ? 228 : 264;
+
   return (
+    /* 모바일 -mt-40: scale-[0.6]이 만드는 시각 여백(~170px)을 당겨
+       "SHOW ME YOUR DREAM" 위 갭을 다른 섹션 리듬(~192px)에 맞춘다.
+       sm은 scale-50이라 여백이 더 커서(~212px) 더 깊게 당긴다(-mt-64).
+       데스크탑 pt-10: 이중 섹션 패딩(288px) 위에 얹히던 pt-40을 축소. */
     <div
       ref={ref}
-      className="flex min-h-[850px] shrink-0 scale-[0.6] transform flex-col items-center justify-start py-0 [perspective:800px] sm:scale-50 md:min-h-[1600px] md:scale-100 md:pt-40 md:pb-0 [@media(max-width:375px)]:min-h-[780px]"
+      className="-mt-40 flex min-h-[850px] shrink-0 scale-[0.6] transform flex-col items-center justify-start py-0 [perspective:800px] sm:-mt-64 sm:scale-50 md:mt-0 md:min-h-[1600px] md:scale-100 md:pt-10 md:pb-0 [@media(max-width:375px)]:min-h-[780px]"
     >
       <motion.div
         style={{
-          translateY: textTransform,
-          opacity: textOpacity,
+          translateY: reduceMotion ? 0 : textTransform,
+          opacity: reduceMotion ? 1 : textOpacity,
         }}
         className="mb-20 text-center text-3xl font-bold text-neutral-800 dark:text-white"
       >
@@ -92,10 +104,10 @@ export const MacBookScroll = ({
       {/* Lid */}
       <Lid
         src={src}
-        scaleX={scaleX}
-        scaleY={scaleY}
-        rotate={rotate}
-        translate={translate}
+        scaleX={reduceMotion ? staticScale : scaleX}
+        scaleY={reduceMotion ? staticScale : scaleY}
+        rotate={reduceMotion ? 0 : rotate}
+        translate={reduceMotion ? staticTranslate : translate}
       />
       {/* Base area */}
       <div className="relative -z-10 h-[22rem] w-[32rem] overflow-hidden rounded-2xl bg-gray-200 dark:bg-[#272729]">
@@ -132,10 +144,10 @@ export const Lid = ({
   translate,
   src,
 }: {
-  scaleX: MotionValue<number>;
-  scaleY: MotionValue<number>;
-  rotate: MotionValue<number>;
-  translate: MotionValue<number>;
+  scaleX: MotionValue<number> | number;
+  scaleY: MotionValue<number> | number;
+  rotate: MotionValue<number> | number;
+  translate: MotionValue<number> | number;
   src?: string;
 }) => {
   return (

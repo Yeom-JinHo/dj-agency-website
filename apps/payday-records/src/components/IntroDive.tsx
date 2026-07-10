@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
+import { useReducedMotionSafe } from "@repo/ui/hooks/useReducedMotionSafe";
 
 /**
  * 진입 인트로: 솔리드 필드 위에 메탈 "P" 실루엣이 등장 → 다이브가 시작되면
@@ -26,10 +27,43 @@ const COUNTER_ORIGIN = "55% 36%";
 // 전체 연출 길이(초).
 const DURATION = 2;
 
+// 실루엣 공통 스타일 — 일반/reduced 렌더가 같은 마스크를 공유한다.
+const silhouetteStyle = {
+  width: "min(66vmin, 92vw)",
+  aspectRatio: MASK_RATIO,
+  WebkitMaskImage: `url(${MASK_SRC})`,
+  maskImage: `url(${MASK_SRC})`,
+  WebkitMaskSize: "contain",
+  maskSize: "contain",
+  WebkitMaskRepeat: "no-repeat",
+  maskRepeat: "no-repeat",
+  WebkitMaskPosition: "center",
+  maskPosition: "center",
+} as const;
+
 function IntroDive() {
   const [done, setDone] = useState(false);
+  const reduceMotion = useReducedMotionSafe();
 
   if (done) return null;
+
+  // prefers-reduced-motion: 다이브(확대) 없이 정적인 P를 잠깐 보여주고
+  // 오버레이 전체를 짧게 페이드아웃 — 모션 대체로 권장되는 fade만 사용.
+  if (reduceMotion) {
+    return (
+      <motion.div
+        className="bg-background fixed inset-0 z-[1000] flex items-center justify-center overflow-hidden"
+        aria-hidden
+        initial={{ opacity: 1 }}
+        animate={{ opacity: 0 }}
+        transition={{ duration: 0.5, delay: 0.6, ease: "easeInOut" }}
+        onAnimationComplete={() => setDone(true)}
+      >
+        <link rel="preload" as="image" href={MASK_SRC} />
+        <div className="bg-foreground relative" style={silhouetteStyle} />
+      </motion.div>
+    );
+  }
 
   return (
     <div
@@ -51,19 +85,7 @@ function IntroDive() {
       {/* 메탈 P 실루엣: 보울 중심으로 거대하게 확대 → 구멍 너머 Hero가 드러난다. */}
       <motion.div
         className="bg-foreground relative"
-        style={{
-          width: "min(66vmin, 92vw)",
-          aspectRatio: MASK_RATIO,
-          transformOrigin: COUNTER_ORIGIN,
-          WebkitMaskImage: `url(${MASK_SRC})`,
-          maskImage: `url(${MASK_SRC})`,
-          WebkitMaskSize: "contain",
-          maskSize: "contain",
-          WebkitMaskRepeat: "no-repeat",
-          maskRepeat: "no-repeat",
-          WebkitMaskPosition: "center",
-          maskPosition: "center",
-        }}
+        style={{ ...silhouetteStyle, transformOrigin: COUNTER_ORIGIN }}
         initial={{ scale: 1, opacity: 0, filter: "blur(14px)" }}
         animate={{
           scale: [1, 1.05, 64],
