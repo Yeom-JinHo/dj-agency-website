@@ -11,8 +11,6 @@ export interface JuntaroTrack {
   name: string;
   /** 기본 "Juntaro" */
   artist?: string;
-  /** 모노 메타 (선택) */
-  label?: string;
   /** placeholder webp 경로 */
   cover: string;
   /** 모달 한 줄 설명 */

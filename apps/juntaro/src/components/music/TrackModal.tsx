@@ -131,7 +131,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
         aria-modal="true"
         aria-labelledby="track-modal-title"
         tabIndex={-1}
-        className="relative z-10 w-full max-w-[800px] overflow-hidden rounded-[2px] bg-white shadow-[0_30px_80px_rgba(0,0,0,0.35)] outline-none"
+        className="relative z-10 max-h-[calc(100dvh-2rem)] w-full max-w-[800px] overflow-x-hidden overflow-y-auto rounded-[2px] bg-white shadow-[0_30px_80px_rgba(0,0,0,0.35)] outline-none sm:max-h-[calc(100dvh-4rem)]"
         initial={
           shouldReduceMotion
             ? { opacity: 0 }

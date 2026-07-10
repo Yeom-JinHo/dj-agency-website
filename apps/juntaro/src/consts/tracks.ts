@@ -11,6 +11,7 @@ export const TRACKS: JuntaroTrack[] = [
     name: "Midnight Circuit",
     artist: "Juntaro",
     cover: "/images/tracks/midnight-circuit.webp",
+    shortDescription: "late-night tech house cut — recorded in Seoul",
     links: [
       { platform: "YouTube", href: socialHref("YouTube"), iconName: "SiYoutube" },
       { platform: "SoundCloud", href: socialHref("SoundCloud"), iconName: "SiSoundcloud" },
@@ -24,6 +25,7 @@ export const TRACKS: JuntaroTrack[] = [
     name: "Seoul Pressure",
     artist: "Juntaro",
     cover: "/images/tracks/seoul-pressure.webp",
+    shortDescription: "peak-time roller built for warehouse floors",
     links: [
       { platform: "YouTube", href: socialHref("YouTube"), iconName: "SiYoutube" },
       { platform: "SoundCloud", href: socialHref("SoundCloud"), iconName: "SiSoundcloud" },
@@ -37,6 +39,7 @@ export const TRACKS: JuntaroTrack[] = [
     name: "Concrete Groove",
     artist: "Juntaro",
     cover: "/images/tracks/concrete-groove.webp",
+    shortDescription: "raw percussive groove over industrial texture",
     links: [
       { platform: "YouTube", href: socialHref("YouTube"), iconName: "SiYoutube" },
       { platform: "SoundCloud", href: socialHref("SoundCloud"), iconName: "SiSoundcloud" },
@@ -50,6 +53,7 @@ export const TRACKS: JuntaroTrack[] = [
     name: "Afterhours Signal",
     artist: "Juntaro",
     cover: "/images/tracks/afterhours-signal.webp",
+    shortDescription: "hypnotic afterhours transmission, stripped and deep",
     links: [
       { platform: "YouTube", href: socialHref("YouTube"), iconName: "SiYoutube" },
       { platform: "SoundCloud", href: socialHref("SoundCloud"), iconName: "SiSoundcloud" },
@@ -63,6 +67,7 @@ export const TRACKS: JuntaroTrack[] = [
     name: "Low End District",
     artist: "Juntaro",
     cover: "/images/tracks/low-end-district.webp",
+    shortDescription: "sub-heavy district anthem with rolling bassline",
     links: [
       { platform: "YouTube", href: socialHref("YouTube"), iconName: "SiYoutube" },
       { platform: "SoundCloud", href: socialHref("SoundCloud"), iconName: "SiSoundcloud" },
