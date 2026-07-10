@@ -2,9 +2,6 @@
 @plugin 'tailwindcss-animate';
 
 @source '../**/*.{ts,tsx}';
-@source '../../../../packages/ui/src/**/*.{ts,tsx}';
-
-@custom-variant dark (&:is(.dark *));
 
 body {
   background-color: #000000;
