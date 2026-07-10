@@ -27,6 +27,9 @@ catalogs:
     '@vercel/speed-insights':
       specifier: ^2.0.0
       version: 2.0.0
+    atropos:
+      specifier: ^2.0.2
+      version: 2.0.2
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -171,6 +174,9 @@ importers:
       '@vercel/speed-insights':
         specifier: 'catalog:'
         version: 2.0.0(next@15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
+      atropos:
+        specifier: 'catalog:'
+        version: 2.0.2
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1
@@ -1319,6 +1325,10 @@ packages:
   async-function@1.0.0:
     resolution: {integrity: sha512-hsU18Ae8CDTR6Kgu9DYf0EbCr/a5iGL0rytQDobUcdpYOKokk8LEjVphnXkDkgpi0wYVsqrXuP0bZxJaTqdgoA==}
     engines: {node: '>= 0.4'}
+
+  atropos@2.0.2:
+    resolution: {integrity: sha512-8f0u0hEOlBTWTSvzY17TcHuQjxUIpkTBq70/I4+UF5B43ORtOoRjm8TPBYEgLM8Ba9AWf6PDtkagbYoybdjaKg==}
+    engines: {node: '>= 12.0.0'}
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -3246,6 +3256,8 @@ snapshots:
       is-array-buffer: 3.0.5
 
   async-function@1.0.0: {}
+
+  atropos@2.0.2: {}
 
   available-typed-arrays@1.0.7:
     dependencies:
