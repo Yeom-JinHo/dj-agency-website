@@ -45,7 +45,7 @@ export function Hero() {
                 alt=""
                 aria-hidden
                 data-atropos-offset="0"
-                className="absolute top-[42%] left-1/2 w-[min(88vw,128dvh)] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.07] blur-[7px] invert"
+                className="absolute top-[42%] left-1/2 w-[min(82vw,110dvh)] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.07] blur-[7px] invert"
               />
               <Image
                 src="/images/profile.webp"
@@ -55,7 +55,7 @@ export function Hero() {
                 priority
                 sizes="min(54vh, 92vw)"
                 data-atropos-offset="2"
-                className="absolute top-1/2 left-1/2 h-[min(80dvh,130vw)] w-auto -translate-x-1/2 -translate-y-1/2 mix-blend-multiply"
+                className="absolute top-1/2 left-1/2 h-[min(66dvh,120vw)] w-auto -translate-x-1/2 -translate-y-1/2 mix-blend-multiply"
               />
               <Image
                 src="/images/logo.webp"
@@ -64,7 +64,7 @@ export function Hero() {
                 width={400}
                 height={300}
                 data-atropos-offset="6"
-                className="absolute bottom-[12dvh] left-1/2 w-[min(48vw,37dvh)] -translate-x-1/2 invert"
+                className="absolute bottom-[19dvh] left-1/2 w-[min(44vw,31dvh)] -translate-x-1/2 invert md:bottom-[14dvh]"
               />
             </span>
           </span>
