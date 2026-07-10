@@ -44,7 +44,7 @@ export function Hero() {
                 src="/images/logo.webp"
                 alt=""
                 aria-hidden
-                data-atropos-offset="-4"
+                data-atropos-offset="-1"
                 className="absolute top-[38%] left-1/2 w-[min(92vw,130dvh)] max-w-none -translate-x-1/2 -translate-y-1/2 opacity-[0.07] blur-[7px] invert"
               />
               <Image
@@ -64,7 +64,7 @@ export function Hero() {
                 width={400}
                 height={300}
                 data-atropos-offset="6"
-                className="absolute bottom-[10dvh] left-1/2 w-[min(60vw,480px)] -translate-x-1/2 invert"
+                className="absolute bottom-[10dvh] left-1/2 w-[min(60vw,54dvh)] -translate-x-1/2 invert"
               />
             </span>
           </span>
