@@ -46,15 +46,8 @@ function WorkCard({
         </span>
       </div>
       <div className="flex items-end justify-between pt-4">
-        <h3 className="relative font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red group-active:text-ca-red">
+        <h3 className="font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red group-active:text-ca-red">
           {work.title}
-          {/* hero 스티치의 hover 확장: 제목이 붉어지는 것과 같은 박자에
-              아래에서 콱 박힌다. 오프셋은 28×3px 바 크기에 비례해 hero(-13~16px)
-              대비 축소 — 미끄러짐이 아니라 "콱" 박자 유지. 퇴장은 150ms 페이드. */}
-          <span
-            aria-hidden="true"
-            className="absolute -bottom-2 left-0 h-[3px] w-7 -rotate-2 rounded-[1px] bg-ca-red opacity-0 transition-opacity duration-150 [--sx:-4px] [--sy:2px] group-hover:animate-ca-stitch-stab group-hover:opacity-100 group-active:animate-ca-stitch-stab group-active:opacity-100"
-          />
         </h3>
         <div className="text-right font-mono text-[11px] uppercase tracking-[0.1em] text-ca-muted lg:text-[13px]">
           {work.credit}
