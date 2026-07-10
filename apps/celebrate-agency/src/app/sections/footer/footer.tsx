@@ -21,7 +21,8 @@ export default function Footer() {
       <div className="mb-14 grid grid-cols-1 gap-[60px] lg:mb-20 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <div className="mb-8 font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
-            <span className="text-ca-red">●</span>
+            {/* hero 인디케이터 dot과 같은 호흡 — 전환 직전 구간에서만 상시 펄스 허용 */}
+            <span className="animate-pulse-dot text-ca-red">●</span>
             &nbsp; [ 03 ] &nbsp; / &nbsp; CONTACT
           </div>
           <a

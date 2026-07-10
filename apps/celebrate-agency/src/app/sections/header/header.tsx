@@ -52,9 +52,11 @@ export default function Header() {
           {/* 형태: 전역 각진 시스템에서 유일한 곡선 — 형태 대비로 최상위 CTA를
               강조하는 의도적 예외(사선 컷 시안 검토 후 pill 유지 결정).
               포커스 링은 빨간 배경이라 ca-fg로 반전, radius를 따라 그려진다. */}
+          {/* 프레스: 스티치가 "콱 박히듯" 눌렸다 복귀 — 하우스 문법상 큰 변위는
+              CTA에만 허용되므로 0.97로 절제. */}
           <a
             href={BOOKING_MAILTO}
-            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-ca-red-dim active:bg-ca-red-dim focus-visible:outline-ca-fg"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-[background-color,transform] duration-200 hover:bg-ca-red-dim active:scale-[0.97] active:bg-ca-red-dim focus-visible:outline-ca-fg"
           >
             Book a Set
             <IconArrowUpRight
