@@ -43,12 +43,7 @@ export default function Footer() {
             <span className="mt-6 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ca-muted transition-colors group-hover:text-ca-red group-active:text-ca-red lg:text-[13px]">
               <span className="inline-block h-2 w-2 bg-ca-red" />
               {BOOKING_EMAIL}
-              <span
-                aria-hidden="true"
-                className="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-active:translate-x-0.5 group-active:-translate-y-0.5"
-              >
-                {ARROW_NE}
-              </span>
+              <span aria-hidden="true">{ARROW_NE}</span>
             </span>
           </a>
         </div>
@@ -90,29 +85,17 @@ export default function Footer() {
             href={SOCIALS.instagram}
             target="_blank"
             rel="noopener noreferrer"
-            className="group transition-colors hover:text-ca-red active:text-ca-red"
+            className="transition-colors hover:text-ca-red active:text-ca-red"
           >
-            Instagram{" "}
-            <span
-              aria-hidden="true"
-              className="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-active:translate-x-0.5 group-active:-translate-y-0.5"
-            >
-              {ARROW_NE}
-            </span>
+            Instagram <span aria-hidden="true">{ARROW_NE}</span>
           </a>
           <a
             href={SOCIALS.youtube}
             target="_blank"
             rel="noopener noreferrer"
-            className="group transition-colors hover:text-ca-red active:text-ca-red"
+            className="transition-colors hover:text-ca-red active:text-ca-red"
           >
-            Youtube{" "}
-            <span
-              aria-hidden="true"
-              className="inline-block transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-active:translate-x-0.5 group-active:-translate-y-0.5"
-            >
-              {ARROW_NE}
-            </span>
+            Youtube <span aria-hidden="true">{ARROW_NE}</span>
           </a>
           <span className="text-ca-muted">
             TikTok <span aria-hidden="true">—</span>

@@ -56,12 +56,12 @@ export default function Header() {
               CTA에만 허용되므로 0.97로 절제. */}
           <a
             href={BOOKING_MAILTO}
-            className="group inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-[background-color,transform] duration-200 hover:bg-ca-red-dim active:scale-[0.97] active:bg-ca-red-dim focus-visible:outline-ca-fg"
+            className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-ca-red-cta px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-white transition-[background-color,transform] duration-200 hover:bg-ca-red-dim active:scale-[0.97] active:bg-ca-red-dim focus-visible:outline-ca-fg"
           >
             Book a Set
             <IconArrowUpRight
               aria-hidden="true"
-              className="size-[15px] transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-active:translate-x-0.5 group-active:-translate-y-0.5"
+              className="size-[15px]"
               stroke={2.25}
             />
           </a>
