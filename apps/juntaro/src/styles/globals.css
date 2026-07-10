@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@plugin 'tailwindcss-animate';
+
+@source '../**/*.{ts,tsx}';
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+}
