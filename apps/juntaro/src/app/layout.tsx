@@ -8,7 +8,8 @@ import "@/styles/globals.css";
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400"],
+  // 500은 /tour 캡션 font-medium용 — 미로드 시 브라우저가 가짜 볼드를 합성한다.
+  weight: ["400", "500"],
   display: "swap",
   variable: "--font-ibm-plex-mono",
 });
