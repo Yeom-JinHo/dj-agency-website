@@ -4,6 +4,7 @@
 @source '../**/*.{ts,tsx}';
 
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #ffffff;
+  color: #111111;
+  overscroll-behavior: none;
 }
