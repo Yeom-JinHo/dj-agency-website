@@ -70,9 +70,6 @@ export function Hero() {
           </span>
         </span>
       </div>
-      <p className="absolute bottom-6 left-1/2 -translate-x-1/2 font-mono text-[11px] tracking-[0.3em] text-[#111111] uppercase">
-        Tech House — Seoul
-      </p>
     </section>
   );
 }

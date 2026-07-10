@@ -2,6 +2,11 @@
 @plugin 'tailwindcss-animate';
 
 @source '../**/*.{ts,tsx}';
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+
+@theme {
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+}
 
 body {
   background-color: #ffffff;
