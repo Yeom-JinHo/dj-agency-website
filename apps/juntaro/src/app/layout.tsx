@@ -24,6 +24,17 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Juntaro",
   description: "Tech House producer and DJ based in Seoul.",
+  // og:image·favicon은 컨벤션 파일(opengraph-image.png, icon.png)이 자동 주입한다.
+  openGraph: {
+    title: "Juntaro",
+    description: "Tech House producer and DJ based in Seoul.",
+    type: "website",
+    siteName: "Juntaro",
+  },
+  // X는 og:image가 있어도 twitter:card 없이는 대형 미리보기를 띄우지 않는다.
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export const viewport: Viewport = {

@@ -9,6 +9,12 @@
     sans-serif;
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 
+  /* 모션 어휘 — duration은 3단만 쓴다: 200(micro: 색·투명도 피드백) /
+     300(field: 행 딤·패널·라벨) / 500(surface: 대형 크로스페이드).
+     이징은 ease-out 단일, 모달 패널 진입만 ease-poster(가속 잔향이 긴 감속 곡선).
+     motion(JS) 쪽은 CSS 토큰을 못 읽어 TrackModal에 같은 배열로 중복 정의돼 있다. */
+  --ease-poster: cubic-bezier(0.16, 1, 0.3, 1);
+
   /* backwards: both로 두면 종료 후에도 fill이 opacity를 잡아 row hover 딤이 무력화된다 (종료 상태 = 자연 상태) */
   --animate-tour-reveal: tour-reveal 0.5s ease-out backwards;
 
@@ -22,6 +28,13 @@
       transform: translateY(0);
     }
   }
+}
+
+html {
+  /* 모달 스크롤 락(overflow-hidden)으로 스크롤바가 사라질 때 본문·고정 헤더가
+     스크롤바 폭만큼 밀리는 시프트 방지 — 클래식 스크롤바 환경(Windows)에서만 의미가 있고,
+     오버레이 스크롤바(macOS 기본)에선 아무 변화가 없다. */
+  scrollbar-gutter: stable;
 }
 
 body {

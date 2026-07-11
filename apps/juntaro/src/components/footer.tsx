@@ -37,7 +37,8 @@ export function Footer({ className }: FooterProps) {
         ))}
       </ul>
 
-      <p className="font-mono text-[11px] tracking-[0.3em] text-[#111111]/55 uppercase">
+      {/* /60: 11px 캡션도 AA 4.5:1(≈4.9:1)을 넘기는 최소 단계 */}
+      <p className="font-mono text-[11px] tracking-[0.3em] text-[#111111]/60 uppercase">
         Built by{" "}
         <SignatureLink
           href="https://www.instagram.com/ye0m_2/"
