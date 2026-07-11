@@ -9,6 +9,9 @@ import { TRACKS } from "@/consts/tracks";
 
 export const metadata: Metadata = {
   title: "Music — Juntaro",
+  description: "Tech House tracks and releases from Juntaro — stream the latest.",
+  alternates: { canonical: "/music" },
+  openGraph: { url: "/music" },
 };
 
 // 카드별 리듬 값 (인덱스 기반, deterministic). 실데이터 15곡에 맞춰 rot/dy를 15칸으로 확장.

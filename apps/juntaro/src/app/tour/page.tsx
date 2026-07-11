@@ -5,6 +5,9 @@ import { TourList } from "@/components/tour-list";
 
 export const metadata: Metadata = {
   title: "Tour — Juntaro",
+  description: "Upcoming Juntaro tour dates and live DJ sets.",
+  alternates: { canonical: "/tour" },
+  openGraph: { url: "/tour" },
 };
 
 export default function TourPage() {
