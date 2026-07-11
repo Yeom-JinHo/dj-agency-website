@@ -41,7 +41,15 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
         aria-label={`${track.name} 트랙 정보 열기`}
         className="block w-full cursor-pointer bg-transparent p-0 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#111111]"
       >
-        <div className={cn("group relative overflow-hidden", cardClassName)}>
+        {/* bg-neutral-200: 커버 디코드 전 카드 형태를 즉시 확보하는 스켈레톤 톤.
+            텍스처(opacity-70 비닐랩) 너머로 비치는 at-rest 밝은 회색에 맞춰 팝인/공백
+            플래시를 없앤다. */}
+        <div
+          className={cn(
+            "group relative overflow-hidden bg-neutral-200",
+            cardClassName,
+          )}
+        >
           <Image
             width={400}
             height={400}
@@ -56,6 +64,9 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
             alt=""
             aria-hidden="true"
             fill
+            // 커버와 동일한 priority — 평상시 커버 위에 비치는 비닐랩 레이어라
+            // 함께 우선 로드해야 초기 카드가 반쪽(커버만)으로 보이지 않는다.
+            priority={priority}
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="pointer-events-none object-cover opacity-70 transition-opacity duration-500 group-hover:opacity-0 motion-reduce:transition-none"
           />
