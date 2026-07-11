@@ -65,7 +65,9 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
               {track.name}
             </h4>
             {track.artist && (
-              <p className="truncate text-xs text-neutral-300">
+              /* line-clamp-2: 긴 콜라보 크레딧("Take Note, Juntaro & LOOZBONE"류)이
+                 좁은 카드 폭에서 한 줄로 잘리지 않도록 2줄까지 노출한다(모달과 동일 처리). */
+              <p className="line-clamp-2 text-xs text-neutral-300">
                 {track.artist}
               </p>
             )}

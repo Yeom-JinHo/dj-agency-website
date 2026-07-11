@@ -13,8 +13,6 @@ import type { IconName } from "@repo/ui/common/Icon";
 import type { JuntaroTrack } from "@/types/music";
 import useClickOutside from "@/hooks/useClickOutside";
 
-import { getTrackTexture } from "./texture";
-
 interface TrackModalProps {
   track: JuntaroTrack;
   onClose: () => void;
@@ -34,9 +32,10 @@ const DEFAULT_FLOOD = { bg: "#111111", text: "#ffffff" };
 
 /**
  * Strobe Row 링크 허브 모달 — 컨테인드 버전.
- * 헤더는 정적 정사각 커버(카드와 동일 비닐랩 텍스처 오버레이) + 캡션(artist)
- * → lowercase 제목 → 설명 2줄 위계로 구성한다. 순백 포스터 절제 원칙에 따라
- * 회전 애니메이션·그림자 이식 없이 카드 시각 어휘를 그대로 공유한다.
+ * 헤더는 정적 정사각 커버(비닐랩 텍스처 없이 앨범 아트 그대로 — 카드가 "밀봉된
+ * LP"라면 모달은 그 비닐을 벗겨 펼친 자리) + 캡션(artist) → lowercase 제목
+ * → 설명 2줄 위계로 구성한다. 순백 포스터 절제 원칙에 따라 회전 애니메이션·
+ * 그림자 이식 없이 카드 시각 어휘(질감·타이포)를 공유하되, 밀봉 텍스처만 벗긴다.
  *
  * a11y(스크롤 락·포커스 트랩·포커스 복귀·Escape·외부 클릭 닫기)는
  * VFL MorphingDialog.tsx:213–283 로직을 그대로 이식했다. 다만 원본은 상시
@@ -158,6 +157,9 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
         </button>
 
         <div className="flex items-start gap-5 px-6 pt-8 pb-6 sm:gap-6 sm:px-8 sm:pt-10 sm:pb-8 lg:px-10">
+          {/* 커버는 실제 앨범 아트를 그대로 노출한다. 카드(MusicCard)는 비닐랩
+              텍스처로 "밀봉된 LP"를 연출하지만, 모달은 그 비닐을 벗겨 트랙을
+              펼쳐 보는 자리 — 여기선 텍스처를 덮지 않는다. */}
           <div className="relative size-[96px] shrink-0 overflow-hidden outline outline-1 outline-[#111111]/10 sm:size-[128px] lg:size-[148px]">
             <Image
               src={track.cover}
@@ -166,18 +168,12 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
               sizes="148px"
               className="object-cover"
             />
-            <Image
-              src={getTrackTexture(track.name)}
-              alt=""
-              aria-hidden="true"
-              fill
-              sizes="148px"
-              className="pointer-events-none object-cover"
-            />
           </div>
 
           <div className="min-w-0 flex-1 pr-8">
-            <p className="font-mono text-[11px] tracking-[0.3em] text-[#111111]/45 uppercase">
+            {/* line-clamp-2: "Take Note, Juntaro & LOOZBONE"류 긴 콜라보 크레딧이
+                좁은 폭에서 3줄 이상으로 흐르지 않도록 2줄로 가둔다(실데이터 최장도 2줄 이내). */}
+            <p className="line-clamp-2 font-mono text-[11px] tracking-[0.3em] text-[#111111]/45 uppercase">
               {track.artist ?? "Juntaro"}
             </p>
             <h2
