@@ -64,7 +64,7 @@ export function MusicCard({ track, cardClassName }: MusicCardProps) {
           />
           {/* 콜라주 라벨 — hover 시에만 카드 하단 오버레이로 노출 (VFL collage variant 미러) */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
-            <h4 className="truncate text-sm font-semibold text-white">
+            <h4 className="font-display truncate text-base leading-[1.05] tracking-[0.02em] text-white">
               {track.name}
             </h4>
             {track.artist && (

@@ -164,7 +164,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
           <div className="min-w-0 flex-1">
             <h2
               id="track-modal-title"
-              className="line-clamp-2 text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-bold tracking-tight text-[#111111] lowercase"
+              className="font-display line-clamp-2 pb-2 text-[clamp(2.45rem,6vw,4.75rem)] leading-[1.04] tracking-[0.01em] text-[#111111] lowercase sm:pb-3"
             >
               {track.name}
             </h2>

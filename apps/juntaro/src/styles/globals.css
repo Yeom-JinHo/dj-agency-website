@@ -5,6 +5,8 @@
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';
 
 @theme {
+  --font-display: var(--font-anton), "Arial Narrow", "Helvetica Neue Condensed",
+    sans-serif;
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 
   /* backwards: both로 두면 종료 후에도 fill이 opacity를 잡아 row hover 딤이 무력화된다 (종료 상태 = 자연 상태) */
