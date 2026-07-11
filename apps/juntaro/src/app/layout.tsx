@@ -1,9 +1,13 @@
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
 import type { ReactNode } from "react";
 import { IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { JsonLd } from "@repo/ui/common/JsonLd";
 
 import { Header } from "@/components/header";
+import { metadata as meta } from "@/app/config";
+import { musicGroup, website } from "@/app/jsonLd";
+import { createMetadata } from "@/utils";
 import "@/styles/globals.css";
 
 const ibmPlexMono = IBM_Plex_Mono({
@@ -14,10 +18,17 @@ const ibmPlexMono = IBM_Plex_Mono({
   variable: "--font-ibm-plex-mono",
 });
 
-export const metadata: Metadata = {
-  title: "Juntaro",
-  description: "Tech House producer and DJ based in Seoul.",
-};
+export const metadata = createMetadata({
+  title: {
+    absolute: meta.site.title,
+    template: `%s | ${meta.site.title}`,
+  },
+  description: meta.site.description,
+  twitter: {
+    title: meta.site.title,
+    description: meta.site.description,
+  },
+});
 
 export const viewport: Viewport = {
   themeColor: "#ffffff",
@@ -33,6 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={ibmPlexMono.variable}>
       <body className="antialiased">
+        <JsonLd items={[musicGroup, website]} />
         <Header />
         {children}
         <Analytics />
