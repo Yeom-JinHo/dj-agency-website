@@ -6,6 +6,20 @@
 
 @theme {
   --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+
+  /* backwards: both로 두면 종료 후에도 fill이 opacity를 잡아 row hover 딤이 무력화된다 (종료 상태 = 자연 상태) */
+  --animate-tour-reveal: tour-reveal 0.5s ease-out backwards;
+
+  @keyframes tour-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 body {
