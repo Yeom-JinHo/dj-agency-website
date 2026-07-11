@@ -8,6 +8,7 @@ import { AnimatePresence } from "motion/react";
 import { cn } from "@repo/ui";
 
 import { TrackModal } from "./TrackModal";
+import { getTrackTexture } from "./texture";
 
 interface MusicCardProps {
   track: JuntaroTrack;
@@ -27,14 +28,7 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
   const triggerRef = useRef<HTMLButtonElement>(null);
   const handleClose = useCallback(() => setIsOpen(false), []);
 
-  const texture = useMemo(() => {
-    // track.name을 기반으로 결정적 랜덤 생성
-    const hash = track.name.split("").reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
-    const textureNumber = (Math.abs(hash) % 3) + 1;
-    return `/images/texture/${textureNumber}.webp`;
-  }, [track.name]);
+  const texture = useMemo(() => getTrackTexture(track.name), [track.name]);
 
   return (
     <div>

@@ -13,6 +13,8 @@ import type { IconName } from "@repo/ui/common/Icon";
 import type { JuntaroTrack } from "@/types/music";
 import useClickOutside from "@/hooks/useClickOutside";
 
+import { getTrackTexture } from "./texture";
+
 interface TrackModalProps {
   track: JuntaroTrack;
   onClose: () => void;
@@ -32,10 +34,9 @@ const DEFAULT_FLOOD = { bg: "#111111", text: "#ffffff" };
 
 /**
  * Strobe Row 링크 허브 모달 — 컨테인드 버전.
- * 회전 LP 디스크(광택·바이닐 캡 28%·그루브·스핀들 10%·5s linear 회전)는
- * VFL MusicInfoCard.tsx:118–170과 시각 동일 이식, 필드만 치환. 크기만 패널
- * 우상단 위성(소형)으로 축소하고, 다크 모달 전제였던 ring-white/5는 순백
- * 배경에서 무의미해 생략했다 — 그 외 렌더링(그라디언트 값·구조)은 그대로.
+ * 헤더는 정적 정사각 커버(카드와 동일 비닐랩 텍스처 오버레이) + 캡션(artist)
+ * → lowercase 제목 → 설명 2줄 위계로 구성한다. 순백 포스터 절제 원칙에 따라
+ * 회전 애니메이션·그림자 이식 없이 카드 시각 어휘를 그대로 공유한다.
  *
  * a11y(스크롤 락·포커스 트랩·포커스 복귀·Escape·외부 클릭 닫기)는
  * VFL MorphingDialog.tsx:213–283 로직을 그대로 이식했다. 다만 원본은 상시
@@ -110,8 +111,6 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
 
   useClickOutside(containerRef, onClose);
 
-  const artistLine = track.artist ?? "Juntaro";
-
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
       <motion.div
@@ -153,85 +152,46 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
           type="button"
           onClick={onClose}
           aria-label="닫기"
-          className="absolute top-4 left-4 z-20 flex size-9 items-center justify-center text-[#111111]/55 transition-colors hover:text-[#111111] focus-visible:text-[#111111] focus-visible:outline-none"
+          className="absolute top-4 right-4 z-20 flex size-9 items-center justify-center text-[#111111]/55 transition-colors hover:text-[#111111] focus-visible:text-[#111111] focus-visible:outline-none"
         >
           <Icon name="LuClose" className="size-5" />
         </button>
 
-        <div className="flex items-start justify-between gap-4 px-6 pt-16 pb-6 sm:px-8 sm:pt-16 sm:pb-8 lg:px-10">
-          <div className="min-w-0 flex-1">
-            <h2
-              id="track-modal-title"
-              className="line-clamp-2 text-[clamp(2.5rem,6vw,4.5rem)] leading-[0.95] font-bold tracking-tight text-[#111111] lowercase"
-            >
-              {track.name}
-            </h2>
-            <p className="mt-3 truncate font-mono text-xs tracking-[0.08em] text-[#111111]/55 sm:text-sm">
-              {artistLine}
-            </p>
-            {track.shortDescription && (
-              <p className="mt-1 font-mono text-xs tracking-[0.08em] text-[#111111]/40 sm:text-sm">
-                {track.shortDescription}
-              </p>
-            )}
-          </div>
-
-          <motion.div
-            className="relative aspect-square size-[92px] shrink-0 overflow-hidden rounded-full shadow-[0_12px_44px_rgba(0,0,0,0.6)] sm:size-[120px] lg:size-[150px]"
-            initial={{ scale: 0.92, opacity: 0, rotate: 0 }}
-            animate={
-              shouldReduceMotion
-                ? { scale: 1, opacity: 1, rotate: 0 }
-                : { scale: 1, opacity: 1, rotate: 360 }
-            }
-            transition={
-              shouldReduceMotion
-                ? { duration: 0.01 }
-                : {
-                    scale: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-                    opacity: { duration: 0.4 },
-                    rotate: {
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: "linear",
-                      delay: 0.45,
-                    },
-                  }
-            }
-          >
+        <div className="flex items-start gap-5 px-6 pt-8 pb-6 sm:gap-6 sm:px-8 sm:pt-10 sm:pb-8 lg:px-10">
+          <div className="relative size-[96px] shrink-0 overflow-hidden outline outline-1 outline-[#111111]/10 sm:size-[128px] lg:size-[148px]">
             <Image
               src={track.cover}
               alt={track.name}
               fill
-              sizes="150px"
+              sizes="148px"
               className="object-cover"
             />
-            <div
+            <Image
+              src={getTrackTexture(track.name)}
+              alt=""
               aria-hidden="true"
-              className="absolute inset-0 rounded-full"
-              style={{
-                background:
-                  "linear-gradient(125deg, rgba(255,255,255,0.14), transparent 42%)",
-              }}
+              fill
+              sizes="148px"
+              className="pointer-events-none object-cover"
             />
-            <div
-              aria-hidden="true"
-              className="absolute top-1/2 left-1/2 aspect-square w-[28%] -translate-x-1/2 -translate-y-1/2 rounded-full ring-1 ring-black/50"
-              style={{
-                background:
-                  "radial-gradient(circle at 50% 50%, #1b1b1d 0%, #101011 55%, #0a0a0b 100%)",
-              }}
+          </div>
+
+          <div className="min-w-0 flex-1 pr-8">
+            <p className="font-mono text-[11px] tracking-[0.3em] text-[#111111]/45 uppercase">
+              {track.artist ?? "Juntaro"}
+            </p>
+            <h2
+              id="track-modal-title"
+              className="line-clamp-2 text-[clamp(1.9rem,4.5vw,3rem)] leading-[1.02] font-bold tracking-tight text-[#111111] lowercase"
             >
-              <div
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background:
-                    "repeating-radial-gradient(circle at 50% 50%, rgba(236,234,227,0.06) 0px, rgba(236,234,227,0.06) 1px, transparent 1px, transparent 3px)",
-                }}
-              />
-              <div className="absolute top-1/2 left-1/2 size-[10%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0a0a0b] ring-1 ring-white/25" />
-            </div>
-          </motion.div>
+              {track.name}
+            </h2>
+            {track.shortDescription && (
+              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#111111]/55">
+                {track.shortDescription}
+              </p>
+            )}
+          </div>
         </div>
 
         {hasLinks && (
