@@ -110,9 +110,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
 
   useClickOutside(containerRef, onClose);
 
-  const description = [track.artist ?? "Juntaro", track.shortDescription]
-    .filter(Boolean)
-    .join(" — ");
+  const artistLine = track.artist ?? "Juntaro";
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
@@ -168,9 +166,12 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
             >
               {track.name}
             </h2>
-            {description && (
-              <p className="mt-3 truncate font-mono text-xs tracking-[0.08em] text-[#111111]/55 sm:text-sm">
-                {description}
+            <p className="mt-3 truncate font-mono text-xs tracking-[0.08em] text-[#111111]/55 sm:text-sm">
+              {artistLine}
+            </p>
+            {track.shortDescription && (
+              <p className="mt-1 font-mono text-xs tracking-[0.08em] text-[#111111]/40 sm:text-sm">
+                {track.shortDescription}
               </p>
             )}
           </div>

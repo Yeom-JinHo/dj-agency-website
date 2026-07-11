@@ -12,7 +12,7 @@ export type Social = {
 export const SOCIALS: Social[] = [
   {
     name: "YouTube",
-    href: "https://www.youtube.com/watch?v=1lAXNqA25Bs",
+    href: "https://www.youtube.com/@JUNTAROMUSIC",
     iconName: "SiYoutube",
     brandColor: "#FF0000",
   },
