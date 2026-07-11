@@ -11,14 +11,16 @@ import { TrackModal } from "./TrackModal";
 
 interface MusicCardProps {
   track: JuntaroTrack;
+  /** collage 카드(정사각형) 크기·그림자 클래스. VFL collage variant 미러 — 유일 소비자인 콜라주 레이아웃에서 항상 전달한다. */
+  cardClassName?: string;
 }
 
 /**
  * 비닐랩 커버 타일. VFL MusicInfoCard의 카드 파트(텍스처 결정·컨테이너·비닐랩 오버레이)를
- * 시각 동일 이식하되, 라벨은 순백 배경용 #111 계열로 보정했다. 클릭 시 Strobe Row
- * 링크 허브 모달(TrackModal)을 카드별 로컬 상태로 소유한다.
+ * 시각 동일 이식하되, 라벨은 VFL collage variant처럼 hover 시 하단 그라데이션 오버레이로
+ * 노출한다. 클릭 시 Strobe Row 링크 허브 모달(TrackModal)을 카드별 로컬 상태로 소유한다.
  */
-export function MusicCard({ track }: MusicCardProps) {
+export function MusicCard({ track, cardClassName }: MusicCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const handleClose = useCallback(() => setIsOpen(false), []);
@@ -43,12 +45,7 @@ export function MusicCard({ track }: MusicCardProps) {
         aria-label={`${track.name} 트랙 정보 열기`}
         className="block w-full cursor-pointer bg-transparent p-0 text-left focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#111111]"
       >
-        <div
-          className={cn(
-            "group relative overflow-hidden",
-            "h-[150px] w-[150px] md:h-[240px] md:w-[240px] lg:h-[300px] lg:w-[300px] xl:h-[360px] xl:w-[360px] 2xl:h-[400px] 2xl:w-[400px]",
-          )}
-        >
+        <div className={cn("group relative overflow-hidden", cardClassName)}>
           <Image
             width={400}
             height={400}
@@ -65,16 +62,17 @@ export function MusicCard({ track }: MusicCardProps) {
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0 motion-reduce:transition-none"
           />
-        </div>
-        <div className="mt-3 w-[150px] text-left md:w-[240px] lg:w-[300px] xl:w-[360px] 2xl:w-[400px]">
-          <h4 className="truncate text-sm font-semibold text-[#111111] md:text-base">
-            {track.name}
-          </h4>
-          {track.artist && (
-            <p className="truncate font-mono text-xs tracking-[0.08em] text-[#111111]/55 md:text-sm">
-              {track.artist}
-            </p>
-          )}
+          {/* 콜라주 라벨 — hover 시에만 카드 하단 오버레이로 노출 (VFL collage variant 미러) */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
+            <h4 className="truncate text-sm font-semibold text-white">
+              {track.name}
+            </h4>
+            {track.artist && (
+              <p className="truncate text-xs text-neutral-300">
+                {track.artist}
+              </p>
+            )}
+          </div>
         </div>
       </button>
 
