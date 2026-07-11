@@ -182,7 +182,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
             </p>
             <h2
               id="track-modal-title"
-              className="font-display line-clamp-2 pb-1 text-[clamp(1.95rem,4.5vw,3rem)] leading-[1.05] tracking-[0.01em] text-[#111111] lowercase"
+              className="font-display line-clamp-2 pb-1 text-[clamp(1.95rem,4.5vw,3rem)] leading-[1.05] tracking-[0.01em] text-[#111111]"
             >
               {track.name}
             </h2>
