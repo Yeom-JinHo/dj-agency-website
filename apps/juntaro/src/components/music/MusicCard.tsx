@@ -65,9 +65,10 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
               {track.name}
             </h4>
             {track.artist && (
-              /* line-clamp-2: 긴 콜라보 크레딧("Take Note, Juntaro & LOOZBONE"류)이
-                 좁은 카드 폭에서 한 줄로 잘리지 않도록 2줄까지 노출한다(모달과 동일 처리). */
-              <p className="line-clamp-2 text-xs text-neutral-300">
+              /* truncate + title: hover 라벨은 순간적 글랜스 상태라 1줄로 잘라 스캔성을
+                 유지한다. 전체 콜라보 크레딧은 한 클릭 거리의 모달에서 온전히 노출되고,
+                 데스크톱은 title 네이티브 툴팁으로 잘린 이름을 보완한다. */
+              <p className="truncate text-xs text-neutral-300" title={track.artist}>
                 {track.artist}
               </p>
             )}
