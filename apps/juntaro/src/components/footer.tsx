@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { cn } from "@repo/ui";
 import { Icon } from "@repo/ui/common/Icon";
 import SignatureLink from "@repo/ui/common/SignatureLink";
@@ -17,15 +19,17 @@ export function Footer({ className }: FooterProps) {
       )}
     >
       <ul className="flex gap-5 md:gap-6">
-        {SOCIALS.map(({ name, href, iconName }) => (
+        {SOCIALS.map(({ name, href, iconName, brandColor }) => (
           <li key={name}>
             <a
               href={href}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Juntaro on ${name}`}
+              style={{ "--jt-social-hover": brandColor } as CSSProperties}
               // p-1로 히트 영역을 16→24px(WCAG 2.5.8)로 키우고, -m-1로 상쇄해 시각 위치·간격은 불변.
-              className="-m-1 block p-1 text-[#111111]/70 transition-colors duration-200 ease-out hover:text-[#111111]/100 focus-visible:text-[#111111]/100 motion-reduce:transition-none"
+              // 기본은 모노톤(먹색 70%), hover/focus 때만 플랫폼 브랜드색으로 점등.
+              className="-m-1 block p-1 text-[#111111]/70 transition-colors duration-200 ease-out hover:text-[var(--jt-social-hover)] focus-visible:text-[var(--jt-social-hover)] motion-reduce:transition-none"
             >
               <Icon name={iconName} size={16} />
             </a>
