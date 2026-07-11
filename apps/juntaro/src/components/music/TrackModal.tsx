@@ -177,9 +177,12 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
             <p className="font-mono text-[11px] tracking-[0.14em] text-[#111111]/45 uppercase">
               {track.artist ?? "Juntaro"}
             </p>
+            {/* 모달은 detail 뷰 — 곡 제목은 clamp 없이 전체 노출한다(길면 자연
+                줄바꿈, 패널은 overflow-y-auto로 스크롤). 제목은 이 화면의 주 정보라
+                말줄임으로 잘리면 안 된다. */}
             <h2
               id="track-modal-title"
-              className="font-display line-clamp-2 pb-1 text-[clamp(1.95rem,4.5vw,3rem)] leading-[1.05] tracking-[0.01em] text-[#111111]"
+              className="font-display pb-1 text-[clamp(1.95rem,4.5vw,3rem)] leading-[1.05] tracking-[0.01em] text-[#111111]"
             >
               {track.name}
             </h2>
