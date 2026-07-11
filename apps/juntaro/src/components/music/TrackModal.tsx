@@ -170,7 +170,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
             />
           </div>
 
-          <div className="min-w-0 flex-1 pr-8">
+          <div className="min-w-0 flex-1 pr-2">
             {/* 모달은 세로 공간이 넉넉한 detail 뷰 — 콜라보 크레딧은 저작자 표시라
                 clamp 없이 자연 줄바꿈으로 온전히 노출한다. tracking은 하단 링크 라벨
                 (0.14em)과 통일해, 긴 이름이 넓은 자간으로 흩어져 보이던 문제를 줄인다. */}
