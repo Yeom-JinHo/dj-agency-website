@@ -211,21 +211,21 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
                     } as CSSProperties
                   }
                   className={cn(
-                    "group/row flex h-16 items-center gap-4 px-6 text-[#111111]",
+                    "group/row flex h-[52px] items-center gap-4 px-6 text-[#111111]",
                     "transition-colors duration-200 motion-reduce:transition-none",
                     "hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]",
                     "focus-visible:bg-[var(--brand-bg)] focus-visible:text-[var(--brand-text)] focus-visible:outline-none",
-                    "sm:h-20 sm:px-8 lg:h-[88px] lg:px-10",
+                    "sm:h-[60px] sm:px-8 lg:h-[68px] lg:px-10",
                   )}
                 >
-                  <Icon name={link.iconName} className="size-6 shrink-0 sm:size-7" />
+                  <Icon name={link.iconName} className="size-5 shrink-0 sm:size-6" />
                   <span className="flex-1 font-mono text-sm tracking-[0.14em] uppercase sm:text-base">
                     {link.platform}
                   </span>
                   <Icon
                     name="LuArrowRight"
                     className={cn(
-                      "size-5 shrink-0 opacity-40",
+                      "size-4 shrink-0 opacity-40 sm:size-5",
                       "transition-[transform,opacity] duration-200 motion-reduce:transition-none",
                       "group-hover/row:translate-x-1 group-hover/row:opacity-100",
                       "group-focus-visible/row:translate-x-1 group-focus-visible/row:opacity-100",
