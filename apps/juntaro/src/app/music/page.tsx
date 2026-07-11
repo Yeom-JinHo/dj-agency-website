@@ -11,15 +11,16 @@ export const metadata: Metadata = {
   title: "Music — Juntaro",
 };
 
-// 카드별 리듬 값 (인덱스 기반, deterministic). VFL MusicList의 10칸 배열에서 5개 슬라이스.
-const ROTS = [-3, 2.5, -2, 3, -2.5];
-const DYS = [0, 40, 14, 46, 24];
+// 카드별 리듬 값 (인덱스 기반, deterministic). 실데이터 15곡에 맞춰 rot/dy를 15칸으로 확장.
+const ROTS = [-3, 2.5, -2, 3, -2.5, 2, -3.5, 1.5, -1.5, 3.5, -2.8, 2.2, -3.2, 1.8, -2.2];
+const DYS = [0, 40, 14, 46, 24, 8, 36, 18, 44, 12, 30, 4, 42, 20, 34];
 
 interface CollageCard {
   track: JuntaroTrack;
   rot: number;
   dy: number;
   z: number;
+  priority: boolean;
 }
 
 const collageCards: CollageCard[] = TRACKS.map((track, i) => ({
@@ -27,6 +28,8 @@ const collageCards: CollageCard[] = TRACKS.map((track, i) => ({
   rot: ROTS[i % ROTS.length]!,
   dy: DYS[i % DYS.length]!,
   z: 2 + ((i * 5) % 6),
+  // 초기 뷰포트에 들어오는 상단 카드만 우선 로드 — LCP 단축.
+  priority: i < 5,
 }));
 
 export default function MusicPage() {
@@ -52,6 +55,7 @@ export default function MusicPage() {
                 <BlurFade inView duration={0.6}>
                   <MusicCard
                     track={c.track}
+                    priority={c.priority}
                     cardClassName="h-[228px] w-[228px] shadow-[0_24px_60px_rgba(0,0,0,0.18)] outline outline-1 outline-[#111111]/10 xl:h-[272px] xl:w-[272px]"
                   />
                 </BlurFade>
@@ -77,6 +81,7 @@ export default function MusicPage() {
                 <BlurFade inView duration={0.6}>
                   <MusicCard
                     track={c.track}
+                    priority={c.priority}
                     cardClassName="h-[172px] w-[172px] shadow-[0_18px_40px_rgba(0,0,0,0.16)] outline outline-1 outline-[#111111]/10 sm:h-[196px] sm:w-[196px]"
                   />
                 </BlurFade>
