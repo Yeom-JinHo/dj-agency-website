@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { IBM_Plex_Mono } from "next/font/google";
+import { Anton, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 
 import { Header } from "@/components/header";
 import "@/styles/globals.css";
+
+const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  variable: "--font-anton",
+});
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ["latin"],
@@ -31,7 +38,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html lang="en" className={ibmPlexMono.variable}>
+    <html lang="en" className={`${anton.variable} ${ibmPlexMono.variable}`}>
       <body className="antialiased">
         <Header />
         {children}
