@@ -40,7 +40,8 @@ export default function MusicPage() {
       <div className="flex flex-1 items-center justify-center px-6 pt-24 pb-16 md:px-10 md:pt-32 lg:px-16">
         {/* 데스크톱: overlapping collage */}
         <div className="hidden w-full justify-center lg:flex">
-          <div className="flex max-w-[940px] flex-wrap items-start justify-center xl:max-w-[1140px]">
+          {/* isolate: 카드 hover:!z-[60]을 이 컨테이너의 스태킹 컨텍스트에 가둬 body 포털 모달(z-50)을 넘지 못하게 한다 — 오버레이는 body 포털 + z-50대, 이 컨테이너는 z-auto 유지가 전제 */}
+          <div className="isolate flex max-w-[940px] flex-wrap items-start justify-center xl:max-w-[1140px]">
             {collageCards.map((c) => (
               <div
                 key={c.track.id}
@@ -66,7 +67,8 @@ export default function MusicPage() {
 
         {/* 모바일: 미니 collage */}
         <div className="flex w-full justify-center lg:hidden">
-          <div className="flex max-w-[380px] flex-wrap items-start justify-center sm:max-w-[440px]">
+          {/* isolate: 카드 active:!z-[60]을 이 컨테이너의 스태킹 컨텍스트에 가둬 body 포털 모달(z-50)을 넘지 못하게 한다 — 오버레이는 body 포털 + z-50대, 이 컨테이너는 z-auto 유지가 전제 */}
+          <div className="isolate flex max-w-[380px] flex-wrap items-start justify-center sm:max-w-[440px]">
             {collageCards.map((c) => (
               <div
                 key={c.track.id}

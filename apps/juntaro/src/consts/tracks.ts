@@ -1,27 +1,26 @@
 import type { JuntaroTrack } from "@/types/music";
-import { SOCIALS } from "@/consts/socials";
-
-const socialHref = (name: (typeof SOCIALS)[number]["name"]): string =>
-  SOCIALS.find((social) => social.name === name)?.href ?? "";
 
 interface TrackLinkSources {
   apple: string;
-  /** 곡별 Spotify 트랙 URL. 미확인 시 아티스트 프로필로 폴백. */
+  /** 곡별 Spotify 트랙 URL. 미확인 시 행 생략. */
   spotify?: string;
-  /** 곡별 Beatport 트랙 URL. 미확인 시 아티스트 프로필로 폴백. */
+  /** 곡별 Beatport 트랙 URL. 미확인 시 행 생략. */
   beatport?: string;
 }
 
 /**
- * 스트리밍 플랫폼 버튼 소스. Apple Music·Spotify·Beatport는 곡별 실제 URL로 해석하고,
- * YouTube(채널)·SoundCloud(프로필)와 미확인 곡의 Spotify/Beatport는 SOCIALS로 폴백한다.
+ * 스트리밍 플랫폼 버튼 소스 — 곡별 실제 URL이 있는 플랫폼만 행으로 노출한다.
+ * 채널/프로필 링크(YouTube·SoundCloud 등)는 footer 소셜이 담당하므로 트랙 모달에서
+ * 프로필로 폴백하지 않는다(트랙 모달의 행 = 이 곡으로 직행한다는 약속).
  */
 const trackLinks = ({ apple, spotify, beatport }: TrackLinkSources): JuntaroTrack["links"] => [
-  { platform: "YouTube", href: socialHref("YouTube"), iconName: "SiYoutube" },
-  { platform: "SoundCloud", href: socialHref("SoundCloud"), iconName: "SiSoundcloud" },
-  { platform: "Spotify", href: spotify ?? socialHref("Spotify"), iconName: "SiSpotify" },
-  { platform: "Apple Music", href: apple, iconName: "SiApple" },
-  { platform: "Beatport", href: beatport ?? socialHref("Beatport"), iconName: "SiBeatport" },
+  ...(spotify
+    ? [{ platform: "Spotify", href: spotify, iconName: "SiSpotify" as const }]
+    : []),
+  { platform: "Apple Music", href: apple, iconName: "SiApple" as const },
+  ...(beatport
+    ? [{ platform: "Beatport", href: beatport, iconName: "SiBeatport" as const }]
+    : []),
 ];
 
 /**
