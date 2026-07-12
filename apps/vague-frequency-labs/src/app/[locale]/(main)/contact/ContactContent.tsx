@@ -1,11 +1,13 @@
 import type { ReactElement } from "react";
 import React from "react";
+import { useTranslations } from "next-intl";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import SectionHeading from "@/components/SectionHeading";
 import KoreaCinematic from "./KoreaCinematic";
 
 export default function ContactContent(): ReactElement {
+  const t = useTranslations("Contact");
   return (
     <main className="my-16 flex-1">
       <section
@@ -38,7 +40,7 @@ export default function ContactContent(): ReactElement {
                     as="p"
                     className="text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed"
                   >
-                    서울특별시 중구 세종대로 110(수정)
+                    {t("address")}
                   </TextReveal>
                 </div>
               </div>

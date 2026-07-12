@@ -1,31 +1,44 @@
 import React from "react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import ParallaxGlobeLogo from "@/components/ParallaxGlobeLogo";
-import { createMetadata } from "@/utils/index";
+import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
 
-const title = "About";
-const description =
-  "About Vague Frequency Laboratory — an independent Seoul electronic music label and creative studio built around experimental tech house and bass house.";
-
-export const metadata = createMetadata({
-  title,
-  description,
-  openGraph: {
-    url: "/about",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Metadata.about" });
+  const title = t("title");
+  const description = t("description");
+  return createMetadata({
     title,
     description,
-  },
-  twitter: {
-    title,
-    description,
-  },
-  alternates: {
-    canonical: "/about",
-  },
-});
+    openGraph: {
+      url: "/about",
+      title,
+      description,
+      locale: ogLocale(locale),
+    },
+    twitter: {
+      title,
+      description,
+    },
+    alternates: localeAlternates("/about", locale),
+  });
+}
 
-export default function AboutPage() {
+export default async function AboutPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return (
     <main className="my-16 flex-1">
       <section

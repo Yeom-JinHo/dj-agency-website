@@ -1,0 +1,47 @@
+{
+  "Metadata": {
+    "home": {
+      "description": "Vague Frequency Laboratory는 서울에 기반을 둔 독립 일렉트로닉 뮤직 레이블입니다. 실험적인 테크 하우스와 베이스 하우스를 중심으로 아티스트, 릴리스, 라이브 셋을 소개합니다."
+    },
+    "about": {
+      "title": "소개",
+      "description": "Vague Frequency Laboratory 소개 — 실험적인 테크 하우스와 베이스 하우스를 중심으로 하는 서울의 독립 일렉트로닉 뮤직 레이블이자 크리에이티브 스튜디오입니다."
+    },
+    "artist": {
+      "title": "아티스트",
+      "description": "Vague Frequency Laboratory 로스터 — 서울에서 실험적인 일렉트로닉 음악을 만드는 테크 하우스·베이스 하우스 아티스트와 DJ를 소개합니다."
+    },
+    "music": {
+      "title": "음악 & 릴리스",
+      "description": "Vague Frequency Laboratory 디스코그래피 — 서울 기반 아티스트들의 실험적인 테크 하우스, 베이스 하우스, 일렉트로닉 릴리스를 살펴볼 수 있습니다."
+    },
+    "video": {
+      "title": "비디오 & 라이브 셋",
+      "description": "Vague Frequency Laboratory 아티스트들의 라이브 셋, DJ 믹스, 퍼포먼스 영상 — 서울에서 만드는 실험적인 테크 하우스와 일렉트로닉 음악입니다."
+    },
+    "contact": {
+      "title": "문의 & 부킹",
+      "description": "서울의 독립 일렉트로닉 뮤직 레이블 Vague Frequency Laboratory에 부킹·릴리스·협업을 문의할 수 있습니다."
+    },
+    "intro": {
+      "title": "인트로",
+      "description": "Vague Frequency Laboratory — 실험적인 테크 하우스와 베이스 하우스를 위한 서울의 독립 일렉트로닉 뮤직 레이블이자 크리에이티브 스튜디오입니다."
+    }
+  },
+  "About": {
+    "body": "Vague Frequency Laboratory는 서울에 기반을 둔 독립 일렉트로닉 뮤직 레이블입니다. 2025년 설립 이후 테크 하우스와 베이스 하우스 아티스트들과 함께 릴리스, 라이브 셋, 비주얼 작업을 이어가고 있습니다."
+  },
+  "Contact": {
+    "address": "서울특별시 중구 세종대로 110"
+  },
+  "Error": {
+    "heading": "문제가 발생했습니다",
+    "body": "페이지를 새로고침하거나 홈으로 돌아가 주세요.",
+    "refresh": "새로고침",
+    "home": "← 홈"
+  },
+  "A11y": {
+    "loading": "로딩 중",
+    "switchLocale": "언어 전환"
+  }
+}

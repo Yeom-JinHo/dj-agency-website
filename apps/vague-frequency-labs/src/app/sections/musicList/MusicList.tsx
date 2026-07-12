@@ -1,5 +1,5 @@
 import type { MusicInfo } from "@/types/music";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import MusicInfoCard from "./MusicInfoCard";

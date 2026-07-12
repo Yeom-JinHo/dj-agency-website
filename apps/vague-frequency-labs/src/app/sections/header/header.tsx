@@ -7,9 +7,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { usePathname } from "next/navigation";
 import { linkLimit, links } from "./config";
-import Link from "next/link";
+// i18n Link/usePathname — /ko에서도 내부 항해가 locale을 보존하고,
+// usePathname은 prefix 제거 경로를 돌려줘 active 매칭이 두 locale에서 동일하게 동작한다.
+import { Link, usePathname } from "@/i18n/navigation";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 import { Icon } from "@repo/ui/common/Icon";
 import { motion } from "motion/react";
@@ -153,6 +155,7 @@ export default function Header() {
                   />
                 ) : null}
               </div>
+              <LanguageSwitcher className="ml-2 lg:ml-3" />
               {/* <div className="flex items-center gap-2">
                 <ThemeToggle />
               </div> */}
@@ -180,6 +183,7 @@ export default function Header() {
                 {title}
               </Link>
             ))}
+            <LanguageSwitcher className="text-base" />
             {/* <div className="flex w-full items-center justify-end">
               <ThemeToggle />
             </div> */}

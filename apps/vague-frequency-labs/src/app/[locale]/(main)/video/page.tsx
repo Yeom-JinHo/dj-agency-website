@@ -1,36 +1,48 @@
-import type { ReactElement } from "react";
 import React from "react";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
-import { createMetadata } from "@/utils/index";
+import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
 
 import YoutubeCard from "./components/YoutubeCard";
 
-const title = "Videos & Live Sets";
-const description =
-  "Watch live sets, DJ mixes, and performances from Vague Frequency Laboratory artists — experimental tech house and electronic music from Seoul.";
-
-export const metadata = createMetadata({
-  title,
-  description,
-  keywords: ["Live Sets", "DJ Mix", "Performance", "Electronic Music", "Seoul"],
-  openGraph: {
-    url: "/video",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Metadata.video" });
+  const title = t("title");
+  const description = t("description");
+  return createMetadata({
     title,
     description,
-  },
-  twitter: {
-    title,
-    description,
-  },
-  alternates: {
-    canonical: "/video",
-  },
-});
+    keywords: ["Live Sets", "DJ Mix", "Performance", "Electronic Music", "Seoul"],
+    openGraph: {
+      url: "/video",
+      title,
+      description,
+      locale: ogLocale(locale),
+    },
+    twitter: {
+      title,
+      description,
+    },
+    alternates: localeAlternates("/video", locale),
+  });
+}
 
-export default function VideoPage(): ReactElement {
+export default async function VideoPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   const musicInfos = [
     ...musicInfo.getInfos(),
     ...musicInfo.getInfos(),

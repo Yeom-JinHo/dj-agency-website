@@ -4,7 +4,7 @@ import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
-import MusicInfoCard from "../../sections/musicList/MusicInfoCard";
+import MusicInfoCard from "@/app/sections/musicList/MusicInfoCard";
 
 export default function MusicContent(): ReactElement {
   const musicInfos = [

@@ -1,30 +1,45 @@
 import { Intro } from "@repo/ui/features/intro";
 import { getAppUrls } from "@repo/utils/app-urls";
-import { createMetadata } from "@/utils/index";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { createMetadata, ogLocale } from "@/utils/index";
 
-const title = "Intro";
-const description =
-  "Enter Vague Frequency Laboratory — an independent Seoul electronic music label and creative studio for experimental tech house and bass house.";
-
-export const metadata = {
-  ...createMetadata({
-    title,
-    description,
-    keywords: ["Electronic Music", "Seoul", "Independent Label"],
-    openGraph: {
-      url: "/intro",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Metadata.intro" });
+  const title = t("title");
+  const description = t("description");
+  return {
+    ...createMetadata({
       title,
       description,
-    },
-    twitter: {
-      title,
-      description,
-    },
-  }),
-  // Gate/entry page — keep it out of the index; the home page carries SEO.
-  robots: { index: false, follow: true },
-};
+      keywords: ["Electronic Music", "Seoul", "Independent Label"],
+      openGraph: {
+        url: "/intro",
+        title,
+        description,
+        locale: ogLocale(locale),
+      },
+      twitter: {
+        title,
+        description,
+      },
+    }),
+    // Gate/entry page — keep it out of the index; the home page carries SEO.
+    robots: { index: false, follow: true },
+  };
+}
 
-export default function IntroPage() {
+export default async function IntroPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+
   return <Intro currentApp="vague-frequency-labs" appUrls={getAppUrls()} />;
 }

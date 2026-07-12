@@ -1,3 +1,6 @@
 import { createNextConfig } from "@repo/next-config";
+import createNextIntlPlugin from "next-intl/plugin";
 
-export default createNextConfig();
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+export default withNextIntl(createNextConfig());
