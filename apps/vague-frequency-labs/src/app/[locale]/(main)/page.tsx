@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
+import { createMetadata, localeAlternates, localeUrl, ogLocale } from "@/utils/index";
 import { getWorldMapData } from "@/utils/world-map-data";
 import About from "@/app/sections/about/about";
 import MediaGridWork from "@/app/sections/mediaGrid/MediaGridWork";
@@ -20,7 +20,7 @@ export async function generateMetadata({
     description,
     keywords: ["Tech House", "Bass House", "Electronic Music", "Music Label", "Seoul", "DJ"],
     openGraph: {
-      url: "/",
+      url: localeUrl("/", locale),
       description,
       locale: ogLocale(locale),
     },

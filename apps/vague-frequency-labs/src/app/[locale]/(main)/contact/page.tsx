@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
+import { createMetadata, localeAlternates, localeUrl, ogLocale } from "@/utils/index";
 import ContactContent from "./ContactContent";
 
 export async function generateMetadata({
@@ -16,7 +16,7 @@ export async function generateMetadata({
     description,
     keywords: ["Booking", "Contact", "Collaboration", "Music Label", "Seoul"],
     openGraph: {
-      url: "/contact",
+      url: localeUrl("/contact", locale),
       title,
       description,
       locale: ogLocale(locale),

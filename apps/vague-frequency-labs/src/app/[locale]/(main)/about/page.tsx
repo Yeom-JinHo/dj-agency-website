@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import ParallaxGlobeLogo from "@/components/ParallaxGlobeLogo";
-import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
+import { createMetadata, localeAlternates, localeUrl, ogLocale } from "@/utils/index";
 
 export async function generateMetadata({
   params,
@@ -18,7 +18,7 @@ export async function generateMetadata({
     title,
     description,
     openGraph: {
-      url: "/about",
+      url: localeUrl("/about", locale),
       title,
       description,
       locale: ogLocale(locale),

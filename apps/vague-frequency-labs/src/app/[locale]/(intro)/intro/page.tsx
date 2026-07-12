@@ -1,7 +1,7 @@
 import { Intro } from "@repo/ui/features/intro";
 import { getAppUrls } from "@repo/utils/app-urls";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { createMetadata, ogLocale } from "@/utils/index";
+import { createMetadata, localeUrl, ogLocale } from "@/utils/index";
 
 export async function generateMetadata({
   params,
@@ -18,7 +18,7 @@ export async function generateMetadata({
       description,
       keywords: ["Electronic Music", "Seoul", "Independent Label"],
       openGraph: {
-        url: "/intro",
+        url: localeUrl("/intro", locale),
         title,
         description,
         locale: ogLocale(locale),

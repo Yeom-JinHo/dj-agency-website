@@ -4,7 +4,7 @@ import { musicInfo } from "@/source";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
-import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
+import { createMetadata, localeAlternates, localeUrl, ogLocale } from "@/utils/index";
 
 import YoutubeCard from "./components/YoutubeCard";
 
@@ -22,7 +22,7 @@ export async function generateMetadata({
     description,
     keywords: ["Live Sets", "DJ Mix", "Performance", "Electronic Music", "Seoul"],
     openGraph: {
-      url: "/video",
+      url: localeUrl("/video", locale),
       title,
       description,
       locale: ogLocale(locale),

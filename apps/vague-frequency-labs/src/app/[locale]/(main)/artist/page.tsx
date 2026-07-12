@@ -8,7 +8,7 @@ import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import { JsonLd } from "@repo/ui/common/JsonLd";
-import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
+import { createMetadata, localeAlternates, localeUrl, ogLocale } from "@/utils/index";
 
 import ArtistSimpleCard from "@/app/sections/artistProfiles/ArtistSimpleCard";
 
@@ -25,7 +25,7 @@ export async function generateMetadata({
     title,
     description,
     openGraph: {
-      url: "/artist",
+      url: localeUrl("/artist", locale),
       title,
       description,
       locale: ogLocale(locale),
