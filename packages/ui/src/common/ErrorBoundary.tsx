@@ -4,9 +4,18 @@ import type { ReactNode } from "react";
 import { Component } from "react";
 import { motion } from "motion/react";
 
+// locale별 문구 주입용 — 미주입 시 기존 영문 기본값이라 기존 소비 앱은 영향 없다.
+interface ErrorBoundaryLabels {
+  heading?: ReactNode;
+  body?: string;
+  refresh?: string;
+  home?: string;
+}
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  labels?: ErrorBoundaryLabels;
 }
 
 interface State {
@@ -106,9 +115,13 @@ export class ErrorBoundary extends Component<Props, State> {
                       "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
                   }}
                 >
-                  Something
-                  <br />
-                  went wrong
+                  {this.props.labels?.heading ?? (
+                    <>
+                      Something
+                      <br />
+                      went wrong
+                    </>
+                  )}
                 </h1>
               </motion.div>
 
@@ -124,7 +137,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 }}
               >
                 <p className="max-w-[340px] font-sans text-[15px] leading-relaxed text-white/50 sm:text-base">
-                  Please refresh the page or return home.
+                  {this.props.labels?.body ??
+                    "Please refresh the page or return home."}
                 </p>
 
                 <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
@@ -133,13 +147,13 @@ export class ErrorBoundary extends Component<Props, State> {
                     onClick={this.handleReload}
                     className="min-w-[150px] rounded-none border border-white/30 bg-transparent px-8 py-3.5 font-mono text-[13px] uppercase tracking-[0.22em] text-white transition-all duration-200 hover:border-white hover:bg-white hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
                   >
-                    Refresh
+                    {this.props.labels?.refresh ?? "Refresh"}
                   </button>
                   <a
                     href="/"
                     className="min-h-[44px] inline-flex items-center font-mono text-[13px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-white/80"
                   >
-                    ← Home
+                    {this.props.labels?.home ?? "← Home"}
                   </a>
                 </div>
               </motion.div>
