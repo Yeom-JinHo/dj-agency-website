@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
+import { IconDeviceMobileRotated } from "@tabler/icons-react";
 import AtroposCore from "atropos";
 
 import "atropos/css";
@@ -86,15 +87,23 @@ export function Hero() {
       <AnimatePresence>
         {mounted && tiltPermission === "idle" && (
           <motion.div
-            initial={{ opacity: 0, y: 4 }}
+            initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
             className="pointer-events-none absolute inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] flex justify-center"
           >
-            <span className="font-mono text-[11px] tracking-[0.25em] text-[#111111]/55 uppercase">
+            {/* 힌트는 pill 형태로 명시적 인터랙션처럼 읽히되, 탭은 hero 전체가
+                받으므로(pointer-events-none) 눌러도 그대로 통과한다. 은은한 scale
+                pulse로 시선을 유도해 발견성을 높인다. */}
+            <motion.span
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+              className="inline-flex items-center gap-2 rounded-full border border-[#111111]/20 bg-white/50 px-4 py-2 font-mono text-[10px] tracking-[0.25em] text-[#111111]/60 uppercase backdrop-blur-sm"
+            >
+              <IconDeviceMobileRotated size={14} stroke={1.5} aria-hidden />
               Tap to feel it
-            </span>
+            </motion.span>
           </motion.div>
         )}
       </AnimatePresence>
