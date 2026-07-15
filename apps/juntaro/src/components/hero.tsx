@@ -92,7 +92,9 @@ export function Hero() {
             transition={{ duration: 0.4, ease: "easeOut" }}
             className="pointer-events-none absolute inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] flex justify-center"
           >
-            <span className="text-[11px] text-black/40">탭해서 모션 켜기</span>
+            <span className="font-mono text-[11px] tracking-[0.25em] text-[#111111]/55 uppercase">
+              Tap to feel it
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
