@@ -118,7 +118,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: shouldReduceMotion ? 0.01 : 0.28 }}
+        transition={{ duration: shouldReduceMotion ? 0.01 : 0.3 }}
       />
 
       <motion.div
@@ -144,14 +144,15 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
         transition={
           shouldReduceMotion
             ? { duration: 0.01 }
-            : { duration: 0.32, ease: [0.16, 1, 0.3, 1] }
+            : // globals.css --ease-poster와 동일 곡선 — motion은 CSS 토큰을 못 읽어 배열로 중복 정의한다.
+              { duration: 0.3, ease: [0.16, 1, 0.3, 1] }
         }
       >
         <button
           type="button"
           onClick={onClose}
           aria-label="닫기"
-          className="absolute top-4 right-4 z-20 flex size-9 items-center justify-center text-[#111111]/55 transition-colors hover:text-[#111111] focus-visible:text-[#111111] focus-visible:outline-none"
+          className="absolute top-4 right-4 z-20 flex size-9 items-center justify-center text-[#111111]/55 transition-colors duration-200 ease-out hover:text-[#111111] focus-visible:text-[#111111] focus-visible:outline-none motion-reduce:transition-none"
         >
           <Icon name="LuClose" className="size-5" />
         </button>
@@ -174,7 +175,8 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
             {/* 모달은 세로 공간이 넉넉한 detail 뷰 — 콜라보 크레딧은 저작자 표시라
                 clamp 없이 자연 줄바꿈으로 온전히 노출한다. tracking은 하단 링크 라벨
                 (0.14em)과 통일해, 긴 이름이 넓은 자간으로 흩어져 보이던 문제를 줄인다. */}
-            <p className="font-mono text-[11px] tracking-[0.14em] text-[#111111]/45 uppercase">
+            {/* /60: 11px 소형 텍스트도 AA 4.5:1(≈4.9:1)을 넘기는 최소 단계 — 위계는 크기·자간이 이미 분리한다 */}
+            <p className="font-mono text-[11px] tracking-[0.14em] text-[#111111]/60 uppercase">
               {track.artist ?? "Juntaro"}
             </p>
             {/* 모달은 detail 뷰 — 곡 제목은 clamp 없이 전체 노출한다(길면 자연
@@ -187,7 +189,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
               {track.name}
             </h2>
             {track.shortDescription && (
-              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#111111]/55">
+              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#111111]/60">
                 {track.shortDescription}
               </p>
             )}
@@ -212,7 +214,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
                   }
                   className={cn(
                     "group/row flex h-[52px] items-center gap-4 px-6 text-[#111111]",
-                    "transition-colors duration-200 motion-reduce:transition-none",
+                    "transition-colors duration-200 ease-out motion-reduce:transition-none",
                     "hover:bg-[var(--brand-bg)] hover:text-[var(--brand-text)]",
                     "focus-visible:bg-[var(--brand-bg)] focus-visible:text-[var(--brand-text)] focus-visible:outline-none",
                     "sm:h-[60px] sm:px-8 lg:h-[68px] lg:px-10",
@@ -226,7 +228,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
                     name="LuArrowRight"
                     className={cn(
                       "size-4 shrink-0 opacity-40 sm:size-5",
-                      "transition-[transform,opacity] duration-200 motion-reduce:transition-none",
+                      "transition-[transform,opacity] duration-200 ease-out motion-reduce:transition-none",
                       "group-hover/row:translate-x-1 group-hover/row:opacity-100",
                       "group-focus-visible/row:translate-x-1 group-focus-visible/row:opacity-100",
                     )}

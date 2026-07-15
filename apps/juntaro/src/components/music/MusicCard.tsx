@@ -82,13 +82,14 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
             // 함께 우선 로드해야 초기 카드가 반쪽(커버만)으로 보이지 않는다.
             priority={priority}
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
-            className="pointer-events-none object-cover opacity-70 transition-opacity duration-500 group-hover:opacity-0 motion-reduce:transition-none"
+            className="pointer-events-none object-cover opacity-70 transition-opacity duration-500 ease-out group-hover:opacity-0 motion-reduce:transition-none"
           />
           {/* 콜라주 라벨 — hover 시에만 카드 하단 오버레이로 노출 (VFL collage variant 미러) */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
-            <h4 className="font-display truncate text-base leading-[1.05] tracking-[0.02em] text-white">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100 motion-reduce:transition-none">
+            {/* h2: sr-only h1(Music) 바로 아래 단계 — h4 점프는 스크린리더 헤딩 순회에서 구조를 깨뜨린다 */}
+            <h2 className="font-display truncate text-base leading-[1.05] tracking-[0.02em] text-white">
               {track.name}
-            </h4>
+            </h2>
             {track.artist && (
               /* truncate + title: hover 라벨은 순간적 글랜스 상태라 1줄로 잘라 스캔성을
                  유지한다. 전체 콜라보 크레딧은 한 클릭 거리의 모달에서 온전히 노출되고,
