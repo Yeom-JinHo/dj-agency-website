@@ -16,8 +16,9 @@ import { useEffect, useState } from "react";
  */
 
 // ── 매핑 상수 (실기기 튜닝 지점) ────────────────────────────────
-const ROTATE_MAX = 14; // 최대 회전각(deg). 데스크톱 9°보다 생동감↑ (목표 12~15°)
-const TILT_RANGE = 32; // 기기를 이 각도(deg)만큼 기울이면 ROTATE_MAX 도달
+const ROTATE_MAX = 18; // 최대 회전각(deg). 데스크톱 9°의 2배 — 강한 틸트(중앙 정렬이라 가장자리 노출 없음)
+const TILT_RANGE = 26; // 기기를 이 각도(deg)만큼 기울이면 ROTATE_MAX 도달. 작을수록 예민·강하게 반응
+const DEPTH_GAIN = 1.6; // 자식 레이어 패럴랙스 증폭(모바일 전용). 입체감의 핵심 레버. 회전각과 독립
 const TAU = 0.09; // smoothing 시간상수(s). 클수록 느긋. framerate 독립 lerp에 사용
 const BETA_SIGN = -1; // 앞뒤(beta) 기울임 부호
 const GAMMA_SIGN = 1; // 좌우(gamma) 기울임 부호
@@ -75,9 +76,9 @@ function useDeviceTilt(rootRef: RefObject<HTMLElement | null>): TiltPermission {
       const ryPct = (ry / ROTATE_MAX) * 100;
       for (const child of offsetEls) {
         const offset = Number(child.dataset.atroposOffset) || 0;
-        child.style.transform = `translate3d(${(ryPct * offset) / 100}%, ${
-          (-rxPct * offset) / 100
-        }%, 0)`;
+        child.style.transform = `translate3d(${
+          (ryPct * offset * DEPTH_GAIN) / 100
+        }%, ${(-rxPct * offset * DEPTH_GAIN) / 100}%, 0)`;
       }
     };
 
