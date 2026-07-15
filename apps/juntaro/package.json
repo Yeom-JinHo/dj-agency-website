@@ -23,6 +23,7 @@
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "schema-dts": "^1.1.5",
     "tailwind-merge": "catalog:"
   },
   "devDependencies": {
