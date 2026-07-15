@@ -143,23 +143,6 @@ function useDeviceTilt(rootRef: RefObject<HTMLElement | null>): TiltPermission {
     const startListening = () => {
       if (listening || disposed) return;
       listening = true;
-
-      // dev-assert: 첫 write 전, atropos DOM 결합이 유효한지 loud 검증.
-      if (process.env.NODE_ENV !== "production") {
-        if (!rotateEl || offsetEls.length === 0) {
-          console.warn(
-            "[useDeviceTilt] .atropos-rotate 또는 [data-atropos-offset] 자식을 찾지 못했습니다. atropos DOM 구조 변경 의심.",
-          );
-        } else {
-          const td = getComputedStyle(rotateEl).transitionDuration;
-          if (td !== "0s") {
-            console.warn(
-              `[useDeviceTilt] .atropos-rotate transition-duration가 0s가 아닙니다 (${td}). CSS transition과 rAF smoothing이 이중 적용되어 감이 어긋날 수 있습니다.`,
-            );
-          }
-        }
-      }
-
       window.addEventListener("deviceorientation", onOrientation);
       window.addEventListener("orientationchange", onOrientationChange);
       rafId = requestAnimationFrame(tick);
