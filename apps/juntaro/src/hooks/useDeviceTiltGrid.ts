@@ -24,6 +24,7 @@ const ROTATE_MAX = 12; // 최대 회전각(deg). 그리드 동시 틸트라 hero
 const TILT_RANGE = 24; // 기기를 이 각도(deg)만큼 기울이면 도달
 const PERSPECTIVE_PX = 800; // perspective 거리. 데스크톱 hover와 동일
 const TAU = 0.09; // smoothing 시간상수(s). framerate 독립 lerp에 사용
+const SETTLE_EPS = 0.02; // deg. 목표-현재 차가 이 아래면 정착으로 보고 rAF 루프 정지
 const BETA_SIGN = -1; // 앞뒤(beta) 기울임 부호
 const GAMMA_SIGN = 1; // 좌우(gamma) 기울임 부호
 // ────────────────────────────────────────────────────────────────
@@ -92,6 +93,7 @@ function useDeviceTiltGrid(
     let rafId = 0;
     let lastT = 0;
     let listening = false;
+    let running = false; // rAF 루프 가동 여부. 정착 시 false로 내려 루프를 재운다
     let disposed = false;
     let requested = false;
 
@@ -105,10 +107,13 @@ function useDeviceTiltGrid(
 
     // 단일 rAF 루프: 이벤트는 최신 목표각만 저장하고, DOM 쓰기는 여기서 담당.
     // alpha = 1 - exp(-dt/TAU) 로 framerate 독립 lerp (60/120Hz 동일 감).
+    // 목표에 수렴(정착)하면 스냅 후 루프를 멈춘다 — 정지 기기에서 15개 카드에 무의미한
+    // transform을 매 프레임 반복하지 않도록(배터리/발열, 특히 grant 공유로 평평히 둔
+    // 채 /music 재방문 시). 새 목표는 onOrientation이 ensureRunning으로 재가동한다.
     const tick = (t: number) => {
-      rafId = requestAnimationFrame(tick);
       if (lastT === 0) {
         lastT = t;
+        rafId = requestAnimationFrame(tick);
         return;
       }
       const dt = (t - lastT) / 1000;
@@ -116,7 +121,27 @@ function useDeviceTiltGrid(
       const alpha = 1 - Math.exp(-dt / TAU);
       curRx += (targetRx - curRx) * alpha;
       curRy += (targetRy - curRy) * alpha;
+      if (
+        Math.abs(targetRx - curRx) < SETTLE_EPS &&
+        Math.abs(targetRy - curRy) < SETTLE_EPS
+      ) {
+        curRx = targetRx;
+        curRy = targetRy;
+        write(curRx, curRy);
+        running = false;
+        return; // reschedule 안 함 → 루프 수면
+      }
       write(curRx, curRy);
+      rafId = requestAnimationFrame(tick);
+    };
+
+    // 정지한 루프를 (재)가동. lastT를 0으로 리셋해 seed 프레임 가드가 재무장되어
+    // 수면 후 첫 dt가 폭주하지 않게 한다.
+    const ensureRunning = () => {
+      if (running || disposed || !listening) return;
+      running = true;
+      lastT = 0;
+      rafId = requestAnimationFrame(tick);
     };
 
     const onOrientation = (e: DeviceOrientationEvent) => {
@@ -133,6 +158,14 @@ function useDeviceTiltGrid(
       const dGamma = gamma - baseGamma;
       targetRx = clamp((BETA_SIGN * dBeta) / TILT_RANGE, -1, 1) * ROTATE_MAX;
       targetRy = clamp((GAMMA_SIGN * dGamma) / TILT_RANGE, -1, 1) * ROTATE_MAX;
+      // 새 목표가 현재각에서 충분히 벗어나면 잠든 루프를 깨운다. iOS는 정지 시에도
+      // deviceorientation을 계속 쏘지만, 그때 목표는 현재각과 거의 같아 재가동되지 않는다.
+      if (
+        Math.abs(targetRx - curRx) >= SETTLE_EPS ||
+        Math.abs(targetRy - curRy) >= SETTLE_EPS
+      ) {
+        ensureRunning();
+      }
     };
 
     // landscape 등 축전환 시 baseline 재캡처.
@@ -144,17 +177,9 @@ function useDeviceTiltGrid(
     const startListening = () => {
       if (listening || disposed) return;
       listening = true;
-      // 자이로가 카드 transform을 소유하는 동안 CSS transition을 무력화한다.
-      // MusicCard onClick의 tilt.reset()이 hover용 `transition: transform 300ms`를
-      // 이 div에 인라인으로 남기는데(모바일 탭에서도 발화), 그게 눌러앉으면 매 프레임
-      // 자이로 write가 lerp 위에 300ms 트랜지션까지 겹쳐 뭉개진다. lerp가 유일한
-      // 스무딩이 되도록 none으로 덮어쓴다(cleanup에서 원복).
-      for (const card of cardEls) {
-        card.style.transition = "none";
-      }
       window.addEventListener("deviceorientation", onOrientation);
       window.addEventListener("orientationchange", onOrientationChange);
-      rafId = requestAnimationFrame(tick);
+      ensureRunning();
     };
 
     // 첫 user gesture 핸들러: 권한 요청은 이 핸들러 '직접 statement'에서 동기 호출.
@@ -212,7 +237,6 @@ function useDeviceTiltGrid(
       if (rafId) cancelAnimationFrame(rafId);
       for (const card of cardEls) {
         card.style.transform = "";
-        card.style.transition = "";
       }
     };
   }, [rootRef]);
