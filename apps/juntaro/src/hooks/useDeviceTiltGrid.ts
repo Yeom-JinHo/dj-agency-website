@@ -144,6 +144,14 @@ function useDeviceTiltGrid(
     const startListening = () => {
       if (listening || disposed) return;
       listening = true;
+      // 자이로가 카드 transform을 소유하는 동안 CSS transition을 무력화한다.
+      // MusicCard onClick의 tilt.reset()이 hover용 `transition: transform 300ms`를
+      // 이 div에 인라인으로 남기는데(모바일 탭에서도 발화), 그게 눌러앉으면 매 프레임
+      // 자이로 write가 lerp 위에 300ms 트랜지션까지 겹쳐 뭉개진다. lerp가 유일한
+      // 스무딩이 되도록 none으로 덮어쓴다(cleanup에서 원복).
+      for (const card of cardEls) {
+        card.style.transition = "none";
+      }
       window.addEventListener("deviceorientation", onOrientation);
       window.addEventListener("orientationchange", onOrientationChange);
       rafId = requestAnimationFrame(tick);
@@ -204,6 +212,7 @@ function useDeviceTiltGrid(
       if (rafId) cancelAnimationFrame(rafId);
       for (const card of cardEls) {
         card.style.transform = "";
+        card.style.transition = "";
       }
     };
   }, [rootRef]);
