@@ -16,9 +16,9 @@ import { useEffect, useState } from "react";
  */
 
 // ── 매핑 상수 (실기기 튜닝 지점) ────────────────────────────────
-const ROTATE_MAX = 18; // 최대 회전각(deg). 데스크톱 9°의 2배 — 강한 틸트(중앙 정렬이라 가장자리 노출 없음)
-const TILT_RANGE = 26; // 기기를 이 각도(deg)만큼 기울이면 ROTATE_MAX 도달. 작을수록 예민·강하게 반응
-const DEPTH_GAIN = 1.6; // 자식 레이어 패럴랙스 증폭(모바일 전용). 입체감의 핵심 레버. 회전각과 독립
+const ROTATE_MAX = 20; // 최대 회전각(deg). 상한 ~22°(초과 시 스큐·가장자리 노출) 아래로 소폭 강화
+const TILT_RANGE = 24; // 기기를 이 각도(deg)만큼 기울이면 도달. 하한 ~22°(미만 시 예민·멀미) 위로 소폭 예민
+const DEPTH_GAIN = 2.0; // 자식 레이어 패럴랙스 증폭(모바일 전용). 입체감의 핵심 레버. 상한 ~2.2 아래
 const TAU = 0.09; // smoothing 시간상수(s). 클수록 느긋. framerate 독립 lerp에 사용
 const BETA_SIGN = -1; // 앞뒤(beta) 기울임 부호
 const GAMMA_SIGN = 1; // 좌우(gamma) 기울임 부호
