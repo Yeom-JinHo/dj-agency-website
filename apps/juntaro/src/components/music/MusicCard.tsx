@@ -7,6 +7,8 @@ import { AnimatePresence } from "motion/react";
 
 import { cn } from "@repo/ui";
 
+import useHoverTilt from "@/hooks/useHoverTilt";
+
 import { TrackModal } from "./TrackModal";
 import { getTrackTexture } from "./texture";
 
@@ -26,6 +28,7 @@ interface MusicCardProps {
 export function MusicCard({ track, cardClassName, priority = false }: MusicCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const tilt = useHoverTilt<HTMLDivElement>();
   const handleClose = useCallback(() => setIsOpen(false), []);
 
   const texture = useMemo(() => getTrackTexture(track.name), [track.name]);
@@ -35,7 +38,11 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          // 모달이 열리면 mouseleave가 발화하지 않아 마지막 틸트 각도로 얼어붙는다.
+          tilt.reset();
+          setIsOpen(true);
+        }}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-label={`${track.name} 트랙 정보 열기`}
@@ -44,7 +51,14 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
         {/* bg-neutral-200: 커버 디코드 전 카드 형태를 즉시 확보하는 스켈레톤 톤.
             텍스처(opacity-70 비닐랩) 너머로 비치는 at-rest 밝은 회색에 맞춰 팝인/공백
             플래시를 없앤다. */}
+        {/* hover 미세 틸트: 이 div는 자체 transform이 없는 유일한 안전 지점 —
+            콜라주 회전·scale은 조상 래퍼, 커버 확대는 자식 소관이라 합성 충돌이 없다.
+            같은 노드에 Tailwind transform 계열 유틸 추가 금지(인라인 transform과 이중 적용). */}
         <div
+          ref={tilt.ref}
+          onMouseEnter={tilt.onMouseEnter}
+          onMouseMove={tilt.onMouseMove}
+          onMouseLeave={tilt.onMouseLeave}
           className={cn(
             "group relative overflow-hidden bg-neutral-200",
             cardClassName,
