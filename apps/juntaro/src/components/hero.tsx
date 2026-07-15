@@ -6,8 +6,13 @@ import AtroposCore from "atropos";
 
 import "atropos/css";
 
+import useDeviceTilt from "../hooks/useDeviceTilt";
+
 export function Hero() {
   const rootRef = useRef<HTMLDivElement>(null);
+
+  // 모바일 자이로 틸트(데스크톱 atropos와 상호배타). "idle"일 때만 힌트 노출.
+  const tiltPermission = useDeviceTilt(rootRef);
 
   useEffect(() => {
     const el = rootRef.current;
@@ -70,6 +75,12 @@ export function Hero() {
           </span>
         </span>
       </div>
+
+      {tiltPermission === "idle" && (
+        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
+          <span className="text-[11px] text-black/40">탭해서 모션 켜기</span>
+        </div>
+      )}
     </section>
   );
 }
