@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import AtroposCore from "atropos";
 
 import "atropos/css";
@@ -13,6 +14,12 @@ export function Hero() {
 
   // 모바일 자이로 틸트(데스크톱 atropos와 상호배타). "idle"일 때만 힌트 노출.
   const tiltPermission = useDeviceTilt(rootRef);
+
+  // SSR/첫 페인트에는 힌트를 렌더하지 않는다. 초기 state가 전 기기 공통 "idle"이라,
+  // 마운트 전에 그리면 데스크톱에서 힌트가 1프레임 반짝였다 사라진다(effect가
+  // "unsupported"로 바꾸기 전). mount 후에만 노출해 이 플래시를 원천 차단.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const el = rootRef.current;
@@ -76,11 +83,19 @@ export function Hero() {
         </span>
       </div>
 
-      {tiltPermission === "idle" && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
-          <span className="text-[11px] text-black/40">탭해서 모션 켜기</span>
-        </div>
-      )}
+      <AnimatePresence>
+        {mounted && tiltPermission === "idle" && (
+          <motion.div
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="pointer-events-none absolute inset-x-0 bottom-[calc(1.5rem+env(safe-area-inset-bottom))] flex justify-center"
+          >
+            <span className="text-[11px] text-black/40">탭해서 모션 켜기</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
