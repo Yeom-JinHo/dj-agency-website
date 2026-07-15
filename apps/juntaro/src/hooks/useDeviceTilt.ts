@@ -34,6 +34,26 @@ type DeviceOrientationEventStatic = {
 const clamp = (v: number, lo: number, hi: number) =>
   Math.min(hi, Math.max(lo, v));
 
+// 허용 사실을 sessionStorage에 기록해, 재방문·클라이언트 라우팅 복귀 시 탭 없이
+// 바로 틸트를 켠다. sessionStorage는 탭 세션과 함께 소멸 → iOS의 origin 권한 수명과
+// 정렬됨. localStorage(영구)면 다음 세션엔 실제 권한이 없는데 플래그만 남아 무탭
+// 시도가 조용히 실패하고 pill도 안 떠 재활성화가 불가하다.
+const STORAGE_KEY = "jt-hero-tilt-granted";
+const readGranted = () => {
+  try {
+    return sessionStorage.getItem(STORAGE_KEY) === "1";
+  } catch {
+    return false; // 사생활 모드 등 접근 불가 → 매번 탭으로 폴백
+  }
+};
+const persistGranted = () => {
+  try {
+    sessionStorage.setItem(STORAGE_KEY, "1");
+  } catch {
+    // 접근 불가 → 무시(이번 마운트는 정상 동작, 다음 마운트에서 다시 탭)
+  }
+};
+
 function useDeviceTilt(rootRef: RefObject<HTMLElement | null>): TiltPermission {
   const [permission, setPermission] = useState<TiltPermission>("idle");
 
@@ -162,6 +182,7 @@ function useDeviceTilt(rootRef: RefObject<HTMLElement | null>): TiltPermission {
           .then((res) => {
             if (disposed) return;
             if (res === "granted") {
+              persistGranted();
               startListening();
               setPermission("granted");
             } else {
@@ -174,14 +195,22 @@ function useDeviceTilt(rootRef: RefObject<HTMLElement | null>): TiltPermission {
           });
       } else {
         // Android 등: 권한 개념 없음 → 바로 리스너 등록.
+        persistGranted();
         startListening();
         setPermission("granted");
       }
     };
 
-    el.addEventListener("touchend", handleGesture, { passive: true });
-    el.addEventListener("click", handleGesture);
-    // 진입 조건 충족 & 미허용 상태 → state "idle" 유지(폴백 힌트 노출).
+    // 이미 이 세션에서 허용했다면(재방문·클라이언트 라우팅 복귀) 탭 없이 바로 시작.
+    // 허용된 origin은 gesture 없이도 deviceorientation이 발화한다.
+    if (readGranted()) {
+      startListening();
+      setPermission("granted");
+    } else {
+      el.addEventListener("touchend", handleGesture, { passive: true });
+      el.addEventListener("click", handleGesture);
+      // 진입 조건 충족 & 미허용 상태 → state "idle" 유지(폴백 힌트 노출).
+    }
 
     return () => {
       disposed = true;
