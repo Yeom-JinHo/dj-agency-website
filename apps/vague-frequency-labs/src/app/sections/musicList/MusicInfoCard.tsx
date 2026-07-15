@@ -18,6 +18,8 @@ import { motion } from "motion/react";
 import { cn } from "@repo/ui";
 import { Icon } from "@repo/ui/common/Icon";
 
+import useHoverTilt from "@/hooks/useHoverTilt";
+
 interface MusicInfoProps {
   musicInfo: MusicInfo;
   /** "collage": 라벨을 hover에만 노출하는 콜라주용. "default": 카드 아래 라벨 상시 노출. */
@@ -53,11 +55,22 @@ function MusicInfoCard({
   }, [musicInfo.name]);
 
   const isCollage = variant === "collage";
+  const tilt = useHoverTilt<HTMLDivElement>();
 
   return (
     <Dialog>
       <DialogTrigger>
-        <motion.div
+        {/* collage에만 hover 미세 틸트. 이 div는 motion prop이 없는 정적 노드라
+            MorphingDialog morph(DialogImage/DialogTrigger layoutId)와 합성 충돌이
+            없는 유일 안전 지점이다. onClick reset: morph 열림 시 오버레이가 커서를
+            덮어 mouseleave가 안 터지는 케이스 대비 — 클릭 버블링이 DialogTrigger의
+            open보다 먼저 타 각도를 0으로 되돌리기 시작한다(300ms melt). */}
+        <div
+          ref={isCollage ? tilt.ref : undefined}
+          onMouseEnter={isCollage ? tilt.onMouseEnter : undefined}
+          onMouseMove={isCollage ? tilt.onMouseMove : undefined}
+          onMouseLeave={isCollage ? tilt.onMouseLeave : undefined}
+          onClick={isCollage ? tilt.reset : undefined}
           className={cn(
             "group relative overflow-hidden",
             isCollage
@@ -94,7 +107,7 @@ function MusicInfoCard({
               )}
             </div>
           )}
-        </motion.div>
+        </div>
         {!isCollage && (
           <div className="mt-3 w-[150px] text-left md:w-[240px] lg:w-[300px] xl:w-[360px] 2xl:w-[400px]">
             <h4 className="truncate text-sm font-semibold md:text-base">
