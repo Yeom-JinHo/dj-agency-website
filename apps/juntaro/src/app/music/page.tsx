@@ -4,6 +4,7 @@ import type { JuntaroTrack } from "@/types/music";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 
 import { Footer } from "@/components/footer";
+import { DeviceTiltScope } from "@/components/music/DeviceTiltScope";
 import { MusicCard } from "@/components/music/MusicCard";
 import { TRACKS } from "@/consts/tracks";
 
@@ -68,7 +69,8 @@ export default function MusicPage() {
         {/* 모바일: 미니 collage */}
         <div className="flex w-full justify-center lg:hidden">
           {/* isolate: 카드 active:!z-[60]을 이 컨테이너의 스태킹 컨텍스트에 가둬 body 포털 모달(z-50)을 넘지 못하게 한다 — 오버레이는 body 포털 + z-50대, 이 컨테이너는 z-auto 유지가 전제 */}
-          <div className="isolate flex max-w-[380px] flex-wrap items-start justify-center sm:max-w-[440px]">
+          {/* DeviceTiltScope: 모바일 자이로 그리드 틸트 엔진 + 첫 터치 권한 게이트 호스트 (coarse pointer 한정) */}
+          <DeviceTiltScope className="isolate flex max-w-[380px] flex-wrap items-start justify-center sm:max-w-[440px]">
             {collageCards.map((c) => (
               <div
                 key={c.track.id}
@@ -89,7 +91,7 @@ export default function MusicPage() {
                 </BlurFade>
               </div>
             ))}
-          </div>
+          </DeviceTiltScope>
         </div>
       </div>
       <Footer />

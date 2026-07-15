@@ -56,6 +56,9 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
             같은 노드에 Tailwind transform 계열 유틸 추가 금지(인라인 transform과 이중 적용). */}
         <div
           ref={tilt.ref}
+          // 모바일 자이로 그리드 엔진(useDeviceTiltGrid)의 수집 대상. hover 훅과
+          // 같은 "자체 transform 없는 안전 지점"을 공유 — coarse/fine 게이트로 상호배타.
+          data-tilt-card
           onMouseEnter={tilt.onMouseEnter}
           onMouseMove={tilt.onMouseMove}
           onMouseLeave={tilt.onMouseLeave}
