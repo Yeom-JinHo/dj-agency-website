@@ -41,6 +41,16 @@ export async function publish(
       if (!baseUrl) {
         return { site, ok: false, error: `Missing ${envName}` };
       }
+      if (
+        process.env.NODE_ENV === "production" &&
+        !baseUrl.startsWith("https://")
+      ) {
+        return {
+          site,
+          ok: false,
+          error: "Insecure base URL (production requires https)",
+        };
+      }
       try {
         const res = await fetch(
           `${baseUrl.replace(/\/$/, "")}/api/revalidate`,
@@ -52,6 +62,7 @@ export async function publish(
             },
             body: JSON.stringify({ tags }),
             cache: "no-store",
+            signal: AbortSignal.timeout(5000),
           },
         );
         if (!res.ok) {

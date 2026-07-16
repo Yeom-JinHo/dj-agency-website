@@ -393,10 +393,11 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 - `getArtists(siteSlug?)`, `getArtistBySlug(slug)`
 - `getReleases(siteSlug?)`, `getReleaseBySlug(slug)`
 - `getTours(siteSlug?)`
-- 사이트 노출은 `*_sites` 조인(`!inner`)으로 필터. 예:
-  `.select('*, artist_sites!inner(site_slug)').eq('artist_sites.site_slug', siteSlug)`
-- 노출 순서는 조인 테이블의 `sort_order`로 정렬(사이트별 독립):
-  `.order('sort_order', { referencedTable: 'artist_sites' })`
+- 사이트 노출 필터 + 노출 순서 정렬은 **조인 테이블을 루트로** 조회한다(사이트별 독립).
+  엔티티를 루트로 두고 `.order('sort_order', { referencedTable: 'artist_sites' })`를 쓰면
+  임베드 배열 내부만 정렬되는 no-op이라 부모 행 순서가 바뀌지 않는다. 예:
+  `from('artist_sites').select('sort_order, artists!inner(*)').eq('site_slug', siteSlug).order('sort_order')`
+  후 `data.map(r => mapArtist(r.artists))`. release/tour도 동일 패턴.
 
 ### 7.5 발행 헬퍼 (`publish/`, 서버 전용) — 방식 B
 ```ts
