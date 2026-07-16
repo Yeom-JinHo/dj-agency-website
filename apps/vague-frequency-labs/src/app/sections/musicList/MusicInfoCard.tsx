@@ -84,7 +84,7 @@ function MusicInfoCard({
             src={musicInfo.image}
             alt={musicInfo.name}
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none"
           />
           <Image
             src={texture}
@@ -92,11 +92,11 @@ function MusicInfoCard({
             aria-hidden="true"
             fill
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
-            className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
+            className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0 motion-reduce:transition-none"
           />
           {isCollage && (
             // 콜라주에서는 라벨을 카드 하단 오버레이로 hover 시에만 노출
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
               <h4 className="truncate text-sm font-semibold text-white">
                 {musicInfo.name}
               </h4>

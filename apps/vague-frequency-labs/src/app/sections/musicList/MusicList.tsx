@@ -57,7 +57,7 @@ function MusicList() {
               {desktopCards.map((c, i) => (
                 <div
                   key={c.info.name + i}
-                  className="relative transition-transform duration-300 ease-out hover:!z-[60] hover:!rotate-0 hover:scale-[1.05]"
+                  className="relative transition-transform duration-300 ease-out hover:!z-[60] hover:!rotate-0 hover:scale-[1.05] motion-reduce:transition-none"
                   style={{
                     margin: "0 -28px -26px",
                     marginTop: c.dy,
@@ -83,7 +83,7 @@ function MusicList() {
               {mobileCards.map((c, i) => (
                 <div
                   key={c.info.name + i}
-                  className="relative transition-transform duration-300 ease-out active:!z-[60] active:!rotate-0 active:scale-[1.05]"
+                  className="relative transition-transform duration-300 ease-out active:!z-[60] active:!rotate-0 active:scale-[1.05] motion-reduce:transition-none"
                   style={{
                     margin: "0 -12px -14px",
                     marginTop: Math.round(c.dy * 0.5),
