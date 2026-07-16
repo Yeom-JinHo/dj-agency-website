@@ -393,6 +393,7 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
 
 - Next.js 15 앱, 포트 3006, `@repo/next-config`/`@repo/eslint-config`/`@repo/typescript-config` 사용.
 - `middleware.ts`로 전체 라우트 인증 가드 → 미로그인 시 `/login`.
+- 초기 편집자는 **본인 1명**(`o1086291943@gmail.com`), Supabase Auth 콘솔에서 초대. 회원가입 UI 없음.
 - `serverExternalPackages: ['sharp']` 로 sharp 서버 외부화.
 - **UI는 직접 구축**: `pnpm dlx shadcn@latest init` (Tailwind v4 + React 19 지원).
   기본 세트: `table`, `form`, `dialog`, `input`, `select`, `sonner`(토스트).
@@ -420,6 +421,8 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
 - VFL 아티스트 6명(`Juntaro/Sielo/SAM/DearBoi/PLAYMODE/Loozbone`) → `artists` + `artist_sites`.
 - payday `Release[]` → `releases` + `release_sites`.
 - VFL `MusicInfo[]` → `releases`(통합 스키마로 매핑) + `release_sites`.
+- **celebrate roster `Artist[]`** → `artists`로 통합(중복 아티스트는 slug로 병합) + `artist_sites`에 `celebrate-agency` 추가.
+  celebrate의 work-case·stats는 이관 대상 아님(하드코딩 유지).
 - 기존 `/public/images/**`의 webp를 Storage `media` 버킷으로 업로드하고 경로 갱신.
 - `fullDescription`의 EN/KO 혼합 문자열을 `*_en`/`*_ko`로 분리(수작업 검수 필요).
 
@@ -453,8 +456,14 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
 
 ---
 
-## 13. 열린 결정 (구현 전 확인용)
+## 13. 세부 결정 (확정)
 
-- `celebrate-agency`가 Music/Artist/Tour 중 무엇을 노출하는지 (현재 미확인).
-- 초기 편집자 계정 수 / 이메일.
-- `platform_links`에 포함할 플랫폼 확정(현재: beatport/spotify/appleMusic/soundcloud/youtubeMusic).
+- **celebrate-agency 범위** → **Artist만.** roster는 공유 `artists` 테이블을 소비.
+  work-case 쇼케이스·stats는 표현 전용이라 **기존 하드코딩 유지**(공유 CMS 범위 밖).
+  Music/Tour 노출은 향후 필요 시 재검토.
+- **초기 편집자 계정** → **본인 1명** (`o1086291943@gmail.com`).
+  코드/시드에는 넣지 않고 Supabase Auth 콘솔에서 초대. 추가 편집자는 이후 콘솔에서.
+- **`platform_links` 목록** → **5개 확정**: `beatport`, `spotify`, `appleMusic`,
+  `soundcloud`, `youtubeMusic`. (레포 사용 빈도와 일치. 컬럼 아닌 jsonb라 추가 용이.)
+
+> 남은 열린 결정 없음. Phase 1 구현 착수 가능.
