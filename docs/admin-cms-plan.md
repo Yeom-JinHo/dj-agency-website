@@ -245,7 +245,9 @@ create table public.artists (
   image_path           text,   -- Storage 경로 (.webp)
   logo_image_path      text,
   image_placeholder    text,   -- blurDataURL base64
-  socials              jsonb not null default '[]'::jsonb,  -- [{name, href, iconName}]
+  city                 text,          -- celebrate roster 용
+  selected_works       jsonb not null default '[]'::jsonb,  -- celebrate: [{title, meta}]
+  socials              jsonb not null default '[]'::jsonb,  -- [{platform, url, label?}] (platform은 enum)
   sort_order           int  not null default 0,
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()
@@ -259,6 +261,7 @@ create table public.releases (
   slug                 text unique not null,
   title                text not null,
   primary_artist_id    uuid references public.artists(id) on delete set null,
+  artist_credit        text,          -- 표시용. 로스터에 없는 외부 아티스트(예: "Sam Collins") 대응
   featured_artists     text[] not null default '{}',
   label                text,
   catalog_no           text,
@@ -269,7 +272,7 @@ create table public.releases (
   full_description_ko  text,
   release_date         date,
   platform_links       jsonb not null default '{}'::jsonb, -- {beatport,spotify,appleMusic,soundcloud,youtubeMusic}
-  socials              jsonb not null default '[]'::jsonb,
+  socials              jsonb not null default '[]'::jsonb,  -- [{platform, url, label?}]
   sort_order           int  not null default 0,
   created_at           timestamptz not null default now(),
   updated_at           timestamptz not null default now()
@@ -293,7 +296,7 @@ create table public.tours (
   description_en text,
   description_ko text,
   status         text not null default 'scheduled'
-                   check (status in ('scheduled','soldout','cancelled','past')),
+                   check (status in ('scheduled','soldout','cancelled')), -- 'past'는 event_date로 유도
   sort_order     int  not null default 0,
   created_at     timestamptz not null default now(),
   updated_at     timestamptz not null default now()
@@ -352,9 +355,10 @@ create policy "media_authenticated_write" on storage.objects for all to authenti
 ## 7. `packages/content` 상세
 
 ### 7.1 zod 스키마 (`schema/`)
-- `social.ts` — `{ name, href, iconName }`
+- `social.ts` — `{ platform: SocialPlatform, url, label? }` (platform enum + 아이콘은 코드 매핑)
 - `site.ts` — `SITE_SLUGS` 상수 + `SiteSlug` 타입
 - `artist.ts` / `release.ts` / `tour.ts` — 각 엔티티의 zod 스키마 + `z.infer` 타입
+  (artist는 `city`/`selected_works`, release는 `artist_credit` 포함; 설명은 `*_en`/`*_ko`)
 - **admin 폼 검증과 사이트 렌더 타입을 이 한 곳에서 공유** (react-hook-form + zodResolver 재사용)
 
 ### 7.2 Supabase 클라이언트 (`supabase/`)
@@ -465,5 +469,27 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
   코드/시드에는 넣지 않고 Supabase Auth 콘솔에서 초대. 추가 편집자는 이후 콘솔에서.
 - **`platform_links` 목록** → **5개 확정**: `beatport`, `spotify`, `appleMusic`,
   `soundcloud`, `youtubeMusic`. (레포 사용 빈도와 일치. 컬럼 아닌 jsonb라 추가 용이.)
+- **발행 상태** → **즉시 공개.** draft/publish 상태·미리보기 미도입(편집자 1명). 저장→revalidate→라이브.
+  향후 필요 시 `published boolean` 경량 플래그부터 추가.
+- **celebrate 전용 필드** → **`artists`에 `city text` + `selected_works jsonb` 추가.**
+  다른 사이트는 null. celebrate roster 완전 CMS화.
+- **socials 입력** → **플랫폼 enum 선택식.** 데이터는 `[{platform, url, label?}]`, 아이콘은 코드에서 매핑.
+  라이브러리 종속 `iconName` 문자열 제거.
+- **en/ko 렌더** → **스키마는 en/ko 분리 유지(i18n-ready).** 사이트 표시 전략(stack vs 로케일 택1)은
+  **i18n 작업(PR #228)에 위임** — 별도 PR에서 확정. CMS는 구조화 저장만 책임.
+  *(주: 현재 세션 GitHub 범위에서 #228 조회 시 404. 접근 가능한 위치 확인되면 재검토.)*
 
-> 남은 열린 결정 없음. Phase 1 구현 착수 가능.
+### 리뷰 반영 — 구현 시 자동 처리 (🔴)
+다각도 리뷰에서 나온 착수-전-필수 항목. 코드/설정으로 해결하며 별도 결정 불요:
+- `releases.artist_credit` 컬럼 추가(로스터 밖 아티스트 표시) — **반영됨(§6)**.
+- **교차 엔티티 revalidate**: 아티스트 변경 시 연결된 `releases`/`tours` 리스트 태그도 무효화.
+- **신규 slug 동적 라우트**: 정적 `generateStaticParams` → `dynamicParams = true` + ISR 태깅 전환(P3).
+- **Server Action 본문 한도**: admin next.config `serverActions.bodySizeLimit` 상향(이미지 업로드).
+- **next/image `remotePatterns`**: `@repo/next-config`에 Supabase Storage 호스트 추가.
+- **turbo.json `globalEnv`**: `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, `REVALIDATE_SECRET` 등록
+  (미등록 시 `turbo/no-undeclared-env-vars` 경고 → `--max-warnings 0` 빌드 실패).
+- **Supabase Auth 공개 가입 비활성화**: RLS `authenticated` 무력화 방지(초대 전용) — 운영 설정.
+- **Storage 덮어쓰기 캐시버스팅**: 재업로드 시 파일명 해시 또는 버전 쿼리.
+- **tours `status`에서 `past` 제거**: `event_date`로 유도, 저장값은 scheduled/soldout/cancelled.
+
+> 남은 열린 결정 없음(#228 위치 확인만 대기). Phase 1 구현 착수 가능.
