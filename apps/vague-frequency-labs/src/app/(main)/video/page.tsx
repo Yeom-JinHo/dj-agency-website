@@ -51,7 +51,7 @@ export default function VideoPage(): ReactElement {
 
           <FancyLine className={"mt-16"} />
           <div className="relative mt-16 flex flex-col items-center justify-center gap-4 overflow-hidden">
-            <div className="flex flex-wrap justify-center gap-16">
+            <div className="flex flex-wrap justify-center">
               {musicInfos.map((info, index) => (
                 <YoutubeCard
                   key={index}

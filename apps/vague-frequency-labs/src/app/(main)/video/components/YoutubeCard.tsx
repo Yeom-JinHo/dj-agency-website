@@ -13,7 +13,11 @@ interface YoutubeCardProps {
 
 export default function YoutubeCard({ id, title }: YoutubeCardProps) {
   return (
-    <BlurFade inView duration={0.6} className="relative w-full md:w-[640px]">
+    <BlurFade
+      inView
+      duration={0.6}
+      className="relative w-full p-8 md:w-[640px]"
+    >
       <LiteYouTubeEmbed
         aspectHeight={9}
         aspectWidth={16}
