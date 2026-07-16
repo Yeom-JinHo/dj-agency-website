@@ -50,17 +50,22 @@ const CHROME_BUTTON =
 interface ArtistModalProps {
   artists: Artist[];
   index: number;
+  /** true면 exit 애니메이션 재생 중 — 끝나면 onExited로 언마운트를 알린다. */
+  closing: boolean;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  onExited: () => void;
 }
 
 export function ArtistModal({
   artists,
   index,
+  closing,
   onClose,
   onPrev,
   onNext,
+  onExited,
 }: ArtistModalProps) {
   const artist = artists[index];
   const total = artists.length;
@@ -86,6 +91,7 @@ export function ArtistModal({
     if (!dialog) return;
 
     const onKey = (event: KeyboardEvent) => {
+      if (closing) return;
       if (event.key === "Escape") {
         onClose();
         return;
@@ -134,7 +140,7 @@ export function ArtistModal({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [onClose, onPrev, onNext]);
+  }, [onClose, onPrev, onNext, closing]);
 
   if (!artist || total === 0) return null;
 
@@ -151,7 +157,14 @@ export function ArtistModal({
       aria-label={`${artist.name} profile`}
       tabIndex={-1}
       onClick={handleBackdrop}
-      className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px]"
+      onAnimationEnd={(event) => {
+        if (closing && event.target === event.currentTarget) onExited();
+      }}
+      className={`${
+        closing
+          ? "animate-modal-fade-out pointer-events-none"
+          : "animate-modal-fade"
+      } fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px]`}
     >
       <div
         role="status"
@@ -164,9 +177,11 @@ export function ArtistModal({
       <div className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12">
         <div
           ref={modalInnerRef}
-          className="animate-modal-pop relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]"
+          className={`${
+            closing ? "animate-modal-pop-out" : "animate-modal-pop"
+          } relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]`}
         >
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-2 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
             <span>
               [ {idxLabel} / {totalLabel} ]
             </span>
@@ -175,7 +190,7 @@ export function ArtistModal({
               type="button"
               onClick={onClose}
               aria-label={`Close ${artist.name} profile`}
-              className={`${CHROME_BUTTON} p-2`}
+              className={`${CHROME_BUTTON} flex min-h-[44px] min-w-[44px] items-center justify-center`}
             >
               <IconX size={14} stroke={1.75} />
             </button>
@@ -183,7 +198,10 @@ export function ArtistModal({
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
             <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
-              <div className="relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none">
+              <div
+                key={artist.id}
+                className="animate-modal-content-in relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none"
+              >
                 <ArtistPortrait
                   key={artist.id}
                   image={artist.image}
@@ -197,7 +215,7 @@ export function ArtistModal({
 
             <div
               key={artist.id}
-              className="flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
+              className="animate-modal-content-in flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
             >
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
                 <span>{ARTIST_ROLE_LABEL}</span>
@@ -280,6 +298,8 @@ export function ArtistModal({
             </button>
           </div>
 
+          {/* prev/next 프리로드: priority가 없으면 lazy + size-0 조합으로
+              브라우저가 fetch 자체를 생략한다 — preload <link> 주입용. */}
           {(prevArtist.image ?? nextArtist.image) ? (
             <div
               aria-hidden="true"
@@ -292,6 +312,7 @@ export function ArtistModal({
                     name={prevArtist.name}
                     variant="modal"
                     sizes="(max-width: 1024px) 60vw, 600px"
+                    priority
                   />
                 </div>
               ) : null}
@@ -302,6 +323,7 @@ export function ArtistModal({
                     name={nextArtist.name}
                     variant="modal"
                     sizes="(max-width: 1024px) 60vw, 600px"
+                    priority
                   />
                 </div>
               ) : null}

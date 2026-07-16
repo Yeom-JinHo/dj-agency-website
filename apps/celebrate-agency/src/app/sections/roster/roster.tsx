@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 
 import { SectionHead } from "@/components/SectionHead";
 import { TapeCorners } from "@/components/Tape";
@@ -34,15 +34,23 @@ export default function Roster() {
   const reservedVisibility = getFillerVisibility(1);
 
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [closing, setClosing] = useState(false);
   const triggerRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const activeIndexRef = useRef<number | null>(null);
   activeIndexRef.current = activeIndex;
 
   const open = useCallback((index: number) => {
+    setClosing(false);
     setActiveIndex(index);
   }, []);
+  // close는 exit 애니메이션만 트리거하고, 실제 언마운트·포커스 복원은
+  // 애니메이션이 끝난 뒤 handleExited에서 수행한다.
   const close = useCallback(() => {
+    setClosing(true);
+  }, []);
+  const handleExited = useCallback(() => {
     const idx = activeIndexRef.current;
+    setClosing(false);
     setActiveIndex(null);
     requestAnimationFrame(() => {
       if (idx !== null) triggerRefs.current[idx]?.focus();
@@ -60,6 +68,46 @@ export default function Roster() {
   const onPrev = useCallback(() => step(-1), [step]);
   const onNext = useCallback(() => step(1), [step]);
 
+  // open이 stable이라 카드 목록은 마운트에 1번만 생성된다. 엘리먼트 동일성
+  // bailout으로 모달 open/close/step마다 카드 전체(+ref 콜백 detach/attach)가
+  // 재조정되는 것을 차단.
+  const cards = useMemo(
+    () =>
+      ARTISTS.map((artist, index) => (
+        <button
+          key={artist.id}
+          ref={(el) => {
+            triggerRefs.current[index] = el;
+          }}
+          type="button"
+          onClick={() => open(index)}
+          aria-haspopup="dialog"
+          aria-label={`View ${artist.name} profile`}
+          className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-ca-bg-hover active:bg-ca-bg-hover focus-visible:z-10"
+        >
+          <div className="relative mb-[18px] aspect-[3/4]">
+            <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">
+              <ArtistPortrait
+                image={artist.image}
+                name={artist.name}
+                variant="card"
+                sizes="(max-width: 1024px) 50vw, 25vw"
+              />
+            </div>
+            <TapeCorners />
+          </div>
+          <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red group-active:text-ca-red">
+            {artist.name}
+          </div>
+          <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
+            <span>{ARTIST_ROLE_LABEL}</span>
+            <span className="text-ca-red">{artist.city}</span>
+          </div>
+        </button>
+      )),
+    [open]
+  );
+
   return (
     <section
       id="roster"
@@ -74,38 +122,7 @@ export default function Roster() {
         aside={`${ARTISTS.length} artists · By invitation.`}
       />
       <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4">
-        {ARTISTS.map((artist, index) => (
-          <button
-            key={artist.id}
-            ref={(el) => {
-              triggerRefs.current[index] = el;
-            }}
-            type="button"
-            onClick={() => open(index)}
-            aria-haspopup="dialog"
-            aria-label={`View ${artist.name} profile`}
-            className="group relative block w-full bg-ca-bg p-6 text-left transition-colors duration-300 hover:bg-ca-bg-hover active:bg-ca-bg-hover focus-visible:z-10"
-          >
-            <div className="relative mb-[18px] aspect-[3/4]">
-              <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">
-                <ArtistPortrait
-                  image={artist.image}
-                  name={artist.name}
-                  variant="card"
-                  sizes="(max-width: 1024px) 50vw, 25vw"
-                />
-              </div>
-              <TapeCorners />
-            </div>
-            <div className="mb-1.5 font-display text-3xl uppercase leading-none tracking-[0.01em] transition-colors duration-300 group-hover:text-ca-red group-active:text-ca-red">
-              {artist.name}
-            </div>
-            <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-[0.08em] text-ca-muted lg:text-[13px]">
-              <span>{ARTIST_ROLE_LABEL}</span>
-              <span className="text-ca-red">{artist.city}</span>
-            </div>
-          </button>
-        ))}
+        {cards}
 
         {bookingVisibility !== null ? (
           <BookingFiller visibility={bookingVisibility} />
@@ -123,9 +140,11 @@ export default function Roster() {
         <ArtistModal
           artists={ARTISTS}
           index={activeIndex}
+          closing={closing}
           onClose={close}
           onPrev={onPrev}
           onNext={onNext}
+          onExited={handleExited}
         />
       ) : null}
     </section>
