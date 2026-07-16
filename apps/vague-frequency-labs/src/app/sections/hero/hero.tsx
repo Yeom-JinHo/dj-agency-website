@@ -2,7 +2,7 @@
 
 import { motion, MotionConfig } from "motion/react";
 import { WorldMap } from "@/components/WorldMap";
-import { useLoaderDone } from "@/app/(main)/loader-context";
+import { useLoaderDone } from "@/app/[locale]/(main)/loader-context";
 import type { WorldMapData } from "@/utils/world-map-data";
 import { hero } from "./config";
 

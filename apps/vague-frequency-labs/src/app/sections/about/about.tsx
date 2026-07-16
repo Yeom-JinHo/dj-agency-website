@@ -1,7 +1,9 @@
+import { useTranslations } from "next-intl";
 import TextReveal from "@repo/ui/common/TextReveal";
 import SectionHeading from "@/components/SectionHeading";
 
 function About() {
+  const t = useTranslations("About");
   return (
     <section
       className="w-full border-t border-border py-24 lg:py-32"
@@ -16,9 +18,7 @@ function About() {
             as="p"
             className="mt-6 max-w-[640px] text-muted-foreground lg:mt-2 lg:w-[45%] md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
           >
-            Vague Frequency Laboratory의 소개 Vague Frequency Laboratory Vague
-            Frequency Laboratory Vague Frequency LaboratoryVague Frequency
-            Laboratory Vague Frequency LaboratoryVague Frequency Laboratory
+            {t("body")}
           </TextReveal>
         </div>
       </div>

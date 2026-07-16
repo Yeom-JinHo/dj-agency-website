@@ -20,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${path === "/" ? "" : path}`,
     changeFrequency: "monthly",
     priority: path === "/" ? 1 : 0.8,
+    alternates: {
+      languages: {
+        en: `${baseUrl}${path === "/" ? "" : path}`,
+        ko: path === "/" ? `${baseUrl}/ko` : `${baseUrl}/ko${path}`,
+      },
+    },
   }));
 
   const artistEntries: MetadataRoute.Sitemap = artistProfile
@@ -28,6 +34,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/artist/${encodeURIComponent(artist.name)}`,
       changeFrequency: "monthly",
       priority: 0.6,
+      alternates: {
+        languages: {
+          en: `${baseUrl}/artist/${encodeURIComponent(artist.name)}`,
+          ko: `${baseUrl}/ko/artist/${encodeURIComponent(artist.name)}`,
+        },
+      },
     }));
 
   return [...staticEntries, ...artistEntries];

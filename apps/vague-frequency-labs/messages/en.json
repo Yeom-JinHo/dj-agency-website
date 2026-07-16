@@ -1,0 +1,47 @@
+{
+  "Metadata": {
+    "home": {
+      "description": "Vague Frequency Laboratory is an independent Seoul electronic music label spotlighting experimental tech house and bass house artists, releases, and live sets."
+    },
+    "about": {
+      "title": "About",
+      "description": "About Vague Frequency Laboratory — an independent Seoul electronic music label and creative studio built around experimental tech house and bass house."
+    },
+    "artist": {
+      "title": "Artists",
+      "description": "Meet the Vague Frequency Laboratory roster — tech house and bass house artists and DJs shaping experimental electronic music from Seoul."
+    },
+    "music": {
+      "title": "Music & Releases",
+      "description": "Browse the Vague Frequency Laboratory discography — experimental tech house, bass house, and electronic music releases from our Seoul-based artists."
+    },
+    "video": {
+      "title": "Videos & Live Sets",
+      "description": "Watch live sets, DJ mixes, and performances from Vague Frequency Laboratory artists — experimental tech house and electronic music from Seoul."
+    },
+    "contact": {
+      "title": "Contact & Booking",
+      "description": "Contact Vague Frequency Laboratory for bookings, releases, and collaborations with our Seoul-based independent electronic music label and its artists."
+    },
+    "intro": {
+      "title": "Intro",
+      "description": "Enter Vague Frequency Laboratory — an independent Seoul electronic music label and creative studio for experimental tech house and bass house."
+    }
+  },
+  "About": {
+    "body": "Vague Frequency Laboratory is an independent electronic music label based in Seoul. Founded in 2025, we work with tech house and bass house artists on releases, live sets, and visual work."
+  },
+  "Contact": {
+    "address": "110 Sejong-daero, Jung-gu, Seoul"
+  },
+  "Error": {
+    "heading": "Something went wrong",
+    "body": "Please refresh the page or return home.",
+    "refresh": "Refresh",
+    "home": "← Home"
+  },
+  "A11y": {
+    "loading": "Loading",
+    "switchLocale": "Switch language"
+  }
+}

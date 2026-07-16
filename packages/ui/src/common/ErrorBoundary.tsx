@@ -4,9 +4,18 @@ import type { ReactNode } from "react";
 import { Component } from "react";
 import { motion } from "motion/react";
 
+// locale별 문구 주입용 — 미주입 시 기존 영문 기본값이라 기존 소비 앱은 영향 없다.
+interface ErrorBoundaryLabels {
+  heading?: ReactNode;
+  body?: string;
+  refresh?: string;
+  home?: string;
+}
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  labels?: ErrorBoundaryLabels;
 }
 
 interface State {
@@ -67,9 +76,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 className="text-[18vw] font-bold uppercase leading-none tracking-[-0.02em] text-white/[0.028] sm:text-[22vw]"
                 style={{
                   whiteSpace: "nowrap",
-                  // celebrate/payday는 --font-anton 정의 → Anton, vfl은 미정의 → mono fallback (앱별 의도 분기)
+                  // Anton은 Latin 전용 — 한글 글리프는 Pretendard(미정의 앱은 monospace)로
+                  // 글자 단위 폴백된다. var 하나에 폰트를 몰아넣으면 변수 정의 시 그것만
+                  // 적용되어 한글 폴백이 사라지므로 콤마 스택으로 분리한다.
                   fontFamily:
-                    "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                    "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace), var(--font-pretendard, monospace)",
                 }}
               >
                 ERROR
@@ -101,14 +112,18 @@ export class ErrorBoundary extends Component<Props, State> {
                 <h1
                   className="text-[clamp(40px,8vw,84px)] uppercase leading-[1.0] tracking-tight text-white"
                   style={{
-                    // celebrate/payday → Anton, vfl → mono fallback (앱별 의도 분기)
+                    // 워터마크와 동일한 콤마 스택 — 한글 heading은 Pretendard로 폴백.
                     fontFamily:
-                      "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                      "var(--font-anton, ui-monospace, SFMono-Regular, Menlo, monospace), var(--font-pretendard, monospace)",
                   }}
                 >
-                  Something
-                  <br />
-                  went wrong
+                  {this.props.labels?.heading ?? (
+                    <>
+                      Something
+                      <br />
+                      went wrong
+                    </>
+                  )}
                 </h1>
               </motion.div>
 
@@ -124,7 +139,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 }}
               >
                 <p className="max-w-[340px] font-sans text-[15px] leading-relaxed text-white/50 sm:text-base">
-                  Please refresh the page or return home.
+                  {this.props.labels?.body ??
+                    "Please refresh the page or return home."}
                 </p>
 
                 <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
@@ -133,13 +149,13 @@ export class ErrorBoundary extends Component<Props, State> {
                     onClick={this.handleReload}
                     className="min-w-[150px] rounded-none border border-white/30 bg-transparent px-8 py-3.5 font-mono text-[13px] uppercase tracking-[0.22em] text-white transition-all duration-200 hover:border-white hover:bg-white hover:text-[#0a0a0a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
                   >
-                    Refresh
+                    {this.props.labels?.refresh ?? "Refresh"}
                   </button>
                   <a
                     href="/"
                     className="min-h-[44px] inline-flex items-center font-mono text-[13px] uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-white/80"
                   >
-                    ← Home
+                    {this.props.labels?.home ?? "← Home"}
                   </a>
                 </div>
               </motion.div>

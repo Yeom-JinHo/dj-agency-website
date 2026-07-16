@@ -8,6 +8,8 @@ import { cn } from "@repo/ui";
 
 interface PreloaderProps {
   children: React.ReactNode;
+  // locale별 로딩 안내 주입용 — 기본값은 기존과 동일한 영문이다.
+  ariaLabel?: string;
 }
 
 export const opacity: Variants = {
@@ -30,7 +32,7 @@ export const slideUp: Variants = {
   },
 };
 
-export function Preloader({ children }: PreloaderProps) {
+export function Preloader({ children, ariaLabel = "Loading" }: PreloaderProps) {
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -59,7 +61,7 @@ export function Preloader({ children }: PreloaderProps) {
       role="status"
       aria-live="polite"
       aria-busy="true"
-      aria-label="Loading"
+      aria-label={ariaLabel}
       className="bg-background fixed z-999 flex h-[100dvh] w-[100dvw] cursor-wait items-center justify-center px-[60px] pb-[40px]"
     >
       {dimension.width > 0 && (

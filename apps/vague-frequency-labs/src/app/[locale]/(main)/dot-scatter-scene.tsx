@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 
 import { MAP_DOT_RADIUS } from "@/consts/map";
@@ -313,6 +314,7 @@ export default function DotScatterScene({
 }) {
   const reduce = useReducedMotion();
   const markDone = useLoaderMarkDone();
+  const t = useTranslations("A11y");
 
   // 마운트 시점 스냅샷 — 재생 도중 hasPlayed가 true로 바뀌어도 이번 마운트의
   // 스킵 여부는 변하지 않는다.
@@ -704,7 +706,7 @@ export default function DotScatterScene({
           )}
           {/* Preloader의 로딩 시맨틱 유지 — 시각적으로 숨긴 status 노드. */}
           <span className="sr-only" role="status" aria-busy="true">
-            Loading
+            {t("loading")}
           </span>
         </motion.div>
       )}

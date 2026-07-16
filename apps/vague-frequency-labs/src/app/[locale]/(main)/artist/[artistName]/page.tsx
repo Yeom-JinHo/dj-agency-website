@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
 import { metadata as meta } from "@/app/config";
 import { artistProfile } from "@/source";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import { Icon } from "@repo/ui/common/Icon";
-import { createMetadata } from "@/utils/index";
+import { createMetadata, localeAlternates, ogLocale } from "@/utils/index";
 
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";
@@ -20,10 +21,10 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(props: {
-  params: Promise<{ artistName: string }>;
+  params: Promise<{ locale: string; artistName: string }>;
 }) {
   const params = await props.params;
-  const { artistName } = params;
+  const { locale, artistName } = params;
   const artist = artistProfile.getPage(decodeURIComponent(artistName));
   if (!artist) notFound();
 
@@ -42,21 +43,24 @@ export async function generateMetadata(props: {
       type: "article",
       images: [cardImage],
       authors: meta.author.name,
+      locale: ogLocale(locale),
     },
     twitter: {
       images: [cardImage],
     },
-    alternates: {
-      canonical: `/artist/${encodeURIComponent(artist.name)}`,
-    },
+    alternates: localeAlternates(
+      `/artist/${encodeURIComponent(artist.name)}`,
+      locale,
+    ),
   }) satisfies Metadata;
 }
 
 export default async function ProjectPage(props0: {
-  params: Promise<{ artistName: string }>;
+  params: Promise<{ locale: string; artistName: string }>;
 }) {
   const params = await props0.params;
-  const { artistName } = params;
+  const { locale, artistName } = params;
+  setRequestLocale(locale);
   const artist = artistProfile.getPage(decodeURIComponent(artistName));
   if (!artist) notFound();
 
