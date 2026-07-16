@@ -36,6 +36,30 @@ export interface WorldMapCity {
   lng: number;
 }
 
+/**
+ * Hero → About "camera" state. A single transform owner (the `.vfl-map-inner`
+ * layer) drives the zoom so the scale + translate can't be split across sources
+ * and overwrite each other. The map image fades to a floor (recede, not vanish);
+ * pins + arcs fade to 0. Timing lives entirely in the caller's transition
+ * strings, so this component stays declarative and re-renders only on toggles.
+ */
+export interface WorldMapCamera {
+  /** transform applied to `.vfl-map-inner` (translate% + scale, single owner). */
+  transform: string;
+  /** transition shorthand for the transform above. */
+  transformTransition: string;
+  /** base map image opacity target — floor during zoom, 1 at rest. */
+  mapOpacity: number;
+  /** transition shorthand for the map image opacity. */
+  mapTransition: string;
+  /** pins + arcs opacity target — 0 during zoom, 1 at rest. */
+  detailOpacity: number;
+  /** transition shorthand for the pins/arcs opacity. */
+  detailTransition: string;
+  /** will-change: transform only while a transition is in flight. */
+  active: boolean;
+}
+
 interface WorldMapProps {
   /** Precomputed dotted-map data (points/dims/pins) built server-side. */
   mapData: WorldMapData;
@@ -58,6 +82,9 @@ interface WorldMapProps {
    *  standalone (non-loader-gated) usage still reveals immediately on mount,
    *  matching the map's prior always-on behavior. */
   revealed?: boolean;
+  /** Hero → About zoom camera. Undefined at rest (map behaves normally — breathe
+   *  keyframe, hover arcs all live); set during the zoom sequence and its reverse. */
+  camera?: WorldMapCamera;
 }
 
 interface PlacedCity {
@@ -87,7 +114,9 @@ function curvedPath(a: PlacedCity, b: PlacedCity) {
 //
 // The ~33.7° axis tilt is baked into the path coordinates — no CSS rotate needed.
 // Small-circle : big-circle = 12:24 = 1:2, producing the authentic S boundary.
-function TaegeukMark() {
+// Exported so the hero About "seal" can reuse the exact same mark — the Seoul
+// pin core is visually promoted into the About header, not redrawn.
+export function TaegeukMark() {
   return (
     <svg
       className="vfl-taegeuk"
@@ -121,6 +150,7 @@ export function WorldMap({
   revealDelay = 0,
   mapRevealDelay = 0,
   revealed = true,
+  camera,
 }: WorldMapProps) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
@@ -178,7 +208,17 @@ export function WorldMap({
     // isn't ambient, so the whole subtree is hidden from assistive tech.
     <div
       className="vfl-map-inner"
-      style={{ aspectRatio: `${width} / ${height}` }}
+      style={{
+        aspectRatio: `${width} / ${height}`,
+        // Single transform owner: the camera's scale + translate live here and
+        // nowhere else, so nothing can overwrite half of the composite transform.
+        ...(camera && {
+          transform: camera.transform,
+          transformOrigin: "50% 50%",
+          transition: camera.transformTransition,
+          willChange: camera.active ? "transform" : "auto",
+        }),
+      }}
       aria-hidden
     >
       {/* Inline data-URI SVG — next/image offers no benefit and can't optimize it. */}
@@ -188,12 +228,22 @@ export function WorldMap({
           svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : undefined
         }
         className={`vfl-map-img${entered ? " revealed" : ""}`}
-        style={{
-          transitionDelay: `${mapRevealDelay}s`,
-          // Keep the breathe keyframe from taking over opacity mid-crossfade —
-          // it only starts once the reveal transition has fully settled.
-          animationDelay: `${mapRevealDelay + 0.4}s`,
-        }}
+        style={
+          camera
+            ? {
+                // Recede to the floor, not zero. `animation: none` stops the
+                // breathe keyframe from fighting this opacity mid-zoom.
+                opacity: camera.mapOpacity,
+                transition: camera.mapTransition,
+                animation: "none",
+              }
+            : {
+                transitionDelay: `${mapRevealDelay}s`,
+                // Keep the breathe keyframe from taking over opacity mid-crossfade —
+                // it only starts once the reveal transition has fully settled.
+                animationDelay: `${mapRevealDelay + 0.4}s`,
+              }
+        }
         alt=""
         draggable={false}
       />
@@ -203,6 +253,11 @@ export function WorldMap({
         viewBox={`0 0 ${width} ${height}`}
         fill="none"
         aria-hidden
+        style={
+          camera
+            ? { opacity: camera.detailOpacity, transition: camera.detailTransition }
+            : undefined
+        }
       >
         <defs>
           <linearGradient id="vfl-arc-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -269,7 +324,16 @@ export function WorldMap({
 
       <div
         className={`vfl-pin-layer${entered ? " revealed" : ""}`}
-        style={{ transitionDelay: `${PIN_REVEAL_DELAY_S}s` }}
+        style={
+          camera
+            ? {
+                opacity: camera.detailOpacity,
+                transition: camera.detailTransition,
+                // Zeroed-out pins must not keep intercepting hover under the room.
+                pointerEvents: camera.detailOpacity === 0 ? "none" : undefined,
+              }
+            : { transitionDelay: `${PIN_REVEAL_DELAY_S}s` }
+        }
       >
         {placed.map((p) => {
           const isHome = p.city.id === homeId;

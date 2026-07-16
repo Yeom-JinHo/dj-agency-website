@@ -397,6 +397,7 @@
    warm text over pure-white map ink, heavy Korean display, film grain + vignette.
    ─────────────────────────────────────────────────────────────── */
 .vfl-hero {
+  position: relative;
   --vfl-bg: #0a0a0b;
   --vfl-fg: #eceae3;
   /* Map-scene ink — loader particles, map dots/arcs, pins, scroll cue. */
@@ -411,6 +412,29 @@
   --vfl-accent-blue: #2e6be6;
   background: var(--vfl-bg);
   color: var(--vfl-fg);
+}
+
+/* ── hero → about stage track ──
+   The hero is a 200svh track holding a 100svh sticky stage. The second screen
+   is the trigger: a sentinel at 25% of the track fires the time-based zoom
+   sequence (not a scrub — scroll only decides the threshold). At rest (scroll 0)
+   the stage is pinned at the top, so the map geometry the loader measures
+   (.vfl-map-inner / .vfl-map-wrap rects) is identical to the old 100svh hero. */
+.vfl-hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.vfl-about-sentinel {
+  position: absolute;
+  top: 50svh;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+  /* Clear the floating header on a /#about deep-link jump. */
+  scroll-margin-top: 4rem;
 }
 
 /* ── map backdrop ── */
@@ -680,6 +704,79 @@
     transparent 45%,
     rgba(0, 0, 0, 0.55) 100%
   );
+}
+
+/* ── about room (hero second screen) ──
+   The enlarged Seoul pulse becomes this framed room; the taegeuk core becomes
+   the header seal. Element opacity/transform is motion-driven (Phase B/C) so no
+   CSS keyframes are added here — reduced-motion is handled in the component
+   (instant snap), and the pulse's own motion-reduce rule stays untouched. */
+.vfl-about-room {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.2vh, 24px);
+  padding: clamp(28px, 6vw, 72px);
+  text-align: center;
+  pointer-events: none;
+}
+.vfl-about-room[data-shown="true"] {
+  /* Let the copy be selectable once the room is the active surface. */
+  pointer-events: auto;
+}
+/* Frozen pulse → frame: a faint full ring with one accent arc, sat behind the
+   copy (negative z within the room's own stacking context, above the map). */
+.vfl-about-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: min(88vmin, 760px);
+  height: min(88vmin, 760px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.vfl-about-frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Taegeuk seal — the promoted Seoul pin core. */
+.vfl-about-seal {
+  position: relative;
+  width: clamp(30px, 5vmin, 44px);
+  aspect-ratio: 1;
+}
+.vfl-about-heading {
+  font-family: var(--font-anton), var(--font-pretendard), sans-serif;
+  font-weight: 400;
+  font-size: clamp(40px, 7vw, 96px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  color: var(--vfl-fg);
+  text-shadow: 0 2px 26px rgba(10, 10, 11, 0.9);
+}
+.vfl-about-body {
+  max-width: min(620px, 86vw);
+  font-family: var(--font-pretendard), sans-serif;
+  font-size: clamp(15px, 1.5vw, 19px);
+  line-height: 1.7;
+  color: var(--vfl-muted);
+  text-wrap: balance;
+}
+.vfl-about-body span {
+  display: inline-block;
+  margin-right: 0.28em;
+}
+.vfl-about-meta {
+  font-family: var(--font-space-mono), ui-monospace, monospace;
+  font-size: clamp(10px, 1.05vw, 13px);
+  letter-spacing: 0.22em;
+  color: var(--vfl-faint);
 }
 
 /* ── headline ── */
