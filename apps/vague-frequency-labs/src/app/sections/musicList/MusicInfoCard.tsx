@@ -18,6 +18,8 @@ import { motion } from "motion/react";
 import { cn } from "@repo/ui";
 import { Icon } from "@repo/ui/common/Icon";
 
+import useHoverTilt from "@/hooks/useHoverTilt";
+
 interface MusicInfoProps {
   musicInfo: MusicInfo;
   /** "collage": 라벨을 hover에만 노출하는 콜라주용. "default": 카드 아래 라벨 상시 노출. */
@@ -53,11 +55,22 @@ function MusicInfoCard({
   }, [musicInfo.name]);
 
   const isCollage = variant === "collage";
+  const tilt = useHoverTilt<HTMLDivElement>();
 
   return (
     <Dialog>
       <DialogTrigger>
-        <motion.div
+        {/* collage에만 hover 미세 틸트. 이 div는 motion prop이 없는 정적 노드라
+            MorphingDialog morph(DialogImage/DialogTrigger layoutId)와 합성 충돌이
+            없는 유일 안전 지점이다. onClick reset: morph 열림 시 오버레이가 커서를
+            덮어 mouseleave가 안 터지는 케이스 대비 — 클릭 버블링이 DialogTrigger의
+            open보다 먼저 타 각도를 0으로 되돌리기 시작한다(300ms melt). */}
+        <div
+          ref={isCollage ? tilt.ref : undefined}
+          onMouseEnter={isCollage ? tilt.onMouseEnter : undefined}
+          onMouseMove={isCollage ? tilt.onMouseMove : undefined}
+          onMouseLeave={isCollage ? tilt.onMouseLeave : undefined}
+          onClick={isCollage ? tilt.reset : undefined}
           className={cn(
             "group relative overflow-hidden",
             isCollage
@@ -71,7 +84,7 @@ function MusicInfoCard({
             src={musicInfo.image}
             alt={musicInfo.name}
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
-            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none"
           />
           <Image
             src={texture}
@@ -79,11 +92,11 @@ function MusicInfoCard({
             aria-hidden="true"
             fill
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
-            className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0"
+            className="pointer-events-none object-cover transition-opacity duration-500 group-hover:opacity-0 motion-reduce:transition-none"
           />
           {isCollage && (
             // 콜라주에서는 라벨을 카드 하단 오버레이로 hover 시에만 노출
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-3 pb-2.5 pt-10 text-left opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
               <h4 className="truncate text-sm font-semibold text-white">
                 {musicInfo.name}
               </h4>
@@ -94,7 +107,7 @@ function MusicInfoCard({
               )}
             </div>
           )}
-        </motion.div>
+        </div>
         {!isCollage && (
           <div className="mt-3 w-[150px] text-left md:w-[240px] lg:w-[300px] xl:w-[360px] 2xl:w-[400px]">
             <h4 className="truncate text-sm font-semibold md:text-base">
