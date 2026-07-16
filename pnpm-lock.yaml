@@ -116,6 +116,9 @@ importers:
       '@supabase/ssr':
         specifier: 'catalog:'
         version: 0.12.3(@supabase/supabase-js@2.110.6)
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.110.6
       class-variance-authority:
         specifier: 'catalog:'
         version: 0.7.1

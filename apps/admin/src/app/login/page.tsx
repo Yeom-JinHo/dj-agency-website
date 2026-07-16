@@ -46,7 +46,9 @@ export default function LoginPage() {
     setSubmitting(false);
 
     if (error) {
-      toast.error(error.message);
+      // 원문(계정 존재 여부 등 노출 가능)은 로그로만, 사용자에겐 고정 문구.
+      console.error("[login] signIn failed:", error.message);
+      toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
       return;
     }
     router.replace("/");

@@ -45,6 +45,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // _next 정적 자원과 /api/*는 가드에서 제외한다.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
+  // _next 정적 자원과 keepalive cron(anon, 인증 없이 도달)만 가드에서 제외한다.
+  // 새로 추가되는 /api 라우트는 매처에 자동 포함되어 기본 가드된다.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/keepalive).*)"],
 };

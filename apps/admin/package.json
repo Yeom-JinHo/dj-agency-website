@@ -16,6 +16,7 @@
     "@repo/next-config": "workspace:*",
     "@repo/ui": "workspace:*",
     "@supabase/ssr": "catalog:",
+    "@supabase/supabase-js": "catalog:",
     "class-variance-authority": "catalog:",
     "clsx": "^2.1.1",
     "lucide-react": "^1.24.0",
