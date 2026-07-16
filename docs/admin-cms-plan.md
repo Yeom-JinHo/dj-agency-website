@@ -37,7 +37,7 @@
 |---|---|---|
 | 백엔드 | **Supabase** (Postgres + Auth + Storage) | 무료 티어 시작, SaaS 비용 회피 |
 | Admin | `apps/admin` (Next.js, 포트 3006), **Vercel 배포** | UI는 **shadcn/ui + Tailwind v4로 직접 구축** |
-| 사이트 소비 | **ISR + on-demand 웹훅 revalidate** | 시간 기반 revalidate 미사용 |
+| 사이트 소비 | **ISR + on-demand revalidate (방식 B: admin 직접 호출)** | 시간 기반 revalidate 미사용. A(DB 웹훅)는 향후 옵션 |
 | 이미지 | 업로드 시 **sharp → webp(≤1MB)** 변환 후 Storage 저장 | 런타임 변환(유료) 미사용 |
 | 콜라보 모델 | `primary_artist_id` + `featured_artists text[]` (v1) | 필요 시 조인 테이블로 승격 |
 | 다국어 | `*_en` / `*_ko` **필드 분리** | admin에서 언어별 편집 |
@@ -60,7 +60,7 @@ Vercel은 ISR을 `reads`(캐시 서빙, 매우 쌈)와 `writes`(페이지 재생
 | 방식 | 재생성 빈도 | 비용 |
 |---|---|---|
 | ❌ 시간 기반 `revalidate: 60` | 트래픽마다 계속 | write 폭증 |
-| ✅ **on-demand(웹훅)** | 편집자 저장 시에만 | write ~ 하루 수 건 |
+| ✅ **on-demand(admin 저장 시 직접 revalidate)** | 편집자 저장 시에만 | write ~ 하루 수 건 |
 
 - 우리는 on-demand 방식 → **write 최소**, 나머지 트래픽은 전부 CDN 캐시(read).
 - 실제 비용 요인은 ISR이 아니라 ① 이미지 최적화 ② 대역폭 ③ 함수 호출인데,
@@ -77,11 +77,17 @@ Vercel은 ISR을 `reads`(캐시 서빙, 매우 쌈)와 `writes`(페이지 재생
 ### 4.1 전체 그림
 
 ```
-편집자 ─(수정)→ [apps/admin] ─→ [Supabase DB] ─(webhook)→ [오케스트레이터] ─(fan-out)→ 각 사이트 revalidateTag
-                                                                                              │
-방문자 ─→ [Vercel CDN 캐시] ──(HIT: 대부분)─────────────────────────────────────────→ 정적 HTML
+편집자 ─(수정)→ [apps/admin] ─┬─→ [Supabase DB] 저장
+                              └─(저장 성공 후 직접 호출)─→ 각 사이트 /api/revalidate → revalidateTag
+                                                                                       │
+방문자 ─→ [Vercel CDN 캐시] ──(HIT: 대부분)──────────────────────────────────→ 정적 HTML
                 └──(MISS: 무효화 직후 1회)──→ 서버 렌더 → Supabase 조회 → 캐시 저장
 ```
+
+> **방식 B(admin 직접 호출)로 확정.** admin이 DB 저장에 성공하면 자신이 방금 바꾼 엔티티·노출
+> 사이트를 근거로 각 사이트 `/api/revalidate`를 직접 POST한다. DB 웹훅+오케스트레이터를 쓰는
+> **방식 A는 향후 옵션**(§12)으로 남긴다. 끝단(`/api/revalidate` + 태그 규약)이 동일하므로 나중에
+> A로 승격하거나 병행해도 사이트 코드는 그대로 재사용된다.
 
 ### 4.2 읽기 경로 (방문자)
 
@@ -109,25 +115,28 @@ export const getArtist = (slug: string) =>
 ```
 1. [apps/admin] 폼 저장 (shadcn Form) → server action
 2. [server action] zod 검증 → supabase.from('artists').update(...)
-3. [Supabase Postgres] UPDATE 커밋 → Database Webhook 발동
-4. [오케스트레이터 Edge Function]
-      · 바뀐 엔티티: artist / slug=juntaro
-      · artist_sites 조인으로 노출 사이트 조회 → [vague-frequency-labs, juntaro]
-      · 해당 사이트에만 fan-out
-5. [각 사이트 POST /api/revalidate] (시크릿 헤더 검증)
+3. [Supabase Postgres] UPDATE 커밋 (성공 확인)
+4. [admin] 방금 바꾼 엔티티·노출 사이트로 태그·대상 계산 (폼 상태로 이미 앎, 추가 조회 X)
+      · 태그: [`artist:juntaro`, `artists`]
+      · 대상 사이트: [vague-frequency-labs, juntaro]   ← 폼의 사이트 선택값
+5. [admin → 각 대상 사이트 POST /api/revalidate] (시크릿 헤더 검증)
       · revalidateTag(`artist:juntaro`)
       · revalidateTag(`artists`)  // 목록도 갱신
+      · 응답을 await → 편집자에게 "발행 완료 / 실패(재시도)" 즉시 피드백
 6. 해당 태그 캐시만 무효화
 7. 다음 방문자 요청 시 캐시 MISS 경로로 1회 재생성 → 새 내용 반영
 ```
 
 **비용 발생은 6→7뿐이며, 저장한 그 순간·영향받은 태그만.**
 
-#### 오케스트레이터를 두는 이유
-Supabase Database Webhook은 **URL 하나**로만 쏜다. 사이트는 4개이므로:
-- **(권장)** Edge Function 1개가 받아 → 노출 사이트 조인 조회 → 필요한 사이트만 fan-out.
-- **(무코드 대안)** 웹훅 4개를 만들어 4개 사이트에 broadcast. `revalidateTag`는
-  해당 태그를 안 쓰는 사이트에선 no-op이라 안전하지만 매번 4개를 두드림.
+#### 발행 로직은 한 곳에 모은다
+뮤테이션마다 revalidate를 흩뿌리지 않도록 `packages/content`에 `publish(tags, sites)` 헬퍼를
+두고 모든 server action이 이 한 함수만 호출한다. 사이트 URL·시크릿은 admin env로 관리
+(`REVALIDATE_SECRET`, 사이트별 base URL). "발행 깜빡" 위험을 구조적으로 제거한다.
+
+> **커버리지 주의(방식 B의 한계):** admin을 거치지 않은 변경(Supabase Studio 수동 편집, SQL,
+> 벌크 임포트)은 자동 반영되지 않는다. 그런 경로를 자주 쓰게 되면 §12의 방식 A(DB 웹훅)를
+> 안전망으로 추가한다.
 
 ### 4.4 이미지 업로드 경로
 
@@ -168,9 +177,10 @@ packages/
       supabase/          - 클라이언트(browser/server/service/anon) + Database 타입
       image/             - toWebp 헬퍼 (sharp, server 전용)
       queries/           - getArtists/getReleases/getTours 등 조회 함수
+      publish/           - publish(tags, sites) 헬퍼 (admin이 사이트 revalidate 호출)
 supabase/
   migrations/            - SQL 마이그레이션 (스키마 + RLS + Storage)
-  functions/             - revalidate 오케스트레이터 Edge Function (Phase 3)
+  functions/             - (향후) 방식 A 승격 시 revalidate 오케스트레이터 Edge Function
 ```
 
 - 각 사이트는 `@repo/content/queries`만 import해 소비.
@@ -189,7 +199,8 @@ supabase/
   "./supabase/anon":     "./src/supabase/anon.ts",      // 사이트 공개 읽기
   "./supabase/types":    "./src/supabase/database.types.ts",
   "./image":             "./src/image/to-webp.ts",      // 서버 전용(sharp)
-  "./queries":           "./src/queries/index.ts"
+  "./queries":           "./src/queries/index.ts",
+  "./publish":           "./src/publish/index.ts"        // 서버 전용(admin 발행)
 }
 ```
 
@@ -366,6 +377,16 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 - 사이트 노출은 `*_sites` 조인(`!inner`)으로 필터. 예:
   `.select('*, artist_sites!inner(site_slug)').eq('artist_sites.site_slug', siteSlug)`
 
+### 7.5 발행 헬퍼 (`publish/`, 서버 전용) — 방식 B
+```ts
+// admin server action이 DB 저장 성공 후 호출. 대상 사이트에만 revalidate POST.
+// 뮤테이션마다 흩뿌리지 않도록 이 한 함수로 중앙화.
+export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<void> { ... }
+```
+- 사이트별 base URL + `REVALIDATE_SECRET`는 admin env로 주입.
+- 각 사이트 `/api/revalidate`는 시크릿 검증 후 `tags.forEach(revalidateTag)`.
+- 응답을 모아 편집자에게 발행 성공/실패를 피드백.
+
 ---
 
 ## 8. `apps/admin` 상세
@@ -386,7 +407,8 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 | `NEXT_PUBLIC_SUPABASE_URL` | admin + 4 sites | Supabase 프로젝트 URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | admin + 4 sites | 공개 읽기(anon) 키 |
 | `SUPABASE_SERVICE_ROLE_KEY` | admin (서버 전용) | 특권 작업 |
-| `REVALIDATE_SECRET` | admin/orchestrator + 4 sites | `/api/revalidate` 시크릿 검증 |
+| `REVALIDATE_SECRET` | admin + 4 sites | `/api/revalidate` 시크릿 검증 |
+| `NEXT_PUBLIC_*_URL` (사이트별 base URL) | admin | 발행 시 각 사이트 `/api/revalidate` 대상 (기존 cross-site URL 재사용) |
 
 - 모든 `.env*`는 gitignore. `.env.example`에 키 이름만 추가.
 
@@ -409,7 +431,7 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 |---|---|---|
 | **P1 — 토대** | ①admin 스켈레톤 + ②`packages/content` + ③SQL 마이그레이션 | 타입/클라이언트/스키마/DB, 빈 대시보드 (lint·check-types 통과) |
 | **P2 — Admin UI** | shadcn로 CRUD 화면 구축 (사용자 주도) | Artist/Music/Tour 목록·편집·이미지 업로드 |
-| **P3 — 사이트 연동** | revalidate 오케스트레이터 + 각 사이트 `/api/revalidate` + `queries` 태깅 소비 | 저장→반영 파이프라인 완성 |
+| **P3 — 사이트 연동** | `publish()` 헬퍼(방식 B) + 각 사이트 `/api/revalidate` + `queries` 태깅 소비 | 저장→반영 파이프라인 완성 |
 | **P4 — 데이터 이관** | 기존 하드코딩 → 시드, 이미지 Storage 이전 | 실데이터로 4개 사이트 전환 |
 
 > P1은 여러 파일·멀티커밋이므로 격리 환경(`claude/admin-music-artist-tour-...` 브랜치)에서 진행,
@@ -425,6 +447,9 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 - **Storage 파일 라이프사이클**: 엔티티 삭제 시 고아 이미지 정리(트리거/배치).
 - **Admin 권한 세분화**: 편집자 롤 구분이 필요하면 RLS에 role 클레임 추가.
 - **호스팅 이전 옵션**: Vercel 비용 이슈 시 Cloudflare Pages/Netlify로 사이트 이전(Supabase 유지).
+- **revalidate 방식 A(DB 웹훅) 승격**: admin 외 경로(Supabase Studio 수동 편집·SQL·벌크 임포트)의
+  변경까지 자동 반영해야 할 때. Database Webhook + 오케스트레이터 Edge Function을 추가하며,
+  사이트 `/api/revalidate`와 태그 규약은 그대로 재사용. B와 병행 가능(revalidateTag는 멱등).
 
 ---
 
@@ -433,4 +458,3 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 - `celebrate-agency`가 Music/Artist/Tour 중 무엇을 노출하는지 (현재 미확인).
 - 초기 편집자 계정 수 / 이메일.
 - `platform_links`에 포함할 플랫폼 확정(현재: beatport/spotify/appleMusic/soundcloud/youtubeMusic).
-- 오케스트레이터: Edge Function(권장) vs 웹훅 4개 broadcast 중 선택.
