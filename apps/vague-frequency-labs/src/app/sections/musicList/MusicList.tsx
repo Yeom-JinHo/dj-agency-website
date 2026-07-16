@@ -62,7 +62,8 @@ function MusicList() {
                     margin: "0 -28px -26px",
                     marginTop: c.dy,
                     zIndex: c.z,
-                    transform: `rotate(${c.rot}deg)`,
+                    // 인라인 transform이 아닌 standalone rotate 속성이어야 hover:!rotate-0가 덮는다
+                    rotate: `${c.rot}deg`,
                   }}
                 >
                   <BlurFade inView duration={0.6}>
@@ -88,7 +89,7 @@ function MusicList() {
                     margin: "0 -12px -14px",
                     marginTop: Math.round(c.dy * 0.5),
                     zIndex: c.z,
-                    transform: `rotate(${c.rot}deg)`,
+                    rotate: `${c.rot}deg`,
                   }}
                 >
                   <BlurFade inView duration={0.6}>

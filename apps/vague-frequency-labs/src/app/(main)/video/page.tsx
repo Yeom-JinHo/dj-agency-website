@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
 import React from "react";
 import { musicInfo } from "@/source";
-import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import { createMetadata } from "@/utils/index";
@@ -54,21 +53,15 @@ export default function VideoPage(): ReactElement {
           <div className="relative mt-16 flex flex-col items-center justify-center gap-4 overflow-hidden">
             <div className="flex flex-wrap justify-center">
               {musicInfos.map((info, index) => (
-                <BlurFade
+                <YoutubeCard
                   key={index}
-                  inView
-                  duration={0.6}
-                  className="relative w-full md:w-[640px]"
-                >
-                  <YoutubeCard
-                    id={index % 2 === 0 ? "1lAXNqA25Bs" : "bikTSiNr08w"}
-                    title={
-                      index % 2 === 0
-                        ? "JUNTARO - Live from Baccarat, Bangkok"
-                        : "DJ 믹스 플레이리스트 - Tech House , Afro house : SIELO | PM MU:SE / MIXMIX"
-                    }
-                  />
-                </BlurFade>
+                  id={index % 2 === 0 ? "1lAXNqA25Bs" : "bikTSiNr08w"}
+                  title={
+                    index % 2 === 0
+                      ? "JUNTARO - Live from Baccarat, Bangkok"
+                      : "DJ 믹스 플레이리스트 - Tech House , Afro house : SIELO | PM MU:SE / MIXMIX"
+                  }
+                />
               ))}
             </div>
           </div>
