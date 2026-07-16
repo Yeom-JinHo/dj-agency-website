@@ -62,8 +62,6 @@
   --animate-ca-stitch-stab: ca-stitch-stab 380ms cubic-bezier(0.2, 0.9, 0.25, 1)
     both;
   --animate-modal-pop: modal-pop 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-modal-fade-out: modal-fade-out 0.16s ease-in both;
-  --animate-modal-pop-out: modal-pop-out 0.16s cubic-bezier(0.4, 0, 1, 1) both;
   --animate-modal-content-in: modal-content-in 0.2s
     cubic-bezier(0.22, 1, 0.36, 1) both;
 
@@ -76,19 +74,12 @@
     }
   }
 
-  @keyframes modal-fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-
   /* opacity는 backdrop(modal-fade)이 담당. 본문은 transform만 — 이중
      투명도 곱연산으로 초기 프레임이 과하게 비치는 현상 방지.
      rotate는 hero ca-stitch-stab의 overshoot→정착 문법을 모달로 확장한
-     "종이 낙하" — 살짝 기운 채 떨어져 60%에서 반동 후 안착. */
+     "종이 낙하" — 살짝 기운 채 떨어져 60%에서 반동 후 안착.
+     퇴장 키프레임은 없다: 진입 중 닫아도 현재값에서 이어지도록
+     ArtistModal이 transition 기반으로 처리. */
   @keyframes modal-pop {
     from {
       transform: scale(0.96) translateY(8px) rotate(-2deg);
@@ -98,16 +89,6 @@
     }
     to {
       transform: scale(1) translateY(0) rotate(0deg);
-    }
-  }
-
-  /* 닫힘은 진입의 역방향 축약 — 같은 기울기 어휘로 짧게 물러난다. */
-  @keyframes modal-pop-out {
-    from {
-      transform: scale(1) translateY(0) rotate(0deg);
-    }
-    to {
-      transform: scale(0.97) translateY(6px) rotate(-1.2deg);
     }
   }
 

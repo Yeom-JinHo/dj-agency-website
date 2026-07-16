@@ -73,27 +73,51 @@ export function ArtistModal({
   const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  const closingRef = useRef(closing);
+  closingRef.current = closing;
+
+  // exit 중 입력 가드: backdrop은 클릭을 계속 흡수하되 액션만 무시.
+  // 버튼의 네이티브 Enter/Space 활성화도 같은 경로로 막는다.
+  const handleClose = useCallback(() => {
+    if (!closingRef.current) onClose();
+  }, [onClose]);
+  const handlePrev = useCallback(() => {
+    if (!closingRef.current) onPrev();
+  }, [onPrev]);
+  const handleNext = useCallback(() => {
+    if (!closingRef.current) onNext();
+  }, [onNext]);
+
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       const inner = modalInnerRef.current;
       if (inner && inner.contains(event.target as Node)) return;
-      onClose();
+      handleClose();
     },
-    [onClose]
+    [handleClose]
   );
 
   useEffect(() => {
     closeButtonRef.current?.focus();
   }, []);
 
+  // transitionend 유실(확장프로그램의 transition 무력화 등) 대비 언마운트 폴백 —
+  // 없으면 body overflow:hidden이 영구 잔류할 수 있다.
+  useEffect(() => {
+    if (!closing) return;
+    const timer = setTimeout(onExited, 300);
+    return () => clearTimeout(timer);
+  }, [closing, onExited]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
     const onKey = (event: KeyboardEvent) => {
-      if (closing) return;
+      // Tab 포커스 트랩은 exit 중에도 유지 — aria-modal인 다이얼로그가 떠 있는
+      // 동안 포커스가 배경으로 새면 안 된다. Escape/Arrow만 closing 가드.
       if (event.key === "Escape") {
-        onClose();
+        if (!closingRef.current) onClose();
         return;
       }
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -103,7 +127,7 @@ export function ArtistModal({
           target instanceof HTMLTextAreaElement ||
           target instanceof HTMLSelectElement ||
           target?.isContentEditable === true;
-        if (inEditable) return;
+        if (inEditable || closingRef.current) return;
         if (event.key === "ArrowLeft") onPrev();
         else onNext();
         return;
@@ -140,7 +164,7 @@ export function ArtistModal({
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [onClose, onPrev, onNext, closing]);
+  }, [onClose, onPrev, onNext]);
 
   if (!artist || total === 0) return null;
 
@@ -157,14 +181,17 @@ export function ArtistModal({
       aria-label={`${artist.name} profile`}
       tabIndex={-1}
       onClick={handleBackdrop}
-      onAnimationEnd={(event) => {
-        if (closing && event.target === event.currentTarget) onExited();
+      onTransitionEnd={(event) => {
+        if (
+          closing &&
+          event.target === event.currentTarget &&
+          event.propertyName === "opacity"
+        )
+          onExited();
       }}
       className={`${
-        closing
-          ? "animate-modal-fade-out pointer-events-none"
-          : "animate-modal-fade"
-      } fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px]`}
+        closing ? "opacity-0" : "animate-modal-fade"
+      } fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px] transition-opacity duration-150 ease-in`}
     >
       <div
         role="status"
@@ -178,8 +205,10 @@ export function ArtistModal({
         <div
           ref={modalInnerRef}
           className={`${
-            closing ? "animate-modal-pop-out" : "animate-modal-pop"
-          } relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]`}
+            closing
+              ? "scale-[0.97] translate-y-[6px] -rotate-[1.2deg]"
+              : "animate-modal-pop"
+          } relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg transition-transform duration-150 ease-in sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]`}
         >
           <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-2 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
             <span>
@@ -188,7 +217,7 @@ export function ArtistModal({
             <button
               ref={closeButtonRef}
               type="button"
-              onClick={onClose}
+              onClick={handleClose}
               aria-label={`Close ${artist.name} profile`}
               className={`${CHROME_BUTTON} flex min-h-[44px] min-w-[44px] items-center justify-center`}
             >
@@ -203,7 +232,6 @@ export function ArtistModal({
                 className="animate-modal-content-in relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none"
               >
                 <ArtistPortrait
-                  key={artist.id}
                   image={artist.image}
                   name={artist.name}
                   variant="modal"
@@ -282,7 +310,7 @@ export function ArtistModal({
           <div className="flex flex-shrink-0 items-center justify-between border-t border-ca-line px-5 py-3">
             <button
               type="button"
-              onClick={onPrev}
+              onClick={handlePrev}
               aria-label={`Previous artist: ${prevArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
@@ -290,7 +318,7 @@ export function ArtistModal({
             </button>
             <button
               type="button"
-              onClick={onNext}
+              onClick={handleNext}
               aria-label={`Next artist: ${nextArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
@@ -298,9 +326,10 @@ export function ArtistModal({
             </button>
           </div>
 
-          {/* prev/next 프리로드: priority가 없으면 lazy + size-0 조합으로
-              브라우저가 fetch 자체를 생략한다 — preload <link> 주입용. */}
-          {(prevArtist.image ?? nextArtist.image) ? (
+          {/* prev/next 프리로드: eager가 없으면 lazy + size-0 조합으로 fetch
+              자체가 생략된다. priority(high)는 메인 포트레이트와 대역폭을
+              경쟁하므로 쓰지 않는다. */}
+          {(prevArtist.image || nextArtist.image) ? (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
@@ -312,7 +341,7 @@ export function ArtistModal({
                     name={prevArtist.name}
                     variant="modal"
                     sizes="(max-width: 1024px) 60vw, 600px"
-                    priority
+                    loading="eager"
                   />
                 </div>
               ) : null}
@@ -323,7 +352,7 @@ export function ArtistModal({
                     name={nextArtist.name}
                     variant="modal"
                     sizes="(max-width: 1024px) 60vw, 600px"
-                    priority
+                    loading="eager"
                   />
                 </div>
               ) : null}

@@ -9,6 +9,7 @@ interface ArtistPortraitProps {
   variant?: "card" | "modal";
   sizes?: string;
   priority?: boolean;
+  loading?: "eager" | "lazy";
   className?: string;
 }
 
@@ -48,6 +49,7 @@ export function ArtistPortrait({
   variant = "card",
   sizes,
   priority,
+  loading,
   className,
 }: ArtistPortraitProps) {
   const [errored, setErrored] = useState(false);
@@ -66,6 +68,7 @@ export function ArtistPortrait({
           fill
           sizes={sizes}
           priority={priority}
+          loading={loading}
           className={`object-cover ${
             variant === "card"
               ? "transform-gpu transition-transform duration-700 ease-out group-hover:scale-[1.06]"
