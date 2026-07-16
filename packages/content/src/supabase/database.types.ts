@@ -281,6 +281,20 @@ export interface Database {
           },
         ];
       };
+      editors: {
+        Row: { user_id: string };
+        Insert: { user_id: string };
+        Update: { user_id?: string };
+        Relationships: [
+          {
+            foreignKeyName: "editors_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

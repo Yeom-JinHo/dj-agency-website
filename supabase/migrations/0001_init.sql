@@ -128,6 +128,9 @@ create table public.editors (
   user_id uuid primary key references auth.users(id) on delete cascade
 );
 alter table public.editors enable row level security;
+-- self-read: 로그인 사용자가 자신의 멤버십만 조회(admin dashboard 가드). 쓰기 정책은 없음.
+create policy editors_self_read on public.editors
+  for select to authenticated using (user_id = auth.uid());
 
 -- RLS
 --   읽기: 참조 데이터 포함 전체 공개(anon SELECT) — 7개 테이블.
