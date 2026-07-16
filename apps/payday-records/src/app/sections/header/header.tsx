@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { linkLimit, links } from "./config";
@@ -10,6 +10,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -42,6 +43,37 @@ export default function Header() {
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
+    };
+  }, [menuOpen]);
+
+  // aria-modal 계약 이행: 열릴 때 포커스 진입, Esc 닫기, Tab 순환(트랩),
+  // 닫힐 때 트리거(햄버거 버튼)로 포커스 복원.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const menu = menuRef.current;
+    const trigger = document.activeElement as HTMLElement | null;
+    menu?.querySelector<HTMLElement>("button")?.focus();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+        return;
+      }
+      if (e.key !== "Tab" || !menu) return;
+      const focusables = menu.querySelectorAll<HTMLElement>("a[href], button");
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      trigger?.focus?.();
     };
   }, [menuOpen]);
 
@@ -155,6 +187,8 @@ export default function Header() {
       {/* Mobile full-screen menu */}
       <div
         id="mobile-menu"
+        ref={menuRef}
+        inert={!menuOpen}
         role="dialog"
         aria-modal="true"
         aria-label="Menu"

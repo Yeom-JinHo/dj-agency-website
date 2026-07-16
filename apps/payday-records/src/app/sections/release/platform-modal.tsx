@@ -31,7 +31,7 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-[6vh]"
+      className="fixed inset-0 z-[1000] flex items-center justify-center px-4 py-[6vh]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
