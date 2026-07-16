@@ -20,9 +20,9 @@ import { useEffect, useState } from "react";
  */
 
 // ── 매핑 상수 (실기기 튜닝 지점) ────────────────────────────────
-const ROTATE_MAX = 12; // 최대 회전각(deg). 그리드 동시 틸트라 hero(±20°)보다 절제 — 가장자리 틈·겹침 축소
-const TILT_RANGE = 24; // 기기를 이 각도(deg)만큼 기울이면 도달
-const PERSPECTIVE_PX = 800; // perspective 거리. 데스크톱 hover와 동일
+const ROTATE_MAX = 14; // 최대 회전각(deg). 12→14 소폭 강화(안전밴드 내). 그리드 동시 틸트라 hero(±20°)보단 절제 — 엣지 틈·겹침·vection 상한 아래
+const TILT_RANGE = 22; // 기기를 이 각도(deg)만큼 기울이면 도달. 24→22로 반응 소폭 예민(각속도만 살짝↑)
+const PERSPECTIVE_PX = 640; // perspective 거리. 800→640로 입체감 강화 — 카드가 작아(172~196px) hover(800/272px)보다 원근 여유. 각속도 불변이라 vection 무비용
 const TAU = 0.09; // smoothing 시간상수(s). framerate 독립 lerp에 사용
 const SETTLE_EPS = 0.02; // deg. 목표-현재 차가 이 아래면 정착으로 보고 rAF 루프 정지
 const BETA_SIGN = -1; // 앞뒤(beta) 기울임 부호
