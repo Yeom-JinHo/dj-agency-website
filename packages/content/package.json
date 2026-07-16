@@ -1,0 +1,38 @@
+{
+  "name": "@repo/content",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./schema": "./src/schema/index.ts",
+    "./supabase/client": "./src/supabase/client.ts",
+    "./supabase/server": "./src/supabase/server.ts",
+    "./supabase/service": "./src/supabase/service.ts",
+    "./supabase/anon": "./src/supabase/anon.ts",
+    "./supabase/types": "./src/supabase/database.types.ts",
+    "./image": "./src/image/to-webp.ts",
+    "./queries": "./src/queries/index.ts",
+    "./publish": "./src/publish/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/ssr": "catalog:",
+    "@supabase/supabase-js": "catalog:",
+    "server-only": "catalog:",
+    "sharp": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "catalog:",
+    "eslint": "catalog:",
+    "next": "catalog:",
+    "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "next": "catalog:"
+  }
+}

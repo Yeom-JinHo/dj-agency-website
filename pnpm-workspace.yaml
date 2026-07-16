@@ -16,6 +16,13 @@ catalog:
   class-variance-authority: ^0.7.1
   "@tabler/icons-react": ^3.35.0
 
+  # Content / CMS (admin)
+  "@supabase/supabase-js": ^2.110.6
+  "@supabase/ssr": ^0.12.3
+  sharp: ^0.35.3
+  zod: ^4.4.3
+  server-only: ^0.0.1
+
   # Dev
   typescript: 5.9.2
   eslint: ^9.38.0
