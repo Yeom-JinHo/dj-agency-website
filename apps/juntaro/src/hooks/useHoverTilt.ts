@@ -37,6 +37,12 @@ function useHoverTilt<T extends HTMLElement>() {
   // mouseleave 겸용 + 단독 노출: 클릭(모달 열림) 시 mouseleave가 발화하지 않아
   // 마지막 각도로 얼어붙는 것을 소비자가 onClick에서 직접 풀 수 있게 한다.
   const reset = useCallback(() => {
+    // onMouseMove와 동일 가드: hover 틸트가 비활성인 환경(coarse/터치)에선 no-op.
+    // 모바일은 mouseenter가 안 불려 enabledRef.current가 null이라 여기서 걸린다.
+    // 이 가드가 없으면 카드 탭(모달 오픈)마다 이 노드에 hover용 `transition:transform
+    // 300ms`가 심겨, 같은 data-tilt-card를 소유한 모바일 자이로 엔진의 rAF write가
+    // CSS 트랜지션과 이중 스무딩돼 탭한 카드만 굼떠진다.
+    if (!enabledRef.current) return;
     cancelAnimationFrame(rafRef.current);
     const el = ref.current;
     if (!el) return;
