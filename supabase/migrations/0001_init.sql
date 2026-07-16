@@ -122,7 +122,17 @@ create index idx_artist_sites_site       on public.artist_sites (site_slug, sort
 create index idx_release_sites_site      on public.release_sites (site_slug, sort_order);
 create index idx_tour_sites_site         on public.tour_sites (site_slug, sort_order);
 
--- RLS: 7개 테이블 일괄 — 공개 읽기(anon SELECT) + authenticated 쓰기(admin)
+-- 편집자 화이트리스트. 행은 넣지 않는다(§13: 계정 정보는 코드에 없음 — 운영자가 콘솔/SQL로 추가).
+-- RLS 활성화 + 정책 없음 = 기본 거부 → service_role만 접근(RLS 우회).
+create table public.editors (
+  user_id uuid primary key references auth.users(id) on delete cascade
+);
+alter table public.editors enable row level security;
+
+-- RLS
+--   읽기: 참조 데이터 포함 전체 공개(anon SELECT) — 7개 테이블.
+--   쓰기: editors 화이트리스트에 든 authenticated만 — sites(참조 데이터)는 제외,
+--         변경은 마이그레이션/service_role 경유만.
 do $$
 declare t text;
 begin
@@ -133,18 +143,33 @@ begin
     execute format('alter table public.%I enable row level security', t);
     execute format(
       'create policy %I on public.%I for select using (true)', t || '_read', t);
+  end loop;
+
+  foreach t in array array[
+    'artists','releases','tours','artist_sites','release_sites','tour_sites'
+  ]
+  loop
     execute format(
-      'create policy %I on public.%I for all to authenticated using (true) with check (true)',
+      'create policy %I on public.%I for all to authenticated '
+      'using (exists (select 1 from public.editors where user_id = auth.uid())) '
+      'with check (exists (select 1 from public.editors where user_id = auth.uid()))',
       t || '_write', t);
   end loop;
 end $$;
 
--- Storage: media 버킷 (public read, authenticated write)
+-- Storage: media 버킷 (public read, editors write)
 -- 경로 규칙: artist/{slug}/profile.webp, release/{slug}/artwork.webp, tour/{slug}/poster.webp
 insert into storage.buckets (id, name, public) values ('media','media',true)
   on conflict (id) do nothing;
 create policy "media_public_read" on storage.objects
   for select using (bucket_id = 'media');
-create policy "media_authenticated_write" on storage.objects
+create policy "media_editors_write" on storage.objects
   for all to authenticated
-  using (bucket_id = 'media') with check (bucket_id = 'media');
+  using (
+    bucket_id = 'media'
+    and exists (select 1 from public.editors where user_id = auth.uid())
+  )
+  with check (
+    bucket_id = 'media'
+    and exists (select 1 from public.editors where user_id = auth.uid())
+  );
