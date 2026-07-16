@@ -6,25 +6,19 @@ import { copyright } from "./config";
 import { Icon } from "@repo/ui/common/Icon";
 import SignatureLink from "@repo/ui/common/SignatureLink";
 
-export default function Content({ isVisible = true }: { isVisible?: boolean }) {
+export default function Content() {
   return (
     <div className="bg-muted/30 flex h-full w-full flex-col justify-between px-4 py-6 sm:px-8 md:px-12 md:py-8">
       <Nav />
-      <Copyright isVisible={isVisible} />
+      <Copyright />
     </div>
   );
 }
 
-const Copyright = ({ isVisible }: { isVisible: boolean }) => {
+const Copyright = () => {
   return (
     <div className="flex flex-col items-start justify-between sm:flex-row sm:items-end">
-      <p
-        className={[
-          "font-display mt-3 text-[14vw] leading-[0.8] sm:mt-10 sm:text-[16vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] 2xl:text-[min(18vw,28rem)]",
-          "transition-[opacity,translate] duration-700 ease-[cubic-bezier(0.33,1,0.68,1)] motion-reduce:transition-none",
-          isVisible ? "translate-y-0 opacity-100" : "translate-y-[0.35em] opacity-0",
-        ].join(" ")}
-      >
+      <p className="font-display mt-3 text-[14vw] leading-[0.8] sm:mt-10 sm:text-[16vw] md:text-[13vw] lg:text-[14vw] xl:text-[16vw] 2xl:text-[min(18vw,28rem)]">
         v.f.labs
       </p>
       <p className="mt-4 text-xs sm:mt-0 sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">

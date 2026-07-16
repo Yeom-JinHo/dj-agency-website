@@ -50,7 +50,7 @@ export default function Footer() {
           isVisible ? "opacity-100" : "opacity-50",
         ].join(" ")}
       >
-        <Content isVisible={isVisible} />
+        <Content />
       </div>
     </div>
   );
