@@ -69,7 +69,9 @@ export default function ArtistPage(): ReactElement {
           <FancyLine className={"mt-16"} />
           <div className="mt-16 flex flex-wrap justify-center gap-16">
             {artistProfile.getPages().map((artist, index) => (
-              <BlurFade key={index} inView duration={0.6}>
+              // 이미지 placeholder blur와 진입 blur가 겹치면 blur-up이 두 번
+              // 일어나므로 진입은 fade/rise만 남긴다 (PR #228과 같은 원칙).
+              <BlurFade key={index} inView duration={0.6} blur="0px">
                 <Link
                   href={`/artist/${artist.name}`}
                   className="cursor-pointer"
