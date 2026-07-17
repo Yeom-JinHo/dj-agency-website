@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { z } from "zod";
+import type { z } from "zod";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import {
   selectedWorkSchema,
@@ -14,8 +14,30 @@ import { DeleteArtistButton } from "../delete-artist-button";
 
 export const dynamic = "force-dynamic";
 
-const socialsArraySchema = z.array(socialSchema);
-const selectedWorksArraySchema = z.array(selectedWorkSchema);
+/**
+ * jsonb 배열을 항목 단위로 파싱한다: 불량 항목 1건 때문에 배열 전체가 []로
+ * 덮여 유효 데이터가 유실되는 걸 막고, 드롭된 항목만 경고로 남긴다.
+ */
+function parseItems<T>(
+  itemSchema: z.ZodType<T>,
+  raw: unknown,
+  ctx: string,
+): T[] {
+  if (!Array.isArray(raw)) {
+    if (raw != null) console.warn(`[admin] ${ctx}: 배열이 아님, 드롭`);
+    return [];
+  }
+  const out: T[] = [];
+  raw.forEach((item, index) => {
+    const result = itemSchema.safeParse(item);
+    if (result.success) {
+      out.push(result.data);
+    } else {
+      console.warn(`[admin] ${ctx}[${index}] 파싱 실패, 드롭`, result.error.issues);
+    }
+  });
+  return out;
+}
 
 export default async function EditArtistPage({
   params,
@@ -47,9 +69,16 @@ export default async function EditArtistPage({
     fullDescriptionEn: artist.full_description_en ?? "",
     fullDescriptionKo: artist.full_description_ko ?? "",
     city: artist.city ?? "",
-    socials: socialsArraySchema.safeParse(artist.socials).data ?? [],
-    selectedWorks:
-      selectedWorksArraySchema.safeParse(artist.selected_works).data ?? [],
+    socials: parseItems(
+      socialSchema,
+      artist.socials,
+      `artist ${artist.slug} (${artist.id}) socials`,
+    ),
+    selectedWorks: parseItems(
+      selectedWorkSchema,
+      artist.selected_works,
+      `artist ${artist.slug} (${artist.id}) selected_works`,
+    ),
     sites,
   };
 
