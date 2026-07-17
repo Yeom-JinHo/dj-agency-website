@@ -73,28 +73,19 @@ export function ArtistModal({
   const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
+  // closing 중 prev/next 차단용(onKey 화살표 + 버튼 인라인 가드) — 넘어가면
+  // aria-live 오낭독 + 포커스 복원이 엉뚱한 카드로 착지한다.
+  // onClose(= setClosing(true))는 멱등이라 가드하지 않는다.
   const closingRef = useRef(closing);
   closingRef.current = closing;
-
-  // exit 중 입력 가드: backdrop은 클릭을 계속 흡수하되 액션만 무시.
-  // 버튼의 네이티브 Enter/Space 활성화도 같은 경로로 막는다.
-  const handleClose = useCallback(() => {
-    if (!closingRef.current) onClose();
-  }, [onClose]);
-  const handlePrev = useCallback(() => {
-    if (!closingRef.current) onPrev();
-  }, [onPrev]);
-  const handleNext = useCallback(() => {
-    if (!closingRef.current) onNext();
-  }, [onNext]);
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       const inner = modalInnerRef.current;
       if (inner && inner.contains(event.target as Node)) return;
-      handleClose();
+      onClose();
     },
-    [handleClose]
+    [onClose]
   );
 
   useEffect(() => {
@@ -115,9 +106,9 @@ export function ArtistModal({
 
     const onKey = (event: KeyboardEvent) => {
       // Tab 포커스 트랩은 exit 중에도 유지 — aria-modal인 다이얼로그가 떠 있는
-      // 동안 포커스가 배경으로 새면 안 된다. Escape/Arrow만 closing 가드.
+      // 동안 포커스가 배경으로 새면 안 된다. Arrow만 closing 가드.
       if (event.key === "Escape") {
-        if (!closingRef.current) onClose();
+        onClose();
         return;
       }
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
@@ -215,7 +206,7 @@ export function ArtistModal({
             <button
               ref={closeButtonRef}
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               aria-label={`Close ${artist.name} profile`}
               className={`${CHROME_BUTTON} flex min-h-[44px] min-w-[44px] items-center justify-center`}
             >
@@ -308,7 +299,9 @@ export function ArtistModal({
           <div className="flex flex-shrink-0 items-center justify-between border-t border-ca-line px-5 py-3">
             <button
               type="button"
-              onClick={handlePrev}
+              onClick={() => {
+                if (!closingRef.current) onPrev();
+              }}
               aria-label={`Previous artist: ${prevArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
@@ -316,7 +309,9 @@ export function ArtistModal({
             </button>
             <button
               type="button"
-              onClick={handleNext}
+              onClick={() => {
+                if (!closingRef.current) onNext();
+              }}
               aria-label={`Next artist: ${nextArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
