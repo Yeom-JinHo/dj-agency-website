@@ -39,7 +39,11 @@ const REVEAL_AT = 0.7;
 const RELEASE_AT = 0.62;
 // Scrubbed ramps (progress windows): pins/arcs bow out first, then the map
 // dims to its floor; the headline clears early so the journey owns the frame.
-const RAMP_DETAIL: [number, number] = [0.25, 0.6];
+// RAMP_DETAIL ends at 0.68, just under REVEAL_AT: pins/arcs stay faintly alive
+// until the About reveal takes over, so a user parking anywhere in the scrub
+// never faces a dead frame with no focal content — and the last embers of the
+// pin cross-fade into the seal/frame succession (UX review 2026-07-18 MAJOR-1).
+const RAMP_DETAIL: [number, number] = [0.25, 0.68];
 const RAMP_MAP_DIM: [number, number] = [0.45, 0.9];
 const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
 // The scroll cue is pure wayfinding chrome — it clears first, ahead of the

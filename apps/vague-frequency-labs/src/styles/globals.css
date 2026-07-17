@@ -415,11 +415,12 @@
 }
 
 /* ── hero → about stage track ──
-   The hero is a 200svh track holding a 100svh sticky stage. The second screen
-   is the trigger: a sentinel at 25% of the track fires the time-based zoom
-   sequence (not a scrub — scroll only decides the threshold). At rest (scroll 0)
-   the stage is pinned at the top, so the map geometry the loader measures
-   (.vfl-map-inner / .vfl-map-wrap rects) is identical to the old 100svh hero. */
+   The hero is a 200svh track holding a 100svh sticky stage. The main path is a
+   SCRUB: hero.tsx's rAF loop reads scrollY directly and drives the camera /
+   dim / pin ramps 1:1 (About reveal fires as a time beat at 70% progress). At
+   rest (scroll 0) the stage is pinned at the top, so the map geometry the
+   loader measures (.vfl-map-inner / .vfl-map-wrap rects) is identical to the
+   old 100svh hero. */
 .vfl-hero-stage {
   position: sticky;
   top: 0;
@@ -428,12 +429,13 @@
 }
 .vfl-about-sentinel {
   position: absolute;
-  /* The whole second screen, not a 1px point: the observer's root is collapsed
-     to the mid-viewport line, and a point sentinel can jump OVER that line in a
-     single frame (instant scroll, End key, anchor jump) without ever emitting an
-     intersection change. A region spanning 100svh→track end turns the trigger
-     into a plain "is the mid-line inside the second screen" boolean — it flips
-     at scrollY = 50svh (25% into the track) at any scroll speed. */
+  /* #about anchor + REDUCED-MOTION trigger only — the scrub path never uses
+     this observer (its rAF loop reads scroll position itself). The whole
+     second screen, not a 1px point: against a root collapsed to the
+     mid-viewport line, a point sentinel can jump OVER that line in a single
+     frame (instant scroll, End key, anchor jump) without ever emitting an
+     intersection change; a region spanning 100svh→track end turns the trigger
+     into a plain "is the mid-line inside the second screen" boolean. */
   top: 100svh;
   bottom: 0;
   left: 0;
