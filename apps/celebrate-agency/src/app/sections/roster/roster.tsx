@@ -53,7 +53,25 @@ export default function Roster() {
     setClosing(false);
     setActiveIndex(null);
     requestAnimationFrame(() => {
-      if (idx !== null) triggerRefs.current[idx]?.focus();
+      if (idx === null) return;
+      const el = triggerRefs.current[idx];
+      if (!el) return;
+      // 기본 focus()는 화면 밖 카드로 한 프레임에 점프 스크롤한다.
+      // preventScroll로 분리한 뒤: 보이면 무스크롤, 1.5행 이내만 smooth,
+      // 그 이상은 instant(원거리 smooth는 ~1s 스와이프 잔상이라 역효과).
+      // reduced-motion은 CSS 전역 룰이 scrollIntoView 옵션을 못 덮으므로 JS 분기.
+      el.focus({ preventScroll: true });
+      const rect = el.getBoundingClientRect();
+      const overflow =
+        rect.top < 0 ? -rect.top : rect.bottom - window.innerHeight;
+      if (overflow <= 0) return;
+      const smooth =
+        overflow <= rect.height * 1.5 &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      el.scrollIntoView({
+        behavior: smooth ? "smooth" : "instant",
+        block: "nearest",
+      });
     });
   }, []);
   const step = useCallback(
