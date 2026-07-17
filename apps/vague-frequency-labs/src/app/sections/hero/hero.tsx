@@ -42,6 +42,10 @@ const RELEASE_AT = 0.62;
 const RAMP_DETAIL: [number, number] = [0.25, 0.6];
 const RAMP_MAP_DIM: [number, number] = [0.45, 0.9];
 const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
+// The scroll cue is pure wayfinding chrome — it clears first, ahead of the
+// brand headline, so the teardown reads outside-in (UI → identity → data →
+// world) instead of leaving a bright affordance lit over a receding globe.
+const RAMP_SCROLL: [number, number] = [0.03, 0.22];
 // Reveal cascade delays (s) — near-zero: the user's hand already did the
 // travelling, so the room answers promptly once the scrub commits.
 const REVEAL_DUR = 0.45;
@@ -152,6 +156,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     );
     const pinLayer = document.querySelector<HTMLElement>(".vfl-pin-layer");
     const headline = document.querySelector<HTMLElement>(".vfl-headline");
+    const scrollCue = document.querySelector<HTMLElement>(".vfl-scroll-cue");
     if (!mapInner || !mapImg) return;
     // Endpoint translate components — interpolated linearly in progress, the
     // same way a CSS transition between the rest and zoom transforms would be.
@@ -189,7 +194,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
       owned = false;
       // Give every style back to the CSS layer (breathe, hover arcs, reveal
       // classes) so the rest state is pixel-identical to a never-scrubbed hero.
-      for (const el of [mapInner, mapImg, arcSvg, pinLayer, headline]) {
+      for (const el of [mapInner, mapImg, arcSvg, pinLayer, headline, scrollCue]) {
         if (!el) continue;
         el.style.removeProperty("transform");
         el.style.removeProperty("opacity");
@@ -223,6 +228,8 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
       }
       if (headline)
         headline.style.opacity = String(1 - ramp(cur, RAMP_HEADLINE));
+      if (scrollCue)
+        scrollCue.style.opacity = String(1 - ramp(cur, RAMP_SCROLL));
       if (cur >= REVEAL_AT && !revealed) {
         revealed = true;
         enterAbout();
@@ -360,13 +367,19 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
           </motion.div>
 
           {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline.
-              Same loader-gated reveal as the headline; clears on About entry. */}
+              Motion only owns the loader-gated fade-in (and the reduced-motion
+              snap on About entry); in the scrub path the rAF loop fades this via
+              RAMP_SCROLL, so its animate target must stay constant there — a
+              `shown`-driven opacity would re-animate and fight the per-frame
+              writes at the reveal/release boundary. */}
           <motion.div
             aria-hidden
             initial={{ opacity: 0 }}
-            animate={{ opacity: done && !shown ? 1 : 0 }}
+            animate={{
+              opacity: reduce ? (done && !shown ? 1 : 0) : done ? 1 : 0,
+            }}
             transition={{ duration: 0.45, ease: "easeOut", delay: shown ? 0 : 0.5 }}
-            className="pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-ink)]"
+            className="vfl-scroll-cue pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-ink)]"
           >
             <span className="hidden font-mono text-[10px] tracking-[0.34em] opacity-55 sm:block">
               SCROLL

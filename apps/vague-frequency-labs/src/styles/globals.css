@@ -782,6 +782,10 @@
   line-height: 1.7;
   color: var(--vfl-muted);
   text-wrap: balance;
+  /* Near-bg soft halo — invisible on the open darkness, but lifts the copy off
+     the dimmed dotted landmass showing through behind the first lines on narrow
+     viewports. Softer than the heading's shadow so fine Pretendard text stays crisp. */
+  text-shadow: 0 1px 12px rgba(10, 10, 11, 0.55);
 }
 /* Word spans only (nested under the aria-hidden wrapper) — the sr-only sibling
    must keep its own clipped box untouched. */
@@ -794,6 +798,7 @@
   font-size: clamp(9px, 1.05vw, 13px);
   letter-spacing: 0.22em;
   color: var(--vfl-faint);
+  text-shadow: 0 1px 10px rgba(10, 10, 11, 0.6);
   /* The coordinate signature is one line — a wrap mid-longitude breaks the
      stamp. Tighter tracking on narrow screens keeps it inside the column. */
   white-space: nowrap;
