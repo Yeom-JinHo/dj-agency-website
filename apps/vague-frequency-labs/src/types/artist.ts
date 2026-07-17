@@ -1,11 +1,12 @@
+import type { StaticImageData } from "next/image";
+
 import type { ARTIST_NAME } from "@/consts/artist";
 
 import type { Socials } from "./contact";
 
 export interface ArtistProfile {
   name: ArtistName;
-  image: string;
-  imagePlaceholder: string;
+  image: StaticImageData;
   logoImage: string;
   nickname: ArtistName;
   shortDescription: string;

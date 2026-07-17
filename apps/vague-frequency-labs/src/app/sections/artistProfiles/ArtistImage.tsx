@@ -22,14 +22,11 @@ const ArtistImage = ({
       {/* 기본 이미지 */}
       <Image
         src={artist.image}
-        width={1280}
-        height={600}
         alt={`Image of ${artist.name}`}
         className={`h-full w-full object-cover object-center transition-all duration-200 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
         priority={priority}
         sizes={sizes}
         placeholder="blur"
-        blurDataURL={artist.imagePlaceholder}
       />
       {backgroundLogo && (
         <div className="absolute inset-0 flex scale-95 items-center justify-center opacity-0 transition-all duration-200 ease-out group-hover:scale-100 group-hover:opacity-100">
