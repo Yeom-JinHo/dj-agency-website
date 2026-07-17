@@ -1,12 +1,12 @@
 import type { ArtistProfile } from "@/types/artist";
 
 import { ARTIST_NAME } from "@/consts/artist";
-import dearboiProfile from "@/images/artist/dearboi/profile.webp";
-import juntaroProfile from "@/images/artist/juntaro/profile.webp";
-import loozboneProfile from "@/images/artist/loozbone/profile.webp";
-import playmodeProfile from "@/images/artist/playmode/profile.webp";
-import samProfile from "@/images/artist/sam/profile.webp";
-import sieloProfile from "@/images/artist/sielo/profile.webp";
+import dearboiProfile from "../public/images/artist/dearboi/profile.webp";
+import juntaroProfile from "../public/images/artist/juntaro/profile.webp";
+import loozboneProfile from "../public/images/artist/loozbone/profile.webp";
+import playmodeProfile from "../public/images/artist/playmode/profile.webp";
+import samProfile from "../public/images/artist/sam/profile.webp";
+import sieloProfile from "../public/images/artist/sielo/profile.webp";
 import { MusicInfo } from "./types/music";
 
 export const artistProfilesData: ArtistProfile[] = [
