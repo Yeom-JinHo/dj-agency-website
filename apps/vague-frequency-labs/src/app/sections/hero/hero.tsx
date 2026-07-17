@@ -33,17 +33,21 @@ const SCRUB_START = 0.2;
 const SCRUB_SPAN = 0.65;
 // Damped-lerp factor per frame — lower = heavier, more cinematic drag.
 const SCRUB_LERP = 0.16;
-// About reveal fires at 70% progress, releases scrubbing back below 62% —
-// the gap keeps jitter at the boundary from strobing the reveal.
-const REVEAL_AT = 0.7;
-const RELEASE_AT = 0.62;
-// Scrubbed ramps (progress windows): pins/arcs bow out first, then the map
-// dims to its floor; the headline clears early so the journey owns the frame.
-// RAMP_DETAIL ends at 0.68, just under REVEAL_AT: pins/arcs stay faintly alive
-// until the About reveal takes over, so a user parking anywhere in the scrub
-// never faces a dead frame with no focal content — and the last embers of the
-// pin cross-fade into the seal/frame succession (UX review 2026-07-18 MAJOR-1).
-const RAMP_DETAIL: [number, number] = [0.25, 0.68];
+// About reveal fires at 90% progress — ARRIVAL, not en route: at 0.9 the
+// camera is at scale 2.17 with Seoul ~90% recentred, so the room blooms where
+// the pulse actually landed instead of floating over a still-travelling map
+// (the "pulse becomes the room" causality needs the pulse to BE there first).
+// Release scrubbing back below 82% — the gap keeps boundary jitter from
+// strobing the reveal.
+const REVEAL_AT = 0.9;
+const RELEASE_AT = 0.82;
+// Scrubbed ramps (progress windows): the headline clears early so the journey
+// owns the frame, and the Seoul pulse RIDES the whole journey — pins/arcs stay
+// alive to 88%, growing with the zoom as the camera closes in, then bow out at
+// the doorstep so the ring blooms in the pulse's place at 0.9. The travelling
+// pulse is the mid-journey focal anchor, so no parking point shows a dead
+// frame (UX review MAJOR-1 stays solved by presence, not embers).
+const RAMP_DETAIL: [number, number] = [0.3, 0.88];
 const RAMP_MAP_DIM: [number, number] = [0.45, 0.9];
 const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
 // The scroll cue is pure wayfinding chrome — it clears first, ahead of the
