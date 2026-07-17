@@ -1,5 +1,21 @@
 import type { JuntaroTrack } from "@/types/music";
 
+import malucoCover from "../../public/images/tracks/maluco.webp";
+import addictionCover from "../../public/images/tracks/addiction.webp";
+import breakItCover from "../../public/images/tracks/break-it.webp";
+import rockCover from "../../public/images/tracks/rock.webp";
+import handsOnMyBodyCover from "../../public/images/tracks/hands-on-my-body.webp";
+import thisIsHowWeGetItCover from "../../public/images/tracks/this-is-how-we-get-it.webp";
+import daBassCover from "../../public/images/tracks/da-bass.webp";
+import timeForTheUndergroundCover from "../../public/images/tracks/time-for-the-underground.webp";
+import satisfiedCover from "../../public/images/tracks/satisfied.webp";
+import paranoiaCover from "../../public/images/tracks/paranoia.webp";
+import savageCover from "../../public/images/tracks/savage.webp";
+import pumpUpTheBasslineCover from "../../public/images/tracks/pump-up-the-bassline.webp";
+import venABailarCover from "../../public/images/tracks/ven-a-bailar.webp";
+import estoTaDuroCover from "../../public/images/tracks/esto-ta-duro.webp";
+import moveCover from "../../public/images/tracks/move.webp";
+
 interface TrackLinkSources {
   apple: string;
   /** 곡별 Spotify 트랙 URL. 미확인 시 행 생략. */
@@ -34,7 +50,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "maluco",
     name: "Maluco",
     artist: "Juntaro & Nessø",
-    cover: "/images/tracks/maluco.webp",
+    cover: malucoCover,
     shortDescription: "Dance · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/maluco/6766939606?i=6766939613&uo=4", spotify: "https://open.spotify.com/track/5SBA90aQVRrgeNZwpyvKna", beatport: "https://www.beatport.com/track/maluco/28836111" }),
   },
@@ -42,7 +58,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "addiction",
     name: "Addiction",
     artist: "Juntaro",
-    cover: "/images/tracks/addiction.webp",
+    cover: addictionCover,
     shortDescription: "House · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/addiction/6774577654?i=6774577656&uo=4", spotify: "https://open.spotify.com/track/7FoALU3vwwmqTpy6CNMCnf", beatport: "https://www.beatport.com/track/addiction/29131875" }),
   },
@@ -50,7 +66,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "break-it",
     name: "Break It",
     artist: "HILLS & Juntaro",
-    cover: "/images/tracks/break-it.webp",
+    cover: breakItCover,
     shortDescription: "House · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/break-it/6766539657?i=6766539658&uo=4", spotify: "https://open.spotify.com/track/05vKwFHsiDpr6zk7rG1qd6", beatport: "https://www.beatport.com/track/break-it/28847823" }),
   },
@@ -58,7 +74,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "rock",
     name: "ROCK",
     artist: "Juntaro",
-    cover: "/images/tracks/rock.webp",
+    cover: rockCover,
     shortDescription: "House · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/rock/1892459097?i=1892459098&uo=4", spotify: "https://open.spotify.com/track/7dQYG7UFZipsvVjW8ZttA3", beatport: "https://www.beatport.com/track/rock/28444125" }),
   },
@@ -66,7 +82,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "hands-on-my-body",
     name: "Hands On My Body",
     artist: "Take Note, Juntaro & LOOZBONE",
-    cover: "/images/tracks/hands-on-my-body.webp",
+    cover: handsOnMyBodyCover,
     shortDescription: "House · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/hands-on-my-body/1872132425?i=1872132432&uo=4", spotify: "https://open.spotify.com/track/2HXUcKQ7pnamxMo7wL0oHv", beatport: "https://www.beatport.com/track/hands-on-my-body/23845591" }),
   },
@@ -74,7 +90,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "this-is-how-we-get-it",
     name: "This Is How We Get It",
     artist: "Juntaro",
-    cover: "/images/tracks/this-is-how-we-get-it.webp",
+    cover: thisIsHowWeGetItCover,
     shortDescription: "House · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/this-is-how-we-get-it/1870929221?i=1870929222&uo=4", beatport: "https://www.beatport.com/track/this-is-how-we-get-it/23700393" }),
   },
@@ -82,7 +98,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "da-bass",
     name: "Da Bass",
     artist: "Sielo & Juntaro",
-    cover: "/images/tracks/da-bass.webp",
+    cover: daBassCover,
     shortDescription: "Electronic · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/da-bass/1869055175?i=1869055177&uo=4", spotify: "https://open.spotify.com/track/6XvzJa5RsWYew3KgD0C4VT", beatport: "https://www.beatport.com/track/da-bass/23471319" }),
   },
@@ -90,7 +106,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "time-for-the-underground",
     name: "Time For The Underground",
     artist: "Juntaro",
-    cover: "/images/tracks/time-for-the-underground.webp",
+    cover: timeForTheUndergroundCover,
     shortDescription: "Dance · Single · 2026",
     links: trackLinks({ apple: "https://music.apple.com/us/album/time-for-the-underground/1855006639?i=1855006641&uo=4", spotify: "https://open.spotify.com/track/4VjIzCy9kNx7zNrxzrLExN", beatport: "https://www.beatport.com/track/time-for-the-underground/22763641" }),
   },
@@ -98,7 +114,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "satisfied",
     name: "Satisfied",
     artist: "Juntaro",
-    cover: "/images/tracks/satisfied.webp",
+    cover: satisfiedCover,
     shortDescription: "House · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/satisfied/1847647228?i=1847647229&uo=4", spotify: "https://open.spotify.com/track/3CQ2QRDzwDsXOVfcgWv8fz", beatport: "https://www.beatport.com/track/satisfied/22309637" }),
   },
@@ -106,7 +122,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "paranoia",
     name: "Paranoia",
     artist: "Juntaro",
-    cover: "/images/tracks/paranoia.webp",
+    cover: paranoiaCover,
     shortDescription: "House · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/paranoia/1844435834?i=1844435835&uo=4", spotify: "https://open.spotify.com/track/6BayB2ZQFrLNHq6B08iPkH", beatport: "https://www.beatport.com/track/paranoia/22019360" }),
   },
@@ -114,7 +130,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "savage",
     name: "Savage",
     artist: "Juntaro",
-    cover: "/images/tracks/savage.webp",
+    cover: savageCover,
     shortDescription: "House · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/savage/1837791259?i=1837791262&uo=4", spotify: "https://open.spotify.com/track/32GLdqVDBAkpGk72iHA8qd", beatport: "https://www.beatport.com/track/savage/21560063" }),
   },
@@ -122,7 +138,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "pump-up-the-bassline",
     name: "Pump Up the Bassline",
     artist: "Juntaro",
-    cover: "/images/tracks/pump-up-the-bassline.webp",
+    cover: pumpUpTheBasslineCover,
     shortDescription: "House · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/pump-up-the-bassline/1838999806?i=1838999808&uo=4", spotify: "https://open.spotify.com/track/1YX6YpL9dRhH8g7IHDkImJ", beatport: "https://www.beatport.com/track/pump-up-the-bassline-/21585060" }),
   },
@@ -130,7 +146,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "ven-a-bailar",
     name: "Ven a Bailar",
     artist: "Alvii Ferrer & Juntaro",
-    cover: "/images/tracks/ven-a-bailar.webp",
+    cover: venABailarCover,
     shortDescription: "Dance · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/ven-a-bailar/1834957524?i=1834957526&uo=4", spotify: "https://open.spotify.com/track/3FH3ezLPoE6yPH7celnYZD", beatport: "https://www.beatport.com/track/ven-a-bailar/21302807" }),
   },
@@ -138,7 +154,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "esto-ta-duro",
     name: "Esto Ta Duro",
     artist: "Black V Neck & Juntaro",
-    cover: "/images/tracks/esto-ta-duro.webp",
+    cover: estoTaDuroCover,
     shortDescription: "House · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/esto-ta-duro-radio-mix/1810680095?i=1810680096&uo=4", spotify: "https://open.spotify.com/track/6q0duMuV6OBSD6uGVxEQR3", beatport: "https://www.beatport.com/track/esto-ta-duro/20433844" }),
   },
@@ -146,7 +162,7 @@ export const TRACKS: JuntaroTrack[] = [
     id: "move",
     name: "Move",
     artist: "Juntaro",
-    cover: "/images/tracks/move.webp",
+    cover: moveCover,
     shortDescription: "House · Single · 2025",
     links: trackLinks({ apple: "https://music.apple.com/us/album/move-extended-mix/1791060740?i=1791060741&uo=4", spotify: "https://open.spotify.com/track/00poJcdrFBLT1flLBOXO2f", beatport: "https://www.beatport.com/track/move/20008945" }),
   },

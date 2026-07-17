@@ -166,6 +166,7 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
               src={track.cover}
               alt={track.name}
               fill
+              placeholder="blur"
               sizes="148px"
               className="object-cover"
             />
