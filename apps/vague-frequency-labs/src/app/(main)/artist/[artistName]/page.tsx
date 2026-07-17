@@ -31,7 +31,7 @@ export async function generateMetadata(props: {
     alt: artist.name,
     width: 1200,
     height: 630,
-    url: artist.image,
+    url: artist.image.src,
     type: "image/webp",
   } as const;
 
