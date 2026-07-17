@@ -83,6 +83,7 @@ function MusicInfoCard({
             height={400}
             src={musicInfo.image}
             alt={musicInfo.name}
+            placeholder="blur"
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none"
           />
@@ -149,6 +150,7 @@ function MusicInfoCard({
                 alt={musicInfo.name}
                 fill
                 sizes="300px"
+                placeholder="blur"
                 className="object-cover"
               />
               {/* 픽처 디스크 광택 */}
