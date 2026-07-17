@@ -11,7 +11,8 @@
     "./supabase/types": "./src/supabase/database.types.ts",
     "./image": "./src/image/to-webp.ts",
     "./queries": "./src/queries/index.ts",
-    "./publish": "./src/publish/index.ts"
+    "./publish": "./src/publish/index.ts",
+    "./tags": "./src/tags.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
