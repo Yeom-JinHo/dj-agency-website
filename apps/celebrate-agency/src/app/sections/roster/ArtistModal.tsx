@@ -76,6 +76,16 @@ export function ArtistModal({
   const closingRef = useRef(closing);
   closingRef.current = closing;
 
+  // content-in은 prev/next 전용: 최초 오픈은 패널 pop이 등장을 담당하며,
+  // 겹치면 이중 모션 + backdrop 페이드와 opacity 곱연산이 생긴다.
+  const hasNavigatedRef = useRef(false);
+  const prevIndexRef = useRef(index);
+  if (prevIndexRef.current !== index) {
+    hasNavigatedRef.current = true;
+    prevIndexRef.current = index;
+  }
+  const contentIn = hasNavigatedRef.current ? "animate-modal-content-in" : "";
+
   // exit 중 입력 가드: backdrop은 클릭을 계속 흡수하되 액션만 무시.
   // 버튼의 네이티브 Enter/Space 활성화도 같은 경로로 막는다.
   const handleClose = useCallback(() => {
@@ -205,9 +215,7 @@ export function ArtistModal({
         <div
           ref={modalInnerRef}
           className={`${
-            closing
-              ? "scale-[0.97] translate-y-[6px] -rotate-[1.2deg]"
-              : "animate-modal-pop"
+            closing ? "scale-[0.97] translate-y-[6px]" : "animate-modal-pop"
           } relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg transition-transform duration-150 ease-in sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]`}
         >
           <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-2 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
@@ -229,7 +237,7 @@ export function ArtistModal({
             <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
               <div
                 key={artist.id}
-                className="animate-modal-content-in relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none"
+                className={`${contentIn} relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none`}
               >
                 <ArtistPortrait
                   image={artist.image}
@@ -243,7 +251,7 @@ export function ArtistModal({
 
             <div
               key={artist.id}
-              className="animate-modal-content-in flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0"
+              className={`${contentIn} flex min-h-0 flex-col gap-4 overflow-y-auto px-5 pt-5 pb-5 lg:gap-6 lg:overflow-hidden lg:px-10 lg:pt-8 lg:pb-0`}
             >
               <div className="flex-shrink-0 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
                 <span>{ARTIST_ROLE_LABEL}</span>
