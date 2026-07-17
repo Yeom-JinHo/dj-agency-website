@@ -428,10 +428,16 @@
 }
 .vfl-about-sentinel {
   position: absolute;
-  top: 50svh;
+  /* The whole second screen, not a 1px point: the observer's root is collapsed
+     to the mid-viewport line, and a point sentinel can jump OVER that line in a
+     single frame (instant scroll, End key, anchor jump) without ever emitting an
+     intersection change. A region spanning 100svh→track end turns the trigger
+     into a plain "is the mid-line inside the second screen" boolean — it flips
+     at scrollY = 50svh (25% into the track) at any scroll speed. */
+  top: 100svh;
+  bottom: 0;
   left: 0;
   width: 1px;
-  height: 1px;
   pointer-events: none;
   /* Clear the floating header on a /#about deep-link jump. */
   scroll-margin-top: 4rem;
@@ -737,7 +743,11 @@
   z-index: -1;
   width: min(88vmin, 760px);
   height: min(88vmin, 760px);
-  transform: translate(-50%, -50%);
+  /* Individual `translate` property, NOT `transform`: motion drives this
+     element's scale via inline `transform`, which would overwrite a CSS
+     transform-based centering (the composite-transform landmine). The two
+     properties compose independently, so centering survives the animation. */
+  translate: -50% -50%;
   pointer-events: none;
 }
 .vfl-about-frame svg {

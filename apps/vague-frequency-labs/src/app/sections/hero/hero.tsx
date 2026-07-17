@@ -104,11 +104,12 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     settleTimer.current = setTimeout(() => setActive(false), ABBREV_MS);
   }, [reduce]);
 
-  // A single sentinel at 25% of the 200svh track is both the #about anchor and
-  // the trigger. Root margin collapses the root to the viewport mid-line, so the
-  // observer fires exactly as the sentinel crosses it; the boundingClientRect
-  // sign tells direction. The first callback handles the fast-scroll / deep-link
-  // case: if we're already past, snap straight to the final About state.
+  // The sentinel is the whole second screen (100svh → track end) and the root is
+  // collapsed to the viewport mid-line, so `isIntersecting` is a plain "is the
+  // mid-line inside the second screen" boolean — it flips at 25% of the track and
+  // can't be jumped over by an instant scroll the way a 1px point could. The
+  // first callback handles the fast-scroll / deep-link case: if we land already
+  // inside (or wholly past) the region, snap straight to the final About state.
   useEffect(() => {
     const el = sentinelRef.current;
     if (!el) return;
@@ -116,10 +117,12 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
-        const past = entry.boundingClientRect.top < window.innerHeight / 2;
+        const inside =
+          entry.isIntersecting ||
+          entry.boundingClientRect.bottom < window.innerHeight / 2;
         if (first) {
           first = false;
-          if (past) {
+          if (inside) {
             playedRef.current = true;
             clearSettle();
             setKind("instant");
@@ -128,7 +131,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
           }
           return;
         }
-        if (past) enterAbout();
+        if (inside) enterAbout();
         else exitAbout();
       },
       { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
