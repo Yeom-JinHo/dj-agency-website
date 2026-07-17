@@ -61,7 +61,7 @@
   --animate-ca-type-in: ca-type-in 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-ca-stitch-stab: ca-stitch-stab 380ms cubic-bezier(0.2, 0.9, 0.25, 1)
     both;
-  --animate-modal-pop: modal-pop 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-modal-pop: modal-pop 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes modal-fade {
     from {
@@ -73,10 +73,17 @@
   }
 
   /* opacity는 backdrop(modal-fade)이 담당. 본문은 transform만 — 이중
-     투명도 곱연산으로 초기 프레임이 과하게 비치는 현상 방지. */
+     투명도 곱연산으로 초기 프레임이 과하게 비치는 현상 방지.
+     rotate 금지: 카드 틸트 어휘를 1100px 패널에 이식하면 2°에도 모서리가
+     ~24px 흔들려 "레이아웃 깨짐"으로 읽힘 (디자이너 검토로 제거).
+     퇴장 키프레임은 없다: 진입 중 닫아도 현재값에서 이어지도록
+     ArtistModal이 transition 기반으로 처리. */
   @keyframes modal-pop {
     from {
       transform: scale(0.96) translateY(8px);
+    }
+    60% {
+      transform: scale(1.008) translateY(-2px);
     }
     to {
       transform: scale(1) translateY(0);
@@ -274,6 +281,17 @@
 }
 
 @layer components {
+  /* 모달 prev/next: key 리마운트 시 포트레이트만 페이드-인 — 색 대비 큰
+     포트레이트 하드 컷의 스트로브감 완화(텍스트는 하드 컷 유지).
+     animation 대신 transition + @starting-style: 최초 오픈 공백 프레임이
+     구조적으로 없어 게이트 로직 불필요, 미지원 브라우저는 하드 컷 폴백. */
+  .ca-portrait-in {
+    transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
   .ca-stripe-ph {
     background: repeating-linear-gradient(
       45deg,
