@@ -1,3 +1,5 @@
+import type { StaticImageData } from "next/image";
+
 export type ArtistSocialPlatform =
   | "instagram"
   | "spotify"
@@ -21,7 +23,7 @@ export interface ArtistWork {
 export interface Artist {
   id: string;
   name: string;
-  image?: string;
+  image?: StaticImageData | string;
   bio: string;
   city: string;
   selectedWorks: ArtistWork[];
