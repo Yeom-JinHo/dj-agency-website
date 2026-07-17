@@ -281,6 +281,17 @@
 }
 
 @layer components {
+  /* 모달 prev/next: key 리마운트 시 포트레이트만 페이드-인 — 색 대비 큰
+     포트레이트 하드 컷의 스트로브감 완화(텍스트는 하드 컷 유지).
+     animation 대신 transition + @starting-style: 최초 오픈 공백 프레임이
+     구조적으로 없어 게이트 로직 불필요, 미지원 브라우저는 하드 컷 폴백. */
+  .ca-portrait-in {
+    transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1);
+    @starting-style {
+      opacity: 0;
+    }
+  }
+
   .ca-stripe-ph {
     background: repeating-linear-gradient(
       45deg,

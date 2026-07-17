@@ -227,7 +227,7 @@ export function ArtistModal({
             <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
               <div
                 key={artist.id}
-                className="relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none"
+                className="ca-portrait-in relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none"
               >
                 <ArtistPortrait
                   image={artist.image}
