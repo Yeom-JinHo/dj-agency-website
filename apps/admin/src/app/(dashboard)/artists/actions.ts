@@ -1,98 +1,22 @@
 "use server";
 
-import { createHash } from "node:crypto";
 import { revalidatePath } from "next/cache";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
-import { toWebp } from "@repo/content/image";
 import type { Database } from "@repo/content/supabase/types";
-import type { SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
+import {
+  imageFile,
+  removeImages,
+  uploadEntityImage,
+  validateImageFile,
+} from "@/lib/entity-media";
+import { syncEntitySites } from "@/lib/entity-sites";
 import { artistFormSchema, formValuesToDbInput } from "./schema";
 
-type Supabase = SupabaseClient<Database>;
-
 export type ArtistActionResult =
-  | { ok: true; id?: string }
+  | { ok: true; id?: string; warning?: string }
   | { ok: false; error: string };
-
-const MEDIA_BUCKET = "media";
-
-/**
- * 파일 → toWebp → Storage 업로드. 경로에 콘텐츠 해시를 넣어 캐시버스팅(§13 🔴):
- * `artist/{slug}/{kind}-{hash8}.webp`. 재업로드마다 새 경로라 CDN/next-image 캐시 충돌 없음.
- */
-async function uploadArtistImage(
-  supabase: Supabase,
-  slug: string,
-  kind: "profile" | "logo",
-  file: File,
-): Promise<{ path: string; placeholder: string }> {
-  const bytes = Buffer.from(await file.arrayBuffer());
-  const { webp, placeholder } = await toWebp(bytes);
-  const hash = createHash("sha256").update(webp).digest("hex").slice(0, 8);
-  const path = `artist/${slug}/${kind}-${hash}.webp`;
-  const { error } = await supabase.storage
-    .from(MEDIA_BUCKET)
-    .upload(path, webp, { contentType: "image/webp", upsert: true });
-  if (error) {
-    throw new Error(`이미지 업로드 실패(${kind}): ${error.message}`);
-  }
-  return { path, placeholder };
-}
-
-/** FormData에서 유효한 이미지 파일만 추출(빈 input은 size 0). */
-function imageFile(formData: FormData, key: string): File | null {
-  const value = formData.get(key);
-  return value instanceof File && value.size > 0 ? value : null;
-}
-
-/** 저장할 sites 배열 → artist_sites Insert 행. */
-function siteRows(
-  artistId: string,
-  sites: { siteSlug: SiteSlug; sortOrder: number }[],
-) {
-  return sites.map((s) => ({
-    artist_id: artistId,
-    site_slug: s.siteSlug,
-    sort_order: s.sortOrder,
-  }));
-}
-
-/**
- * artist_sites를 폼 상태에 맞춘다: 체크된 사이트는 upsert(sort_order 갱신),
- * 빠진 사이트는 delete. 전량 teardown 대신 diff로 최소 변경.
- */
-async function syncArtistSites(
-  supabase: Supabase,
-  artistId: string,
-  sites: { siteSlug: SiteSlug; sortOrder: number }[],
-): Promise<void> {
-  if (sites.length > 0) {
-    const { error } = await supabase
-      .from("artist_sites")
-      .upsert(siteRows(artistId, sites), { onConflict: "artist_id,site_slug" });
-    if (error) throw new Error(`사이트 노출 갱신 실패: ${error.message}`);
-  }
-  const keep = sites.map((s) => s.siteSlug);
-  let del = supabase.from("artist_sites").delete().eq("artist_id", artistId);
-  if (keep.length > 0) {
-    del = del.not("site_slug", "in", `(${keep.join(",")})`);
-  }
-  const { error } = await del;
-  if (error) throw new Error(`사이트 노출 정리 실패: ${error.message}`);
-}
-
-/** best-effort Storage 삭제(고아 정리는 §12 향후 — 실패는 무시). */
-async function removeImages(supabase: Supabase, paths: string[]): Promise<void> {
-  const targets = paths.filter((p): p is string => Boolean(p));
-  if (targets.length === 0) return;
-  await supabase.storage
-    .from(MEDIA_BUCKET)
-    .remove(targets)
-    .catch(() => undefined);
-}
 
 function toErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
@@ -102,8 +26,9 @@ export async function createArtist(
   formData: FormData,
 ): Promise<ArtistActionResult> {
   try {
-    const raw = formData.get("payload");
-    const values = artistFormSchema.parse(JSON.parse(String(raw)));
+    const values = artistFormSchema.parse(
+      JSON.parse(String(formData.get("payload"))),
+    );
     const { columns, sites } = formValuesToDbInput(values);
 
     const slug = slugify(values.name);
@@ -111,30 +36,22 @@ export async function createArtist(
       return { ok: false, error: "이름에서 slug를 만들 수 없습니다." };
     }
 
-    // createServerSupabaseClient는 인증 세션을 실어 RLS(authenticated)가 서버측 방어로 동작.
+    // createServerSupabaseClient는 인증 세션을 실어 RLS(editors)가 서버측 방어로 동작.
     const supabase = await createServerSupabaseClient();
 
+    // 이미지 유효성은 행 생성 전에 검사 — 불량 입력이 행을 만들지 않게.
     const profile = imageFile(formData, "profileImage");
     const logo = imageFile(formData, "logoImage");
-    const profileUpload = profile
-      ? await uploadArtistImage(supabase, slug, "profile", profile)
-      : null;
-    const logoUpload = logo
-      ? await uploadArtistImage(supabase, slug, "logo", logo)
-      : null;
+    if (profile) validateImageFile(profile);
+    if (logo) validateImageFile(logo);
 
+    // insert-first: slug 확보를 먼저 해 이름 중복(23505) 같은 흔한 실패에서 Storage
+    // 고아를 막고 update 경로와 대칭이 되게 한다.
     const { data, error } = await supabase
       .from("artists")
-      .insert({
-        slug,
-        ...columns,
-        image_path: profileUpload?.path ?? null,
-        logo_image_path: logoUpload?.path ?? null,
-        image_placeholder: profileUpload?.placeholder ?? null,
-      })
+      .insert({ slug, ...columns })
       .select("id")
       .single();
-
     if (error) {
       const message =
         error.code === "23505"
@@ -142,12 +59,49 @@ export async function createArtist(
           : error.message;
       return { ok: false, error: message };
     }
+    const id = data.id;
 
-    await syncArtistSites(supabase, data.id, sites);
+    // 행 생성 이후 단계(이미지 업로드 → image 컬럼 update → sites 동기화).
+    // 여기서 실패해도 행은 이미 존재하므로 삭제하지 않고 편집 화면으로 안내(dead-end 회피).
+    try {
+      const profileUpload = profile
+        ? await uploadEntityImage(supabase, "artist", slug, "profile", profile)
+        : null;
+      const logoUpload = logo
+        ? await uploadEntityImage(supabase, "artist", slug, "logo", logo)
+        : null;
+
+      if (profileUpload || logoUpload) {
+        const imageColumns: Database["public"]["Tables"]["artists"]["Update"] =
+          {};
+        if (profileUpload) {
+          imageColumns.image_path = profileUpload.path;
+          imageColumns.image_placeholder = profileUpload.placeholder;
+        }
+        if (logoUpload) {
+          imageColumns.logo_image_path = logoUpload.path;
+        }
+        const { error: updateError } = await supabase
+          .from("artists")
+          .update(imageColumns)
+          .eq("id", id);
+        if (updateError) throw new Error(updateError.message);
+      }
+
+      await syncEntitySites(supabase, "artist_sites", "artist_id", id, sites);
+    } catch (postError) {
+      // P3: publish(tags, sites) 연결 지점
+      revalidatePath("/artists");
+      return {
+        ok: true,
+        id,
+        warning: `아티스트는 생성됐지만 일부 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 이미지·사이트 노출을 다시 저장해주세요.`,
+      };
+    }
 
     // P3: publish(tags, sites) 연결 지점
     revalidatePath("/artists");
-    return { ok: true, id: data.id };
+    return { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -158,8 +112,9 @@ export async function updateArtist(
   formData: FormData,
 ): Promise<ArtistActionResult> {
   try {
-    const raw = formData.get("payload");
-    const values = artistFormSchema.parse(JSON.parse(String(raw)));
+    const values = artistFormSchema.parse(
+      JSON.parse(String(formData.get("payload"))),
+    );
     const { columns, sites } = formValuesToDbInput(values);
 
     const supabase = await createServerSupabaseClient();
@@ -176,10 +131,16 @@ export async function updateArtist(
     const profile = imageFile(formData, "profileImage");
     const logo = imageFile(formData, "logoImage");
     const profileUpload = profile
-      ? await uploadArtistImage(supabase, existing.slug, "profile", profile)
+      ? await uploadEntityImage(
+          supabase,
+          "artist",
+          existing.slug,
+          "profile",
+          profile,
+        )
       : null;
     const logoUpload = logo
-      ? await uploadArtistImage(supabase, existing.slug, "logo", logo)
+      ? await uploadEntityImage(supabase, "artist", existing.slug, "logo", logo)
       : null;
 
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지.
@@ -198,13 +159,23 @@ export async function updateArtist(
       .eq("id", id);
     if (error) return { ok: false, error: error.message };
 
-    await syncArtistSites(supabase, id, sites);
+    await syncEntitySites(supabase, "artist_sites", "artist_id", id, sites);
 
-    // 교체된 이전 이미지 삭제(best-effort).
-    await removeImages(supabase, [
-      profileUpload ? existing.image_path ?? "" : "",
-      logoUpload ? existing.logo_image_path ?? "" : "",
-    ]);
+    // 교체된 이전 이미지 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
+    // 방금 올린 파일을 지우게 되므로 제외한다.
+    const oldProfilePath =
+      profileUpload &&
+      existing.image_path &&
+      existing.image_path !== profileUpload.path
+        ? existing.image_path
+        : null;
+    const oldLogoPath =
+      logoUpload &&
+      existing.logo_image_path &&
+      existing.logo_image_path !== logoUpload.path
+        ? existing.logo_image_path
+        : null;
+    await removeImages(supabase, [oldProfilePath, oldLogoPath]);
 
     // P3: publish(tags, sites) 연결 지점
     revalidatePath("/artists");
@@ -232,8 +203,8 @@ export async function deleteArtist(id: string): Promise<ArtistActionResult> {
 
     if (existing) {
       await removeImages(supabase, [
-        existing.image_path ?? "",
-        existing.logo_image_path ?? "",
+        existing.image_path,
+        existing.logo_image_path,
       ]);
     }
 

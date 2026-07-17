@@ -170,6 +170,13 @@ export function ArtistForm({
       toast.error(result.error);
       return;
     }
+    // 부분 성공(생성됐지만 이미지/사이트 저장 실패): 편집 화면으로 안내해 이어서 저장.
+    if (result.warning && result.id) {
+      toast.warning(result.warning);
+      router.push(`/artists/${result.id}`);
+      router.refresh();
+      return;
+    }
     toast.success(
       mode === "create"
         ? "아티스트를 만들었습니다."
