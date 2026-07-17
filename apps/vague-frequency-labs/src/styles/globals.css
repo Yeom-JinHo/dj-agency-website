@@ -727,7 +727,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(14px, 2.2vh, 24px);
+  /* No uniform gap — grouped margins below give the column a typographic
+     rhythm (seal+heading read as one label/title pair, the signature stands
+     apart) instead of an even mechanical stack. */
   padding: clamp(28px, 6vw, 72px);
   text-align: center;
   pointer-events: none;
@@ -772,6 +774,8 @@
   aspect-ratio: 1;
 }
 .vfl-about-heading {
+  /* Tight to the seal above — the taegeuk and the title read as one lockup. */
+  margin-top: clamp(8px, 1.4vh, 12px);
   font-family: var(--font-anton), var(--font-pretendard), sans-serif;
   font-weight: 400;
   font-size: clamp(40px, 7vw, 96px);
@@ -781,6 +785,8 @@
   text-shadow: 0 2px 26px rgba(10, 10, 11, 0.9);
 }
 .vfl-about-body {
+  /* One full beat below the title. */
+  margin-top: clamp(16px, 2.6vh, 24px);
   /* 78vw (not 86vw): on a 390px phone the ring is ~359px, so the text column
      must stay narrower (~304px) for the frame to still read as enclosing it.
      100svh − 12rem tracks the frame's own height cap (100svh − 9rem) at 48px
@@ -804,6 +810,9 @@
   margin-right: 0.28em;
 }
 .vfl-about-meta {
+  /* The widest gap — the coordinate stamp signs off at a distance, like a
+     seal pressed below a letter. */
+  margin-top: clamp(20px, 3.3vh, 30px);
   font-family: var(--font-space-mono), ui-monospace, monospace;
   font-size: clamp(9px, 1.05vw, 13px);
   letter-spacing: 0.22em;
