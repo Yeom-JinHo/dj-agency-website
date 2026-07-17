@@ -7,14 +7,16 @@ const MIN_QUALITY = 40;
 const QUALITY_STEP = 10;
 // quality 바닥(40)에서도 초과하면 최대 변을 단계 축소하며 재시도.
 const MAX_DIMENSIONS = [2400, 2000, 1600, 1200] as const;
+// 디코딩 픽셀 상한(픽셀 폭탄 방지). 모든 sharp 입력 디코드에 적용.
+const SHARP_INPUT = { limitInputPixels: 40_000_000 } as const;
 
 /** quality 80부터 ≤1MB가 될 때까지 낮추며 webp로 인코딩. */
 async function encodeStepDown(input: Buffer): Promise<Buffer> {
   let quality = START_QUALITY;
-  let webp = await sharp(input).webp({ quality }).toBuffer();
+  let webp = await sharp(input, SHARP_INPUT).webp({ quality }).toBuffer();
   while (webp.byteLength > MAX_BYTES && quality > MIN_QUALITY) {
     quality -= QUALITY_STEP;
-    webp = await sharp(input).webp({ quality }).toBuffer();
+    webp = await sharp(input, SHARP_INPUT).webp({ quality }).toBuffer();
   }
   return webp;
 }
@@ -31,7 +33,7 @@ export async function toWebp(
 
   if (webp.byteLength > MAX_BYTES) {
     for (const dim of MAX_DIMENSIONS) {
-      const resized = await sharp(input)
+      const resized = await sharp(input, SHARP_INPUT)
         .resize(dim, dim, { fit: "inside", withoutEnlargement: true })
         .toBuffer();
       webp = await encodeStepDown(resized);
@@ -45,7 +47,7 @@ export async function toWebp(
     );
   }
 
-  const blur = await sharp(input)
+  const blur = await sharp(input, SHARP_INPUT)
     .resize(16, 16, { fit: "inside" })
     .webp({ quality: 40 })
     .toBuffer();

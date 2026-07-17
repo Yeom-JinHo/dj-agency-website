@@ -8,6 +8,8 @@ import {
   type SiteSlug,
 } from "@repo/content/schema";
 
+import { nullify, normalizeSocials } from "@/lib/form-normalize";
+
 /**
  * Artist 편집 폼 값. content의 원자 스키마(socialSchema/selectedWorkSchema/siteSlugSchema)를
  * 재사용해 검증을 사이트 렌더와 공유한다. DB Row(artistSchema)와 달리 폼은 문자열 기반
@@ -50,13 +52,7 @@ export const emptyArtistFormValues: ArtistFormValues = {
   sites: [],
 };
 
-/** 빈/공백 문자열 → null (DB에는 null로 저장). */
-function nullify(value: string): string | null {
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-/** meta가 빈 문자열이면 제거(선택 필드). */
+/** meta가 빈 문자열이면 제거(선택 필드) — artist 전용(§7 헬퍼 승격에서 잔류). */
 function normalizeSelectedWorks(works: SelectedWork[]): SelectedWork[] {
   return works
     .filter((w) => w.title.trim().length > 0)
@@ -64,16 +60,6 @@ function normalizeSelectedWorks(works: SelectedWork[]): SelectedWork[] {
       const meta = w.meta?.trim();
       return meta ? { title: w.title.trim(), meta } : { title: w.title.trim() };
     });
-}
-
-/** label이 빈 문자열이면 제거(선택 필드) — jsonb에 label:"" 미저장. */
-function normalizeSocials(socials: Social[]): Social[] {
-  return socials.map((s) => {
-    const label = s.label?.trim();
-    return label
-      ? { platform: s.platform, url: s.url, label }
-      : { platform: s.platform, url: s.url };
-  });
 }
 
 export interface ArtistDbInput {
