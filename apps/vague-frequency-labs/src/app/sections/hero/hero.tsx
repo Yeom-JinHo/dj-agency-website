@@ -196,12 +196,25 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
   // Room element reveal timing. Phase B (frame/seal) overlaps Phase C (heading/
   // body/meta). Exit and instant collapse to a fast crossfade so a fast reverse
   // or reduced-motion never lingers.
-  const revealT = (dFull: number, dAbbrev: number, extra = 0) =>
+  const revealT = (dFull: number, dAbbrev: number, extra = 0, dur = 0.6) =>
     shown
       ? {
-          duration: kind === "instant" ? 0 : 0.6,
+          duration: kind === "instant" ? 0 : full ? dur : Math.min(dur, 0.3),
           ease: REVEAL_EASE,
           delay: kind === "instant" ? 0 : (full ? dFull : dAbbrev) + extra,
+        }
+      : { duration: kind === "instant" ? 0 : 0.28, ease: "easeOut" as const, delay: 0 };
+
+  // Body word cascade — its own envelope so 51 words finish inside Phase C
+  // (last word lands at 0.9 + 50·0.005 + 0.35 ≈ 1.5s) instead of dragging the
+  // 0.6s/0.012 element timing past the sequence window; abbreviated re-entry
+  // compresses the cascade too, keeping it in step with the 0.45s camera.
+  const wordT = (i: number) =>
+    shown
+      ? {
+          duration: kind === "instant" ? 0 : full ? 0.35 : 0.25,
+          ease: REVEAL_EASE,
+          delay: kind === "instant" ? 0 : full ? 0.9 + i * 0.005 : 0.32 + i * 0.002,
         }
       : { duration: kind === "instant" ? 0 : 0.28, ease: "easeOut" as const, delay: 0 };
 
@@ -307,12 +320,11 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
           {/* About "room" — the enlarged Seoul pulse becomes the frame, the
               taegeuk core the header seal. Cross-succession: the map-side pin
               elements fade out while this layer fades in at the same centre, so
-              nothing is left orphaned beside the frame. */}
-          <div
-            className="vfl-about-room"
-            data-shown={shown}
-            aria-hidden={!shown}
-          >
+              nothing is left orphaned beside the frame.
+              Deliberately NOT aria-hidden while unrevealed: the scroll trigger
+              never fires for a screen-reader virtual cursor, and this copy
+              exists nowhere else, so it must stay in the accessibility tree. */}
+          <div className="vfl-about-room" data-shown={shown}>
             <motion.div
               className="vfl-about-frame"
               aria-hidden
@@ -363,24 +375,34 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
               About
             </motion.h2>
 
+            {/* AT reads the intact sentence from the sr-only span; the animated
+                word spans are presentation-only (no space text nodes between
+                them — margin-right fakes the gaps — so they'd read/copy as one
+                run-on word). */}
             <p className="vfl-about-body">
-              {bodyWords.map((word, i) => (
-                <motion.span
-                  key={`${word}-${i}`}
-                  initial={false}
-                  animate={{ opacity: shown ? 1 : 0, y: shown ? 0 : 8 }}
-                  transition={revealT(0.9, 0.32, i * 0.012)}
-                >
-                  {word}
-                </motion.span>
-              ))}
+              <span className="sr-only">{ABOUT_BODY}</span>
+              <span aria-hidden>
+                {bodyWords.map((word, i) => (
+                  <motion.span
+                    key={`${word}-${i}`}
+                    initial={false}
+                    animate={{ opacity: shown ? 1 : 0, y: shown ? 0 : 8 }}
+                    transition={wordT(i)}
+                  >
+                    {word}
+                  </motion.span>
+                ))}
+              </span>
             </p>
 
+            {/* The coordinate signature signs off AFTER the last body word
+                (~1.5s full / ~0.65s abbreviated) — introduction first, then
+                the stamp. */}
             <motion.div
               className="vfl-about-meta"
               initial={false}
               animate={{ opacity: shown ? 1 : 0 }}
-              transition={revealT(1.05, 0.4)}
+              transition={revealT(1.5, 0.65, 0, 0.35)}
             >
               {ABOUT_META}
             </motion.div>

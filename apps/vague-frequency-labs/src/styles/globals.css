@@ -741,8 +741,11 @@
   left: 50%;
   top: 50%;
   z-index: -1;
-  width: min(88vmin, 760px);
-  height: min(88vmin, 760px);
+  /* 92vmin (desktop unchanged — the 760px cap wins there): paired with the
+     78vw text column so the mobile ring/column ratio (~1.18) stays close to
+     the desktop 760/620, keeping the "room" reading on phones. */
+  width: min(92vmin, 760px);
+  height: min(92vmin, 760px);
   /* Individual `translate` property, NOT `transform`: motion drives this
      element's scale via inline `transform`, which would overwrite a CSS
      transform-based centering (the composite-transform landmine). The two
@@ -771,22 +774,34 @@
   text-shadow: 0 2px 26px rgba(10, 10, 11, 0.9);
 }
 .vfl-about-body {
-  max-width: min(620px, 86vw);
+  /* 78vw (not 86vw): on a 390px phone the ring is ~359px, so the text column
+     must stay narrower (~304px) for the frame to still read as enclosing it. */
+  max-width: min(620px, 78vw);
   font-family: var(--font-pretendard), sans-serif;
   font-size: clamp(15px, 1.5vw, 19px);
   line-height: 1.7;
   color: var(--vfl-muted);
   text-wrap: balance;
 }
-.vfl-about-body span {
+/* Word spans only (nested under the aria-hidden wrapper) — the sr-only sibling
+   must keep its own clipped box untouched. */
+.vfl-about-body span span {
   display: inline-block;
   margin-right: 0.28em;
 }
 .vfl-about-meta {
   font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: clamp(10px, 1.05vw, 13px);
+  font-size: clamp(9px, 1.05vw, 13px);
   letter-spacing: 0.22em;
   color: var(--vfl-faint);
+  /* The coordinate signature is one line — a wrap mid-longitude breaks the
+     stamp. Tighter tracking on narrow screens keeps it inside the column. */
+  white-space: nowrap;
+}
+@media (max-width: 480px) {
+  .vfl-about-meta {
+    letter-spacing: 0.13em;
+  }
 }
 
 /* ── headline ── */
