@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image, { type StaticImageData } from "next/image";
 
 interface ArtistPortraitProps {
-  image?: StaticImageData | string;
+  image?: StaticImageData;
   name: string;
   variant?: "card" | "modal";
   sizes?: string;
@@ -62,16 +62,15 @@ export function ArtistPortrait({
         <NoPortrait name={name} variant={variant} />
       ) : (
         <Image
-          key={typeof image === "string" ? image : image.src}
+          // 모달 prev/next처럼 인스턴스가 재사용될 때 errored 상태를 리셋한다.
+          key={image.src}
           src={image}
           alt={name}
           fill
           sizes={sizes}
           priority={priority}
           loading={loading}
-          // 정적 import(StaticImageData)만 빌드 타임 blur를 자동 생성한다.
-          // 문자열 경로(comingSoon 폴백)는 blurDataURL이 없어 placeholder 생략.
-          placeholder={typeof image === "string" ? undefined : "blur"}
+          placeholder="blur"
           className={`object-cover ${
             variant === "card"
               ? "transform-gpu transition-transform duration-700 ease-out group-hover:scale-[1.06]"

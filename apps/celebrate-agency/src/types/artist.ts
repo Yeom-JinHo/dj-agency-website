@@ -23,7 +23,7 @@ export interface ArtistWork {
 export interface Artist {
   id: string;
   name: string;
-  image?: StaticImageData | string;
+  image?: StaticImageData;
   bio: string;
   city: string;
   selectedWorks: ArtistWork[];
