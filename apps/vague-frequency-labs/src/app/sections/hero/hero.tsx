@@ -54,6 +54,13 @@ const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
 // brand headline, so the teardown reads outside-in (UI → identity → data →
 // world) instead of leaving a bright affordance lit over a receding globe.
 const RAMP_SCROLL: [number, number] = [0.03, 0.22];
+// Accent-arc charge: after the camera journey ends (scrollY 0.85·100svh) the
+// remaining scroll to the sticky release (1.0·100svh) sweeps the frozen-pulse
+// arc around the ring — scroll feedback in the dwell zone, and the circuit
+// completes exactly as the stage lets go, handing off to Media. Geometry of
+// the r=96 frame circle (viewBox 200): C = 2π·96 ≈ 603.19, resting dash 44.
+const ARC_CIRC = 603.19;
+const ARC_BASE_DASH = 44;
 // Reveal cascade delays (s) — near-zero: the user's hand already did the
 // travelling, so the room answers promptly once the scrub commits.
 const REVEAL_DUR = 0.45;
@@ -165,6 +172,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     const pinLayer = document.querySelector<HTMLElement>(".vfl-pin-layer");
     const headline = document.querySelector<HTMLElement>(".vfl-headline");
     const scrollCue = document.querySelector<HTMLElement>(".vfl-scroll-cue");
+    const accentArc = document.querySelector<SVGCircleElement>(".vfl-about-arc");
     if (!mapInner || !mapImg) return;
     // Endpoint translate components — interpolated linearly in progress, the
     // same way a CSS transition between the rest and zoom transforms would be.
@@ -175,6 +183,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     const ramp = (p: number, [a, b]: [number, number]) =>
       Math.min(1, Math.max(0, (p - a) / (b - a)));
     let target = 0;
+    let arcTarget = 0;
     let revealed = false;
     let owned = false;
     const readScroll = () => {
@@ -183,9 +192,18 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         1,
         Math.max(0, (window.scrollY - SCRUB_START * H) / (SCRUB_SPAN * H)),
       );
+      // Arc charge runs over the dwell stretch: camera-journey end → sticky
+      // release. Completing at exactly 1·100svh couples "ring fully red" with
+      // the stage letting go.
+      const arcStart = (SCRUB_START + SCRUB_SPAN) * H;
+      arcTarget = Math.min(
+        1,
+        Math.max(0, (window.scrollY - arcStart) / (H - arcStart)),
+      );
     };
     readScroll();
     let cur = target;
+    let arcCur = arcTarget;
     let raf = 0;
     const own = () => {
       owned = true;
@@ -211,6 +229,8 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         el.style.removeProperty("pointer-events");
         el.style.removeProperty("will-change");
       }
+      // Fall back to the JSX presentation attribute (the resting 44 dash).
+      accentArc?.style.removeProperty("stroke-dasharray");
     };
     const tick = () => {
       cur += (target - cur) * SCRUB_LERP;
@@ -238,6 +258,15 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         headline.style.opacity = String(1 - ramp(cur, RAMP_HEADLINE));
       if (scrollCue)
         scrollCue.style.opacity = String(1 - ramp(cur, RAMP_SCROLL));
+      // Frozen-pulse arc sweeps the ring with the dwell scroll (reverses when
+      // scrubbed back). style.strokeDasharray overrides the JSX attribute and
+      // is released with everything else at rest.
+      arcCur += (arcTarget - arcCur) * SCRUB_LERP;
+      if (Math.abs(arcTarget - arcCur) < 0.0005) arcCur = arcTarget;
+      if (accentArc) {
+        const dash = ARC_BASE_DASH + (ARC_CIRC - ARC_BASE_DASH) * arcCur;
+        accentArc.style.strokeDasharray = `${dash.toFixed(2)} ${ARC_CIRC.toFixed(2)}`;
+      }
       if (cur >= REVEAL_AT && !revealed) {
         revealed = true;
         enterAbout();
@@ -435,8 +464,12 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
                   strokeWidth="0.6"
                 />
                 {/* The frozen pulse arc — a single accent segment at top, the
-                    signal that became the room's frame. */}
+                    signal that became the room's frame. The scrub loop sweeps
+                    it around the ring over the dwell scroll (post-arrival →
+                    sticky release), so the circuit completes exactly as the
+                    stage hands off to the next section. */}
                 <circle
+                  className="vfl-about-arc"
                   cx="100"
                   cy="100"
                   r="96"
