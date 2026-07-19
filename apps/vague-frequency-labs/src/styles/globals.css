@@ -417,7 +417,8 @@
 /* ── hero → about stage track ──
    The hero is a 200svh track holding a 100svh sticky stage. The main path is a
    SCRUB: hero.tsx's rAF loop reads scrollY directly and drives the camera /
-   dim / pin ramps 1:1 (About reveal fires as a time beat at 70% progress). At
+   dim / pin ramps 1:1 (the About reveal fires once the scrub commits past 90%
+   progress — see REVEAL_AT in hero.tsx, the source of truth for thresholds). At
    rest (scroll 0) the stage is pinned at the top, so the map geometry the
    loader measures (.vfl-map-inner / .vfl-map-wrap rects) is identical to the
    old 100svh hero. */

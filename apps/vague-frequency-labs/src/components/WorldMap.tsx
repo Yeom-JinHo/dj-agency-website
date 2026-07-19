@@ -37,27 +37,19 @@ export interface WorldMapCity {
 }
 
 /**
- * Hero → About "camera" state. A single transform owner (the `.vfl-map-inner`
- * layer) drives the zoom so the scale + translate can't be split across sources
- * and overwrite each other. The map image fades to a floor (recede, not vanish);
- * pins + arcs fade to 0. Timing lives entirely in the caller's transition
- * strings, so this component stays declarative and re-renders only on toggles.
+ * Hero → About "camera" state — the reduced-motion instant snap ONLY (the
+ * scrub path writes the map styles straight to the DOM and passes no camera).
+ * A single transform owner (the `.vfl-map-inner` layer) holds the zoom so the
+ * scale + translate can't be split across sources and overwrite each other;
+ * all three values apply with transitions suppressed.
  */
 export interface WorldMapCamera {
   /** transform applied to `.vfl-map-inner` (translate% + scale, single owner). */
   transform: string;
-  /** transition shorthand for the transform above. */
-  transformTransition: string;
-  /** base map image opacity target — floor during zoom, 1 at rest. */
+  /** base map image opacity — floor during zoom, 1 at rest. */
   mapOpacity: number;
-  /** transition shorthand for the map image opacity. */
-  mapTransition: string;
-  /** pins + arcs opacity target — 0 during zoom, 1 at rest. */
+  /** pins + arcs opacity — 0 during zoom, 1 at rest. */
   detailOpacity: number;
-  /** transition shorthand for the pins/arcs opacity. */
-  detailTransition: string;
-  /** will-change: transform only while a transition is in flight. */
-  active: boolean;
 }
 
 interface WorldMapProps {
@@ -215,8 +207,7 @@ export function WorldMap({
         ...(camera && {
           transform: camera.transform,
           transformOrigin: "50% 50%",
-          transition: camera.transformTransition,
-          willChange: camera.active ? "transform" : "auto",
+          transition: "none",
         }),
       }}
       aria-hidden
@@ -234,7 +225,7 @@ export function WorldMap({
                 // Recede to the floor, not zero. `animation: none` stops the
                 // breathe keyframe from fighting this opacity mid-zoom.
                 opacity: camera.mapOpacity,
-                transition: camera.mapTransition,
+                transition: "none",
                 animation: "none",
               }
             : {
@@ -255,7 +246,7 @@ export function WorldMap({
         aria-hidden
         style={
           camera
-            ? { opacity: camera.detailOpacity, transition: camera.detailTransition }
+            ? { opacity: camera.detailOpacity, transition: "none" }
             : undefined
         }
       >
@@ -328,7 +319,7 @@ export function WorldMap({
           camera
             ? {
                 opacity: camera.detailOpacity,
-                transition: camera.detailTransition,
+                transition: "none",
                 // Zeroed-out pins must not keep intercepting hover under the room.
                 pointerEvents: camera.detailOpacity === 0 ? "none" : undefined,
               }

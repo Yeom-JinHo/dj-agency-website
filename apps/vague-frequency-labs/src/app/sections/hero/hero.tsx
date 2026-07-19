@@ -42,12 +42,15 @@ const SCRUB_LERP = 0.16;
 const REVEAL_AT = 0.9;
 const RELEASE_AT = 0.82;
 // Scrubbed ramps (progress windows): the headline clears early so the journey
-// owns the frame, and the Seoul pulse RIDES the whole journey — pins/arcs stay
-// alive to 88%, growing with the zoom as the camera closes in, then bow out at
-// the doorstep so the ring blooms in the pulse's place at 0.9. The travelling
-// pulse is the mid-journey focal anchor, so no parking point shows a dead
-// frame (UX review MAJOR-1 stays solved by presence, not embers).
+// owns the frame; other cities' pins and the arcs bow out by 88%. The Seoul
+// pulse RIDES the whole journey — it dims to PULSE_FLOOR (recede, don't
+// vanish, same treatment as the map) and HOLDS there until the reveal fires,
+// then hands off to the room. Presence, not embers: there is no parking point
+// between the pins' exit and the reveal where the frame is empty (final design
+// review M1 — an endpoint-aligned fade always leaves a near-zero band).
 const RAMP_DETAIL: [number, number] = [0.3, 0.88];
+const RAMP_PULSE: [number, number] = [0.3, 0.8];
+const PULSE_FLOOR = 0.4;
 const RAMP_MAP_DIM: [number, number] = [0.45, 0.9];
 const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
 // The scroll cue is pure wayfinding chrome — it clears first, ahead of the
@@ -170,6 +173,13 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
       ".vfl-map-inner > svg",
     );
     const pinLayer = document.querySelector<HTMLElement>(".vfl-pin-layer");
+    // The home pulse outlives the other pins (PULSE_FLOOR hold), so pins fade
+    // individually instead of through the layer — a layer fade would multiply
+    // the home pin to zero along with everything else.
+    const otherPins = Array.from(
+      document.querySelectorAll<HTMLElement>(".vfl-pin:not(.home)"),
+    );
+    const homePin = document.querySelector<HTMLElement>(".vfl-pin.home");
     const headline = document.querySelector<HTMLElement>(".vfl-headline");
     const scrollCue = document.querySelector<HTMLElement>(".vfl-scroll-cue");
     const accentArc = document.querySelector<SVGCircleElement>(".vfl-about-arc");
@@ -204,6 +214,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     readScroll();
     let cur = target;
     let arcCur = arcTarget;
+    let pulseCur = 1;
     let raf = 0;
     const own = () => {
       owned = true;
@@ -214,13 +225,27 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
       mapImg.style.transition = "none";
       mapImg.style.animation = "none";
       if (arcSvg) arcSvg.style.transition = "none";
-      if (pinLayer) pinLayer.style.transition = "none";
+      for (const p of otherPins) p.style.transition = "none";
+      if (homePin) {
+        homePin.style.transition = "none";
+        // A hover tooltip on a 2× zoomed pin mid-journey reads as a glitch.
+        homePin.style.pointerEvents = "none";
+      }
     };
     const release = () => {
       owned = false;
       // Give every style back to the CSS layer (breathe, hover arcs, reveal
       // classes) so the rest state is pixel-identical to a never-scrubbed hero.
-      for (const el of [mapInner, mapImg, arcSvg, pinLayer, headline, scrollCue]) {
+      for (const el of [
+        mapInner,
+        mapImg,
+        arcSvg,
+        pinLayer,
+        headline,
+        scrollCue,
+        homePin,
+        ...otherPins,
+      ]) {
         if (!el) continue;
         el.style.removeProperty("transform");
         el.style.removeProperty("opacity");
@@ -229,6 +254,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         el.style.removeProperty("pointer-events");
         el.style.removeProperty("will-change");
       }
+      pulseCur = 1;
       // Fall back to the JSX presentation attribute (the resting 44 dash).
       accentArc?.style.removeProperty("stroke-dasharray");
     };
@@ -250,9 +276,21 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
       );
       const detail = String(1 - ramp(cur, RAMP_DETAIL));
       if (arcSvg) arcSvg.style.opacity = detail;
-      if (pinLayer) {
-        pinLayer.style.opacity = detail;
-        pinLayer.style.pointerEvents = detail === "0" ? "none" : "";
+      for (const p of otherPins) {
+        p.style.opacity = detail;
+        p.style.pointerEvents = detail === "0" ? "none" : "";
+      }
+      // Home pulse: dim to the floor and HOLD until the reveal takes over,
+      // then hand off — lerped so both the handoff and a scrub-back re-emerge
+      // are smooth. (Reveal/release below key on `target`, so this stays in
+      // sync with the room even while `cur` is still catching up.)
+      if (homePin) {
+        const pulseTarget = revealed
+          ? 0
+          : 1 - (1 - PULSE_FLOOR) * ramp(cur, RAMP_PULSE);
+        pulseCur += (pulseTarget - pulseCur) * SCRUB_LERP;
+        if (Math.abs(pulseTarget - pulseCur) < 0.0005) pulseCur = pulseTarget;
+        homePin.style.opacity = pulseCur.toFixed(3);
       }
       if (headline)
         headline.style.opacity = String(1 - ramp(cur, RAMP_HEADLINE));
@@ -267,10 +305,14 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         const dash = ARC_BASE_DASH + (ARC_CIRC - ARC_BASE_DASH) * arcCur;
         accentArc.style.strokeDasharray = `${dash.toFixed(2)} ${ARC_CIRC.toFixed(2)}`;
       }
-      if (cur >= REVEAL_AT && !revealed) {
+      // Reveal/release key on `target` (raw scroll position), NOT the lerped
+      // `cur`: the damped lerp is asymptotic, so a park with target just under
+      // the old cur-threshold would settle at 0.89x and never fire even though
+      // the user had committed past it (final design review M1).
+      if (target >= REVEAL_AT && !revealed) {
         revealed = true;
         enterAbout();
-      } else if (cur <= RELEASE_AT && revealed) {
+      } else if (target <= RELEASE_AT && revealed) {
         revealed = false;
         exitAbout();
       }
@@ -292,12 +334,8 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     if (!reduce || mode !== "about") return undefined;
     return {
       transform: zoomTransform,
-      transformTransition: "transform 0s",
       mapOpacity: MAP_FLOOR,
-      mapTransition: "opacity 0s",
       detailOpacity: 0,
-      detailTransition: "opacity 0s",
-      active: false,
     };
   }, [reduce, mode, zoomTransform]);
 
@@ -315,12 +353,12 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
   // Room element reveal timing. Frame/seal land first, then heading, body,
   // signature. Exit and instant collapse to a fast crossfade so scrubbing back
   // or reduced motion never lingers.
-  const revealT = (dFull: number, dAbbrev: number, extra = 0, dur = REVEAL_DUR) =>
+  const revealT = (dFull: number, dAbbrev: number, dur = REVEAL_DUR) =>
     shown
       ? {
           duration: kind === "instant" ? 0 : full ? dur : Math.min(dur, 0.3),
           ease: REVEAL_EASE,
-          delay: kind === "instant" ? 0 : (full ? dFull : dAbbrev) + extra,
+          delay: kind === "instant" ? 0 : full ? dFull : dAbbrev,
         }
       : { duration: kind === "instant" ? 0 : 0.28, ease: "easeOut" as const, delay: 0 };
 
@@ -530,7 +568,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
               className="vfl-about-meta"
               initial={false}
               animate={{ opacity: shown ? 1 : 0 }}
-              transition={revealT(D_META, 0.65, 0, 0.35)}
+              transition={revealT(D_META, 0.65, 0.35)}
             >
               {ABOUT_META}
             </motion.div>
