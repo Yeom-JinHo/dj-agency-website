@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import { siteSlugSchema } from "@repo/content/schema";
 import { adminGetArtistById } from "@repo/content/admin-queries";
 
@@ -18,6 +19,9 @@ export default async function EditArtistPage({
   const parsed = siteSlugSchema.safeParse(siteParam);
   if (!parsed.success) notFound();
   const site = parsed.data;
+
+  // id도 site처럼 선검증 — 비-uuid 손입력 URL이 Postgres 22P02로 500이 되지 않게 404 처리.
+  if (!z.string().uuid().safeParse(id).success) notFound();
 
   const artist = await adminGetArtistById(id);
   // 다른 사이트의 아티스트를 이 라우트로 편집하지 못하게 소속 방어.

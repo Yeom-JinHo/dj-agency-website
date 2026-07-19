@@ -18,9 +18,6 @@ type ArtistRow = Database["public"]["Tables"]["artists"]["Row"];
 type ReleaseRow = Database["public"]["Tables"]["releases"]["Row"];
 type TourRow = Database["public"]["Tables"]["tours"]["Row"];
 
-const socialsSchema = z.array(socialSchema);
-const selectedWorksSchema = z.array(selectedWorkSchema);
-
 /**
  * jsonb 필드는 safeParse로 격리한다: 한 행의 잘못된 데이터가 조회 전체를 throw하지 않도록
  * 실패 시 기본값으로 폴백하고 엔티티 id/slug를 붙여 경고를 남긴다.
@@ -40,6 +37,29 @@ function parseOr<T>(
   return fallback;
 }
 
+/**
+ * jsonb 배열은 **항목 단위**로 격리한다: 불량 항목 1건이 배열 전체를 []로 붕괴시키면
+ * 편집 화면이 빈 배열을 로드→저장하며 정상 항목까지 유실되므로(구모델 리뷰 하드닝),
+ * 유효 항목만 보존하고 드롭된 항목은 경고로 표면화한다.
+ */
+function parseItems<T>(schema: z.ZodType<T>, value: unknown, ctx: string): T[] {
+  if (!Array.isArray(value)) {
+    if (value != null) console.warn(`[content] ${ctx}: 배열이 아님, [] 사용`);
+    return [];
+  }
+  const items: T[] = [];
+  for (const [i, raw] of value.entries()) {
+    const result = schema.safeParse(raw);
+    if (result.success) items.push(result.data);
+    else
+      console.warn(
+        `[content] ${ctx}[${i}]: 항목 파싱 실패, 드롭`,
+        result.error.issues,
+      );
+  }
+  return items;
+}
+
 export function mapArtist(row: ArtistRow): Artist {
   const ctx = `artist ${row.site_slug}/${row.slug} (${row.id})`;
   return {
@@ -56,13 +76,12 @@ export function mapArtist(row: ArtistRow): Artist {
     logoImagePath: row.logo_image_path,
     imagePlaceholder: row.image_placeholder,
     city: row.city,
-    selectedWorks: parseOr(
-      selectedWorksSchema,
+    selectedWorks: parseItems(
+      selectedWorkSchema,
       row.selected_works,
-      [],
       `${ctx} selected_works`,
     ),
-    socials: parseOr(socialsSchema, row.socials, [], `${ctx} socials`),
+    socials: parseItems(socialSchema, row.socials, `${ctx} socials`),
     sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -94,7 +113,7 @@ export function mapRelease(row: ReleaseRow): Release {
       {},
       `${ctx} platform_links`,
     ),
-    socials: parseOr(socialsSchema, row.socials, [], `${ctx} socials`),
+    socials: parseItems(socialSchema, row.socials, `${ctx} socials`),
     sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
