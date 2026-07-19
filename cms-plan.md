@@ -488,7 +488,12 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
   피처링 아티스트에 프로필 링크·교차검색이 필요해지면 전환.
 - **언어 추가**: `*_en`/`*_ko` 패턴에 컬럼 추가, 또는 `translations` 테이블로 정규화.
 - **Storage 파일 라이프사이클**: 엔티티 삭제 시 고아 이미지 정리(트리거/배치).
-- **Admin 권한 세분화**: 편집자 롤 구분이 필요하면 RLS에 role 클레임 추가.
+- **Admin 권한 세분화** — **방향 확정: 공유 editors 모델 유지 + 사이트 단위 권한으로 확장.**
+  편집자가 늘어 사이트별 권한 구분이 필요해지면, `editors`는 "admin 접근 가능"의 공유
+  화이트리스트로 유지하고 `editor_sites(user_id, site_slug)` 조인 테이블을 추가한다.
+  RLS 쓰기 정책의 editors exists 검증에 대상 엔티티의 `*_sites` 노출과 `editor_sites`
+  교집합 조건을 결합하면 스키마·admin 인가 구조 변경 없이 확장된다. 역할(role) 클레임
+  방식은 채택하지 않음. 편집자 1명인 현재는 구현하지 않는다.
 - **호스팅 이전 옵션**: Vercel 비용 이슈 시 Cloudflare Pages/Netlify로 사이트 이전(Supabase 유지).
 - **revalidate 방식 A(DB 웹훅) 승격**: admin 외 경로(Supabase Studio 수동 편집·SQL·벌크 임포트)의
   변경까지 자동 반영해야 할 때. Database Webhook + 오케스트레이터 Edge Function을 추가하며,
