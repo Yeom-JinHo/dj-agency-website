@@ -73,6 +73,7 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
             src={track.cover}
             alt={track.name}
             priority={priority}
+            placeholder="blur"
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none"
           />
