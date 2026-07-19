@@ -1,7 +1,8 @@
 # Admin CMS 설계 계획 — Music / Artist / Tour
 
-4개 사이트(`vague-frequency-labs`, `payday-records`, `celebrate-agency`, `juntaro`)가
-공유하는 **단일 콘텐츠 소스 + 편집용 Admin**을 구축하기 위한 상세 설계 문서.
+4개 사이트(`vague-frequency-labs`, `payday-records`, `celebrate-agency`, `juntaro`)의
+콘텐츠를 **단일 DB + 편집용 Admin 한 곳**에서 관리하기 위한 상세 설계 문서.
+(엔티티는 각 사이트 소속 — 사이트 간 공유 자산 아님. §13 소속 모델 결정 참조.)
 
 > 상태: **설계 확정, 구현 대기.** 이 문서는 구현 전 합의된 청사진이다.
 
@@ -144,8 +145,9 @@ export const getArtist = (site: SiteSlug, slug: string) =>
 **비용 발생은 6→7뿐이며, 저장한 그 순간·영향받은 태그만.**
 
 #### 발행 로직은 한 곳에 모은다
-뮤테이션마다 revalidate를 흩뿌리지 않도록 `packages/content`에 `publish(tags, sites)` 헬퍼를
-두고 모든 server action이 이 한 함수만 호출한다. 사이트 URL·시크릿은 admin env로 관리
+뮤테이션마다 revalidate를 흩뿌리지 않도록 `packages/content`에 `publish(tags, site)` 헬퍼를
+두고 모든 server action이 이 한 함수만 호출한다(태그는 반드시 `contentTags` 빌더로 조립 —
+문자열 리터럴 금지). 사이트 URL·시크릿은 admin env로 관리
 (`REVALIDATE_SECRET`, 사이트별 base URL). "발행 깜빡" 위험을 구조적으로 제거한다.
 
 > **커버리지 주의(방식 B의 한계):** admin을 거치지 않은 변경(Supabase Studio 수동 편집, SQL,
@@ -213,7 +215,8 @@ supabase/
   "./supabase/anon":     "./src/supabase/anon.ts",      // 사이트 공개 읽기
   "./supabase/types":    "./src/supabase/database.types.ts",
   "./image":             "./src/image/to-webp.ts",      // 서버 전용(sharp)
-  "./queries":           "./src/queries/index.ts",
+  "./queries":           "./src/queries/index.ts",       // 사이트용 캐시 조회 (admin 사용 금지)
+  "./admin-queries":     "./src/admin-queries/index.ts", // 서버 전용, 비캐시 (admin 전용, P2 신설)
   "./publish":           "./src/publish/index.ts"        // 서버 전용(admin 발행)
 }
 ```
@@ -397,6 +400,13 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
   (조인 테이블이 사라져 이전의 referencedTable no-op 문제 자체가 소멸.)
 - 캐시 태그는 사이트 결합(`contentTags` 빌더 경유): `artist:${site}:${slug}` / `artists:${site}` 등.
 
+> **⚠️ admin은 이 함수들을 재사용 금지 (P2 계약).** queries는 전부 `unstable_cache`+anon인데
+> admin은 사이트 앱과 별개 배포라 `publish()`가 admin 자신의 캐시를 무효화하지 못한다 —
+> 재사용하면 저장 후에도 편집자가 영구 stale 목록을 본다. P2에서 **`./admin-queries` 서브패스**
+> (server-only, 인증 서버 클라이언트, `unstable_cache` 미사용)를 신설해 목록/단건(by-id 포함,
+> `getArtistById` 등) 조회를 전담시킨다. 사이트용 캐시 queries와 물리적으로 분리해 사고성
+> 재사용을 구조적으로 차단.
+
 ### 7.5 발행 헬퍼 (`publish/`, 서버 전용) — 방식 B
 ```ts
 // admin server action이 DB 저장 성공 후 호출. 엔티티의 소속 사이트 1곳에만 revalidate POST.
@@ -422,6 +432,10 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
 - **UI는 직접 구축**: `pnpm dlx shadcn@latest init` (Tailwind v4 + React 19 지원).
   기본 세트: `table`, `form`, `dialog`, `input`, `select`, `sonner`(토스트).
 - CRUD는 server action + `@repo/content`의 zod 스키마·Supabase 서버 클라이언트·`toWebp` 사용.
+  목록·단건 조회는 `./admin-queries`(비캐시)만 사용(§7.4 계약).
+- **P2 필수 규약**: 업로드 경로 빌더는 `site` 인자 포함(`{entity}/{site}/{slug}/{kind}-{hash8}.webp`),
+  릴리즈·투어 폼의 아티스트 select는 **같은 사이트 소속 아티스트만** 노출(교차 사이트 참조를
+  UI에서 차단 — DB는 전역 FK라 단순 제약으로 못 막음).
 
 ---
 
@@ -451,6 +465,9 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
 - **juntaro `TOUR_DATES[]` 8건**(`src/consts/tours.ts`) → `tours(site_slug='juntaro')`. **시드 데모 데이터로 취급**
   (venue는 PR #221의 연출용 데이터, 실제 공연 이력 아님). `dateLabel`/`year` 문자열 →
   `event_date timestamptz` 파싱 규칙을 시드 스크립트에 명시.
+  **slug·title 합성 규칙 필수**: TOUR_DATES에는 slug/title이 없는데 tours는 둘 다 NOT NULL.
+  시드가 `title = "{venue} — {city}"`, `slug = slugify("{city}-{YYYY-MM-DD}")` 형태로 합성한다
+  (충돌 시 `-2` 서픽스). 규칙은 시드 스크립트에 상수로 명시.
 - **celebrate roster `Artist[]`** → `artists(site_slug='celebrate-agency')` **별도 행으로 전량 시드.**
   VFL 6명과 겹치는 인물도 병합하지 않고 celebrate 소속 행을 따로 만든다(§13 소속 모델 결정 —
   이름·사진 변경 시 두 곳 수정을 감수). celebrate의 work-case·stats는 이관 대상 아님(하드코딩 유지).
@@ -459,6 +476,9 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
 - **slug 시드 규칙**: `slug = 기존 라우트 파라미터 값`(VFL `[artistName]`에 실제 들어가는 문자열)으로
   맞춰 기존 URL·SEO를 그대로 보존(redirect 불필요). VFL 라우트는 P3~P4에서 이름 기반 →
   slug 기반 소비로 전환하되 파라미터 값이 동일하므로 URL 불변.
+  **주의 — VFL 아티스트는 slugify 금지**: 라우트 파라미터가 `Juntaro`/`SAM` 같은 원문(혼합
+  대문자)이므로 시드는 원문 그대로 넣는다. admin 신규 생성만 slugify(소문자·하이픈) 적용 —
+  두 형식이 섞여도 slug는 사이트 내 유니크 제약이라 안전하다.
 
 ---
 
