@@ -38,9 +38,10 @@ function parseOr<T>(
 }
 
 function mapArtist(row: ArtistRow): Artist {
-  const ctx = `artist ${row.slug} (${row.id})`;
+  const ctx = `artist ${row.site_slug}/${row.slug} (${row.id})`;
   return {
     id: row.id,
+    siteSlug: row.site_slug as SiteSlug,
     slug: row.slug,
     name: row.name,
     nickname: row.nickname,
@@ -59,15 +60,17 @@ function mapArtist(row: ArtistRow): Artist {
       `${ctx} selected_works`,
     ),
     socials: parseOr(socialsSchema, row.socials, [], `${ctx} socials`),
+    sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
 function mapRelease(row: ReleaseRow): Release {
-  const ctx = `release ${row.slug} (${row.id})`;
+  const ctx = `release ${row.site_slug}/${row.slug} (${row.id})`;
   return {
     id: row.id,
+    siteSlug: row.site_slug as SiteSlug,
     slug: row.slug,
     title: row.title,
     primaryArtistId: row.primary_artist_id,
@@ -89,6 +92,7 @@ function mapRelease(row: ReleaseRow): Release {
       `${ctx} platform_links`,
     ),
     socials: parseOr(socialsSchema, row.socials, [], `${ctx} socials`),
+    sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -97,6 +101,7 @@ function mapRelease(row: ReleaseRow): Release {
 function mapTour(row: TourRow): Tour {
   return {
     id: row.id,
+    siteSlug: row.site_slug as SiteSlug,
     slug: row.slug,
     title: row.title,
     artistId: row.artist_id,
@@ -111,118 +116,124 @@ function mapTour(row: TourRow): Tour {
     descriptionEn: row.description_en,
     descriptionKo: row.description_ko,
     status: row.status as Tour["status"],
+    sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
-// 사이트 필터는 조인 테이블을 루트로 조회해야 노출 순서(sort_order)가 부모 행에 실제 반영된다.
-// (엔티티를 루트로 두고 `.order(referencedTable)`을 쓰면 임베드 배열 내부만 정렬되는 no-op.)
-async function fetchArtists(siteSlug?: SiteSlug): Promise<Artist[]> {
-  const supabase = createAnonClient();
-  if (siteSlug) {
-    const { data, error } = await supabase
-      .from("artist_sites")
-      .select("sort_order, artists!inner(*)")
-      .eq("site_slug", siteSlug)
-      .order("sort_order");
-    if (error) throw error;
-    return (data ?? []).map((r) => mapArtist(r.artists));
-  }
-  const { data, error } = await supabase.from("artists").select("*");
-  if (error) throw error;
-  return (data ?? []).map(mapArtist);
-}
-
-async function fetchArtistBySlug(slug: string): Promise<Artist | null> {
+// 소속 모델: 사이트 필터는 단순 컬럼 조건 + sort_order 정렬(이전 조인 테이블 no-op 소멸).
+async function fetchArtists(siteSlug: SiteSlug): Promise<Artist[]> {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("artists")
     .select("*")
+    .eq("site_slug", siteSlug)
+    .order("sort_order");
+  if (error) throw error;
+  return (data ?? []).map(mapArtist);
+}
+
+async function fetchArtistBySlug(
+  siteSlug: SiteSlug,
+  slug: string,
+): Promise<Artist | null> {
+  const supabase = createAnonClient();
+  const { data, error } = await supabase
+    .from("artists")
+    .select("*")
+    .eq("site_slug", siteSlug)
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
   return data ? mapArtist(data) : null;
 }
 
-async function fetchReleases(siteSlug?: SiteSlug): Promise<Release[]> {
-  const supabase = createAnonClient();
-  if (siteSlug) {
-    const { data, error } = await supabase
-      .from("release_sites")
-      .select("sort_order, releases!inner(*)")
-      .eq("site_slug", siteSlug)
-      .order("sort_order");
-    if (error) throw error;
-    return (data ?? []).map((r) => mapRelease(r.releases));
-  }
-  const { data, error } = await supabase.from("releases").select("*");
-  if (error) throw error;
-  return (data ?? []).map(mapRelease);
-}
-
-async function fetchReleaseBySlug(slug: string): Promise<Release | null> {
+async function fetchReleases(siteSlug: SiteSlug): Promise<Release[]> {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("releases")
     .select("*")
+    .eq("site_slug", siteSlug)
+    .order("sort_order");
+  if (error) throw error;
+  return (data ?? []).map(mapRelease);
+}
+
+async function fetchReleaseBySlug(
+  siteSlug: SiteSlug,
+  slug: string,
+): Promise<Release | null> {
+  const supabase = createAnonClient();
+  const { data, error } = await supabase
+    .from("releases")
+    .select("*")
+    .eq("site_slug", siteSlug)
     .eq("slug", slug)
     .maybeSingle();
   if (error) throw error;
   return data ? mapRelease(data) : null;
 }
 
-async function fetchTours(siteSlug?: SiteSlug): Promise<Tour[]> {
+async function fetchTours(siteSlug: SiteSlug): Promise<Tour[]> {
   const supabase = createAnonClient();
-  if (siteSlug) {
-    const { data, error } = await supabase
-      .from("tour_sites")
-      .select("sort_order, tours!inner(*)")
-      .eq("site_slug", siteSlug)
-      .order("sort_order");
-    if (error) throw error;
-    return (data ?? []).map((r) => mapTour(r.tours));
-  }
-  const { data, error } = await supabase.from("tours").select("*");
+  const { data, error } = await supabase
+    .from("tours")
+    .select("*")
+    .eq("site_slug", siteSlug)
+    .order("sort_order");
   if (error) throw error;
   return (data ?? []).map(mapTour);
 }
 
 /**
- * 사이트 소비용 조회 함수. 사이트 노출은 조인 테이블(`*_sites`)을 루트로 `!inner` 조회해
- * 필터하고, 노출 순서는 조인 테이블 `sort_order`로 정렬한다(사이트별 독립).
- * 각 함수는 contentTags 스킴(§4.2)으로 unstable_cache 태깅한다.
+ * 사이트 소비용 조회 함수. 소속 모델이라 siteSlug가 필수 인자이며, 사이트 필터는
+ * `site_slug` 컬럼 조건 + `sort_order` 정렬로 처리한다(조인 테이블 제거).
+ * 각 함수는 contentTags 스킴(§4.2, 사이트 결합)으로 unstable_cache 태깅한다.
  */
-export async function getArtists(siteSlug?: SiteSlug): Promise<Artist[]> {
-  return unstable_cache(
-    () => fetchArtists(siteSlug),
-    ["artists", siteSlug ?? "all"],
-    { tags: [contentTags.artists] },
-  )();
-}
-
-export async function getArtistBySlug(slug: string): Promise<Artist | null> {
-  return unstable_cache(() => fetchArtistBySlug(slug), ["artist", slug], {
-    tags: [contentTags.artist(slug), contentTags.artists],
+export async function getArtists(siteSlug: SiteSlug): Promise<Artist[]> {
+  return unstable_cache(() => fetchArtists(siteSlug), ["artists", siteSlug], {
+    tags: [contentTags.artists(siteSlug)],
   })();
 }
 
-export async function getReleases(siteSlug?: SiteSlug): Promise<Release[]> {
+export async function getArtistBySlug(
+  siteSlug: SiteSlug,
+  slug: string,
+): Promise<Artist | null> {
   return unstable_cache(
-    () => fetchReleases(siteSlug),
-    ["releases", siteSlug ?? "all"],
-    { tags: [contentTags.releases] },
+    () => fetchArtistBySlug(siteSlug, slug),
+    ["artist", siteSlug, slug],
+    {
+      tags: [contentTags.artist(siteSlug, slug), contentTags.artists(siteSlug)],
+    },
   )();
 }
 
-export async function getReleaseBySlug(slug: string): Promise<Release | null> {
-  return unstable_cache(() => fetchReleaseBySlug(slug), ["release", slug], {
-    tags: [contentTags.release(slug), contentTags.releases],
+export async function getReleases(siteSlug: SiteSlug): Promise<Release[]> {
+  return unstable_cache(() => fetchReleases(siteSlug), ["releases", siteSlug], {
+    tags: [contentTags.releases(siteSlug)],
   })();
 }
 
-export async function getTours(siteSlug?: SiteSlug): Promise<Tour[]> {
-  return unstable_cache(() => fetchTours(siteSlug), ["tours", siteSlug ?? "all"], {
-    tags: [contentTags.tours],
+export async function getReleaseBySlug(
+  siteSlug: SiteSlug,
+  slug: string,
+): Promise<Release | null> {
+  return unstable_cache(
+    () => fetchReleaseBySlug(siteSlug, slug),
+    ["release", siteSlug, slug],
+    {
+      tags: [
+        contentTags.release(siteSlug, slug),
+        contentTags.releases(siteSlug),
+      ],
+    },
+  )();
+}
+
+export async function getTours(siteSlug: SiteSlug): Promise<Tour[]> {
+  return unstable_cache(() => fetchTours(siteSlug), ["tours", siteSlug], {
+    tags: [contentTags.tours(siteSlug)],
   })();
 }

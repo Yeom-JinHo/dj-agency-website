@@ -1,7 +1,8 @@
 # Admin CMS 설계 계획 — Music / Artist / Tour
 
-4개 사이트(`vague-frequency-labs`, `payday-records`, `celebrate-agency`, `juntaro`)가
-공유하는 **단일 콘텐츠 소스 + 편집용 Admin**을 구축하기 위한 상세 설계 문서.
+4개 사이트(`vague-frequency-labs`, `payday-records`, `celebrate-agency`, `juntaro`)의
+콘텐츠를 **단일 DB + 편집용 Admin 한 곳**에서 관리하기 위한 상세 설계 문서.
+(엔티티는 각 사이트 소속 — 사이트 간 공유 자산 아님. §13 소속 모델 결정 참조.)
 
 > 상태: **설계 확정, 구현 대기.** 이 문서는 구현 전 합의된 청사진이다.
 
@@ -113,11 +114,12 @@ PostgREST 호출) route를 두고 cron으로 호출해 7일 윈도우를 매일 
 조회 함수는 **태그**를 달아 캐시한다:
 
 ```ts
-export const getArtist = (slug: string) =>
+// slug는 사이트 내 유니크 → 태그·캐시 키 모두 사이트 결합
+export const getArtist = (site: SiteSlug, slug: string) =>
   unstable_cache(
-    () => fetchArtistFromSupabase(slug),
-    ["artist", slug],
-    { tags: [`artist:${slug}`, "artists"] } // ← 무효화 키
+    () => fetchArtistFromSupabase(site, slug),
+    ["artist", site, slug],
+    { tags: [`artist:${site}:${slug}`, `artists:${site}`] } // ← 무효화 키
   )();
 ```
 
@@ -129,14 +131,12 @@ export const getArtist = (slug: string) =>
 1. [apps/admin] 폼 저장 (shadcn Form) → server action
 2. [server action] zod 검증 → supabase.from('artists').update(...)
 3. [Supabase Postgres] UPDATE 커밋 (성공 확인)
-4. [admin] 방금 바꾼 엔티티·노출 사이트로 태그·대상 계산 (폼 상태로 이미 앎, 추가 조회 X)
-      · 태그: [`artist:juntaro`, `artists`]
-      · 대상 사이트: **변경 전 노출 사이트 ∪ 변경 후 노출 사이트**
-        (예: [vague-frequency-labs, juntaro] — 노출을 해제한 사이트도 포함해야
-        해제된 사이트에 남은 캐시가 무효화됨. 폼 초기값이 "변경 전"을 이미 앎)
-5. [admin → 각 대상 사이트 POST /api/revalidate] (시크릿 헤더 검증)
-      · revalidateTag(`artist:juntaro`)
-      · revalidateTag(`artists`)  // 목록도 갱신
+4. [admin] 태그·대상 계산 — **대상 사이트 = 엔티티의 소속 사이트 1개** (라우트 컨텍스트로 이미 앎)
+      · 태그: [`artist:vague-frequency-labs:juntaro`, `artists:vague-frequency-labs`]
+      · 소속 모델이라 노출 해제·합집합 계산이 없음 (유령 캐시 문제 원천 소멸)
+5. [admin → 소속 사이트 POST /api/revalidate] (시크릿 헤더 검증)
+      · revalidateTag(`artist:vague-frequency-labs:juntaro`)
+      · revalidateTag(`artists:vague-frequency-labs`)  // 목록도 갱신
       · 응답을 await → 편집자에게 "발행 완료 / 실패(재시도)" 즉시 피드백
 6. 해당 태그 캐시만 무효화
 7. 다음 방문자 요청 시 캐시 MISS 경로로 1회 재생성 → 새 내용 반영
@@ -145,8 +145,9 @@ export const getArtist = (slug: string) =>
 **비용 발생은 6→7뿐이며, 저장한 그 순간·영향받은 태그만.**
 
 #### 발행 로직은 한 곳에 모은다
-뮤테이션마다 revalidate를 흩뿌리지 않도록 `packages/content`에 `publish(tags, sites)` 헬퍼를
-두고 모든 server action이 이 한 함수만 호출한다. 사이트 URL·시크릿은 admin env로 관리
+뮤테이션마다 revalidate를 흩뿌리지 않도록 `packages/content`에 `publish(tags, site)` 헬퍼를
+두고 모든 server action이 이 한 함수만 호출한다(태그는 반드시 `contentTags` 빌더로 조립 —
+문자열 리터럴 금지). 사이트 URL·시크릿은 admin env로 관리
 (`REVALIDATE_SECRET`, 사이트별 base URL). "발행 깜빡" 위험을 구조적으로 제거한다.
 
 > **커버리지 주의(방식 B의 한계):** admin을 거치지 않은 변경(Supabase Studio 수동 편집, SQL,
@@ -214,7 +215,8 @@ supabase/
   "./supabase/anon":     "./src/supabase/anon.ts",      // 사이트 공개 읽기
   "./supabase/types":    "./src/supabase/database.types.ts",
   "./image":             "./src/image/to-webp.ts",      // 서버 전용(sharp)
-  "./queries":           "./src/queries/index.ts",
+  "./queries":           "./src/queries/index.ts",       // 사이트용 캐시 조회 (admin 사용 금지)
+  "./admin-queries":     "./src/admin-queries/index.ts", // 서버 전용, 비캐시 (admin 전용, P2 신설)
   "./publish":           "./src/publish/index.ts"        // 서버 전용(admin 발행)
 }
 ```
@@ -223,7 +225,9 @@ supabase/
 
 ## 6. DB 스키마 (SQL)
 
-핵심 설계: **엔티티↔사이트는 다대다**(아티스트가 여러 사이트에 노출) → 조인 테이블 분리.
+핵심 설계: **엔티티는 사이트 소속**(`site_slug` FK) — 공유 자산 아님. 같은 인물이 여러
+사이트에 필요하면 사이트별 행을 각각 만든다(예: VFL의 Juntaro와 celebrate의 Juntaro는 별개 행).
+slug는 **사이트 내 유니크**(`unique(site_slug, slug)`), 정렬은 엔티티의 `sort_order`.
 다국어는 `*_en`/`*_ko`, 콜라보는 `featured_artists text[]`(v1).
 
 ```sql
@@ -247,10 +251,11 @@ insert into public.sites (slug, name) values
   ('celebrate-agency',     'Celebrate Agency'),
   ('juntaro',              'Juntaro');
 
--- artists (사이트 공유)
+-- artists (사이트 소속)
 create table public.artists (
   id                   uuid primary key default gen_random_uuid(),
-  slug                 text unique not null,
+  site_slug            text not null references public.sites(slug),
+  slug                 text not null,
   name                 text not null,
   nickname             text,
   short_description_en text,
@@ -263,16 +268,19 @@ create table public.artists (
   city                 text,          -- celebrate roster 용
   selected_works       jsonb not null default '[]'::jsonb,  -- celebrate: [{title, meta}]
   socials              jsonb not null default '[]'::jsonb,  -- [{platform, url, label?}] (platform은 enum)
+  sort_order           int  not null default 0,
   created_at           timestamptz not null default now(),
-  updated_at           timestamptz not null default now()
+  updated_at           timestamptz not null default now(),
+  unique (site_slug, slug)
 );
 create trigger artists_set_updated_at before update on public.artists
   for each row execute function public.set_updated_at();
 
--- releases (음원)
+-- releases (음원, 사이트 소속)
 create table public.releases (
   id                   uuid primary key default gen_random_uuid(),
-  slug                 text unique not null,
+  site_slug            text not null references public.sites(slug),
+  slug                 text not null,
   title                text not null,
   primary_artist_id    uuid references public.artists(id) on delete set null,
   artist_credit        text,          -- 표시용. 로스터에 없는 외부 아티스트(예: "Sam Collins") 대응
@@ -288,16 +296,19 @@ create table public.releases (
   release_date         date,
   platform_links       jsonb not null default '{}'::jsonb, -- {beatport,spotify,appleMusic,soundcloud,youtubeMusic}
   socials              jsonb not null default '[]'::jsonb,  -- [{platform, url, label?}]
+  sort_order           int  not null default 0,
   created_at           timestamptz not null default now(),
-  updated_at           timestamptz not null default now()
+  updated_at           timestamptz not null default now(),
+  unique (site_slug, slug)
 );
 create trigger releases_set_updated_at before update on public.releases
   for each row execute function public.set_updated_at();
 
--- tours (신규 엔티티)
+-- tours (신규 엔티티, 사이트 소속)
 create table public.tours (
   id             uuid primary key default gen_random_uuid(),
-  slug           text unique not null,
+  site_slug      text not null references public.sites(slug),
+  slug           text not null,
   title          text not null,
   artist_id      uuid references public.artists(id) on delete set null,
   venue          text,
@@ -312,58 +323,50 @@ create table public.tours (
   description_ko text,
   status         text not null default 'scheduled'
                    check (status in ('scheduled','soldout','cancelled')), -- 'past'는 event_date로 유도
+  sort_order     int  not null default 0,
   created_at     timestamptz not null default now(),
-  updated_at     timestamptz not null default now()
+  updated_at     timestamptz not null default now(),
+  unique (site_slug, slug)
 );
 create trigger tours_set_updated_at before update on public.tours
   for each row execute function public.set_updated_at();
 
--- 엔티티 ↔ 사이트 노출 (다대다)
--- sort_order는 여기(조인 테이블)에 둔다: 같은 아티스트/릴리즈라도 사이트별 노출 순서가 독립.
-create table public.artist_sites (
-  artist_id  uuid references public.artists(id) on delete cascade,
-  site_slug  text references public.sites(slug)  on delete cascade,
-  sort_order int  not null default 0,
-  primary key (artist_id, site_slug)
-);
-create table public.release_sites (
-  release_id uuid references public.releases(id) on delete cascade,
-  site_slug  text references public.sites(slug)   on delete cascade,
-  sort_order int  not null default 0,
-  primary key (release_id, site_slug)
-);
-create table public.tour_sites (
-  tour_id    uuid references public.tours(id)  on delete cascade,
-  site_slug  text references public.sites(slug) on delete cascade,
-  sort_order int  not null default 0,
-  primary key (tour_id, site_slug)
-);
-
--- 인덱스 (읽기 경로: 사이트별 필터 + 노출 순서 정렬)
+-- 인덱스 (읽기 경로: 소속 사이트 필터 + 정렬)
+create index idx_artists_site            on public.artists  (site_slug, sort_order);
+create index idx_releases_site           on public.releases (site_slug, sort_order);
+create index idx_tours_site              on public.tours    (site_slug, sort_order);
 create index idx_releases_primary_artist on public.releases (primary_artist_id);
-create index idx_tours_artist            on public.tours (artist_id);
-create index idx_tours_event_date        on public.tours (event_date desc);
-create index idx_artist_sites_site       on public.artist_sites (site_slug, sort_order);
-create index idx_release_sites_site      on public.release_sites (site_slug, sort_order);
-create index idx_tour_sites_site         on public.tour_sites (site_slug, sort_order);
+create index idx_tours_artist            on public.tours    (artist_id);
+create index idx_tours_event_date        on public.tours    (event_date desc);
 ```
 ### RLS & Storage
 
 ```sql
--- 모든 테이블 RLS 활성화 → 공개 읽기 + authenticated 쓰기
--- (각 테이블에 대해)
---   create policy <t>_read  on public.<t> for select using (true);
---   create policy <t>_write on public.<t> for all to authenticated using (true) with check (true);
+-- editors 화이트리스트 (P1 리뷰 반영으로 확정된 모델)
+create table public.editors (
+  user_id uuid primary key references auth.users(id) on delete cascade
+);
+-- editors: RLS on + self-read만 (user_id = auth.uid() 조건 select). 쓰기 정책 없음(service_role/콘솔 전용).
 
--- Storage: media 버킷 (public read, authenticated write)
+-- 엔티티 테이블 RLS: 공개 읽기 + editors 화이트리스트 쓰기 (do $$ 루프로 일괄 생성)
+--   create policy <t>_read  on public.<t> for select using (true);
+--   create policy <t>_write on public.<t> for all to authenticated
+--     using (exists (select 1 from public.editors where user_id = auth.uid()))
+--     with check (exists (select 1 from public.editors where user_id = auth.uid()));
+-- sites는 읽기 전용(쓰기 정책 없음) — 참조 데이터 변경은 마이그레이션/service_role 경유만.
+
+-- Storage: media 버킷 (public read, editors write — 동일 exists 검증 결합)
 insert into storage.buckets (id, name, public) values ('media','media',true);
-create policy "media_public_read"        on storage.objects for select using (bucket_id = 'media');
-create policy "media_authenticated_write" on storage.objects for all to authenticated
-  using (bucket_id = 'media') with check (bucket_id = 'media');
+create policy "media_public_read"   on storage.objects for select using (bucket_id = 'media');
+create policy "media_editors_write" on storage.objects for all to authenticated
+  using (bucket_id = 'media' and exists (select 1 from public.editors where user_id = auth.uid()))
+  with check (bucket_id = 'media' and exists (select 1 from public.editors where user_id = auth.uid()));
 ```
 
-> 실제 마이그레이션에서는 RLS 정책을 `do $$ ... $$` 루프로 7개 테이블에 일괄 생성한다.
-> Storage 경로 규칙: `artist/{slug}/profile.webp`, `release/{slug}/artwork.webp`, `tour/{slug}/poster.webp`.
+> Storage 경로 규칙: `{entity}/{slug}/{kind}-{contentHash8}.webp`
+> (예: `artist/juntaro/profile-a1b2c3d4.webp` — 해시 파일명이 §13 캐시버스팅을 담당.
+> 소속 모델에서 slug는 사이트 내 유니크이므로 경로 충돌 방지를 위해 `{entity}/{site}/{slug}/...`로
+> 사이트 프리픽스를 포함할 것.)
 
 ---
 
@@ -390,20 +393,25 @@ export async function toWebp(input: Buffer): Promise<{ webp: Buffer; placeholder
 ```
 
 ### 7.4 조회 함수 (`queries/`)
-- `getArtists(siteSlug?)`, `getArtistBySlug(slug)`
-- `getReleases(siteSlug?)`, `getReleaseBySlug(slug)`
-- `getTours(siteSlug?)`
-- 사이트 노출 필터 + 노출 순서 정렬은 **조인 테이블을 루트로** 조회한다(사이트별 독립).
-  엔티티를 루트로 두고 `.order('sort_order', { referencedTable: 'artist_sites' })`를 쓰면
-  임베드 배열 내부만 정렬되는 no-op이라 부모 행 순서가 바뀌지 않는다. 예:
-  `from('artist_sites').select('sort_order, artists!inner(*)').eq('site_slug', siteSlug).order('sort_order')`
-  후 `data.map(r => mapArtist(r.artists))`. release/tour도 동일 패턴.
+- `getArtists(siteSlug)`, `getArtistBySlug(siteSlug, slug)` — **siteSlug 필수** (소속 모델)
+- `getReleases(siteSlug)`, `getReleaseBySlug(siteSlug, slug)`
+- `getTours(siteSlug)`
+- 소속 필터는 단순 컬럼 조건: `.eq('site_slug', siteSlug).order('sort_order')`.
+  (조인 테이블이 사라져 이전의 referencedTable no-op 문제 자체가 소멸.)
+- 캐시 태그는 사이트 결합(`contentTags` 빌더 경유): `artist:${site}:${slug}` / `artists:${site}` 등.
+
+> **⚠️ admin은 이 함수들을 재사용 금지 (P2 계약).** queries는 전부 `unstable_cache`+anon인데
+> admin은 사이트 앱과 별개 배포라 `publish()`가 admin 자신의 캐시를 무효화하지 못한다 —
+> 재사용하면 저장 후에도 편집자가 영구 stale 목록을 본다. P2에서 **`./admin-queries` 서브패스**
+> (server-only, 인증 서버 클라이언트, `unstable_cache` 미사용)를 신설해 목록/단건(by-id 포함,
+> `getArtistById` 등) 조회를 전담시킨다. 사이트용 캐시 queries와 물리적으로 분리해 사고성
+> 재사용을 구조적으로 차단.
 
 ### 7.5 발행 헬퍼 (`publish/`, 서버 전용) — 방식 B
 ```ts
-// admin server action이 DB 저장 성공 후 호출. 대상 사이트에만 revalidate POST.
+// admin server action이 DB 저장 성공 후 호출. 엔티티의 소속 사이트 1곳에만 revalidate POST.
 // 뮤테이션마다 흩뿌리지 않도록 이 한 함수로 중앙화.
-export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<void> { ... }
+export async function publish(tags: string[], site: SiteSlug): Promise<PublishResult> { ... }
 ```
 - 사이트별 base URL + `REVALIDATE_SECRET`는 admin env로 주입.
 - 각 사이트 `/api/revalidate`는 시크릿 검증 후 `tags.forEach(revalidateTag)`.
@@ -414,12 +422,20 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
 ## 8. `apps/admin` 상세
 
 - Next.js 15 앱, 포트 3006, `@repo/next-config`/`@repo/eslint-config`/`@repo/typescript-config` 사용.
+- **라우트 구조는 사이트-우선**: `/[site]/artists · /[site]/releases · /[site]/tours`.
+  대시보드(`/`)는 사이트 4카드, 각 사이트 홈은 카테고리 3카드. 헤더에 사이트 스위처 +
+  카테고리 내비(활성 강조). 엔티티 폼에서 "사이트 노출" UI는 없음 — 소속은 라우트 컨텍스트로
+  자동 결정되고, 정렬은 엔티티 `sort_order` 필드로 편집.
 - `middleware.ts`로 전체 라우트 인증 가드 → 미로그인 시 `/login`.
 - 초기 편집자는 **본인 1명**(`o1086291943@gmail.com`), Supabase Auth 콘솔에서 초대. 회원가입 UI 없음.
 - `serverExternalPackages: ['sharp']` 로 sharp 서버 외부화.
 - **UI는 직접 구축**: `pnpm dlx shadcn@latest init` (Tailwind v4 + React 19 지원).
   기본 세트: `table`, `form`, `dialog`, `input`, `select`, `sonner`(토스트).
 - CRUD는 server action + `@repo/content`의 zod 스키마·Supabase 서버 클라이언트·`toWebp` 사용.
+  목록·단건 조회는 `./admin-queries`(비캐시)만 사용(§7.4 계약).
+- **P2 필수 규약**: 업로드 경로 빌더는 `site` 인자 포함(`{entity}/{site}/{slug}/{kind}-{hash8}.webp`),
+  릴리즈·투어 폼의 아티스트 select는 **같은 사이트 소속 아티스트만** 노출(교차 사이트 참조를
+  UI에서 차단 — DB는 전역 FK라 단순 제약으로 못 막음).
 
 ---
 
@@ -441,20 +457,28 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
 ## 10. 기존 하드코딩 데이터 마이그레이션
 
 현재 `source.ts` / `config.ts`의 데이터를 **시드 SQL/스크립트**로 이관.
-- VFL 아티스트 6명(`Juntaro/Sielo/SAM/DearBoi/PLAYMODE/Loozbone`) → `artists` + `artist_sites`.
-- payday `Release[]` → `releases` + `release_sites`.
-- VFL `MusicInfo[]` → `releases`(통합 스키마로 매핑) + `release_sites`.
-- **juntaro `TRACKS[]` 15곡**(`src/consts/tracks.ts`) → `releases` + `release_sites`에 `juntaro` 추가.
-- **juntaro `TOUR_DATES[]` 8건**(`src/consts/tours.ts`) → `tours` + `tour_sites`. **시드 데모 데이터로 취급**
+**소속 모델 기준: 각 앱의 데이터는 해당 사이트 소속 행으로 시드한다. 사이트 간 병합 없음.**
+- VFL 아티스트 6명(`Juntaro/Sielo/SAM/DearBoi/PLAYMODE/Loozbone`) → `artists(site_slug='vague-frequency-labs')`.
+- payday `Release[]` → `releases(site_slug='payday-records')`.
+- VFL `MusicInfo[]` → `releases(site_slug='vague-frequency-labs')`(통합 스키마로 매핑).
+- **juntaro `TRACKS[]` 15곡**(`src/consts/tracks.ts`) → `releases(site_slug='juntaro')`.
+- **juntaro `TOUR_DATES[]` 8건**(`src/consts/tours.ts`) → `tours(site_slug='juntaro')`. **시드 데모 데이터로 취급**
   (venue는 PR #221의 연출용 데이터, 실제 공연 이력 아님). `dateLabel`/`year` 문자열 →
   `event_date timestamptz` 파싱 규칙을 시드 스크립트에 명시.
-- **celebrate roster `Artist[]`** → `artists`로 통합(중복 아티스트는 slug로 병합) + `artist_sites`에 `celebrate-agency` 추가.
-  celebrate의 work-case·stats는 이관 대상 아님(하드코딩 유지).
+  **slug·title 합성 규칙 필수**: TOUR_DATES에는 slug/title이 없는데 tours는 둘 다 NOT NULL.
+  시드가 `title = "{venue} — {city}"`, `slug = slugify("{city}-{YYYY-MM-DD}")` 형태로 합성한다
+  (충돌 시 `-2` 서픽스). 규칙은 시드 스크립트에 상수로 명시.
+- **celebrate roster `Artist[]`** → `artists(site_slug='celebrate-agency')` **별도 행으로 전량 시드.**
+  VFL 6명과 겹치는 인물도 병합하지 않고 celebrate 소속 행을 따로 만든다(§13 소속 모델 결정 —
+  이름·사진 변경 시 두 곳 수정을 감수). celebrate의 work-case·stats는 이관 대상 아님(하드코딩 유지).
 - 기존 `/public/images/**`의 webp를 Storage `media` 버킷으로 업로드하고 경로 갱신.
 - `fullDescription`의 EN/KO 혼합 문자열을 `*_en`/`*_ko`로 분리(수작업 검수 필요).
 - **slug 시드 규칙**: `slug = 기존 라우트 파라미터 값`(VFL `[artistName]`에 실제 들어가는 문자열)으로
   맞춰 기존 URL·SEO를 그대로 보존(redirect 불필요). VFL 라우트는 P3~P4에서 이름 기반 →
   slug 기반 소비로 전환하되 파라미터 값이 동일하므로 URL 불변.
+  **주의 — VFL 아티스트는 slugify 금지**: 라우트 파라미터가 `Juntaro`/`SAM` 같은 원문(혼합
+  대문자)이므로 시드는 원문 그대로 넣는다. admin 신규 생성만 slugify(소문자·하이픈) 적용 —
+  두 형식이 섞여도 slug는 사이트 내 유니크 제약이라 안전하다.
 
 ---
 
@@ -488,7 +512,13 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
   피처링 아티스트에 프로필 링크·교차검색이 필요해지면 전환.
 - **언어 추가**: `*_en`/`*_ko` 패턴에 컬럼 추가, 또는 `translations` 테이블로 정규화.
 - **Storage 파일 라이프사이클**: 엔티티 삭제 시 고아 이미지 정리(트리거/배치).
-- **Admin 권한 세분화**: 편집자 롤 구분이 필요하면 RLS에 role 클레임 추가.
+- **Admin 권한 세분화** — **방향 확정: 공유 editors 모델 유지 + 사이트 단위 권한으로 확장.**
+  편집자가 늘어 사이트별 권한 구분이 필요해지면, `editors`는 "admin 접근 가능"의 공유
+  화이트리스트로 유지하고 `editor_sites(user_id, site_slug)` 조인 테이블을 추가한다.
+  RLS 쓰기 정책의 editors exists 검증에 "대상 행의 `site_slug`가 그 편집자의 `editor_sites`에
+  존재" 조건을 결합하면 스키마·admin 인가 구조 변경 없이 확장된다(소속 모델이라 조건이
+  단일 컬럼 비교로 단순). 역할(role) 클레임 방식은 채택하지 않음. 편집자 1명인 현재는
+  구현하지 않는다.
 - **호스팅 이전 옵션**: Vercel 비용 이슈 시 Cloudflare Pages/Netlify로 사이트 이전(Supabase 유지).
 - **revalidate 방식 A(DB 웹훅) 승격**: admin 외 경로(Supabase Studio 수동 편집·SQL·벌크 임포트)의
   변경까지 자동 반영해야 할 때. Database Webhook + 오케스트레이터 Edge Function을 추가하며,
@@ -498,8 +528,15 @@ export async function publish(tags: string[], siteSlugs: SiteSlug[]): Promise<vo
 
 ## 13. 세부 결정 (확정)
 
-- **celebrate-agency 범위** → **Artist만.** roster는 공유 `artists` 테이블을 소비.
-  work-case 쇼케이스·stats는 표현 전용이라 **기존 하드코딩 유지**(공유 CMS 범위 밖).
+- **소속 모델 전환 (2026-07-19)** → **엔티티는 사이트 소속, 공유 자산 아님.**
+  `*_sites` 조인 테이블 폐기, `site_slug` FK + 엔티티 `sort_order` + `unique(site_slug, slug)`.
+  근거: 실데이터 확인 결과 VFL 6명 전원이 celebrate roster에도 등장하지만, 사이트별 필드가
+  이미 분리돼 있어(celebrate=city/selected_works/자체 bio, VFL=fullDescription/logo) 공유 실익이
+  이름·slug 수준. 소속 모델로 스키마·revalidate(합집합·유령 캐시 소멸)·admin UX(사이트-우선
+  라우트)가 전부 단순화. **감수 비용: 공통 인물의 이름·사진 변경 시 사이트별 행 각각 수정.**
+  교차 사이트 집계 요구 없음 확인. slug는 사이트 내 유니크.
+- **celebrate-agency 범위** → **Artist만.** roster는 celebrate 소속 `artists` 행을 소비.
+  work-case 쇼케이스·stats는 표현 전용이라 **기존 하드코딩 유지**(CMS 범위 밖).
   Music/Tour 노출은 향후 필요 시 재검토.
 - **초기 편집자 계정** → **본인 1명** (`o1086291943@gmail.com`).
   코드/시드에는 넣지 않고 Supabase Auth 콘솔에서 초대. 추가 편집자는 이후 콘솔에서.

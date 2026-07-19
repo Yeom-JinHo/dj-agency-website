@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { socialSchema } from "./social";
+import { siteSlugSchema } from "./site";
 
 /** celebrate roster의 selected works 항목. */
 export const selectedWorkSchema = z.object({
@@ -9,11 +10,13 @@ export const selectedWorkSchema = z.object({
 export type SelectedWork = z.infer<typeof selectedWorkSchema>;
 
 /**
- * 사이트 간 공유되는 아티스트. 설명은 en/ko 분리(i18n-ready),
+ * 사이트 소속 아티스트(site_slug FK). 설명은 en/ko 분리(i18n-ready),
  * `city`/`selectedWorks`는 celebrate roster용(다른 사이트는 비움).
+ * slug는 사이트 내 유니크, 정렬은 `sortOrder`.
  */
 export const artistSchema = z.object({
   id: z.string().uuid(),
+  siteSlug: siteSlugSchema,
   slug: z.string(),
   name: z.string(),
   nickname: z.string().nullable(),
@@ -27,6 +30,7 @@ export const artistSchema = z.object({
   city: z.string().nullable(),
   selectedWorks: z.array(selectedWorkSchema),
   socials: z.array(socialSchema),
+  sortOrder: z.number(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
