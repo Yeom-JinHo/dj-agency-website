@@ -25,6 +25,7 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
             width={340}
             height={340}
             sizes="(max-width: 768px) calc(50vw - 2.5rem), 340px"
+            placeholder="blur"
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
           />
         ) : (
