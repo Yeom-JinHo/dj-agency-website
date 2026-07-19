@@ -463,17 +463,19 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
                   stroke="var(--vfl-line-strong)"
                   strokeWidth="0.6"
                 />
-                {/* The frozen pulse arc — a single accent segment at top, the
-                    signal that became the room's frame. The scrub loop sweeps
-                    it around the ring over the dwell scroll (post-arrival →
-                    sticky release), so the circuit completes exactly as the
+                {/* The progress arc — warm white, so the charge reads as the
+                    hairline ring SOLIDIFYING (luminance, not hue): progress in
+                    the same register as the site's mono/hairline vocabulary,
+                    leaving the taegeuk seal as the room's only colour moment.
+                    The scrub loop sweeps it over the dwell scroll (post-arrival
+                    → sticky release), the circuit completing exactly as the
                     stage hands off to the next section. */}
                 <circle
                   className="vfl-about-arc"
                   cx="100"
                   cy="100"
                   r="96"
-                  stroke="var(--vfl-accent)"
+                  stroke="var(--vfl-fg)"
                   strokeWidth="1"
                   strokeLinecap="round"
                   strokeDasharray="44 559"
