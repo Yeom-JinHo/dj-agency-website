@@ -21,61 +21,52 @@ export interface PublishResult {
 
 /**
  * 방식 B 발행 헬퍼. admin server action이 DB 저장 성공 후 호출한다.
- * 대상 사이트에만 revalidate POST(시크릿 헤더). 뮤테이션마다 흩뿌리지 않도록 중앙화.
+ * 소속 모델이라 대상은 엔티티의 소속 사이트 1곳뿐 — 그 사이트에만 revalidate POST
+ * (시크릿 헤더). 뮤테이션마다 흩뿌리지 않도록 중앙화.
  * 사이트 base URL + REVALIDATE_SECRET은 admin env로 주입.
- * 결과를 사이트별 성공/실패로 모아 반환(§7.5) — 편집자에게 발행 피드백.
+ * 성공/실패를 단일 결과로 반환(§7.5) — 편집자에게 발행 피드백.
  */
 export async function publish(
   tags: string[],
-  siteSlugs: SiteSlug[],
-): Promise<PublishResult[]> {
+  site: SiteSlug,
+): Promise<PublishResult> {
   const secret = process.env.REVALIDATE_SECRET;
   if (!secret) {
     throw new Error("Missing REVALIDATE_SECRET");
   }
 
-  return Promise.all(
-    siteSlugs.map(async (site): Promise<PublishResult> => {
-      const envName = SITE_URL_ENV[site];
-      const baseUrl = process.env[envName];
-      if (!baseUrl) {
-        return { site, ok: false, error: `Missing ${envName}` };
-      }
-      if (
-        process.env.NODE_ENV === "production" &&
-        !baseUrl.startsWith("https://")
-      ) {
-        return {
-          site,
-          ok: false,
-          error: "Insecure base URL (production requires https)",
-        };
-      }
-      try {
-        const res = await fetch(
-          `${baseUrl.replace(/\/$/, "")}/api/revalidate`,
-          {
-            method: "POST",
-            headers: {
-              "content-type": "application/json",
-              "x-revalidate-secret": secret,
-            },
-            body: JSON.stringify({ tags }),
-            cache: "no-store",
-            signal: AbortSignal.timeout(5000),
-          },
-        );
-        if (!res.ok) {
-          return { site, ok: false, error: `HTTP ${res.status}` };
-        }
-        return { site, ok: true };
-      } catch (err) {
-        return {
-          site,
-          ok: false,
-          error: err instanceof Error ? err.message : String(err),
-        };
-      }
-    }),
-  );
+  const envName = SITE_URL_ENV[site];
+  const baseUrl = process.env[envName];
+  if (!baseUrl) {
+    return { site, ok: false, error: `Missing ${envName}` };
+  }
+  if (process.env.NODE_ENV === "production" && !baseUrl.startsWith("https://")) {
+    return {
+      site,
+      ok: false,
+      error: "Insecure base URL (production requires https)",
+    };
+  }
+  try {
+    const res = await fetch(`${baseUrl.replace(/\/$/, "")}/api/revalidate`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-revalidate-secret": secret,
+      },
+      body: JSON.stringify({ tags }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) {
+      return { site, ok: false, error: `HTTP ${res.status}` };
+    }
+    return { site, ok: true };
+  } catch (err) {
+    return {
+      site,
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
 }

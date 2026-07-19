@@ -22,6 +22,7 @@ export interface Database {
       artists: {
         Row: {
           id: string;
+          site_slug: string;
           slug: string;
           name: string;
           nickname: string | null;
@@ -35,11 +36,13 @@ export interface Database {
           city: string | null;
           selected_works: Json;
           socials: Json;
+          sort_order: number;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
+          site_slug: string;
           slug: string;
           name: string;
           nickname?: string | null;
@@ -53,11 +56,13 @@ export interface Database {
           city?: string | null;
           selected_works?: Json;
           socials?: Json;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          site_slug?: string;
           slug?: string;
           name?: string;
           nickname?: string | null;
@@ -71,14 +76,24 @@ export interface Database {
           city?: string | null;
           selected_works?: Json;
           socials?: Json;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "artists_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
+        ];
       };
       releases: {
         Row: {
           id: string;
+          site_slug: string;
           slug: string;
           title: string;
           primary_artist_id: string | null;
@@ -95,11 +110,13 @@ export interface Database {
           release_date: string | null;
           platform_links: Json;
           socials: Json;
+          sort_order: number;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
+          site_slug: string;
           slug: string;
           title: string;
           primary_artist_id?: string | null;
@@ -116,11 +133,13 @@ export interface Database {
           release_date?: string | null;
           platform_links?: Json;
           socials?: Json;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          site_slug?: string;
           slug?: string;
           title?: string;
           primary_artist_id?: string | null;
@@ -137,10 +156,18 @@ export interface Database {
           release_date?: string | null;
           platform_links?: Json;
           socials?: Json;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "releases_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
           {
             foreignKeyName: "releases_primary_artist_id_fkey";
             columns: ["primary_artist_id"];
@@ -153,6 +180,7 @@ export interface Database {
       tours: {
         Row: {
           id: string;
+          site_slug: string;
           slug: string;
           title: string;
           artist_id: string | null;
@@ -167,11 +195,13 @@ export interface Database {
           description_en: string | null;
           description_ko: string | null;
           status: string;
+          sort_order: number;
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id?: string;
+          site_slug: string;
           slug: string;
           title: string;
           artist_id?: string | null;
@@ -186,11 +216,13 @@ export interface Database {
           description_en?: string | null;
           description_ko?: string | null;
           status?: string;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          site_slug?: string;
           slug?: string;
           title?: string;
           artist_id?: string | null;
@@ -205,79 +237,24 @@ export interface Database {
           description_en?: string | null;
           description_ko?: string | null;
           status?: string;
+          sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: "tours_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
           {
             foreignKeyName: "tours_artist_id_fkey";
             columns: ["artist_id"];
             isOneToOne: false;
             referencedRelation: "artists";
             referencedColumns: ["id"];
-          },
-        ];
-      };
-      artist_sites: {
-        Row: { artist_id: string; site_slug: string; sort_order: number };
-        Insert: { artist_id: string; site_slug: string; sort_order?: number };
-        Update: { artist_id?: string; site_slug?: string; sort_order?: number };
-        Relationships: [
-          {
-            foreignKeyName: "artist_sites_artist_id_fkey";
-            columns: ["artist_id"];
-            isOneToOne: false;
-            referencedRelation: "artists";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "artist_sites_site_slug_fkey";
-            columns: ["site_slug"];
-            isOneToOne: false;
-            referencedRelation: "sites";
-            referencedColumns: ["slug"];
-          },
-        ];
-      };
-      release_sites: {
-        Row: { release_id: string; site_slug: string; sort_order: number };
-        Insert: { release_id: string; site_slug: string; sort_order?: number };
-        Update: { release_id?: string; site_slug?: string; sort_order?: number };
-        Relationships: [
-          {
-            foreignKeyName: "release_sites_release_id_fkey";
-            columns: ["release_id"];
-            isOneToOne: false;
-            referencedRelation: "releases";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "release_sites_site_slug_fkey";
-            columns: ["site_slug"];
-            isOneToOne: false;
-            referencedRelation: "sites";
-            referencedColumns: ["slug"];
-          },
-        ];
-      };
-      tour_sites: {
-        Row: { tour_id: string; site_slug: string; sort_order: number };
-        Insert: { tour_id: string; site_slug: string; sort_order?: number };
-        Update: { tour_id?: string; site_slug?: string; sort_order?: number };
-        Relationships: [
-          {
-            foreignKeyName: "tour_sites_tour_id_fkey";
-            columns: ["tour_id"];
-            isOneToOne: false;
-            referencedRelation: "tours";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "tour_sites_site_slug_fkey";
-            columns: ["site_slug"];
-            isOneToOne: false;
-            referencedRelation: "sites";
-            referencedColumns: ["slug"];
           },
         ];
       };
