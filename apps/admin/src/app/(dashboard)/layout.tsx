@@ -54,7 +54,7 @@ export default async function DashboardLayout({
             href="/"
             className="text-sm font-semibold tracking-tight whitespace-nowrap"
           >
-            v.f.labs Admin
+            ye0m2 admin
           </Link>
           <SiteSwitcher />
           <NavLinks />

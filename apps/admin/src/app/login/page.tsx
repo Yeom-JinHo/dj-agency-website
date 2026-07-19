@@ -60,7 +60,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm space-y-6">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
-            v.f.labs Admin
+            ye0m2 admin
           </h1>
           <p className="text-muted-foreground text-sm">
             Sign in to manage content.
