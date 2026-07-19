@@ -27,6 +27,9 @@ catalogs:
     '@vercel/speed-insights':
       specifier: ^2.0.0
       version: 2.0.0
+    atropos:
+      specifier: ^2.0.2
+      version: 2.0.2
     class-variance-authority:
       specifier: ^0.7.1
       version: 0.7.1
@@ -48,6 +51,9 @@ catalogs:
     react-dom:
       specifier: ^19.2.0
       version: 19.2.0
+    react-scan:
+      specifier: ^0.5.3
+      version: 0.5.3
     tailwind-merge:
       specifier: ^3.5.0
       version: 3.5.0
@@ -334,7 +340,7 @@ importers:
         version: 12.23.24(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next:
         specifier: 'catalog:'
-        version: 15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 15.5.18(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: 'catalog:'
         version: 19.2.0
@@ -3165,12 +3171,12 @@ snapshots:
 
   '@vercel/analytics@2.0.1(next@15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)':
     optionalDependencies:
-      next: 15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next: 15.5.18(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
 
   '@vercel/speed-insights@2.0.0(next@15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)':
     optionalDependencies:
-      next: 15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next: 15.5.18(@babel/core@7.29.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
 
   acorn-jsx@5.3.2(acorn@8.15.0):
@@ -4107,29 +4113,6 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  next@15.5.18(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
-    dependencies:
-      '@next/env': 15.5.18
-      '@swc/helpers': 0.5.15
-      caniuse-lite: 1.0.30001790
-      postcss: 8.4.31
-      react: 19.2.0
-      react-dom: 19.2.0(react@19.2.0)
-      styled-jsx: 5.1.6(react@19.2.0)
-    optionalDependencies:
-      '@next/swc-darwin-arm64': 15.5.18
-      '@next/swc-darwin-x64': 15.5.18
-      '@next/swc-linux-arm64-gnu': 15.5.18
-      '@next/swc-linux-arm64-musl': 15.5.18
-      '@next/swc-linux-x64-gnu': 15.5.18
-      '@next/swc-linux-x64-musl': 15.5.18
-      '@next/swc-win32-arm64-msvc': 15.5.18
-      '@next/swc-win32-x64-msvc': 15.5.18
-      sharp: 0.34.4
-    transitivePeerDependencies:
-      - '@babel/core'
-      - babel-plugin-macros
-
   node-releases@2.0.38: {}
 
   object-assign@4.1.1: {}
@@ -4504,11 +4487,6 @@ snapshots:
       react: 19.2.0
     optionalDependencies:
       '@babel/core': 7.29.0
-
-  styled-jsx@5.1.6(react@19.2.0):
-    dependencies:
-      client-only: 0.0.1
-      react: 19.2.0
 
   supports-color@7.2.0:
     dependencies:
