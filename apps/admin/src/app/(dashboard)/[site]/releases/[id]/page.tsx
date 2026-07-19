@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
+import { z } from "zod";
 import {
   adminGetReleaseById,
   adminListArtists,
 } from "@repo/content/admin-queries";
-import { PLATFORM_LINK_KEYS, type SiteSlug } from "@repo/content/schema";
+import { PLATFORM_LINK_KEYS, siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
 import { ReleaseForm } from "../release-form";
@@ -18,14 +19,19 @@ export default async function EditReleasePage({
   params: Promise<{ site: string; id: string }>;
 }) {
   const { site, id } = await params;
-  const siteSlug = site as SiteSlug;
+  // artist 패턴과 동일한 3중 방어: site 검증 + uuid 선검증(비-uuid 손입력 → 404) + 소속 대조.
+  const parsedSite = siteSlugSchema.safeParse(site);
+  if (!parsedSite.success) notFound();
+  const siteSlug = parsedSite.data;
+  if (!z.string().uuid().safeParse(id).success) notFound();
 
   const [release, artists] = await Promise.all([
     adminGetReleaseById(id),
     adminListArtists(siteSlug),
   ]);
 
-  if (!release) notFound();
+  // 다른 사이트의 릴리즈를 이 라우트로 편집하지 못하게 소속 방어.
+  if (!release || release.siteSlug !== siteSlug) notFound();
 
   // platform_links → 5개 확정 키의 문자열 폼 표현(빈 키는 ""). Release는 이미 파싱된 도메인 객체.
   const platformLinks = Object.fromEntries(
