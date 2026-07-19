@@ -7,6 +7,11 @@ import loozboneProfile from "../public/images/artist/loozbone/profile.webp";
 import playmodeProfile from "../public/images/artist/playmode/profile.webp";
 import samProfile from "../public/images/artist/sam/profile.webp";
 import sieloProfile from "../public/images/artist/sielo/profile.webp";
+import music1Cover from "../public/images/music/1.webp";
+import music2Cover from "../public/images/music/2.webp";
+import music3Cover from "../public/images/music/3.webp";
+import music4Cover from "../public/images/music/4.webp";
+import music5Cover from "../public/images/music/5.webp";
 import { MusicInfo } from "./types/music";
 
 export const artistProfilesData: ArtistProfile[] = [
@@ -283,7 +288,7 @@ export const musicInfoDatas: MusicInfo[] = [
     name: "Floating",
     artist: ARTIST_NAME.JUNTARO,
     label: "Payday Records",
-    image: "/images/music/1.webp",
+    image: music1Cover,
     shortDescription: "test",
     fullDescription: "test",
     socials: [
@@ -318,7 +323,7 @@ export const musicInfoDatas: MusicInfo[] = [
     name: "Baby",
     artist: ARTIST_NAME.SIELO,
     label: "Payday Records",
-    image: "/images/music/2.webp",
+    image: music2Cover,
     shortDescription: "test",
     fullDescription: "test",
     socials: [
@@ -343,7 +348,7 @@ export const musicInfoDatas: MusicInfo[] = [
     name: "Demolish",
     artist: ARTIST_NAME.SIELO,
     label: "Payday Records",
-    image: "/images/music/3.webp",
+    image: music3Cover,
     shortDescription: "test",
     fullDescription: "test",
     socials: [
@@ -358,7 +363,7 @@ export const musicInfoDatas: MusicInfo[] = [
     name: "Esto Ta Duro",
     artist: ARTIST_NAME.JUNTARO,
     label: "Payday Records",
-    image: "/images/music/4.webp",
+    image: music4Cover,
     shortDescription: "test",
     fullDescription: "test",
     socials: [
@@ -373,7 +378,7 @@ export const musicInfoDatas: MusicInfo[] = [
     name: "Selecta",
     artist: ARTIST_NAME.JUNTARO,
     label: "Payday Records",
-    image: "/images/music/5.webp",
+    image: music5Cover,
     shortDescription: "test",
     fullDescription: "test",
     socials: [
