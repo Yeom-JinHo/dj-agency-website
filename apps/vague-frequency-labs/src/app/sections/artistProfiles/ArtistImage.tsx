@@ -32,8 +32,6 @@ const ArtistImage = ({
         <div className="absolute inset-0 flex scale-95 items-center justify-center opacity-0 transition-all duration-200 ease-out group-hover:scale-100 group-hover:opacity-100">
           <Image
             src={artist.logoImage}
-            width={320}
-            height={150}
             sizes="(max-width: 768px) 50vw, 20vw"
             alt={`Hover image of ${artist.name}`}
             className="h-auto w-full object-contain brightness-75"

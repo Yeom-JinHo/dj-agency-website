@@ -1,11 +1,17 @@
 import type { ArtistProfile } from "@/types/artist";
 
 import { ARTIST_NAME } from "@/consts/artist";
+import dearboiLogo from "../public/images/artist/dearboi/logo.webp";
 import dearboiProfile from "../public/images/artist/dearboi/profile.webp";
+import juntaroLogo from "../public/images/artist/juntaro/logo.webp";
 import juntaroProfile from "../public/images/artist/juntaro/profile.webp";
+import loozboneLogo from "../public/images/artist/loozbone/logo.webp";
 import loozboneProfile from "../public/images/artist/loozbone/profile.webp";
+import playmodeLogo from "../public/images/artist/playmode/logo.webp";
 import playmodeProfile from "../public/images/artist/playmode/profile.webp";
+import samLogo from "../public/images/artist/sam/logo.webp";
 import samProfile from "../public/images/artist/sam/profile.webp";
+import sieloLogo from "../public/images/artist/sielo/logo.webp";
 import sieloProfile from "../public/images/artist/sielo/profile.webp";
 import music1Cover from "../public/images/music/1.webp";
 import music2Cover from "../public/images/music/2.webp";
@@ -18,7 +24,7 @@ export const artistProfilesData: ArtistProfile[] = [
   {
     name: ARTIST_NAME.JUNTARO,
     image: juntaroProfile,
-    logoImage: "/images/artist/juntaro/logo.webp",
+    logoImage: juntaroLogo,
     nickname: ARTIST_NAME.JUNTARO,
     shortDescription: "King",
     fullDescription: `
@@ -62,7 +68,7 @@ EP와 싱글을 발매하며 프로듀서로서의 실력을 입증했습니다.
   {
     name: ARTIST_NAME.SIELO,
     image: sieloProfile,
-    logoImage: "/images/artist/sielo/logo.webp",
+    logoImage: sieloLogo,
     nickname: ARTIST_NAME.SIELO,
     shortDescription: "King",
     fullDescription: `
@@ -121,7 +127,7 @@ World DJ Festival, Micro Seoul, Strike Music Festival 등 주요 페스티벌에
   {
     name: ARTIST_NAME.LOOZBONE,
     image: loozboneProfile,
-    logoImage: "/images/artist/loozbone/logo.webp",
+    logoImage: loozboneLogo,
     nickname: ARTIST_NAME.LOOZBONE,
     shortDescription: "King",
     fullDescription: `
@@ -178,7 +184,7 @@ LOOZBONE은 빠르게 떠오르는 일렉트로닉 댄스 뮤직 신의 스타�
   {
     name: ARTIST_NAME.SAM,
     image: samProfile,
-    logoImage: "/images/artist/sam/logo.webp",
+    logoImage: samLogo,
     nickname: ARTIST_NAME.SAM,
     shortDescription: "King",
     fullDescription: "test",
@@ -203,7 +209,7 @@ LOOZBONE은 빠르게 떠오르는 일렉트로닉 댄스 뮤직 신의 스타�
   {
     name: ARTIST_NAME.DEARBOI,
     image: dearboiProfile,
-    logoImage: "/images/artist/dearboi/logo.webp",
+    logoImage: dearboiLogo,
     nickname: ARTIST_NAME.DEARBOI,
     shortDescription: "King",
     fullDescription: `
@@ -236,7 +242,7 @@ Dearboi는 서울을 기반으로 활동하는 하우스/테크 하우스 DJ로,
   {
     name: ARTIST_NAME.PLAYMODE,
     image: playmodeProfile,
-    logoImage: "/images/artist/playmode/logo.webp",
+    logoImage: playmodeLogo,
     nickname: ARTIST_NAME.PLAYMODE,
     shortDescription: "King",
     fullDescription: `

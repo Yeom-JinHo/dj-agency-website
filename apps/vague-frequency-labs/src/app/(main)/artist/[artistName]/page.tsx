@@ -27,10 +27,12 @@ export async function generateMetadata(props: {
   const artist = artistProfile.getPage(decodeURIComponent(artistName));
   if (!artist) notFound();
 
+  // 1200×630 고정 선언은 세로 원본과 안 맞는 거짓 치수였다 — 실치수를 선언한다.
+  // (전용 OG 카드 라우트는 공유 트래픽 대비 과투자로 기각)
   const cardImage = {
     alt: artist.name,
-    width: 1200,
-    height: 630,
+    width: artist.image.width,
+    height: artist.image.height,
     url: artist.image.src,
     type: "image/webp",
   } as const;
