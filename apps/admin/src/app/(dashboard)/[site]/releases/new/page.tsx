@@ -1,5 +1,6 @@
+import { notFound } from "next/navigation";
 import { adminListArtists } from "@repo/content/admin-queries";
-import type { SiteSlug } from "@repo/content/schema";
+import { siteSlugSchema } from "@repo/content/schema";
 
 import { ReleaseForm } from "../release-form";
 import { emptyReleaseFormValues } from "../schema";
@@ -12,7 +13,10 @@ export default async function NewReleasePage({
   params: Promise<{ site: string }>;
 }) {
   const { site } = await params;
-  const siteSlug = site as SiteSlug;
+  // artist 패턴과 동일: layout 가드에 더해 페이지에서도 site 재검증(방어 심층화).
+  const parsedSite = siteSlugSchema.safeParse(site);
+  if (!parsedSite.success) notFound();
+  const siteSlug = parsedSite.data;
 
   const artists = await adminListArtists(siteSlug);
 
