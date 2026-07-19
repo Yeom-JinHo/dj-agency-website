@@ -27,12 +27,14 @@ export async function generateMetadata(props: {
   const artist = artistProfile.getPage(decodeURIComponent(artistName));
   if (!artist) notFound();
 
+  // 세로 원본을 그대로 1200×630으로 선언하던 것을 전용 OG 카드 라우트로 교체.
+  // 파일 컨벤션 자동 태그는 팩토리 기본 og:image에 덮이므로 명시 지정한다 (PR #94 관례).
   const cardImage = {
     alt: artist.name,
     width: 1200,
     height: 630,
-    url: artist.image.src,
-    type: "image/webp",
+    url: `/artist/${encodeURIComponent(artist.name)}/og`,
+    type: "image/png",
   } as const;
 
   return createMetadata({

@@ -38,6 +38,7 @@
     "@types/react-dom": "catalog:",
     "eslint": "catalog:",
     "postcss": "catalog:",
+    "sharp": "0.34.4",
     "tailwindcss": "catalog:",
     "tailwindcss-animate": "catalog:",
     "typescript": "catalog:"
