@@ -56,16 +56,11 @@ const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
 const RAMP_SCROLL: [number, number] = [0.03, 0.22];
 // Accent-arc charge: after the camera journey ends (scrollY 0.85·100svh) the
 // remaining scroll to the sticky release (1.0·100svh) sweeps the frozen-pulse
-// arcs around the ring — scroll feedback in the dwell zone, and the circuit
-// completes exactly as the stage lets go, handing off to Media.
-// TWO arcs, like the Seoul pin's own red+blue pulse pair: red anchored at 12
-// o'clock, blue at 6, both sweeping clockwise in rotational symmetry — at full
-// charge the ring reads as crisp taegeuk halves (red right, blue left), no
-// blended midtones. Geometry of the r=96 frame circle (viewBox 200):
-// C = 2π·96 ≈ 603.19, each arc rests at 44 and completes at C/2.
+// arc around the ring — scroll feedback in the dwell zone, and the circuit
+// completes exactly as the stage lets go, handing off to Media. Geometry of
+// the r=96 frame circle (viewBox 200): C = 2π·96 ≈ 603.19, resting dash 44.
 const ARC_CIRC = 603.19;
 const ARC_BASE_DASH = 44;
-const ARC_FULL_DASH = ARC_CIRC / 2;
 // Reveal cascade delays (s) — near-zero: the user's hand already did the
 // travelling, so the room answers promptly once the scrub commits.
 const REVEAL_DUR = 0.45;
@@ -177,9 +172,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     const pinLayer = document.querySelector<HTMLElement>(".vfl-pin-layer");
     const headline = document.querySelector<HTMLElement>(".vfl-headline");
     const scrollCue = document.querySelector<HTMLElement>(".vfl-scroll-cue");
-    const accentArcs = document.querySelectorAll<SVGCircleElement>(
-      ".vfl-about-arc",
-    );
+    const accentArc = document.querySelector<SVGCircleElement>(".vfl-about-arc");
     if (!mapInner || !mapImg) return;
     // Endpoint translate components — interpolated linearly in progress, the
     // same way a CSS transition between the rest and zoom transforms would be.
@@ -237,7 +230,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         el.style.removeProperty("will-change");
       }
       // Fall back to the JSX presentation attribute (the resting 44 dash).
-      accentArcs.forEach((a) => a.style.removeProperty("stroke-dasharray"));
+      accentArc?.style.removeProperty("stroke-dasharray");
     };
     const tick = () => {
       cur += (target - cur) * SCRUB_LERP;
@@ -265,17 +258,15 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
         headline.style.opacity = String(1 - ramp(cur, RAMP_HEADLINE));
       if (scrollCue)
         scrollCue.style.opacity = String(1 - ramp(cur, RAMP_SCROLL));
-      // Frozen-pulse arc pair sweeps the ring with the dwell scroll (reverses
-      // when scrubbed back) — each arc grows to a half-circle, meeting the
-      // other at 12/6 for the taegeuk read. style.strokeDasharray overrides
-      // the JSX attribute and is released with everything else at rest.
+      // Frozen-pulse arc sweeps the ring with the dwell scroll (reverses when
+      // scrubbed back). style.strokeDasharray overrides the JSX attribute and
+      // is released with everything else at rest.
       arcCur += (arcTarget - arcCur) * SCRUB_LERP;
       if (Math.abs(arcTarget - arcCur) < 0.0005) arcCur = arcTarget;
-      const dash = ARC_BASE_DASH + (ARC_FULL_DASH - ARC_BASE_DASH) * arcCur;
-      const dashValue = `${dash.toFixed(2)} ${ARC_CIRC.toFixed(2)}`;
-      accentArcs.forEach((a) => {
-        a.style.strokeDasharray = dashValue;
-      });
+      if (accentArc) {
+        const dash = ARC_BASE_DASH + (ARC_CIRC - ARC_BASE_DASH) * arcCur;
+        accentArc.style.strokeDasharray = `${dash.toFixed(2)} ${ARC_CIRC.toFixed(2)}`;
+      }
       if (cur >= REVEAL_AT && !revealed) {
         revealed = true;
         enterAbout();
@@ -472,12 +463,11 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
                   stroke="var(--vfl-line-strong)"
                   strokeWidth="0.6"
                 />
-                {/* The frozen pulse arcs — red anchored at 12, blue at 6, the
-                    same red/blue pair as the Seoul pin's own pulse rings. The
-                    scrub loop sweeps both clockwise over the dwell scroll
-                    (post-arrival → sticky release) until they meet as taegeuk
-                    halves, the circuit completing exactly as the stage hands
-                    off to the next section. */}
+                {/* The frozen pulse arc — a single accent segment at top, the
+                    signal that became the room's frame. The scrub loop sweeps
+                    it around the ring over the dwell scroll (post-arrival →
+                    sticky release), so the circuit completes exactly as the
+                    stage hands off to the next section. */}
                 <circle
                   className="vfl-about-arc"
                   cx="100"
@@ -488,18 +478,6 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
                   strokeLinecap="round"
                   strokeDasharray="44 559"
                   transform="rotate(-90 100 100)"
-                  opacity="0.9"
-                />
-                <circle
-                  className="vfl-about-arc"
-                  cx="100"
-                  cy="100"
-                  r="96"
-                  stroke="var(--vfl-accent-blue)"
-                  strokeWidth="1"
-                  strokeLinecap="round"
-                  strokeDasharray="44 559"
-                  transform="rotate(90 100 100)"
                   opacity="0.9"
                 />
               </svg>
