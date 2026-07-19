@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 
 interface ArtistPortraitProps {
-  image?: string;
+  image?: StaticImageData;
   name: string;
   variant?: "card" | "modal";
   sizes?: string;
@@ -62,13 +62,15 @@ export function ArtistPortrait({
         <NoPortrait name={name} variant={variant} />
       ) : (
         <Image
-          key={image}
+          // 모달 prev/next처럼 인스턴스가 재사용될 때 errored 상태를 리셋한다.
+          key={image.src}
           src={image}
           alt={name}
           fill
           sizes={sizes}
           priority={priority}
           loading={loading}
+          placeholder="blur"
           className={`object-cover ${
             variant === "card"
               ? "transform-gpu transition-transform duration-700 ease-out group-hover:scale-[1.06]"
