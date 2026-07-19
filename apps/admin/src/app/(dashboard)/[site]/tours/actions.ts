@@ -23,6 +23,26 @@ function toErrorMessage(err: unknown): string {
 }
 
 /**
+ * artist_id same-site 검증: select UI는 같은 사이트만 노출하지만(클라이언트 방어)
+ * FK는 존재만 검사하므로, 타 사이트 아티스트 uuid를 직접 넣는 우회를 서버에서 차단한다.
+ * (release의 assertArtistInSite와 동일 패턴)
+ */
+async function assertArtistInSite(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  artistId: string | null,
+  site: string,
+): Promise<string | null> {
+  if (!artistId) return null;
+  const { data } = await supabase
+    .from("artists")
+    .select("id")
+    .eq("id", artistId)
+    .eq("site_slug", site)
+    .maybeSingle();
+  return data ? null : "선택한 아티스트가 이 사이트 소속이 아닙니다.";
+}
+
+/**
  * admin 자신의 사이트-스코프 라우트 revalidate.
  * P3: publish(contentTags.tours(site) 등, site) 연결 지점 — 사이트 앱의 태그 캐시는
  * 별개 배포라 여기서 revalidateTag를 불러도 무효화되지 않는다. 반드시 publish 헬퍼가
@@ -56,6 +76,13 @@ export async function createTour(
     // 이미지 유효성은 행 생성 전에 검사 — 불량 입력이 행을 만들지 않게.
     const poster = imageFile(formData, "posterImage");
     if (poster) validateImageFile(poster);
+
+    const artistError = await assertArtistInSite(
+      supabase,
+      columns.artist_id ?? null,
+      site,
+    );
+    if (artistError) return { ok: false, error: artistError };
 
     // insert-first: (site_slug, slug) 확보를 먼저 해 사이트 내 제목 중복(23505)에서
     // Storage 고아를 막고 update 경로와 대칭이 되게 한다.
@@ -123,13 +150,22 @@ export async function updateTour(
 
     // slug·site_slug는 불변(§13) — 기존 행에서 slug를 읽어 이미지 경로 조립·교체
     // 삭제에 쓴다. update 컬럼에는 slug/site_slug를 넣지 않는다.
+    // site_slug 스코프: 타 사이트 투어를 이 site 컨텍스트로 조작하지 못하게(artist 패턴).
     const { data: existing, error: loadError } = await supabase
       .from("tours")
       .select("slug, poster_path")
       .eq("id", id)
+      .eq("site_slug", site)
       .maybeSingle();
     if (loadError) return { ok: false, error: loadError.message };
     if (!existing) return { ok: false, error: "투어를 찾을 수 없습니다." };
+
+    const artistError = await assertArtistInSite(
+      supabase,
+      columns.artist_id ?? null,
+      site,
+    );
+    if (artistError) return { ok: false, error: artistError };
 
     const poster = imageFile(formData, "posterImage");
     const posterUpload = poster
@@ -153,7 +189,8 @@ export async function updateTour(
     const { error } = await supabase
       .from("tours")
       .update({ ...columns, ...imageColumns })
-      .eq("id", id);
+      .eq("id", id)
+      .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
     // 교체된 이전 포스터 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
@@ -182,13 +219,19 @@ export async function deleteTour(
     const supabase = await createServerSupabaseClient();
 
     // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.
+    // site_slug 스코프: 타 사이트 투어 삭제 차단(artist 패턴).
     const { data: existing } = await supabase
       .from("tours")
       .select("poster_path")
       .eq("id", id)
+      .eq("site_slug", site)
       .maybeSingle();
 
-    const { error } = await supabase.from("tours").delete().eq("id", id);
+    const { error } = await supabase
+      .from("tours")
+      .delete()
+      .eq("id", id)
+      .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
     if (existing) {
