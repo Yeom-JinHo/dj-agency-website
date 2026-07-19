@@ -1,8 +1,11 @@
 import type { ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 
+import { NavLinks } from "@/components/nav-links";
+import { SiteSwitcher } from "@/components/site-switcher";
 import { Button } from "@/components/ui/button";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 대상에서 제외한다 —
@@ -46,9 +49,16 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-svh">
       <header className="flex items-center justify-between border-b px-6 py-3">
-        <span className="text-sm font-semibold tracking-tight">
-          v.f.labs Admin
-        </span>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="text-sm font-semibold tracking-tight whitespace-nowrap"
+          >
+            ye0m2 admin
+          </Link>
+          <SiteSwitcher />
+          <NavLinks />
+        </div>
         <div className="flex items-center gap-3">
           {user.email ? (
             <span className="text-muted-foreground text-sm">{user.email}</span>

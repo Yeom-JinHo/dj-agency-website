@@ -1,32 +1,29 @@
-// P1은 골격만 — Artist/Music/Tour CRUD는 P2에서 shadcn table/form으로 구축한다.
-const SECTIONS = [
-  { title: "Artists", description: "Shared roster across all sites." },
-  { title: "Music", description: "Releases and tracks." },
-  { title: "Tours", description: "Scheduled events." },
-] as const;
+import Link from "next/link";
+import { SITE_SLUGS } from "@repo/content/schema";
 
+import { SITE_LABELS } from "@/lib/sites";
+
+// 사이트-우선 라우트(§8): 대시보드는 4개 사이트 카드 → /[site].
 export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">대시보드</h1>
         <p className="text-muted-foreground text-sm">
-          Content management for v.f.labs sites.
+          관리할 사이트를 선택하세요.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {SECTIONS.map((section) => (
-          <section
-            key={section.title}
-            className="rounded-lg border p-5"
-            aria-label={section.title}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {SITE_SLUGS.map((site) => (
+          <Link
+            key={site}
+            href={`/${site}`}
+            className="hover:bg-muted/50 rounded-lg border p-5 transition-colors"
           >
-            <h2 className="text-base font-medium">{section.title}</h2>
-            <p className="text-muted-foreground mt-1 text-sm">
-              {section.description}
-            </p>
-          </section>
+            <h2 className="text-base font-medium">{SITE_LABELS[site]}</h2>
+            <p className="text-muted-foreground mt-1 text-sm">{site}</p>
+          </Link>
         ))}
       </div>
     </div>
