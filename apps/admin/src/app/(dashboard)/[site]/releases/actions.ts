@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import type { Database } from "@repo/content/supabase/types";
-import type { SiteSlug } from "@repo/content/schema";
+import { siteSlugSchema } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
 import {
@@ -23,10 +23,12 @@ function toErrorMessage(err: unknown): string {
 }
 
 export async function createRelease(
-  site: SiteSlug,
+  siteInput: string,
   formData: FormData,
 ): Promise<ReleaseActionResult> {
   try {
+    // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — artist/tour 액션과 동일 패턴.
+    const site = siteSlugSchema.parse(siteInput);
     const values = releaseFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -106,11 +108,12 @@ export async function createRelease(
 }
 
 export async function updateRelease(
-  site: SiteSlug,
+  siteInput: string,
   id: string,
   formData: FormData,
 ): Promise<ReleaseActionResult> {
   try {
+    const site = siteSlugSchema.parse(siteInput);
     const values = releaseFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -173,10 +176,11 @@ export async function updateRelease(
 }
 
 export async function deleteRelease(
-  site: SiteSlug,
+  siteInput: string,
   id: string,
 ): Promise<ReleaseActionResult> {
   try {
+    const site = siteSlugSchema.parse(siteInput);
     const supabase = await createServerSupabaseClient();
 
     // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.
