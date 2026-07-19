@@ -1,9 +1,8 @@
 "use server";
 
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import { siteSlugSchema, type SiteSlug } from "@repo/content/schema";
-import { contentTags } from "@repo/content/tags";
 import type { Database } from "@repo/content/supabase/types";
 
 import { slugify } from "@/lib/media";
@@ -24,13 +23,12 @@ function toErrorMessage(err: unknown): string {
 }
 
 /**
- * P3 발행 앵커: 소비자 사이트의 tours 리스트 캐시(queries의 unstable_cache는
- * contentTags.tours(site)로 태깅)를 무효화해 저장 즉시 반영한다. 상세 태그
- * (tour(site,slug))는 contentTags에 없어 리스트 태그만 무효화한다. admin 자신의
- * 사이트-스코프 라우트도 함께 revalidate.
+ * admin 자신의 사이트-스코프 라우트 revalidate.
+ * P3: publish(contentTags.tours(site) 등, site) 연결 지점 — 사이트 앱의 태그 캐시는
+ * 별개 배포라 여기서 revalidateTag를 불러도 무효화되지 않는다. 반드시 publish 헬퍼가
+ * 각 사이트 /api/revalidate로 POST해야 하며, 태그는 contentTags 빌더로만 조립한다.
  */
 function revalidateTours(site: SiteSlug, id?: string): void {
-  revalidateTag(contentTags.tours(site));
   revalidatePath(`/${site}/tours`);
   if (id) revalidatePath(`/${site}/tours/${id}`);
 }
