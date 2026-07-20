@@ -267,6 +267,7 @@ export async function deleteArtist(
           contentTags.tours(site),
         ],
         site,
+        "delete",
       );
     }
 

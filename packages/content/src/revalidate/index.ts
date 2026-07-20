@@ -8,7 +8,8 @@ import { z } from "zod";
 const MAX_TAGS = 50;
 
 const bodySchema = z.object({
-  tags: z.array(z.string().min(1)).max(MAX_TAGS),
+  // 빈 배열은 무의미한 no-op 요청이라 거부, 태그당 길이 상한으로 거대 문자열 차단.
+  tags: z.array(z.string().min(1).max(256)).min(1).max(MAX_TAGS),
 });
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;

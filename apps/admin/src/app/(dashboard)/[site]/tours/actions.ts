@@ -248,7 +248,11 @@ export async function deleteTour(
     let publishWarning: string | null = null;
     if (existing) {
       await removeImages(supabase, [existing.poster_path]);
-      publishWarning = await publishOrWarn([contentTags.tours(site)], site);
+      publishWarning = await publishOrWarn(
+        [contentTags.tours(site)],
+        site,
+        "delete",
+      );
     }
 
     revalidateTours(site);

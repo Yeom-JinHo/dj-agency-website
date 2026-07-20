@@ -217,7 +217,9 @@ supabase/
   "./image":             "./src/image/to-webp.ts",      // 서버 전용(sharp)
   "./queries":           "./src/queries/index.ts",       // 사이트용 캐시 조회 (admin 사용 금지)
   "./admin-queries":     "./src/admin-queries/index.ts", // 서버 전용, 비캐시 (admin 전용, P2 신설)
-  "./publish":           "./src/publish/index.ts"        // 서버 전용(admin 발행)
+  "./tags":              "./src/tags.ts",                // 캐시 태그 빌더 (브라우저 안전, 단일 출처)
+  "./publish":           "./src/publish/index.ts",       // 서버 전용(admin 발행)
+  "./revalidate":        "./src/revalidate/index.ts"     // 서버 전용, 사이트 /api/revalidate 핸들러 팩토리 (P3 신설)
 }
 ```
 

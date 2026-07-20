@@ -256,6 +256,7 @@ export async function deleteRelease(
       publishWarning = await publishOrWarn(
         [contentTags.release(site, existing.slug), contentTags.releases(site)],
         site,
+        "delete",
       );
     }
 
