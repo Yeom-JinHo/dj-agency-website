@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import { siteSlugSchema, type SiteSlug } from "@repo/content/schema";
+import { contentTags } from "@repo/content/tags";
 import type { Database } from "@repo/content/supabase/types";
 
+import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
 import {
   imageFile,
@@ -38,6 +40,14 @@ export async function createArtist(
     if (!slug) {
       return { ok: false, error: "이름에서 slug를 만들 수 없습니다." };
     }
+
+    // 아티스트명은 릴리즈·투어 표시에 쓰이므로 교차 엔티티 리스트 태그도 무효화(§13 🔴).
+    const publishTags = [
+      contentTags.artist(site, slug),
+      contentTags.artists(site),
+      contentTags.releases(site),
+      contentTags.tours(site),
+    ];
 
     // createServerSupabaseClient는 인증 세션을 실어 RLS(editors)가 서버측 방어로 동작.
     const supabase = await createServerSupabaseClient();
@@ -98,18 +108,22 @@ export async function createArtist(
         if (updateError) throw new Error(updateError.message);
       }
     } catch (postError) {
-      // P3: publish(contentTags.artist(site, slug), contentTags.artists(site)) 연결 지점 — 빌더로 태그 무효화
+      // 행은 저장됐으니 이미지 없이라도 사이트에 반영(발행). 발행 경고는 이미지 경고에 덧붙인다.
+      const publishWarning = await publishOrWarn(publishTags, site);
       revalidatePath(`/${site}/artists`);
+      const imageWarning = `아티스트는 생성됐지만 이미지 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 이미지를 다시 저장해주세요.`;
       return {
         ok: true,
         id,
-        warning: `아티스트는 생성됐지만 이미지 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 이미지를 다시 저장해주세요.`,
+        warning: publishWarning ? `${imageWarning} ${publishWarning}` : imageWarning,
       };
     }
 
-    // P3: publish(contentTags.artist(site, slug), contentTags.artists(site)) 연결 지점 — 빌더로 태그 무효화
+    const publishWarning = await publishOrWarn(publishTags, site);
     revalidatePath(`/${site}/artists`);
-    return { ok: true, id };
+    return publishWarning
+      ? { ok: true, id, warning: publishWarning }
+      : { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -194,10 +208,21 @@ export async function updateArtist(
         : null;
     await removeImages(supabase, [oldProfilePath, oldLogoPath]);
 
-    // P3: publish(contentTags.artist(site, existing.slug), contentTags.artists(site)) 연결 지점 — 빌더로 태그 무효화
+    // 아티스트명 변경이 릴리즈·투어 표시에 반영되도록 교차 엔티티 태그도 무효화(§13 🔴).
+    const publishWarning = await publishOrWarn(
+      [
+        contentTags.artist(site, existing.slug),
+        contentTags.artists(site),
+        contentTags.releases(site),
+        contentTags.tours(site),
+      ],
+      site,
+    );
     revalidatePath(`/${site}/artists`);
     revalidatePath(`/${site}/artists/${id}`);
-    return { ok: true, id };
+    return publishWarning
+      ? { ok: true, id, warning: publishWarning }
+      : { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -211,10 +236,10 @@ export async function deleteArtist(
     const site = siteSlugSchema.parse(siteParam);
     const supabase = await createServerSupabaseClient();
 
-    // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리. site_slug로 소속 방어.
+    // slug는 삭제된 상세 페이지 캐시 태그 조립에, 이미지 경로는 Storage 정리에 쓴다.
     const { data: existing } = await supabase
       .from("artists")
-      .select("image_path, logo_image_path")
+      .select("slug, image_path, logo_image_path")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
@@ -226,16 +251,27 @@ export async function deleteArtist(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
+    // 행이 없었다면 무효화할 캐시도 없다 — 실제 삭제가 일어난 경우에만 발행.
+    let publishWarning: string | null = null;
     if (existing) {
       await removeImages(supabase, [
         existing.image_path,
         existing.logo_image_path,
       ]);
+      // 삭제된 상세 태그 포함 — 상세 페이지 캐시까지 무효화(§13 🔴 교차 엔티티).
+      publishWarning = await publishOrWarn(
+        [
+          contentTags.artist(site, existing.slug),
+          contentTags.artists(site),
+          contentTags.releases(site),
+          contentTags.tours(site),
+        ],
+        site,
+      );
     }
 
-    // P3: publish(contentTags.artists(site)) 연결 지점 — 빌더로 태그 무효화
     revalidatePath(`/${site}/artists`);
-    return { ok: true };
+    return publishWarning ? { ok: true, warning: publishWarning } : { ok: true };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }

@@ -42,7 +42,12 @@ export function DeleteReleaseButton({
       return;
     }
     setOpen(false);
-    toast.success("릴리즈를 삭제했습니다.");
+    // 삭제는 성공했으나 사이트 반영(발행)만 실패한 경우 경고로 알린다(§4.3).
+    if (result.warning) {
+      toast.warning(result.warning);
+    } else {
+      toast.success("릴리즈를 삭제했습니다.");
+    }
     router.push(`/${site}/releases`);
     router.refresh();
   }

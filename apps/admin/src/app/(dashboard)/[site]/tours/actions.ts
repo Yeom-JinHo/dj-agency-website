@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import { siteSlugSchema, type SiteSlug } from "@repo/content/schema";
+import { contentTags } from "@repo/content/tags";
 import type { Database } from "@repo/content/supabase/types";
 
+import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
 import {
   imageFile,
@@ -43,10 +45,9 @@ async function assertArtistInSite(
 }
 
 /**
- * admin 자신의 사이트-스코프 라우트 revalidate.
- * P3: publish(contentTags.tours(site) 등, site) 연결 지점 — 사이트 앱의 태그 캐시는
- * 별개 배포라 여기서 revalidateTag를 불러도 무효화되지 않는다. 반드시 publish 헬퍼가
- * 각 사이트 /api/revalidate로 POST해야 하며, 태그는 contentTags 빌더로만 조립한다.
+ * admin 자신의 사이트-스코프 라우트 revalidate. 사이트 앱의 태그 캐시는 별개 배포라
+ * 여기서 무효화되지 않는다 — 각 뮤테이션 종료점에서 publishOrWarn([contentTags.tours(site)])
+ * 를 함께 호출해 사이트 /api/revalidate로 POST한다(태그는 contentTags 빌더로만 조립).
  */
 function revalidateTours(site: SiteSlug, id?: string): void {
   revalidatePath(`/${site}/tours`);
@@ -119,16 +120,22 @@ export async function createTour(
         if (updateError) throw new Error(updateError.message);
       }
     } catch (postError) {
+      // 행은 저장됐으니 포스터 없이라도 사이트에 반영(발행). 발행 경고는 포스터 경고에 덧붙인다.
+      const publishWarning = await publishOrWarn([contentTags.tours(site)], site);
       revalidateTours(site, id);
+      const imageWarning = `투어는 생성됐지만 포스터 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 포스터를 다시 저장해주세요.`;
       return {
         ok: true,
         id,
-        warning: `투어는 생성됐지만 포스터 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 포스터를 다시 저장해주세요.`,
+        warning: publishWarning ? `${imageWarning} ${publishWarning}` : imageWarning,
       };
     }
 
+    const publishWarning = await publishOrWarn([contentTags.tours(site)], site);
     revalidateTours(site, id);
-    return { ok: true, id };
+    return publishWarning
+      ? { ok: true, id, warning: publishWarning }
+      : { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -203,8 +210,11 @@ export async function updateTour(
         : null;
     await removeImages(supabase, [oldPosterPath]);
 
+    const publishWarning = await publishOrWarn([contentTags.tours(site)], site);
     revalidateTours(site, id);
-    return { ok: true, id };
+    return publishWarning
+      ? { ok: true, id, warning: publishWarning }
+      : { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -234,12 +244,15 @@ export async function deleteTour(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
+    // 행이 없었다면 무효화할 캐시도 없다 — 실제 삭제가 일어난 경우에만 발행.
+    let publishWarning: string | null = null;
     if (existing) {
       await removeImages(supabase, [existing.poster_path]);
+      publishWarning = await publishOrWarn([contentTags.tours(site)], site);
     }
 
     revalidateTours(site);
-    return { ok: true };
+    return publishWarning ? { ok: true, warning: publishWarning } : { ok: true };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
