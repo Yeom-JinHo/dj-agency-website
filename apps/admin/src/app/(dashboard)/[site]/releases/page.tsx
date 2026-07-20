@@ -21,8 +21,21 @@ import {
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 제외.
 export const dynamic = "force-dynamic";
 
+/**
+ * 발매일 → `2026-10-03` 고정 포맷. Asia/Seoul로 타임존을 고정해 서버 실행 환경
+ * TZ와 무관하게 KST 날짜를 표시(tours 목록 formatEventDate와 동형 — 단일 KST
+ * 편집자 기준). toLocaleDateString은 서버 TZ에 의존해 하루가 밀릴 수 있어 배제.
+ */
 function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("en-CA");
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const get = (type: string) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 export default async function ReleasesPage({

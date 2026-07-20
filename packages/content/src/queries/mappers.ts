@@ -4,6 +4,7 @@ import {
   platformLinksSchema,
   selectedWorkSchema,
   socialSchema,
+  tourStatusSchema,
 } from "../schema";
 import type { SiteSlug } from "../schema/site";
 import type { Artist, Release, Tour } from "../schema";
@@ -137,7 +138,8 @@ export function mapTour(row: TourRow): Tour {
     posterPlaceholder: row.poster_placeholder,
     descriptionEn: row.description_en,
     descriptionKo: row.description_ko,
-    status: row.status as Tour["status"],
+    // DB status가 예상 밖 값이어도 폴백("scheduled")으로 안전하게 승격(캐스팅 대신 검증).
+    status: tourStatusSchema.catch("scheduled").parse(row.status),
     sortOrder: row.sort_order,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
