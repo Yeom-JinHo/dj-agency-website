@@ -211,11 +211,12 @@ export function ArtistModal({
 
               {artist.socials.length > 0 ? (
                 <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
-                  {artist.socials.map((social) => {
+                  {artist.socials.map((social, index) => {
                     const Icon = SOCIAL_ICONS[social.platform];
                     return (
                       <a
-                        key={social.platform}
+                        // CMS 소셜은 "etc"로 흡수되는 플랫폼이 복수 존재할 수 있어 platform 단독 key는 충돌.
+                        key={`${social.platform}-${index}`}
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
