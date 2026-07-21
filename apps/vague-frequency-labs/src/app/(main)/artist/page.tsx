@@ -2,7 +2,8 @@ import type { CollectionPage, WithContext } from "schema-dts";
 import React, { ReactElement } from "react";
 import Link from "next/link";
 import { metadata as meta } from "@/app/config";
-import { artistProfile } from "@/source";
+import { getArtists } from "@repo/content/queries";
+import { toArtistProfile, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
@@ -53,7 +54,9 @@ const jsonLd: WithContext<CollectionPage> = {
   // })),
 };
 
-export default function ArtistPage(): ReactElement {
+export default async function ArtistPage(): Promise<ReactElement> {
+  const artists = (await getArtists(VFL_SITE)).map(toArtistProfile);
+
   return (
     <main className="my-16 flex-1">
       <JsonLd items={jsonLd} />
@@ -68,7 +71,7 @@ export default function ArtistPage(): ReactElement {
 
           <FancyLine className={"mt-16"} />
           <div className="mt-16 flex flex-wrap justify-center gap-16">
-            {artistProfile.getPages().map((artist, index) => (
+            {artists.map((artist, index) => (
               <BlurFade key={index} inView duration={0.6}>
                 <Link
                   href={`/artist/${artist.name}`}
