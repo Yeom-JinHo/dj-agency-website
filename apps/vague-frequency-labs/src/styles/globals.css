@@ -416,8 +416,9 @@
 
 /* ── hero → about stage track ──
    The hero is a 200svh track holding a 100svh sticky stage. The main path is a
-   SCRUB: hero.tsx's rAF loop reads scrollY directly and drives the camera /
-   dim / pin ramps 1:1 (the About reveal fires once the scrub commits past 90%
+   SCRUB: hero.tsx's scroll driver publishes spring-smoothed progress vars that
+   the scrub-ramp rules below consume (the About reveal fires once the scrub
+   commits past 90%
    progress — see REVEAL_AT in hero.tsx, the source of truth for thresholds). At
    rest (scroll 0) the stage is pinned at the top, so the map geometry the
    loader measures (.vfl-map-inner / .vfl-map-wrap rects) is identical to the
@@ -431,7 +432,7 @@
 .vfl-about-sentinel {
   position: absolute;
   /* #about anchor + REDUCED-MOTION trigger only — the scrub path never uses
-     this observer (its rAF loop reads scroll position itself). The whole
+     this observer (its scroll driver reads the position itself). The whole
      second screen, not a 1px point: against a root collapsed to the
      mid-viewport line, a point sentinel can jump OVER that line in a single
      frame (instant scroll, End key, anchor jump) without ever emitting an
@@ -444,6 +445,101 @@
   pointer-events: none;
   /* Clear the floating header on a /#about deep-link jump. */
   scroll-margin-top: 4rem;
+}
+
+/* ── hero → about scrub ramps ──
+   hero.tsx publishes exactly four things: --p (camera progress 0→1, spring-
+   smoothed), --arc (dwell charge 0→1), --cam-tx/--cam-ty (Seoul recenter
+   endpoints from map data), and the [data-scrub] / [data-done] / [data-about]
+   attributes. Every visual ramp lives HERE, gated behind [data-scrub] so that
+   at rest (attribute absent) the base CSS — breathe keyframe, loader
+   crossfade, pin reveal, hover arcs — is untouched by construction.
+
+   Ramp windows (progress → clamp01((p − start) / (end − start))):
+   - scroll cue   0.03–0.22  (chrome clears first: outside-in teardown)
+   - headline     0.05–0.35
+   - pins/arcs    0.30–0.88  (other cities bow out before arrival)
+   - home pulse   0.30–0.80 → floors at 0.4, HOLDS until the reveal takes
+                  over (presence, not embers — final design review M1), then
+                  [data-about] hands it off to the room
+   - map dim      0.45–0.90 → floors at 0.15 (recede, don't vanish)
+   - camera       linear: translate(−50% → −50%+var(--cam)), scale(1 → 2.3)
+   - arc charge   dash 44 → 603.19 (2π·96) over --arc; completion = sticky
+                  release = Media handoff */
+.vfl-hero {
+  --p: 0;
+  --arc: 0;
+  --cam-tx: 0%;
+  --cam-ty: 0%;
+}
+.vfl-hero[data-scrub] .vfl-map-inner {
+  transform: translate(
+      calc(-50% + var(--cam-tx) * var(--p)),
+      calc(-50% + var(--cam-ty) * var(--p))
+    )
+    scale(calc(1 + 1.3 * var(--p)));
+  transition: none;
+  will-change: transform;
+}
+.vfl-hero[data-scrub] .vfl-map-img {
+  --dim: clamp(0, calc((var(--p) - 0.45) / 0.45), 1);
+  opacity: calc(1 - 0.85 * var(--dim));
+  animation: none;
+  transition: none;
+}
+.vfl-hero[data-scrub] .vfl-map-overlay,
+.vfl-hero[data-scrub] .vfl-pin:not(.home) {
+  --detail: clamp(0, calc((var(--p) - 0.3) / 0.58), 1);
+  opacity: calc(1 - var(--detail));
+  transition: none;
+}
+/* Hover pins/arcs are a rest-state affordance — a tooltip popping on a 2×
+   zoomed pin mid-journey reads as a glitch. */
+.vfl-hero[data-scrub] .vfl-pin-layer {
+  pointer-events: none;
+}
+.vfl-hero[data-scrub] .vfl-pin.home {
+  --pulse: clamp(0, calc((var(--p) - 0.3) / 0.5), 1);
+  opacity: calc(1 - 0.6 * var(--pulse));
+  /* Smooths both the [data-about] handoff below and a scrub-back re-emerge;
+     also low-passes the var-driven dim, which the slow pulse window absorbs. */
+  transition: opacity 0.25s ease-out;
+}
+.vfl-hero[data-scrub][data-about] .vfl-pin.home {
+  opacity: 0;
+}
+.vfl-hero[data-scrub] .vfl-headline {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.05) / 0.3), 1));
+}
+/* Cue visibility is pure CSS: hidden until the loader lands ([data-done]),
+   faded by early scrub progress, gone in the About state. Source order makes
+   the scrub/about rules win over the fade-in rule. */
+.vfl-scroll-cue {
+  opacity: 0;
+}
+.vfl-hero[data-done] .vfl-scroll-cue {
+  opacity: 1;
+  transition: opacity 0.45s ease-out 0.5s;
+}
+.vfl-hero[data-scrub] .vfl-scroll-cue {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.03) / 0.19), 1));
+  transition: none;
+}
+.vfl-hero[data-about] .vfl-scroll-cue {
+  opacity: 0;
+}
+.vfl-hero[data-scrub] .vfl-about-arc {
+  stroke-dasharray: calc(44px + 559.19px * var(--arc)) 603.19px;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion snaps between states — no lingering fades. Selectors must
+     match the specificity of the transition sources above (media queries add
+     none of their own), or the 0.25s/0.45s rules would win. */
+  .vfl-hero[data-scrub] .vfl-pin.home,
+  .vfl-hero[data-done] .vfl-scroll-cue,
+  .vfl-hero[data-scrub] .vfl-scroll-cue {
+    transition: none;
+  }
 }
 
 /* ── map backdrop ── */

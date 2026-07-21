@@ -36,22 +36,6 @@ export interface WorldMapCity {
   lng: number;
 }
 
-/**
- * Hero → About "camera" state — the reduced-motion instant snap ONLY (the
- * scrub path writes the map styles straight to the DOM and passes no camera).
- * A single transform owner (the `.vfl-map-inner` layer) holds the zoom so the
- * scale + translate can't be split across sources and overwrite each other;
- * all three values apply with transitions suppressed.
- */
-export interface WorldMapCamera {
-  /** transform applied to `.vfl-map-inner` (translate% + scale, single owner). */
-  transform: string;
-  /** base map image opacity — floor during zoom, 1 at rest. */
-  mapOpacity: number;
-  /** pins + arcs opacity — 0 during zoom, 1 at rest. */
-  detailOpacity: number;
-}
-
 interface WorldMapProps {
   /** Precomputed dotted-map data (points/dims/pins) built server-side. */
   mapData: WorldMapData;
@@ -74,9 +58,6 @@ interface WorldMapProps {
    *  standalone (non-loader-gated) usage still reveals immediately on mount,
    *  matching the map's prior always-on behavior. */
   revealed?: boolean;
-  /** Hero → About zoom camera. Undefined at rest (map behaves normally — breathe
-   *  keyframe, hover arcs all live); set during the zoom sequence and its reverse. */
-  camera?: WorldMapCamera;
 }
 
 interface PlacedCity {
@@ -142,7 +123,6 @@ export function WorldMap({
   revealDelay = 0,
   mapRevealDelay = 0,
   revealed = true,
-  camera,
 }: WorldMapProps) {
   const reduce = useReducedMotion();
   const [active, setActive] = useState<string | null>(null);
@@ -200,16 +180,7 @@ export function WorldMap({
     // isn't ambient, so the whole subtree is hidden from assistive tech.
     <div
       className="vfl-map-inner"
-      style={{
-        aspectRatio: `${width} / ${height}`,
-        // Single transform owner: the camera's scale + translate live here and
-        // nowhere else, so nothing can overwrite half of the composite transform.
-        ...(camera && {
-          transform: camera.transform,
-          transformOrigin: "50% 50%",
-          transition: "none",
-        }),
-      }}
+      style={{ aspectRatio: `${width} / ${height}` }}
       aria-hidden
     >
       {/* Inline data-URI SVG — next/image offers no benefit and can't optimize it. */}
@@ -219,22 +190,12 @@ export function WorldMap({
           svg ? `data:image/svg+xml;utf8,${encodeURIComponent(svg)}` : undefined
         }
         className={`vfl-map-img${entered ? " revealed" : ""}`}
-        style={
-          camera
-            ? {
-                // Recede to the floor, not zero. `animation: none` stops the
-                // breathe keyframe from fighting this opacity mid-zoom.
-                opacity: camera.mapOpacity,
-                transition: "none",
-                animation: "none",
-              }
-            : {
-                transitionDelay: `${mapRevealDelay}s`,
-                // Keep the breathe keyframe from taking over opacity mid-crossfade —
-                // it only starts once the reveal transition has fully settled.
-                animationDelay: `${mapRevealDelay + 0.4}s`,
-              }
-        }
+        style={{
+          transitionDelay: `${mapRevealDelay}s`,
+          // Keep the breathe keyframe from taking over opacity mid-crossfade —
+          // it only starts once the reveal transition has fully settled.
+          animationDelay: `${mapRevealDelay + 0.4}s`,
+        }}
         alt=""
         draggable={false}
       />
@@ -244,11 +205,6 @@ export function WorldMap({
         viewBox={`0 0 ${width} ${height}`}
         fill="none"
         aria-hidden
-        style={
-          camera
-            ? { opacity: camera.detailOpacity, transition: "none" }
-            : undefined
-        }
       >
         <defs>
           <linearGradient id="vfl-arc-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -315,16 +271,7 @@ export function WorldMap({
 
       <div
         className={`vfl-pin-layer${entered ? " revealed" : ""}`}
-        style={
-          camera
-            ? {
-                opacity: camera.detailOpacity,
-                transition: "none",
-                // Zeroed-out pins must not keep intercepting hover under the room.
-                pointerEvents: camera.detailOpacity === 0 ? "none" : undefined,
-              }
-            : { transitionDelay: `${PIN_REVEAL_DELAY_S}s` }
-        }
+        style={{ transitionDelay: `${PIN_REVEAL_DELAY_S}s` }}
       >
         {placed.map((p) => {
           const isHome = p.city.id === homeId;

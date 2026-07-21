@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { motion, MotionConfig, useReducedMotion } from "motion/react";
 import {
-  WorldMap,
-  TaegeukMark,
-  type WorldMapCamera,
-} from "@/components/WorldMap";
+  motion,
+  MotionConfig,
+  useMotionValueEvent,
+  useReducedMotion,
+  useSpring,
+} from "motion/react";
+import { WorldMap, TaegeukMark } from "@/components/WorldMap";
 import { useLoaderDone } from "@/app/(main)/loader-context";
 import type { WorldMapData } from "@/utils/world-map-data";
 import { hero } from "./config";
@@ -17,53 +19,39 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const REVEAL_EASE = [0.16, 1, 0.3, 1] as const;
 
 // ── Hero → About scrub-hybrid tuning knobs ──────────────────────────────────
-// The camera is SCRUBBED: scroll position drives zoom/dim/pin ramps 1:1 through
-// a damped lerp (the user's hand is the tempo — park, reverse, creep at will).
-// Only the About reveal is a time-based beat, fired with hysteresis once the
-// scrub commits. Chosen over trigger playback after live comparison (2026-07-17).
+// The camera is SCRUBBED: scroll position drives the zoom 1:1 through a damped
+// spring (the user's hand is the tempo — park, reverse, creep at will). Only
+// the About reveal is a time-based beat, fired with hysteresis once the scrub
+// commits. Chosen over trigger playback after live comparison (2026-07-17).
+//
+// ARCHITECTURE: this component computes ONE progress value per concern and
+// publishes it as CSS custom properties (--p, --arc) plus a [data-scrub]
+// attribute on the section. Every visual ramp (camera transform, map dim, pin
+// fades, pulse floor, chrome fades, arc charge) lives in globals.css under
+// "hero → about scrub ramps", colocated with the elements it styles. JS never
+// touches those elements, so there is no style ownership to manage — removing
+// the attribute IS the release, and rest is pixel-identical by construction.
 //
 // Camera zoom factor toward Seoul. 2.3 keeps a readable world silhouette while
-// the pulse blooms into a room (see design options §5-1).
+// the pulse blooms into a room (see design options §5-1). Mirrored by the
+// scale() factor (SCALE − 1 = 1.3) in the CSS camera rule.
 const SCALE = 2.3;
-// Map opacity floor once About takes over — recede, don't vanish (rejection §4).
-const MAP_FLOOR = 0.15;
 // Scrub progress 0→1 maps over scrollY ∈ [SCRUB_START, SCRUB_START+SCRUB_SPAN]
 // in units of 100svh (the 200svh track's first half; sticky releases at 100svh).
 const SCRUB_START = 0.2;
 const SCRUB_SPAN = 0.65;
-// Damped-lerp factor per frame — lower = heavier, more cinematic drag.
-const SCRUB_LERP = 0.16;
+// Damped-spring smoothing — the scrub 손맛. Overdamped (ζ≈1.24): monotonic,
+// no overshoot, ~120ms settle, and time-based so the weight feels identical
+// at 60Hz and 120Hz (unlike a per-frame lerp factor).
+const SCRUB_SPRING = { stiffness: 260, damping: 40 } as const;
 // About reveal fires at 90% progress — ARRIVAL, not en route: at 0.9 the
 // camera is at scale 2.17 with Seoul ~90% recentred, so the room blooms where
-// the pulse actually landed instead of floating over a still-travelling map
-// (the "pulse becomes the room" causality needs the pulse to BE there first).
-// Release scrubbing back below 82% — the gap keeps boundary jitter from
-// strobing the reveal.
+// the pulse actually landed. Keyed on the RAW scroll position, not the spring
+// value (a spring is asymptotic — a park just short of the threshold would
+// otherwise never fire). Release scrubbing back below 82%; the gap keeps
+// boundary jitter from strobing the reveal.
 const REVEAL_AT = 0.9;
 const RELEASE_AT = 0.82;
-// Scrubbed ramps (progress windows): the headline clears early so the journey
-// owns the frame; other cities' pins and the arcs bow out by 88%. The Seoul
-// pulse RIDES the whole journey — it dims to PULSE_FLOOR (recede, don't
-// vanish, same treatment as the map) and HOLDS there until the reveal fires,
-// then hands off to the room. Presence, not embers: there is no parking point
-// between the pins' exit and the reveal where the frame is empty (final design
-// review M1 — an endpoint-aligned fade always leaves a near-zero band).
-const RAMP_DETAIL: [number, number] = [0.3, 0.88];
-const RAMP_PULSE: [number, number] = [0.3, 0.8];
-const PULSE_FLOOR = 0.4;
-const RAMP_MAP_DIM: [number, number] = [0.45, 0.9];
-const RAMP_HEADLINE: [number, number] = [0.05, 0.35];
-// The scroll cue is pure wayfinding chrome — it clears first, ahead of the
-// brand headline, so the teardown reads outside-in (UI → identity → data →
-// world) instead of leaving a bright affordance lit over a receding globe.
-const RAMP_SCROLL: [number, number] = [0.03, 0.22];
-// Accent-arc charge: after the camera journey ends (scrollY 0.85·100svh) the
-// remaining scroll to the sticky release (1.0·100svh) sweeps the frozen-pulse
-// arc around the ring — scroll feedback in the dwell zone, and the circuit
-// completes exactly as the stage lets go, handing off to Media. Geometry of
-// the r=96 frame circle (viewBox 200): C = 2π·96 ≈ 603.19, resting dash 44.
-const ARC_CIRC = 603.19;
-const ARC_BASE_DASH = 44;
 // Reveal cascade delays (s) — near-zero: the user's hand already did the
 // travelling, so the room answers promptly once the scrub commits.
 const REVEAL_DUR = 0.45;
@@ -93,25 +81,36 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
   const [mode, setMode] = useState<Mode>("hero");
   const [kind, setKind] = useState<SeqKind>("instant");
   const playedRef = useRef(false);
+  const sectionRef = useRef<HTMLElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
-  // Seoul's projected fraction in the map-inner's own box — the scrub loop and
-  // the reduced-motion camera both interpolate translate/scale from it, so the
+  // Seoul's projected fraction in the map-inner's own box — the CSS camera
+  // rule interpolates translate/scale from the endpoint vars below, so the
   // zoom needs no pixel measurement (dotted-map getPin projection, no hardcode).
-  const { seoulU, seoulV, zoomTransform } = useMemo(() => {
+  const { seoulU, seoulV } = useMemo(() => {
     const seoul = mapData.placed.find((p) => p.id === hero.homeId);
-    const u = seoul ? seoul.x / mapData.width : 0.876;
-    const v = seoul ? seoul.y / mapData.height : 0.364;
-    // Inline transform REPLACES the CSS base `translate(-50%, -50%)`, so the
-    // −50% centring is folded back in.
-    const tx = -50 - SCALE * (u - 0.5) * 100;
-    const ty = -50 - SCALE * (v - 0.5) * 100;
     return {
-      seoulU: u,
-      seoulV: v,
-      zoomTransform: `translate(${tx.toFixed(2)}%, ${ty.toFixed(2)}%) scale(${SCALE})`,
+      seoulU: seoul ? seoul.x / mapData.width : 0.876,
+      seoulV: seoul ? seoul.y / mapData.height : 0.364,
     };
   }, [mapData]);
+
+  // Camera recenter endpoints → CSS vars, once per map data. The inline CSS
+  // camera transform REPLACES the base `translate(-50%, -50%)`, so the −50%
+  // centring is folded back into the rule; at --p:0 it reduces to the pure
+  // base and rest is pixel-identical to a never-scrubbed hero.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    el.style.setProperty(
+      "--cam-tx",
+      `${(-SCALE * (seoulU - 0.5) * 100).toFixed(2)}%`,
+    );
+    el.style.setProperty(
+      "--cam-ty",
+      `${(-SCALE * (seoulV - 0.5) * 100).toFixed(2)}%`,
+    );
+  }, [seoulU, seoulV]);
 
   const enterAbout = useCallback(() => {
     const k: SeqKind = reduce ? "instant" : playedRef.current ? "abbrev" : "full";
@@ -125,219 +124,96 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
     setMode("hero");
   }, [reduce]);
 
-  // Reduced-motion fallback: no scrub, no camera motion — the sentinel (the
+  // Scrub progress springs → CSS vars. `jump()` teleports (deep links, reduced
+  // motion, cleanup); `set()` glides. Publishing stops at the section element:
+  // the ramp rules in globals.css do everything else.
+  const p = useSpring(0, SCRUB_SPRING);
+  const arc = useSpring(0, SCRUB_SPRING);
+  useMotionValueEvent(p, "change", (v) => {
+    const el = sectionRef.current;
+    if (!el) return;
+    el.style.setProperty("--p", v.toFixed(4));
+    if (v > 0.001) el.setAttribute("data-scrub", "");
+    else el.removeAttribute("data-scrub");
+  });
+  useMotionValueEvent(arc, "change", (v) => {
+    sectionRef.current?.style.setProperty("--arc", v.toFixed(4));
+  });
+
+  // Scrub driver — the only scroll listener. Waits for the loader to land so
+  // [data-scrub] can't override the crossfade / pin-reveal / breathe CSS while
+  // the dot-scatter scene is still measuring and landing.
+  useEffect(() => {
+    if (reduce || !done) return;
+    let revealed = false;
+    const read = (jump: boolean) => {
+      const H = window.innerHeight;
+      const t = Math.min(
+        1,
+        Math.max(0, (window.scrollY - SCRUB_START * H) / (SCRUB_SPAN * H)),
+      );
+      // Arc charge runs over the dwell stretch: camera-journey end → sticky
+      // release. Completing at exactly 1·100svh couples "ring fully solid"
+      // with the stage letting go.
+      const arcStart = (SCRUB_START + SCRUB_SPAN) * H;
+      const a = Math.min(
+        1,
+        Math.max(0, (window.scrollY - arcStart) / (H - arcStart)),
+      );
+      if (jump) {
+        p.jump(t);
+        arc.jump(a);
+      } else {
+        p.set(t);
+        arc.set(a);
+      }
+      if (t >= REVEAL_AT && !revealed) {
+        revealed = true;
+        enterAbout();
+      } else if (t <= RELEASE_AT && revealed) {
+        revealed = false;
+        exitAbout();
+      }
+    };
+    const onScroll = () => read(false);
+    // Restored-scroll / deep-link landing settles instantly (no glide-in).
+    read(true);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      p.jump(0);
+      arc.jump(0);
+    };
+  }, [reduce, done, p, arc, enterAbout, exitAbout]);
+
+  // Reduced-motion fallback: no scrub, no camera glide — the sentinel (the
   // whole second screen, 100svh → track end) against a mid-viewport root line
-  // snaps the About state instantly in either direction. The region sentinel
-  // can't be jumped over by an instant scroll the way a 1px point could; the
-  // first callback handles the load-time deep-link / restored-scroll case.
+  // snaps between rest and the fully-zoomed About state. Same CSS vars, jumped
+  // instead of sprung, so there is no separate style path to maintain. The
+  // region sentinel can't be jumped over by an instant scroll the way a 1px
+  // point could, and the first callback covers a restored-scroll landing.
   useEffect(() => {
     if (!reduce) return;
     const el = sentinelRef.current;
     if (!el) return;
-    let first = true;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry) return;
         const inside =
           entry.isIntersecting ||
           entry.boundingClientRect.bottom < window.innerHeight / 2;
-        if (first) {
-          first = false;
-          if (inside) {
-            playedRef.current = true;
-            setKind("instant");
-            setMode("about");
-          }
-          return;
-        }
+        p.jump(inside ? 1 : 0);
         if (inside) enterAbout();
-        else exitAbout();
+        else if (playedRef.current) exitAbout();
       },
       { rootMargin: "-50% 0px -50% 0px", threshold: 0 },
     );
     io.observe(el);
-    return () => io.disconnect();
-  }, [enterAbout, exitAbout, reduce]);
-
-  // Scrub loop. Styles are written straight to the DOM each frame; React never
-  // manages transform/opacity for these elements in the scrub path (the camera
-  // prop stays undefined), so the writes don't fight the reconciler.
-  useEffect(() => {
-    // Wait for the loader to land — the crossfade / pin-reveal / breathe CSS
-    // owns these elements until then, and stomping them mid-loader breaks the
-    // dot-scatter landing illusion.
-    if (reduce || !done) return;
-    const mapInner = document.querySelector<HTMLElement>(".vfl-map-inner");
-    const mapImg = document.querySelector<HTMLElement>(".vfl-map-img");
-    const arcSvg = document.querySelector<SVGSVGElement>(
-      ".vfl-map-inner > svg",
-    );
-    const pinLayer = document.querySelector<HTMLElement>(".vfl-pin-layer");
-    // The home pulse outlives the other pins (PULSE_FLOOR hold), so pins fade
-    // individually instead of through the layer — a layer fade would multiply
-    // the home pin to zero along with everything else.
-    const otherPins = Array.from(
-      document.querySelectorAll<HTMLElement>(".vfl-pin:not(.home)"),
-    );
-    const homePin = document.querySelector<HTMLElement>(".vfl-pin.home");
-    const headline = document.querySelector<HTMLElement>(".vfl-headline");
-    const scrollCue = document.querySelector<HTMLElement>(".vfl-scroll-cue");
-    const accentArc = document.querySelector<SVGCircleElement>(".vfl-about-arc");
-    if (!mapInner || !mapImg) return;
-    // Endpoint translate components — interpolated linearly in progress, the
-    // same way a CSS transition between the rest and zoom transforms would be.
-    // (Recentre by the full term ONLY at progress 1; at 0 this must be a pure
-    // −50%/−50% or the map sits displaced at rest.)
-    const txEnd = -SCALE * (seoulU - 0.5) * 100;
-    const tyEnd = -SCALE * (seoulV - 0.5) * 100;
-    const ramp = (p: number, [a, b]: [number, number]) =>
-      Math.min(1, Math.max(0, (p - a) / (b - a)));
-    let target = 0;
-    let arcTarget = 0;
-    let revealed = false;
-    let owned = false;
-    const readScroll = () => {
-      const H = window.innerHeight;
-      target = Math.min(
-        1,
-        Math.max(0, (window.scrollY - SCRUB_START * H) / (SCRUB_SPAN * H)),
-      );
-      // Arc charge runs over the dwell stretch: camera-journey end → sticky
-      // release. Completing at exactly 1·100svh couples "ring fully red" with
-      // the stage letting go.
-      const arcStart = (SCRUB_START + SCRUB_SPAN) * H;
-      arcTarget = Math.min(
-        1,
-        Math.max(0, (window.scrollY - arcStart) / (H - arcStart)),
-      );
-    };
-    readScroll();
-    let cur = target;
-    let arcCur = arcTarget;
-    let pulseCur = 1;
-    let raf = 0;
-    const own = () => {
-      owned = true;
-      // No transitions while scrubbing — the lerp IS the smoothing — and the
-      // breathe keyframe must not fight the dim ramp.
-      mapInner.style.transition = "none";
-      mapInner.style.willChange = "transform";
-      mapImg.style.transition = "none";
-      mapImg.style.animation = "none";
-      if (arcSvg) arcSvg.style.transition = "none";
-      for (const p of otherPins) p.style.transition = "none";
-      if (homePin) {
-        homePin.style.transition = "none";
-        // A hover tooltip on a 2× zoomed pin mid-journey reads as a glitch.
-        homePin.style.pointerEvents = "none";
-      }
-    };
-    const release = () => {
-      owned = false;
-      // Give every style back to the CSS layer (breathe, hover arcs, reveal
-      // classes) so the rest state is pixel-identical to a never-scrubbed hero.
-      for (const el of [
-        mapInner,
-        mapImg,
-        arcSvg,
-        pinLayer,
-        headline,
-        scrollCue,
-        homePin,
-        ...otherPins,
-      ]) {
-        if (!el) continue;
-        el.style.removeProperty("transform");
-        el.style.removeProperty("opacity");
-        el.style.removeProperty("transition");
-        el.style.removeProperty("animation");
-        el.style.removeProperty("pointer-events");
-        el.style.removeProperty("will-change");
-      }
-      pulseCur = 1;
-      // Fall back to the JSX presentation attribute (the resting 44 dash).
-      accentArc?.style.removeProperty("stroke-dasharray");
-    };
-    const tick = () => {
-      cur += (target - cur) * SCRUB_LERP;
-      if (Math.abs(target - cur) < 0.0005) cur = target;
-      if (cur <= 0.001 && target <= 0.001) {
-        if (owned) release();
-        raf = requestAnimationFrame(tick);
-        return;
-      }
-      if (!owned) own();
-      const s = 1 + (SCALE - 1) * cur;
-      const tx = -50 + txEnd * cur;
-      const ty = -50 + tyEnd * cur;
-      mapInner.style.transform = `translate(${tx.toFixed(3)}%, ${ty.toFixed(3)}%) scale(${s.toFixed(4)})`;
-      mapImg.style.opacity = String(
-        1 - (1 - MAP_FLOOR) * ramp(cur, RAMP_MAP_DIM),
-      );
-      const detail = String(1 - ramp(cur, RAMP_DETAIL));
-      if (arcSvg) arcSvg.style.opacity = detail;
-      for (const p of otherPins) {
-        p.style.opacity = detail;
-        p.style.pointerEvents = detail === "0" ? "none" : "";
-      }
-      // Home pulse: dim to the floor and HOLD until the reveal takes over,
-      // then hand off — lerped so both the handoff and a scrub-back re-emerge
-      // are smooth. (Reveal/release below key on `target`, so this stays in
-      // sync with the room even while `cur` is still catching up.)
-      if (homePin) {
-        const pulseTarget = revealed
-          ? 0
-          : 1 - (1 - PULSE_FLOOR) * ramp(cur, RAMP_PULSE);
-        pulseCur += (pulseTarget - pulseCur) * SCRUB_LERP;
-        if (Math.abs(pulseTarget - pulseCur) < 0.0005) pulseCur = pulseTarget;
-        homePin.style.opacity = pulseCur.toFixed(3);
-      }
-      if (headline)
-        headline.style.opacity = String(1 - ramp(cur, RAMP_HEADLINE));
-      if (scrollCue)
-        scrollCue.style.opacity = String(1 - ramp(cur, RAMP_SCROLL));
-      // Frozen-pulse arc sweeps the ring with the dwell scroll (reverses when
-      // scrubbed back). style.strokeDasharray overrides the JSX attribute and
-      // is released with everything else at rest.
-      arcCur += (arcTarget - arcCur) * SCRUB_LERP;
-      if (Math.abs(arcTarget - arcCur) < 0.0005) arcCur = arcTarget;
-      if (accentArc) {
-        const dash = ARC_BASE_DASH + (ARC_CIRC - ARC_BASE_DASH) * arcCur;
-        accentArc.style.strokeDasharray = `${dash.toFixed(2)} ${ARC_CIRC.toFixed(2)}`;
-      }
-      // Reveal/release key on `target` (raw scroll position), NOT the lerped
-      // `cur`: the damped lerp is asymptotic, so a park with target just under
-      // the old cur-threshold would settle at 0.89x and never fire even though
-      // the user had committed past it (final design review M1).
-      if (target >= REVEAL_AT && !revealed) {
-        revealed = true;
-        enterAbout();
-      } else if (target <= RELEASE_AT && revealed) {
-        revealed = false;
-        exitAbout();
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    window.addEventListener("scroll", readScroll, { passive: true });
-    raf = requestAnimationFrame(tick);
     return () => {
-      window.removeEventListener("scroll", readScroll);
-      cancelAnimationFrame(raf);
-      release();
+      io.disconnect();
+      p.jump(0);
     };
-  }, [reduce, done, seoulU, seoulV, enterAbout, exitAbout]);
-
-  // Camera prop — reduced-motion path only (instant snap to the zoomed state);
-  // undefined otherwise so the scrub loop owns the map styles, and undefined at
-  // rest so the CSS base (breathe, hover arcs) behaves normally.
-  const camera: WorldMapCamera | undefined = useMemo(() => {
-    if (!reduce || mode !== "about") return undefined;
-    return {
-      transform: zoomTransform,
-      mapOpacity: MAP_FLOOR,
-      detailOpacity: 0,
-    };
-  }, [reduce, mode, zoomTransform]);
+  }, [reduce, p, enterAbout, exitAbout]);
 
   // Staggered rise so the headline reads in order — eyebrow, brand, subline —
   // instead of arriving as one flat block. Held at `initial` until the loader
@@ -377,10 +253,18 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <section className="vfl-hero relative min-h-[200svh]">
+      {/* data-done / data-about are the declarative state hooks the scrub CSS
+          keys on (loader-gated cue fade-in, pulse→room handoff); [data-scrub]
+          and --p/--arc are written imperatively by the springs above. */}
+      <section
+        ref={sectionRef}
+        className="vfl-hero relative min-h-[200svh]"
+        data-done={done ? "" : undefined}
+        data-about={shown ? "" : undefined}
+      >
         {/* #about anchor + reduced-motion trigger sentinel (the whole second
-            screen). A /#about deep link lands here; in the scrub path the rAF
-            loop reads the restored scroll position and settles instantly. */}
+            screen). A /#about deep link lands here; in the scrub path the
+            driver reads the restored scroll position and settles instantly. */}
         <div
           id="about"
           ref={sentinelRef}
@@ -401,7 +285,6 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
               revealed={done}
               mapRevealDelay={0}
               revealDelay={0.2}
-              camera={camera}
             />
           </div>
 
@@ -410,16 +293,14 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
 
           {/* Headline: a name-lockup cascade — solid brand column, outlined
               ENTERTAINMENT suffix, mono subline — bottom-left on desktop,
-              centred below the map band on mobile. The scrub loop fades the
-              wrapper with early progress; motion's target stays static in the
-              scrub path so the per-frame writes never fight it. */}
+              centred below the map band on mobile. The scrub CSS fades the
+              wrapper with early progress; motion only owns its opacity in the
+              reduced-motion path (inline styles would beat the CSS ramp). */}
           <motion.div
             className="vfl-headline"
             initial={false}
             animate={
-              reduce
-                ? { opacity: shown ? 0 : 1, y: shown ? -12 : 0 }
-                : { opacity: 1, y: 0 }
+              reduce ? { opacity: shown ? 0 : 1, y: shown ? -12 : 0 } : undefined
             }
             transition={{ duration: kind === "instant" ? 0 : 0.35, ease: "easeOut" }}
           >
@@ -441,19 +322,18 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
             </motion.div>
           </motion.div>
 
-          {/* Scroll wayfinding — bottom-center, clear of the bottom-left headline.
-              Motion only owns the loader-gated fade-in (and the reduced-motion
-              snap on About entry); in the scrub path the rAF loop fades this via
-              RAMP_SCROLL, so its animate target must stay constant there — a
-              `shown`-driven opacity would re-animate and fight the per-frame
-              writes at the reveal/release boundary. */}
+          {/* Scroll wayfinding — bottom-center, clear of the bottom-left
+              headline. Visibility is pure CSS: hidden until [data-done]
+              (loader gate), scrub-faded via --p, hidden under [data-about].
+              Motion only animates the chevron bounce (and owns opacity in the
+              reduced-motion path). */}
           <motion.div
             aria-hidden
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: reduce ? (done && !shown ? 1 : 0) : done ? 1 : 0,
-            }}
-            transition={{ duration: 0.45, ease: "easeOut", delay: shown ? 0 : 0.5 }}
+            initial={false}
+            animate={
+              reduce ? { opacity: done && !shown ? 1 : 0 } : undefined
+            }
+            transition={{ duration: 0.45, ease: "easeOut" }}
             className="vfl-scroll-cue pointer-events-none absolute inset-x-0 bottom-6 z-[5] flex flex-col items-center gap-2 [color:var(--vfl-ink)]"
           >
             <span className="hidden font-mono text-[10px] tracking-[0.34em] opacity-55 sm:block">
@@ -480,8 +360,8 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
 
           {/* About "room" — the enlarged Seoul pulse becomes the frame, the
               taegeuk core the header seal. Cross-succession: the map-side pin
-              elements fade out while this layer fades in at the same centre, so
-              nothing is left orphaned beside the frame.
+              elements fade out (scrub CSS) while this layer fades in at the
+              same centre, so nothing is left orphaned beside the frame.
               Deliberately NOT aria-hidden while unrevealed: the scroll trigger
               never fires for a screen-reader virtual cursor, and this copy
               exists nowhere else, so it must stay in the accessibility tree. */}
@@ -505,7 +385,7 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
                     hairline ring SOLIDIFYING (luminance, not hue): progress in
                     the same register as the site's mono/hairline vocabulary,
                     leaving the taegeuk seal as the room's only colour moment.
-                    The scrub loop sweeps it over the dwell scroll (post-arrival
+                    The scrub CSS sweeps it over the dwell scroll (post-arrival
                     → sticky release), the circuit completing exactly as the
                     stage hands off to the next section. */}
                 <circle
