@@ -9,8 +9,8 @@ export interface Release {
   title: string;
   artist: string;
   label?: string;
-  // 로컬 /public 경로만 사용 (예: "/images/release/1.webp").
-  // 외부 CDN URL은 next-config의 images.remotePatterns 설정 전까지 런타임 에러가 납니다.
+  // CMS 전환 후 Supabase Storage 공개 URL을 사용한다(@repo/content/media mediaUrl).
+  // 원격 호스트는 @repo/next-config의 images.remotePatterns(**.supabase.co)로 허용됨.
   artwork?: string;
   catalogNo?: string;
   // 값이 있는 플랫폼만 모달에 노출됩니다.
