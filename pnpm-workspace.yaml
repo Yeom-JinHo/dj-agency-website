@@ -25,6 +25,7 @@ catalog:
 
   # Dev
   typescript: 5.9.2
+  tsx: ^4.20.6
   eslint: ^9.38.0
   "@types/node": ^25.6.0
   "@types/react": 19.2.0

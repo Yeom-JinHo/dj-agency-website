@@ -6,10 +6,12 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "seed:cms": "tsx --tsconfig scripts/tsconfig.json --conditions=react-server scripts/seed-cms.ts"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
+    "tsx": "catalog:",
     "turbo": "^2.6.0",
     "typescript": "5.9.2"
   },

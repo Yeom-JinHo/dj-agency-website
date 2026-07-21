@@ -482,6 +482,21 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
   대문자)이므로 시드는 원문 그대로 넣는다. admin 신규 생성만 slugify(소문자·하이픈) 적용 —
   두 형식이 섞여도 slug는 사이트 내 유니크 제약이라 안전하다.
 
+- **시드 스크립트**: `scripts/seed-cms.ts`(러너 tsx). `pnpm seed:cms --dry-run`으로 DB 미접근
+  변환 결과·검수 목록 확인, `pnpm seed:cms`로 실 시드(멱등 upsert + 이미지 Storage 이전).
+  env는 `apps/admin/.env.local`→루트 `.env`에서 `NEXT_PUBLIC_SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY`
+  로드. `--cleanup-test`는 VFL slug='test' 행만 정리. (시드 예상: artists 44 · releases 21 · tours 8)
+
+  > **⚠️ 시드는 사실상 1회성.** upsert가 행 전체를 소스값으로 교체하므로, admin에서 수기
+  > 편집을 시작한 뒤 재실행하면 편집 내용이 소스의 placeholder 값으로 원복된다.
+  > **admin 편집 개시 후 재실행 금지** (`--dry-run`·`--cleanup-test`는 무해).
+
+  **시드 후 검수 체크리스트** (2026-07-21 실 시드 완료 — admin에서 처리):
+  - [ ] EN/KO 자동 분리 5건 경계 검증: VFL `Juntaro`·`Sielo`·`Loozbone`·`DearBoi`·`PLAYMODE`의 full description
+  - [ ] placeholder 카피 실카피로 교체: VFL 아티스트 6명 short description("King"), `SAM` full description("test"),
+        VFL 음원 5곡 설명("test"), celebrate 다수 bio("Coming Soon.")
+  - [ ] juntaro 투어 8건은 시드 데모 — 실 공연 정보로 교체 또는 유지 판단
+
 ---
 
 ## 11. 단계별 로드맵
