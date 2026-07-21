@@ -397,6 +397,7 @@
    warm text over pure-white map ink, heavy Korean display, film grain + vignette.
    ─────────────────────────────────────────────────────────────── */
 .vfl-hero {
+  position: relative;
   --vfl-bg: #0a0a0b;
   --vfl-fg: #eceae3;
   /* Map-scene ink — loader particles, map dots/arcs, pins, scroll cue. */
@@ -411,6 +412,134 @@
   --vfl-accent-blue: #2e6be6;
   background: var(--vfl-bg);
   color: var(--vfl-fg);
+}
+
+/* ── hero → about stage track ──
+   The hero is a 200svh track holding a 100svh sticky stage. The main path is a
+   SCRUB: hero.tsx's scroll driver publishes spring-smoothed progress vars that
+   the scrub-ramp rules below consume (the About reveal fires once the scrub
+   commits past 90%
+   progress — see REVEAL_AT in hero.tsx, the source of truth for thresholds). At
+   rest (scroll 0) the stage is pinned at the top, so the map geometry the
+   loader measures (.vfl-map-inner / .vfl-map-wrap rects) is identical to the
+   old 100svh hero. */
+.vfl-hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.vfl-about-sentinel {
+  position: absolute;
+  /* #about anchor + REDUCED-MOTION trigger only — the scrub path never uses
+     this observer (its scroll driver reads the position itself). The whole
+     second screen, not a 1px point: against a root collapsed to the
+     mid-viewport line, a point sentinel can jump OVER that line in a single
+     frame (instant scroll, End key, anchor jump) without ever emitting an
+     intersection change; a region spanning 100svh→track end turns the trigger
+     into a plain "is the mid-line inside the second screen" boolean. */
+  top: 100svh;
+  bottom: 0;
+  left: 0;
+  width: 1px;
+  pointer-events: none;
+  /* Clear the floating header on a /#about deep-link jump. */
+  scroll-margin-top: 4rem;
+}
+
+/* ── hero → about scrub ramps ──
+   hero.tsx publishes exactly four things: --p (camera progress 0→1, spring-
+   smoothed), --arc (dwell charge 0→1), --cam-tx/--cam-ty (Seoul recenter
+   endpoints from map data), and the [data-scrub] / [data-done] / [data-about]
+   attributes. Every visual ramp lives HERE, gated behind [data-scrub] so that
+   at rest (attribute absent) the base CSS — breathe keyframe, loader
+   crossfade, pin reveal, hover arcs — is untouched by construction.
+
+   Ramp windows (progress → clamp01((p − start) / (end − start))):
+   - scroll cue   0.03–0.22  (chrome clears first: outside-in teardown)
+   - headline     0.05–0.35
+   - pins/arcs    0.30–0.88  (other cities bow out before arrival)
+   - home pulse   0.30–0.80 → floors at 0.4, HOLDS until the reveal takes
+                  over (presence, not embers — final design review M1), then
+                  [data-about] hands it off to the room
+   - map dim      0.45–0.90 → floors at 0.15 (recede, don't vanish)
+   - camera       linear: translate(−50% → −50%+var(--cam)), scale(1 → 2.3)
+   - arc charge   dash 44 → 603.19 (2π·96) over --arc; completion = sticky
+                  release = Media handoff */
+.vfl-hero {
+  --p: 0;
+  --arc: 0;
+  --cam-tx: 0%;
+  --cam-ty: 0%;
+}
+.vfl-hero[data-scrub] .vfl-map-inner {
+  transform: translate(
+      calc(-50% + var(--cam-tx) * var(--p)),
+      calc(-50% + var(--cam-ty) * var(--p))
+    )
+    scale(calc(1 + 1.3 * var(--p)));
+  transition: none;
+  will-change: transform;
+}
+.vfl-hero[data-scrub] .vfl-map-img {
+  --dim: clamp(0, calc((var(--p) - 0.45) / 0.45), 1);
+  opacity: calc(1 - 0.85 * var(--dim));
+  animation: none;
+  transition: none;
+}
+.vfl-hero[data-scrub] .vfl-map-overlay,
+.vfl-hero[data-scrub] .vfl-pin:not(.home) {
+  --detail: clamp(0, calc((var(--p) - 0.3) / 0.58), 1);
+  opacity: calc(1 - var(--detail));
+  transition: none;
+}
+/* Hover pins/arcs are a rest-state affordance — a tooltip popping on a 2×
+   zoomed pin mid-journey reads as a glitch. */
+.vfl-hero[data-scrub] .vfl-pin-layer {
+  pointer-events: none;
+}
+.vfl-hero[data-scrub] .vfl-pin.home {
+  --pulse: clamp(0, calc((var(--p) - 0.3) / 0.5), 1);
+  opacity: calc(1 - 0.6 * var(--pulse));
+  /* Smooths both the [data-about] handoff below and a scrub-back re-emerge;
+     also low-passes the var-driven dim, which the slow pulse window absorbs. */
+  transition: opacity 0.25s ease-out;
+}
+.vfl-hero[data-scrub][data-about] .vfl-pin.home {
+  opacity: 0;
+}
+.vfl-hero[data-scrub] .vfl-headline {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.05) / 0.3), 1));
+}
+/* Cue visibility is pure CSS: hidden until the loader lands ([data-done]),
+   faded by early scrub progress, gone in the About state. Source order makes
+   the scrub/about rules win over the fade-in rule. */
+.vfl-scroll-cue {
+  opacity: 0;
+}
+.vfl-hero[data-done] .vfl-scroll-cue {
+  opacity: 1;
+  transition: opacity 0.45s ease-out 0.5s;
+}
+.vfl-hero[data-scrub] .vfl-scroll-cue {
+  opacity: calc(1 - clamp(0, calc((var(--p) - 0.03) / 0.19), 1));
+  transition: none;
+}
+.vfl-hero[data-about] .vfl-scroll-cue {
+  opacity: 0;
+}
+.vfl-hero[data-scrub] .vfl-about-arc {
+  stroke-dasharray: calc(44px + 559.19px * var(--arc)) 603.19px;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Reduced motion snaps between states — no lingering fades. Selectors must
+     match the specificity of the transition sources above (media queries add
+     none of their own), or the 0.25s/0.45s rules would win. */
+  .vfl-hero[data-scrub] .vfl-pin.home,
+  .vfl-hero[data-done] .vfl-scroll-cue,
+  .vfl-hero[data-scrub] .vfl-scroll-cue {
+    transition: none;
+  }
 }
 
 /* ── map backdrop ── */
@@ -682,6 +811,107 @@
   );
 }
 
+/* ── about room (hero second screen) ──
+   The enlarged Seoul pulse becomes this framed room; the taegeuk core becomes
+   the header seal. Element opacity/transform is motion-driven (Phase B/C) so no
+   CSS keyframes are added here — reduced-motion is handled in the component
+   (instant snap), and the pulse's own motion-reduce rule stays untouched. */
+.vfl-about-room {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* No uniform gap — grouped margins below give the column a typographic
+     rhythm (seal+heading read as one label/title pair, the signature stands
+     apart) instead of an even mechanical stack. */
+  padding: clamp(28px, 6vw, 72px);
+  text-align: center;
+  pointer-events: none;
+}
+.vfl-about-room[data-shown="true"] {
+  /* Let the copy be selectable once the room is the active surface. */
+  pointer-events: auto;
+}
+/* Frozen pulse → frame: a faint full ring with one accent arc, sat behind the
+   copy (negative z within the room's own stacking context, above the map). */
+.vfl-about-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  /* 92vmin (paired with the 78vw text column so the mobile ring/column ratio
+     ~1.18 stays close to the desktop 760/620), capped two ways:
+     - 760px absolute (tall desktops)
+     - 100svh − 9rem: the ring is viewport-centred, so this pins its top edge
+       at 72px on every height — clear of the 64px fixed header. Without it,
+       common short-desktop viewports (720–860px tall) slide the ring top and
+       the accent arc (the frozen pulse — the narrative anchor) under the
+       header glass. */
+  width: min(92vmin, calc(100svh - 9rem), 760px);
+  height: min(92vmin, calc(100svh - 9rem), 760px);
+  /* Individual `translate` property, NOT `transform`: motion drives this
+     element's scale via inline `transform`, which would overwrite a CSS
+     transform-based centering (the composite-transform landmine). The two
+     properties compose independently, so centering survives the animation. */
+  translate: -50% -50%;
+  pointer-events: none;
+}
+.vfl-about-frame svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+/* Taegeuk seal — the promoted Seoul pin core. */
+.vfl-about-seal {
+  position: relative;
+  width: clamp(30px, 5vmin, 44px);
+  aspect-ratio: 1;
+}
+.vfl-about-heading {
+  /* Tight to the seal above — the taegeuk and the title read as one lockup. */
+  margin-top: clamp(8px, 1.4vh, 12px);
+  font-family: var(--font-anton), var(--font-pretendard), sans-serif;
+  font-weight: 400;
+  font-size: clamp(40px, 7vw, 96px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  color: var(--vfl-fg);
+  text-shadow: 0 2px 26px rgba(10, 10, 11, 0.9);
+}
+.vfl-about-body {
+  /* One full beat below the title. */
+  margin-top: clamp(16px, 2.6vh, 24px);
+  /* 78vw (not 86vw): on a 390px phone the ring is ~359px, so the text column
+     must stay narrower (~304px) for the frame to still read as enclosing it.
+     100svh − 12rem tracks the frame's own height cap (100svh − 9rem) at 48px
+     narrower, so on short desktop viewports the column shrinks WITH the ring
+     and the frame keeps enclosing the copy instead of being overrun by it. */
+  max-width: min(620px, 78vw, calc(100svh - 12rem));
+  font-family: var(--font-pretendard), sans-serif;
+  font-size: clamp(15px, 1.5vw, 19px);
+  line-height: 1.7;
+  /* Local override, NOT --vfl-muted (0.52): that alpha caps the glyph
+     luminance at ~5:1 against the room's darkness — AA borderline, and the
+     user read it as faint. 0.66 lands ~8:1 (AAA even over the brightest map
+     dots) while staying clearly subordinate to the solid heading. Kept local
+     because the token's only other consumer is the hero mono subline, a
+     different role that shouldn't be coupled to body-copy legibility. */
+  color: rgba(236, 234, 227, 0.66);
+  text-wrap: balance;
+  /* Near-bg soft halo — invisible on the open darkness, but lifts the copy off
+     the dimmed dotted landmass showing through behind the first lines on narrow
+     viewports. Softer than the heading's shadow so fine Pretendard text stays crisp. */
+  text-shadow: 0 1px 12px rgba(10, 10, 11, 0.55);
+}
+/* Word spans only (nested under the aria-hidden wrapper) — the sr-only sibling
+   must keep its own clipped box untouched. */
+.vfl-about-body span span {
+  display: inline-block;
+  margin-right: 0.28em;
+}
 /* ── headline ── */
 .vfl-headline {
   position: absolute;

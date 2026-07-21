@@ -87,7 +87,9 @@ function curvedPath(a: PlacedCity, b: PlacedCity) {
 //
 // The ~33.7° axis tilt is baked into the path coordinates — no CSS rotate needed.
 // Small-circle : big-circle = 12:24 = 1:2, producing the authentic S boundary.
-function TaegeukMark() {
+// Exported so the hero About "seal" can reuse the exact same mark — the Seoul
+// pin core is visually promoted into the About header, not redrawn.
+export function TaegeukMark() {
   return (
     <svg
       className="vfl-taegeuk"
