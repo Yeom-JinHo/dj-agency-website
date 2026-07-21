@@ -893,7 +893,13 @@
   font-family: var(--font-pretendard), sans-serif;
   font-size: clamp(15px, 1.5vw, 19px);
   line-height: 1.7;
-  color: var(--vfl-muted);
+  /* Local override, NOT --vfl-muted (0.52): that alpha caps the glyph
+     luminance at ~5:1 against the room's darkness — AA borderline, and the
+     user read it as faint. 0.66 lands ~8:1 (AAA even over the brightest map
+     dots) while staying clearly subordinate to the solid heading. Kept local
+     because the token's only other consumer is the hero mono subline, a
+     different role that shouldn't be coupled to body-copy legibility. */
+  color: rgba(236, 234, 227, 0.66);
   text-wrap: balance;
   /* Near-bg soft halo — invisible on the open darkness, but lifts the copy off
      the dimmed dotted landmass showing through behind the first lines on narrow
@@ -906,25 +912,6 @@
   display: inline-block;
   margin-right: 0.28em;
 }
-.vfl-about-meta {
-  /* The widest gap — the coordinate stamp signs off at a distance, like a
-     seal pressed below a letter. */
-  margin-top: clamp(20px, 3.3vh, 30px);
-  font-family: var(--font-space-mono), ui-monospace, monospace;
-  font-size: clamp(9px, 1.05vw, 13px);
-  letter-spacing: 0.22em;
-  color: var(--vfl-faint);
-  text-shadow: 0 1px 10px rgba(10, 10, 11, 0.6);
-  /* The coordinate signature is one line — a wrap mid-longitude breaks the
-     stamp. Tighter tracking on narrow screens keeps it inside the column. */
-  white-space: nowrap;
-}
-@media (max-width: 480px) {
-  .vfl-about-meta {
-    letter-spacing: 0.13em;
-  }
-}
-
 /* ── headline ── */
 .vfl-headline {
   position: absolute;

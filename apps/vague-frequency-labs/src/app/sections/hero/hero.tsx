@@ -59,11 +59,10 @@ const D_FRAME = 0.05;
 const D_SEAL = 0.1;
 const D_HEADING = 0.2;
 const D_BODY = 0.3;
-const D_META = 0.95;
-// About copy — confirmed 2026-07-17 (design options §6). Do not edit.
+// About copy — confirmed 2026-07-17 (design options §6; the coordinate meta
+// line was later removed by user decision, 2026-07-21). Do not edit.
 const ABOUT_BODY =
   "Vague Frequency Laboratory is an independent electronic music label and creative studio, broadcasting from Seoul since 2025. We work where experimental tech house and bass house blur — frequencies tuned in the studio, tested on dance floors from Tokyo to Berlin. Every signal we send out starts here, at home base.";
-const ABOUT_META = "37.5665°N · 126.9780°E — SEOUL · EST. 2025";
 
 type Mode = "hero" | "about";
 type SeqKind = "full" | "abbrev" | "instant";
@@ -441,17 +440,6 @@ function Hero({ mapData }: { mapData: WorldMapData }) {
                 ))}
               </span>
             </p>
-
-            {/* The coordinate signature signs off AFTER the last body word —
-                introduction first, then the stamp. */}
-            <motion.div
-              className="vfl-about-meta"
-              initial={false}
-              animate={{ opacity: shown ? 1 : 0 }}
-              transition={revealT(D_META, 0.65, 0.35)}
-            >
-              {ABOUT_META}
-            </motion.div>
           </div>
         </div>
       </section>
