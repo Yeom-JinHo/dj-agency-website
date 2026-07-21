@@ -1,17 +1,16 @@
 import type { CSSProperties } from "react";
 
-import { ARTISTS } from "@/consts/artists";
+import type { Artist } from "@/types/artist";
 
 // Each set must exceed viewport width so the -50% translate (= one set)
-// always lands on filled track. 2x ARTISTS covers up to ~4K displays.
+// always lands on filled track. 2x roster covers up to ~4K displays.
 const REPEATS_PER_SET = 2;
 
-const SET = Array.from({ length: REPEATS_PER_SET }).flatMap(() =>
-  ARTISTS.map((artist) => artist.name)
-);
-
-export default function Marquee() {
-  const loop = [...SET, ...SET];
+export default function Marquee({ artists }: { artists: Artist[] }) {
+  const set = Array.from({ length: REPEATS_PER_SET }).flatMap(() =>
+    artists.map((artist) => artist.name)
+  );
+  const loop = [...set, ...set];
   return (
     <div
       aria-hidden="true"
@@ -25,7 +24,7 @@ export default function Marquee() {
         // px/s stays constant as the roster grows. Resolved on the element so
         // the inherited --marquee-base picks up the breakpoint value.
         style={
-          { animationDuration: `calc(var(--marquee-base) * ${ARTISTS.length})` } as CSSProperties
+          { animationDuration: `calc(var(--marquee-base) * ${artists.length})` } as CSSProperties
         }
       >
         {loop.map((item, i) => (

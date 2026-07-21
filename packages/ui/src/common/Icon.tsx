@@ -3,22 +3,26 @@ import { IconType } from "react-icons";
 import { LuPlus, LuMenu, LuX, LuArrowLeft, LuArrowRight } from "react-icons/lu";
 import {
   SiApple,
+  SiApplemusic,
   SiBeatport,
   SiInstagram,
   SiSoundcloud,
   SiSpotify,
   SiX,
   SiYoutube,
+  SiYoutubemusic,
 } from "react-icons/si";
 
 export type IconName =
   | "SiApple"
+  | "SiApplemusic"
   | "SiBeatport"
   | "SiInstagram"
   | "SiSoundcloud"
   | "SiSpotify"
   | "SiX"
   | "SiYoutube"
+  | "SiYoutubemusic"
   | "LuPlus"
   | "LuMenu"
   | "LuClose"
@@ -27,12 +31,14 @@ export type IconName =
 
 const iconMap: Record<IconName, IconType> = {
   SiApple: SiApple,
+  SiApplemusic: SiApplemusic,
   SiBeatport: SiBeatport,
   SiInstagram: SiInstagram,
   SiSoundcloud: SiSoundcloud,
   SiSpotify: SiSpotify,
   SiX: SiX,
   SiYoutube: SiYoutube,
+  SiYoutubemusic: SiYoutubemusic,
   LuPlus: LuPlus,
   LuMenu: LuMenu,
   LuClose: LuX,
