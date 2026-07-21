@@ -14,7 +14,8 @@
     "./admin-queries": "./src/admin-queries/index.ts",
     "./publish": "./src/publish/index.ts",
     "./revalidate": "./src/revalidate/index.ts",
-    "./tags": "./src/tags.ts"
+    "./tags": "./src/tags.ts",
+    "./media": "./src/media.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
