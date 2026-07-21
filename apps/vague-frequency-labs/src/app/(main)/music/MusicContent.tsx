@@ -1,23 +1,16 @@
 import type { ReactElement } from "react";
 import React from "react";
-import { musicInfo } from "@/source";
+import { getReleases } from "@repo/content/queries";
+import { toMusicInfo, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import MusicInfoCard from "../../sections/musicList/MusicInfoCard";
 
-export default function MusicContent(): ReactElement {
-  const musicInfos = [
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-  ];
+export default async function MusicContent(): Promise<ReactElement> {
+  const releases = (await getReleases(VFL_SITE)).map(toMusicInfo);
+  // 실데이터가 적어 시각 밀도를 위해 9회 반복(라이브 파리티).
+  const musicInfos = Array.from({ length: 9 }, () => releases).flat();
 
   return (
     <main className="my-16 flex-1">

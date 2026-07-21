@@ -1,13 +1,12 @@
 import type { MusicInfo } from "@/types/music";
 import Link from "next/link";
-import { musicInfo } from "@/source";
+import { getReleases } from "@repo/content/queries";
+import { toMusicInfo, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import MusicInfoCard from "./MusicInfoCard";
 import SectionHeading from "@/components/SectionHeading";
 
 import { Icon } from "@repo/ui/common/Icon";
-
-const baseMusicInfos = musicInfo.getInfos();
 
 // 카드별 리듬 값 (인덱스 기반, deterministic)
 const ROTS = [-3, 2.5, -2, 3, -2.5, 2, -3.5, 2, -2, 3];
@@ -22,23 +21,26 @@ interface CollageCard {
 
 // cols×rows 콜라주 카드 생성.
 // 곡은 (열 + 행×2) 로 배치해 같은 곡이 가로·세로로 인접하지 않게 분산.
-function buildCards(cols: number, rows: number): CollageCard[] {
-  if (baseMusicInfos.length === 0) return [];
+function buildCards(
+  infos: MusicInfo[],
+  cols: number,
+  rows: number,
+): CollageCard[] {
+  if (infos.length === 0) return [];
   const count = cols * rows;
   return Array.from({ length: count }, (_, i) => ({
-    info: baseMusicInfos[
-      ((i % cols) + Math.floor(i / cols) * 2) % baseMusicInfos.length
-    ]!,
+    info: infos[((i % cols) + Math.floor(i / cols) * 2) % infos.length]!,
     rot: ROTS[i % ROTS.length]!,
     dy: DYS[i % DYS.length]!,
     z: 2 + ((i * 5) % 6),
   }));
 }
 
-const desktopCards = buildCards(5, 3); // 15
-const mobileCards = buildCards(2, 4); // 8
+async function MusicList() {
+  const baseMusicInfos = (await getReleases(VFL_SITE)).map(toMusicInfo);
+  const desktopCards = buildCards(baseMusicInfos, 5, 3); // 15
+  const mobileCards = buildCards(baseMusicInfos, 2, 4); // 8
 
-function MusicList() {
   return (
     <section className="w-full py-24 lg:py-32" id="music-list">
       <div className="grid gap-10">

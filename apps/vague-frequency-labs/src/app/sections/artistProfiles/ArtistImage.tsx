@@ -17,21 +17,29 @@ const ArtistImage = ({
   priority?: boolean;
   sizes?: string;
 }) => {
+  // CMS 데이터 방어: 빈 src·빈 blurDataURL은 next/image가 throw하므로(페이지 500)
+  // placeholder 없으면 blur를 생략하고, 이미지 자체가 없으면 렌더하지 않는다.
+  // 정상 데이터(시드·admin 업로드)에서는 기존과 렌더 결과가 동일하다.
+  const blurProps = artist.imagePlaceholder
+    ? ({ placeholder: "blur", blurDataURL: artist.imagePlaceholder } as const)
+    : {};
+
   return (
     <div className="group relative h-full w-full overflow-hidden object-cover">
       {/* 기본 이미지 */}
-      <Image
-        src={artist.image}
-        width={1280}
-        height={600}
-        alt={`Image of ${artist.name}`}
-        className={`h-full w-full object-cover object-center transition-all duration-200 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
-        priority={priority}
-        sizes={sizes}
-        placeholder="blur"
-        blurDataURL={artist.imagePlaceholder}
-      />
-      {backgroundLogo && (
+      {artist.image && (
+        <Image
+          src={artist.image}
+          width={1280}
+          height={600}
+          alt={`Image of ${artist.name}`}
+          className={`h-full w-full object-cover object-center transition-all duration-200 ${backgroundLogo ? "group-hover:scale-110 group-hover:opacity-30" : "rounded-lg"}`}
+          priority={priority}
+          sizes={sizes}
+          {...blurProps}
+        />
+      )}
+      {backgroundLogo && artist.logoImage && (
         <div className="absolute inset-0 flex scale-95 items-center justify-center opacity-0 transition-all duration-200 ease-out group-hover:scale-100 group-hover:opacity-100">
           <Image
             src={artist.logoImage}
