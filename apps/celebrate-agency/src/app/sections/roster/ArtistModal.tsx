@@ -69,12 +69,14 @@ const SOCIAL_HOVER: Record<ArtistSocialPlatform, string> = {
   beatport: "hover:text-[#01FF95] active:text-[#01FF95]",
   appleMusic: "hover:text-[#FA243C] active:text-[#FA243C]",
   youtubeMusic: "hover:text-[#FF0000] active:text-[#FF0000]",
-  // Bandcamp 브랜드 블루 계열 — 공식색(#629aa9)은 다크 배경에서 대비가 약해 상향 조정.
-  bandcamp: "hover:text-[#1DA0C3] active:text-[#1DA0C3]",
+  // Bandcamp 공식(#408294, 채도 40%)과 다크 배경 대비 사이의 절충 중간톤(대비 약 5.4:1).
+  bandcamp: "hover:text-[#3190AA] active:text-[#3190AA]",
   // TikTok 공식 로고는 흑색이라 다크 배경에 묻힘. x(흰색)와 겹치지 않도록
   // 브랜드 시그니처 핑크/레드로 대체해 식별성을 유지한다.
   tiktok: "hover:text-[#FE2C55] active:text-[#FE2C55]",
-  etc: "hover:text-ca-red active:text-ca-red",
+  // 폴백 링크는 브랜드가 아니므로 중립 회색 — ca-red를 주면 레드 계열 브랜드들 사이에
+  // "가짜 6번째 레드"가 끼어들어 색 구분을 더 흐린다.
+  etc: "hover:text-ca-muted active:text-ca-muted",
 };
 
 const CHROME_BUTTON =
