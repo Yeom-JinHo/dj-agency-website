@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import type { Database } from "@repo/content/supabase/types";
 import { siteSlugSchema } from "@repo/content/schema";
+import { contentTags } from "@repo/content/tags";
 
+import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
 import {
   imageFile,
@@ -57,6 +59,8 @@ export async function createRelease(
     if (!slug) {
       return { ok: false, error: "제목에서 slug를 만들 수 없습니다." };
     }
+
+    const publishTags = [contentTags.release(site, slug), contentTags.releases(site)];
 
     // createServerSupabaseClient는 인증 세션을 실어 RLS(editors)가 서버측 방어로 동작.
     const supabase = await createServerSupabaseClient();
@@ -116,18 +120,22 @@ export async function createRelease(
         if (updateError) throw new Error(updateError.message);
       }
     } catch (postError) {
-      // P3 앵커: publish 시 contentTags.releases(site)·contentTags.release(site, slug) 무효화.
+      // 행은 저장됐으니 아트워크 없이라도 사이트에 반영(발행). 발행 경고는 아트워크 경고에 덧붙인다.
+      const publishWarning = await publishOrWarn(publishTags, site);
       revalidatePath(`/${site}/releases`);
+      const imageWarning = `릴리즈는 생성됐지만 일부 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 아트워크를 다시 저장해주세요.`;
       return {
         ok: true,
         id,
-        warning: `릴리즈는 생성됐지만 일부 저장에 실패했습니다(${toErrorMessage(postError)}). 편집 화면에서 아트워크를 다시 저장해주세요.`,
+        warning: publishWarning ? `${imageWarning} ${publishWarning}` : imageWarning,
       };
     }
 
-    // P3 앵커: publish 시 contentTags.releases(site)·contentTags.release(site, slug) 무효화.
+    const publishWarning = await publishOrWarn(publishTags, site);
     revalidatePath(`/${site}/releases`);
-    return { ok: true, id };
+    return publishWarning
+      ? { ok: true, id, warning: publishWarning }
+      : { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -202,10 +210,15 @@ export async function updateRelease(
         : null;
     await removeImages(supabase, [oldArtworkPath]);
 
-    // P3 앵커: publish 시 contentTags.releases(site)·contentTags.release(site, existing.slug) 무효화.
+    const publishWarning = await publishOrWarn(
+      [contentTags.release(site, existing.slug), contentTags.releases(site)],
+      site,
+    );
     revalidatePath(`/${site}/releases`);
     revalidatePath(`/${site}/releases/${id}`);
-    return { ok: true, id };
+    return publishWarning
+      ? { ok: true, id, warning: publishWarning }
+      : { ok: true, id };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }
@@ -219,11 +232,11 @@ export async function deleteRelease(
     const site = siteSlugSchema.parse(siteInput);
     const supabase = await createServerSupabaseClient();
 
-    // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.
+    // slug는 삭제된 상세 캐시 태그에, artwork_path는 Storage 정리에 쓴다.
     // site_slug 스코프: 타 사이트 릴리즈 삭제 차단(artist 패턴).
     const { data: existing } = await supabase
       .from("releases")
-      .select("artwork_path")
+      .select("slug, artwork_path")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
@@ -235,13 +248,20 @@ export async function deleteRelease(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
+    // 행이 없었다면 무효화할 캐시도 없다 — 실제 삭제가 일어난 경우에만 발행.
+    let publishWarning: string | null = null;
     if (existing) {
       await removeImages(supabase, [existing.artwork_path]);
+      // 삭제된 상세 태그 포함 — 상세 페이지 캐시까지 무효화.
+      publishWarning = await publishOrWarn(
+        [contentTags.release(site, existing.slug), contentTags.releases(site)],
+        site,
+        "delete",
+      );
     }
 
-    // P3 앵커: publish 시 contentTags.releases(site) 무효화.
     revalidatePath(`/${site}/releases`);
-    return { ok: true };
+    return publishWarning ? { ok: true, warning: publishWarning } : { ok: true };
   } catch (err) {
     return { ok: false, error: toErrorMessage(err) };
   }

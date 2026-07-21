@@ -18,8 +18,20 @@ import {
 // 인증 세션(쿠키)·비캐시 admin 쿼리에 의존하므로 정적 프리렌더 제외.
 export const dynamic = "force-dynamic";
 
+/**
+ * 수정일 → `2026-10-03` 고정 포맷. Asia/Seoul 고정으로 서버 TZ와 무관하게 KST 날짜
+ * 표시(releases·tours 목록과 동형). toLocaleDateString은 서버 TZ 의존이라 배제.
+ */
 function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("en-CA");
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(value));
+  const get = (type: string) =>
+    parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
 export default async function ArtistsPage({

@@ -13,6 +13,7 @@
     "./queries": "./src/queries/index.ts",
     "./admin-queries": "./src/admin-queries/index.ts",
     "./publish": "./src/publish/index.ts",
+    "./revalidate": "./src/revalidate/index.ts",
     "./tags": "./src/tags.ts"
   },
   "scripts": {

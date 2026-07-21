@@ -195,6 +195,9 @@ importers:
 
   apps/celebrate-agency:
     dependencies:
+      '@repo/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@repo/next-config':
         specifier: workspace:*
         version: link:../../packages/next-config
@@ -268,6 +271,9 @@ importers:
 
   apps/juntaro:
     dependencies:
+      '@repo/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@repo/next-config':
         specifier: workspace:*
         version: link:../../packages/next-config
@@ -344,6 +350,9 @@ importers:
 
   apps/payday-records:
     dependencies:
+      '@repo/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@repo/next-config':
         specifier: workspace:*
         version: link:../../packages/next-config
@@ -420,6 +429,9 @@ importers:
 
   apps/vague-frequency-labs:
     dependencies:
+      '@repo/content':
+        specifier: workspace:*
+        version: link:../../packages/content
       '@repo/next-config':
         specifier: workspace:*
         version: link:../../packages/next-config
