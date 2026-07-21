@@ -15,6 +15,10 @@
  *     분리하되, 이중언어 자동 분리 건은 "검수 필요"로 남긴다.
  *   - 멱등: upsert(onConflict "site_slug,slug"), 이미지는 콘텐츠 해시 경로 upsert.
  *
+ * ⚠️ 시드는 사실상 1회성이다 — admin에서 수기 편집(카피 교정·발매일 입력 등)을 시작한
+ *    뒤 재실행하면 upsert가 행 전체를 소스값으로 되돌려 편집 내용이 소실된다.
+ *    admin 편집 개시 후에는 재실행 금지(--cleanup-test·--dry-run은 무해).
+ *
  * 러너: tsx (루트 devDependency). 앱 TS 소스와 packages/content 소스를 직접 import한다.
  * 서버 전용 모듈(sharp/service role)은 실행 경로에서만 dynamic import → --dry-run은
  * server-only 없이 구동된다.
