@@ -17,7 +17,8 @@ const SITE_SLUG = "celebrate-agency" as const;
 
 /**
  * DB socials platform enum → 기존 roster 아이콘 키(types/artist).
- * 아이콘 테이블(ArtistModal SOCIAL_ICONS)에 없는 플랫폼은 범용 링크 아이콘("etc")으로 흡수한다.
+ * beatport/appleMusic/youtubeMusic/bandcamp/tiktok은 각각 전용 아이콘(ArtistModal
+ * SOCIAL_ICONS)이 있어 자기 자신으로 통과시킨다. website만 범용 링크 아이콘("etc")으로 흡수.
  */
 const PLATFORM_TO_ROSTER: Record<SocialPlatform, ArtistSocialPlatform> = {
   instagram: "instagram",
@@ -25,11 +26,11 @@ const PLATFORM_TO_ROSTER: Record<SocialPlatform, ArtistSocialPlatform> = {
   soundcloud: "soundcloud",
   spotify: "spotify",
   x: "x",
-  beatport: "etc",
-  appleMusic: "etc",
-  youtubeMusic: "etc",
-  bandcamp: "etc",
-  tiktok: "etc",
+  beatport: "beatport",
+  appleMusic: "appleMusic",
+  youtubeMusic: "youtubeMusic",
+  bandcamp: "bandcamp",
+  tiktok: "tiktok",
   website: "etc",
 };
 

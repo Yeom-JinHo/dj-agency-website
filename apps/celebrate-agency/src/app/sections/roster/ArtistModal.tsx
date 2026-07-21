@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import {
+  IconBrandBandcamp,
   IconBrandInstagram,
   IconBrandSoundcloud,
   IconBrandSpotify,
+  IconBrandTiktok,
   IconBrandX,
   IconBrandYoutube,
   IconLink,
@@ -12,18 +14,36 @@ import {
   type Icon as TablerIcon,
 } from "@tabler/icons-react";
 
+import { Icon } from "@repo/ui/common/Icon";
+import type { IconName } from "@repo/ui/common/Icon";
+
 import { ARTIST_ROLE_LABEL } from "@/consts/artists";
 import type { Artist, ArtistSocialPlatform } from "@/types/artist";
 
 import { ArtistPortrait } from "./ArtistPortrait";
 
-const SOCIAL_ICONS: Record<ArtistSocialPlatform, TablerIcon> = {
-  soundcloud: IconBrandSoundcloud,
-  instagram: IconBrandInstagram,
-  spotify: IconBrandSpotify,
-  youtube: IconBrandYoutube,
-  x: IconBrandX,
-  etc: IconLink,
+/**
+ * tabler(스트로크 아웃라인)와 simple-icons(면 글리프, @repo/ui Icon 경유)를 한 줄에
+ * 섞어 렌더하기 위한 판별 유니온. 렌더 쪽에서 두 종류 모두 동일한 48px 박스에
+ * 넣어 터치 타깃과 행 정렬을 통일하고, si는 내부 크기만 26px로 낮춰 면 글리프가
+ * 스트로크 아이콘보다 무거워 보이는 걸 광학적으로 보정한다.
+ */
+type SocialIconDef =
+  | { kind: "tabler"; Component: TablerIcon }
+  | { kind: "si"; name: IconName };
+
+const SOCIAL_ICONS: Record<ArtistSocialPlatform, SocialIconDef> = {
+  soundcloud: { kind: "tabler", Component: IconBrandSoundcloud },
+  instagram: { kind: "tabler", Component: IconBrandInstagram },
+  spotify: { kind: "tabler", Component: IconBrandSpotify },
+  youtube: { kind: "tabler", Component: IconBrandYoutube },
+  x: { kind: "tabler", Component: IconBrandX },
+  beatport: { kind: "si", name: "SiBeatport" },
+  appleMusic: { kind: "si", name: "SiApplemusic" },
+  youtubeMusic: { kind: "si", name: "SiYoutubemusic" },
+  bandcamp: { kind: "tabler", Component: IconBrandBandcamp },
+  tiktok: { kind: "tabler", Component: IconBrandTiktok },
+  etc: { kind: "tabler", Component: IconLink },
 };
 
 const SOCIAL_LABELS: Record<ArtistSocialPlatform, string> = {
@@ -32,6 +52,11 @@ const SOCIAL_LABELS: Record<ArtistSocialPlatform, string> = {
   spotify: "Spotify",
   youtube: "YouTube",
   x: "X",
+  beatport: "Beatport",
+  appleMusic: "Apple Music",
+  youtubeMusic: "YouTube Music",
+  bandcamp: "Bandcamp",
+  tiktok: "TikTok",
   etc: "Link",
 };
 
@@ -41,6 +66,14 @@ const SOCIAL_HOVER: Record<ArtistSocialPlatform, string> = {
   spotify: "hover:text-[#1ED760] active:text-[#1ED760]",
   youtube: "hover:text-[#FF0000] active:text-[#FF0000]",
   x: "hover:text-white active:text-white",
+  beatport: "hover:text-[#01FF95] active:text-[#01FF95]",
+  appleMusic: "hover:text-[#FA243C] active:text-[#FA243C]",
+  youtubeMusic: "hover:text-[#FF0000] active:text-[#FF0000]",
+  // Bandcamp 브랜드 블루 계열 — 공식색(#629aa9)은 다크 배경에서 대비가 약해 상향 조정.
+  bandcamp: "hover:text-[#1DA0C3] active:text-[#1DA0C3]",
+  // TikTok 공식 로고는 흑색이라 다크 배경에 묻힘. x(흰색)와 겹치지 않도록
+  // 브랜드 시그니처 핑크/레드로 대체해 식별성을 유지한다.
+  tiktok: "hover:text-[#FE2C55] active:text-[#FE2C55]",
   etc: "hover:text-ca-red active:text-ca-red",
 };
 
@@ -212,7 +245,7 @@ export function ArtistModal({
               {artist.socials.length > 0 ? (
                 <div className="flex flex-shrink-0 flex-wrap items-center gap-5">
                   {artist.socials.map((social, index) => {
-                    const Icon = SOCIAL_ICONS[social.platform];
+                    const def = SOCIAL_ICONS[social.platform];
                     return (
                       <a
                         // CMS 소셜은 "etc"로 흡수되는 플랫폼이 복수 존재할 수 있어 platform 단독 key는 충돌.
@@ -221,9 +254,13 @@ export function ArtistModal({
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${SOCIAL_LABELS[social.platform]} (opens in new tab)`}
-                        className={`p-2 text-ca-fg transition-colors duration-200 ${SOCIAL_HOVER[social.platform]}`}
+                        className={`flex size-12 items-center justify-center text-ca-fg transition-colors duration-200 ${SOCIAL_HOVER[social.platform]}`}
                       >
-                        <Icon size={32} stroke={1.75} />
+                        {def.kind === "tabler" ? (
+                          <def.Component size={32} stroke={1.75} />
+                        ) : (
+                          <Icon name={def.name} size={26} />
+                        )}
                       </a>
                     );
                   })}
