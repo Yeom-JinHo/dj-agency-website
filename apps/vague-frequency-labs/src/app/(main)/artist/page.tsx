@@ -74,7 +74,7 @@ export default async function ArtistPage(): Promise<ReactElement> {
             {artists.map((artist, index) => (
               <BlurFade key={index} inView duration={0.6}>
                 <Link
-                  href={`/artist/${artist.name}`}
+                  href={`/artist/${encodeURIComponent(artist.slug)}`}
                   className="cursor-pointer"
                 >
                   <ArtistSimpleCard artist={artist} />

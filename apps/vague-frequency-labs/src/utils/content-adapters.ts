@@ -70,6 +70,7 @@ function combineDescription(
 /** 도메인 Artist → 기존 ArtistProfile props. 이미지는 mediaUrl로 Storage 공개 URL 조립. */
 export function toArtistProfile(artist: Artist): ArtistProfile {
   return {
+    slug: artist.slug,
     name: artist.name as ArtistName,
     image: mediaUrl(artist.imagePath) ?? "",
     imagePlaceholder: artist.imagePlaceholder ?? "",

@@ -50,7 +50,7 @@ export async function generateMetadata(props: {
       images: [cardImage],
     },
     alternates: {
-      canonical: `/artist/${encodeURIComponent(artist.name)}`,
+      canonical: `/artist/${encodeURIComponent(artist.slug)}`,
     },
   }) satisfies Metadata;
 }
