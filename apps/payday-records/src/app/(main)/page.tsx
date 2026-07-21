@@ -6,6 +6,7 @@ import Contact from "../sections/contact/contact";
 import Hero from "../sections/hero/hero";
 import Playlist from "../sections/playlist/playlist";
 import Release from "../sections/release/release";
+import { getReleaseItems } from "../sections/release/data";
 
 const title = "Payday Records — Independent Music Label";
 const description =
@@ -27,12 +28,14 @@ export const metadata = createMetadata({
   twitter: { title: { absolute: title }, description },
 });
 
-export default function Home(): ReactElement {
+export default async function Home(): Promise<ReactElement> {
+  const releases = await getReleaseItems();
+
   return (
     <main className="flex-1">
       <Hero />
       <About />
-      <Release />
+      <Release releases={releases} />
       <Playlist />
       <Contact />
     </main>
