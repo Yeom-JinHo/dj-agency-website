@@ -1,16 +1,54 @@
 import type { Metadata } from "next";
 import type { JuntaroTrack } from "@/types/music";
 
+import { getReleases } from "@repo/content/queries";
+import { mediaUrl } from "@repo/content/media";
+import type { Release } from "@repo/content/schema";
 import { BlurFade } from "@repo/ui/common/BlurFade";
+import type { IconName } from "@repo/ui/common/Icon";
 
 import { Footer } from "@/components/footer";
 import { DeviceTiltScope } from "@/components/music/DeviceTiltScope";
 import { MusicCard } from "@/components/music/MusicCard";
-import { TRACKS } from "@/consts/tracks";
 
 export const metadata: Metadata = {
   title: "Music — Juntaro",
 };
+
+/**
+ * platform_links(5키) → 트랙 모달 링크 행. 기존 consts/tracks.ts의 trackLinks()가
+ * 낳던 순서(Spotify → Apple Music → Beatport)와 아이콘·라벨을 그대로 재현한다.
+ * SoundCloud/YouTube Music은 juntaro 릴리즈 데이터엔 없어 현재는 no-op이지만,
+ * 5키 계약을 온전히 반영해 둔다.
+ */
+const LINK_SPECS: {
+  key: keyof Release["platformLinks"];
+  platform: string;
+  iconName: IconName;
+}[] = [
+  { key: "spotify", platform: "Spotify", iconName: "SiSpotify" },
+  { key: "appleMusic", platform: "Apple Music", iconName: "SiApple" },
+  { key: "beatport", platform: "Beatport", iconName: "SiBeatport" },
+  { key: "soundcloud", platform: "SoundCloud", iconName: "SiSoundcloud" },
+  { key: "youtubeMusic", platform: "YouTube Music", iconName: "SiYoutube" },
+];
+
+/** 도메인 Release → 기존 JuntaroTrack props 어댑터(UI 무변경, 데이터 계층만 교체). */
+function toTrack(release: Release): JuntaroTrack {
+  return {
+    id: release.slug,
+    name: release.title,
+    artist: release.artistCredit ?? undefined,
+    cover: mediaUrl(release.artworkPath) ?? "",
+    shortDescription: release.shortDescriptionEn ?? undefined,
+    links: LINK_SPECS.flatMap((spec) => {
+      const href = release.platformLinks[spec.key];
+      return href
+        ? [{ platform: spec.platform, href, iconName: spec.iconName }]
+        : [];
+    }),
+  };
+}
 
 // 카드별 리듬 값 (인덱스 기반, deterministic). 실데이터 15곡에 맞춰 rot/dy를 15칸으로 확장.
 const ROTS = [-3, 2.5, -2, 3, -2.5, 2, -3.5, 1.5, -1.5, 3.5, -2.8, 2.2, -3.2, 1.8, -2.2];
@@ -24,16 +62,17 @@ interface CollageCard {
   priority: boolean;
 }
 
-const collageCards: CollageCard[] = TRACKS.map((track, i) => ({
-  track,
-  rot: ROTS[i % ROTS.length]!,
-  dy: DYS[i % DYS.length]!,
-  z: 2 + ((i * 5) % 6),
-  // 초기 뷰포트에 들어오는 상단 카드만 우선 로드 — LCP 단축.
-  priority: i < 5,
-}));
+export default async function MusicPage() {
+  const tracks = (await getReleases("juntaro")).map(toTrack);
+  const collageCards: CollageCard[] = tracks.map((track, i) => ({
+    track,
+    rot: ROTS[i % ROTS.length]!,
+    dy: DYS[i % DYS.length]!,
+    z: 2 + ((i * 5) % 6),
+    // 초기 뷰포트에 들어오는 상단 카드만 우선 로드 — LCP 단축.
+    priority: i < 5,
+  }));
 
-export default function MusicPage() {
   return (
     <main className="flex min-h-dvh flex-col">
       {/* 헤더 내비가 활성 밑줄로 현재 페이지를 이미 지목하므로 제목은 접근성용으로만 둔다. */}

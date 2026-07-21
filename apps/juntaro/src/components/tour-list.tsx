@@ -1,18 +1,27 @@
 import type { CSSProperties } from "react";
 
-import { TOUR_DATES } from "@/consts/tours";
+/** 기존 TOUR_DATES 항목과 동일한 표시용 뷰 모델 — Tour 도메인 타입에서 파생해 주입한다. */
+export interface TourRow {
+  /** "MAR 14" — event_date를 KST 고정으로 파생 */
+  dateLabel: string;
+  /** "2026" — event_date를 KST 고정으로 파생 */
+  year: string;
+  city: string;
+  country: string;
+  venue: string;
+}
 
-export function TourList() {
+export function TourList({ tours }: { tours: TourRow[] }) {
   return (
     <div className="px-6 pb-10 md:px-10 md:pb-14">
       {/* 데이터는 현재 2026 단일 연대이므로 그룹핑 없이 첫 항목 연도를 그대로 디바이더로 쓴다. */}
       {/* 캡션이 이 페이지의 실제 정보라 푸터의 장식용 /55보다 한 단계 진하게 + medium (WCAG AA 4.5:1 확보) */}
       <p className="mb-6 font-mono text-[11px] font-medium tracking-[0.3em] text-[#111111]/70 uppercase md:mb-8">
-        {TOUR_DATES[0].year}
+        {tours[0]?.year}
       </p>
 
       <ul className="group/rows">
-        {TOUR_DATES.map((tour, i) => (
+        {tours.map((tour, i) => (
           <li
             key={`${tour.city}-${tour.dateLabel}`}
             // hover는 감각 피드백만 — 링크 어휘(밑줄·커서) 금지. 형제 row 딤은 field 급이라 200ms 대신 300ms
