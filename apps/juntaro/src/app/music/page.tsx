@@ -63,7 +63,11 @@ interface CollageCard {
 }
 
 export default async function MusicPage() {
-  const tracks = (await getReleases("juntaro")).map(toTrack);
+  // 커버 없는 릴리즈는 제외 — MusicCard/TrackModal이 <Image src>를 요구하고(빈 문자열은
+  // next/image 에러), 원본 계약도 "트랙엔 항상 커버 존재"였다(리뷰 가드).
+  const tracks = (await getReleases("juntaro"))
+    .filter((release) => mediaUrl(release.artworkPath) !== null)
+    .map(toTrack);
   const collageCards: CollageCard[] = tracks.map((track, i) => ({
     track,
     rot: ROTS[i % ROTS.length]!,
