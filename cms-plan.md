@@ -482,6 +482,11 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
   대문자)이므로 시드는 원문 그대로 넣는다. admin 신규 생성만 slugify(소문자·하이픈) 적용 —
   두 형식이 섞여도 slug는 사이트 내 유니크 제약이라 안전하다.
 
+- **시드 스크립트**: `scripts/seed-cms.ts`(러너 tsx). `pnpm seed:cms --dry-run`으로 DB 미접근
+  변환 결과·검수 목록 확인, `pnpm seed:cms`로 실 시드(멱등 upsert + 이미지 Storage 이전).
+  env는 `apps/admin/.env.local`→루트 `.env`에서 `NEXT_PUBLIC_SUPABASE_URL`·`SUPABASE_SERVICE_ROLE_KEY`
+  로드. `--cleanup-test`는 VFL slug='test' 행만 정리. (시드 예상: artists 44 · releases 21 · tours 8)
+
 ---
 
 ## 11. 단계별 로드맵
