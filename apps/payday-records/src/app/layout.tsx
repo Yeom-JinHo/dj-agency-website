@@ -55,14 +55,7 @@ export default function RootLayout({
   children: ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      // Next 16부터 라우트 전환 시 scroll-behavior 오버라이드가 사라졌다.
-      // 이 속성이 있어야 #about 앵커의 부드러운 스크롤은 유지하면서
-      // 라우트 이동은 기존처럼 즉시 최상단으로 점프한다.
-      data-scroll-behavior="smooth"
-      className="dark scroll-smooth motion-reduce:scroll-auto"
-    >
+    <html lang="en" className="dark scroll-smooth motion-reduce:scroll-auto">
       <body
         className={`${bricolage_grotesque.variable} ${anton.variable} antialiased`}
       >
