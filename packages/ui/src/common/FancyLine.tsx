@@ -29,6 +29,8 @@ export default function FancyLine({
     } catch (error) {
       console.warn("Line component setup error:", error);
     }
+    // 마운트 시 초기 경로(progress = 0)만 1회 그린다. 이후 갱신은 마우스 핸들러가 담당.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setPath = (progress: number) => {
@@ -60,7 +62,6 @@ export default function FancyLine({
     const pathBound = path.current?.getBoundingClientRect();
 
     if (pathBound) {
-      // eslint-disable-next-line react-compiler/react-compiler
       x = (clientX - pathBound.left) / pathBound.width;
       progress += movementY;
       setPath(progress);

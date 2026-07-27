@@ -39,12 +39,8 @@ function Button({
   className,
   variant,
   size,
-  asChild = false,
   ...props
-}: ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  }) {
+}: ComponentProps<"button"> & VariantProps<typeof buttonVariants>) {
   return (
     <button
       className={cn(buttonVariants({ variant, size, className }))}
