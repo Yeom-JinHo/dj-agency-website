@@ -17,6 +17,8 @@
     "@types/node": "catalog:",
     "eslint": "catalog:",
     "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "typescript": "catalog:"
   },
   "peerDependencies": {
