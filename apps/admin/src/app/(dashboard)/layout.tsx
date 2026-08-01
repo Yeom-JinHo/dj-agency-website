@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 
 import { NavLinks } from "@/components/nav-links";
+import { SignOutButton } from "@/components/sign-out-button";
 import { SiteSwitcher } from "@/components/site-switcher";
-import { Button } from "@/components/ui/button";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 대상에서 제외한다 —
 // 빌드 타임에 서버 클라이언트를 호출하지 않는다.
@@ -63,11 +63,7 @@ export default async function DashboardLayout({
           {user.email ? (
             <span className="text-muted-foreground text-sm">{user.email}</span>
           ) : null}
-          <form action={signOut}>
-            <Button type="submit" variant="outline" size="sm">
-              Sign out
-            </Button>
-          </form>
+          <SignOutButton action={signOut} />
         </div>
       </header>
       <main className="p-6">{children}</main>
