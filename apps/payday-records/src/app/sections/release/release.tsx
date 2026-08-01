@@ -13,7 +13,6 @@ import ReleaseCard from "./release-card";
 const PlatformModal = dynamic(() => import("./platform-modal"), { ssr: false });
 
 // releases는 서버 컴포넌트(page.tsx)에서 @repo/content로 조회해 주입한다.
-// (하드코딩 소스는 ./config에 남아 있으나 더 이상 import하지 않는다.)
 function Release({ releases }: { releases: ReleaseItem[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const close = useCallback(() => setOpenIndex(null), []);

@@ -10,7 +10,8 @@ export interface Release {
   artist: string;
   label?: string;
   // CMS 전환 후 Supabase Storage 공개 URL을 사용한다(@repo/content/media mediaUrl).
-  // 원격 호스트는 @repo/next-config의 images.remotePatterns(**.supabase.co)로 허용됨.
+  // 원격 호스트는 @repo/next-config의 images.remotePatterns로 허용됨 — 와일드카드가 아니라
+  // 자사 프로젝트 호스트(NEXT_PUBLIC_SUPABASE_URL 파생) + /storage/v1/object/public/media/** 경로로 고정.
   artwork?: string;
   /** blurDataURL(placeholder). CMS가 업로드 시 생성 — 없으면 blur 생략. */
   artworkPlaceholder?: string;
