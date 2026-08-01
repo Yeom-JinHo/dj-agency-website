@@ -53,7 +53,7 @@ export default async function DashboardPage() {
               className="hover:bg-muted/50 rounded-lg border p-5 transition-colors"
             >
               <h2 className="text-base font-medium">{SITE_LABELS[site]}</h2>
-              <p className="text-muted-foreground mt-1 text-sm">{site}</p>
+              <p className="text-muted-foreground mt-1 font-mono text-sm">{site}</p>
               {summary ? (
                 <p className="text-muted-foreground mt-3 text-xs tabular-nums">
                   {summary}

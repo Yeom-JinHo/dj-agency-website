@@ -8,6 +8,8 @@
 @source '../../../../packages/ui/src/**/*.{ts,tsx}';
 
 @theme inline {
+    --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, monospace;
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);
