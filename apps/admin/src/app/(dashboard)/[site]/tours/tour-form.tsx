@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { TOUR_STATUSES, type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
+import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 import { Button } from "@/components/ui/button";
 import { FormActions } from "@/components/form-actions";
 import { Input } from "@/components/ui/input";
@@ -154,6 +155,16 @@ export function TourForm({
 
   const listHref = `/${site}/tours`;
 
+  // 파일 선택은 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
+  const hasUnsaved = form.formState.isDirty || posterFile !== null;
+  useUnsavedWarning(hasUnsaved && !submitting);
+
+  /** 검증 실패 시 RHF가 첫 오류 필드에 포커스하지만, sticky 저장 바에서
+   * "아무 일도 없는" 것처럼 보이지 않게 토스트로도 알린다. */
+  function onInvalid() {
+    toast.error("입력값을 확인해주세요.");
+  }
+
   async function onSubmit(values: TourFormValues) {
     setSubmitting(true);
     // datetime-local → ISO 변환은 여기(클라이언트)에서 — 브라우저 TZ 기준.
@@ -162,20 +173,38 @@ export function TourForm({
     fd.set("payload", JSON.stringify(payload));
     if (posterFile) fd.set("posterImage", posterFile);
 
-    const result =
+    const result = await (
       mode === "create"
-        ? await createTour(site, fd)
-        : await updateTour(site, tourId!, fd);
-    setSubmitting(false);
+        ? createTour(site, fd)
+        : updateTour(site, tourId!, fd)
+    ).catch((error: unknown) => {
+      // 액션 호출 자체의 실패(오프라인·게이트웨이 오류)는 reject로 온다.
+      console.error("[admin] save failed:", error);
+      return null;
+    });
 
+    if (!result) {
+      setSubmitting(false);
+      toast.error("요청을 처리하지 못했습니다. 네트워크 상태를 확인해주세요.");
+      return;
+    }
     if (!result.ok) {
+      setSubmitting(false);
       toast.error(result.error);
       return;
     }
+    // 성공 시 pending 유지는 라우트가 실제로 바뀌는 경로에만 — 그래야
+    // 네비게이션 완료 전 버튼 라벨 복귀(재클릭 유발)를 막으면서도 잠금이 안 남는다.
     // 부분 성공(생성됐지만 포스터 저장 실패): 편집 화면으로 안내해 이어서 저장.
     if (result.warning && result.id) {
       toast.warning(result.warning);
-      router.push(`${listHref}/${result.id}`);
+      if (mode === "create") {
+        router.push(`${listHref}/${result.id}`);
+        router.refresh();
+        return;
+      }
+      // edit 모드는 같은 URL이라 언마운트가 없다 — 잠금을 풀어야 재시도 가능.
+      setSubmitting(false);
       router.refresh();
       return;
     }
@@ -188,10 +217,9 @@ export function TourForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="max-w-2xl space-y-8"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+        {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. */}
+        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-8">
         {/* 기본 정보 */}
         <section className="space-y-4">
           <FormField
@@ -438,11 +466,22 @@ export function TourForm({
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push(listHref)}
+            onClick={() => {
+              if (
+                hasUnsaved &&
+                !window.confirm(
+                  "저장하지 않은 변경사항이 있습니다. 나갈까요?",
+                )
+              ) {
+                return;
+              }
+              router.push(listHref);
+            }}
           >
             취소
           </Button>
         </FormActions>
+        </fieldset>
       </form>
     </Form>
   );
