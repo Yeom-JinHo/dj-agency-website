@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAnonClient } from "@repo/content/supabase/anon";
+import { secretMatches } from "@repo/content/revalidate";
 
 // Supabase 무료 티어는 7일 API 비활성 시 프로젝트를 pause한다(cms-plan §3).
 // Vercel Cron이 하루 1회 이 route를 호출해 초경량 조회로 7일 윈도우를 리셋한다.
@@ -11,9 +12,16 @@ const NO_STORE = { "Cache-Control": "no-store" } as const;
 export async function GET(request: Request) {
   // Vercel Cron은 CRON_SECRET 설정 시 `Authorization: Bearer <secret>`을 자동 첨부한다.
   // 외부에서 직접 호출해 함수 실행을 유발하는 것을 차단한다.
-  if (
-    request.headers.get("authorization") !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  // 미설정은 fail-closed(500) — 문자열 보간 비교는 "Bearer undefined" 통과라는
+  // fail-open이 된다. revalidate 핸들러와 동일하게 상수시간 비교를 공유한다.
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    console.error("[keepalive] CRON_SECRET 미설정 — 요청 거부");
+    return NextResponse.json({ ok: false }, { status: 500, headers: NO_STORE });
+  }
+  const auth = request.headers.get("authorization");
+  const token = auth?.startsWith("Bearer ") ? auth.slice("Bearer ".length) : null;
+  if (!secretMatches(token, secret)) {
     return new NextResponse(null, { status: 401, headers: NO_STORE });
   }
 

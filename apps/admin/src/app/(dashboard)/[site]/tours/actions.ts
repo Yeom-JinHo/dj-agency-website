@@ -230,12 +230,15 @@ export async function deleteTour(
 
     // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.
     // site_slug 스코프: 타 사이트 투어 삭제 차단(artist 패턴).
-    const { data: existing } = await supabase
+    const { data: existing, error: loadError } = await supabase
       .from("tours")
       .select("poster_path")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
+    // 조회 순단을 "행 없음"으로 오인하면 삭제만 성공하고 발행·Storage 정리가
+    // 스킵돼 삭제된 콘텐츠가 사이트 캐시에 영구 잔존한다(TTL 없음) — 삭제 전 중단.
+    if (loadError) return { ok: false, error: loadError.message };
 
     const { error } = await supabase
       .from("tours")

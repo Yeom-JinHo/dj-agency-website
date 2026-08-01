@@ -17,8 +17,12 @@ const NO_STORE = { "Cache-Control": "no-store" } as const;
 /**
  * 시크릿 상수시간 비교. 길이 불일치 시 timingSafeEqual가 throw하지 않도록
  * 동일 길이 더미 비교로 정규화해 길이 노출·예외를 함께 막는다.
+ * (revalidate 핸들러 외에 admin keepalive의 CRON_SECRET 검증도 공유.)
  */
-function secretMatches(provided: string | null, expected: string): boolean {
+export function secretMatches(
+  provided: string | null,
+  expected: string,
+): boolean {
   if (!provided) return false;
   const a = Buffer.from(provided);
   const b = Buffer.from(expected);

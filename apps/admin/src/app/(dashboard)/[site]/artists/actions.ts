@@ -237,12 +237,15 @@ export async function deleteArtist(
     const supabase = await createServerSupabaseClient();
 
     // slug는 삭제된 상세 페이지 캐시 태그 조립에, 이미지 경로는 Storage 정리에 쓴다.
-    const { data: existing } = await supabase
+    const { data: existing, error: loadError } = await supabase
       .from("artists")
       .select("slug, image_path, logo_image_path")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
+    // 조회 순단을 "행 없음"으로 오인하면 삭제만 성공하고 발행·Storage 정리가
+    // 스킵돼 삭제된 콘텐츠가 사이트 캐시에 영구 잔존한다(TTL 없음) — 삭제 전 중단.
+    if (loadError) return { ok: false, error: loadError.message };
 
     const { error } = await supabase
       .from("artists")
