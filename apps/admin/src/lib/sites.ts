@@ -1,4 +1,10 @@
+import type { StaticImageData } from "next/image";
 import { SITE_SLUGS, type SiteSlug } from "@repo/content/schema";
+
+import celebrateAgencyIcon from "@/assets/site-icons/celebrate-agency.webp";
+import juntaroIcon from "@/assets/site-icons/juntaro.webp";
+import paydayRecordsIcon from "@/assets/site-icons/payday-records.webp";
+import vagueFrequencyLabsIcon from "@/assets/site-icons/vague-frequency-labs.webp";
 
 /**
  * 사이트-우선 라우트(§8)의 공용 상수. SITE_SLUGS는 @repo/content/schema에서 소비하고,
@@ -23,6 +29,14 @@ export const CATEGORIES = [
 
 /** 카테고리 라우트 세그먼트. 카운트를 세그먼트 키로 다루는 화면들이 공유한다. */
 export type CategorySegment = (typeof CATEGORIES)[number]["segment"];
+
+/** 사이트별 앱 아이콘(스위처·대시보드 카드 표시용). 각 앱 icon.png를 64px webp로 리사이즈한 복사본. */
+export const SITE_ICONS: Record<SiteSlug, StaticImageData> = {
+  "vague-frequency-labs": vagueFrequencyLabsIcon,
+  "payday-records": paydayRecordsIcon,
+  "celebrate-agency": celebrateAgencyIcon,
+  juntaro: juntaroIcon,
+};
 
 /** 임의 문자열이 유효한 사이트 슬러그인지 좁힘(라우트 site 파라미터 검증용). */
 export function isSiteSlug(value: string): value is SiteSlug {
