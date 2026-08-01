@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminListArtists, adminListTours } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
+import { MapPin } from "lucide-react";
 
 import { mediaUrl } from "@/lib/media";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -83,15 +85,25 @@ export default async function ToursPage({
           <h1 className="text-2xl font-semibold tracking-tight">투어</h1>
           <p className="text-muted-foreground text-sm">예정된 공연 일정.</p>
         </div>
-        <Button asChild>
-          <Link href={`/${site}/tours/new`}>새 투어</Link>
-        </Button>
+        {/* 빈 상태에서는 CTA가 EmptyState 안에 있으므로 우상단 버튼을 숨긴다. */}
+        {tours.length > 0 ? (
+          <Button asChild>
+            <Link href={`/${site}/tours/new`}>새 투어</Link>
+          </Button>
+        ) : null}
       </div>
 
       {tours.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          아직 투어가 없습니다. &ldquo;새 투어&rdquo;로 추가하세요.
-        </p>
+        <EmptyState
+          icon={MapPin}
+          title="아직 투어가 없습니다"
+          description="예정된 공연 일정을 추가하세요."
+          action={
+            <Button asChild>
+              <Link href={`/${site}/tours/new`}>새 투어</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="rounded-lg border">
           <Table>

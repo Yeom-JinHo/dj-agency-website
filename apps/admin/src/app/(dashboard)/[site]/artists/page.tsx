@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Users } from "lucide-react";
 import { siteSlugSchema } from "@repo/content/schema";
 import { adminListArtists } from "@repo/content/admin-queries";
 
 import { mediaUrl } from "@/lib/media";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -55,15 +57,25 @@ export default async function ArtistsPage({
             이 사이트에 소속된 아티스트 로스터.
           </p>
         </div>
-        <Button asChild>
-          <Link href={`/${site}/artists/new`}>새 아티스트</Link>
-        </Button>
+        {/* 빈 상태에서는 CTA가 EmptyState 안에 있으므로 우상단 버튼을 숨긴다. */}
+        {artists.length > 0 ? (
+          <Button asChild>
+            <Link href={`/${site}/artists/new`}>새 아티스트</Link>
+          </Button>
+        ) : null}
       </div>
 
       {artists.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          아직 아티스트가 없습니다. &ldquo;새 아티스트&rdquo;로 추가하세요.
-        </p>
+        <EmptyState
+          icon={Users}
+          title="아직 아티스트가 없습니다"
+          description="이 사이트의 로스터에 첫 아티스트를 추가하세요."
+          action={
+            <Button asChild>
+              <Link href={`/${site}/artists/new`}>새 아티스트</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="rounded-lg border">
           <Table>

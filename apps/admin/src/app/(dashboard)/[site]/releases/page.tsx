@@ -6,8 +6,10 @@ import {
   adminListArtists,
 } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
+import { Disc3 } from "lucide-react";
 
 import { mediaUrl } from "@/lib/media";
+import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -66,15 +68,25 @@ export default async function ReleasesPage({
             이 사이트의 릴리즈.
           </p>
         </div>
-        <Button asChild>
-          <Link href={`/${site}/releases/new`}>새 릴리즈</Link>
-        </Button>
+        {/* 빈 상태에서는 CTA가 EmptyState 안에 있으므로 우상단 버튼을 숨긴다. */}
+        {releases.length > 0 ? (
+          <Button asChild>
+            <Link href={`/${site}/releases/new`}>새 릴리즈</Link>
+          </Button>
+        ) : null}
       </div>
 
       {releases.length === 0 ? (
-        <p className="text-muted-foreground text-sm">
-          아직 릴리즈가 없습니다. &ldquo;새 릴리즈&rdquo;로 추가하세요.
-        </p>
+        <EmptyState
+          icon={Disc3}
+          title="아직 릴리즈가 없습니다"
+          description="이 사이트에서 발매한 음원을 추가하세요."
+          action={
+            <Button asChild>
+              <Link href={`/${site}/releases/new`}>새 릴리즈</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="rounded-lg border">
           <Table>
