@@ -11,7 +11,7 @@ import { nullify, normalizeSocials } from "@/lib/form-normalize";
 /** 빈 값은 허용하되, 값이 있으면 URL 형식을 강제(platform_links/socials와 동일 rigor). */
 const urlOrEmpty = z.string().refine(
   (v) => v === "" || z.string().url().safeParse(v).success,
-  { message: "Enter a valid URL" },
+  { message: "올바른 URL을 입력해주세요." },
 );
 
 /** platform_links 폼 표현: 5개 확정 키 모두 문자열(빈 값 허용). */
@@ -32,7 +32,7 @@ const platformLinksFormSchema = z.object(
  * 변환에서 text[]로 분해한다.
  */
 export const releaseFormSchema = z.object({
-  title: z.string().trim().min(1, "Title is required"),
+  title: z.string().trim().min(1, "제목을 입력해주세요."),
   // "" = 없음. 로스터 select에서 선택, 서버 변환에서 null로.
   primaryArtistId: z.string(),
   artistCredit: z.string(),

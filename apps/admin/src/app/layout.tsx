@@ -15,7 +15,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className="antialiased">
         {children}
         <Toaster />

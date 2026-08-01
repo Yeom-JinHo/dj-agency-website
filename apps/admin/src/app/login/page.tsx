@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/form";
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("이메일 형식이 올바르지 않습니다."),
+  password: z.string().min(1, "비밀번호를 입력해주세요."),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -65,7 +65,7 @@ export default function LoginPage() {
             ye0m2 admin
           </h1>
           <p className="text-muted-foreground text-sm">
-            Sign in to manage content.
+            로그인 후 콘텐츠를 관리할 수 있습니다.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export default function LoginPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -94,7 +94,7 @@ export default function LoginPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>비밀번호</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -107,7 +107,7 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Signing in…" : "Sign in"}
+              {submitting ? "로그인 중…" : "로그인"}
             </Button>
           </form>
         </Form>

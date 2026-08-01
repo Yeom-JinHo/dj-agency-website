@@ -13,14 +13,14 @@ import { nullify } from "@/lib/form-normalize";
  * server 재검증이 공유한다.
  */
 export const tourFormSchema = z.object({
-  title: z.string().trim().min(1, "Title is required"),
+  title: z.string().trim().min(1, "제목을 입력해주세요."),
   // 로스터 아티스트 선택(nullable). "" = 미지정.
   artistId: z.string(),
   venue: z.string(),
   city: z.string(),
   country: z.string(),
   // datetime-local 또는 ISO(제출 직전 클라이언트가 ISO로 변환) — 둘 다 비어있지 않은 문자열.
-  eventDate: z.string().trim().min(1, "Event date is required"),
+  eventDate: z.string().trim().min(1, "공연 일시를 입력해주세요."),
   doorTime: z.string(),
   ticketUrl: z.string(),
   descriptionEn: z.string(),
