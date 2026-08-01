@@ -6,7 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * 미로그인 사용자는 /login으로 리다이렉트한다. (/api/*, 정적 자원은 매처에서 제외 —
  * keepalive cron은 anon으로 인증 없이 도달해야 한다.)
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
