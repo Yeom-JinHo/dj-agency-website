@@ -35,25 +35,31 @@ export function DeleteTourButton({
   async function onConfirm() {
     setDeleting(true);
     const result = await deleteTour(site, tourId);
-    setDeleting(false);
 
     if (!result.ok) {
+      setDeleting(false);
       toast.error(result.error);
       return;
     }
-    setOpen(false);
     // 삭제는 성공했으나 사이트 반영(발행)만 실패한 경우 경고로 알린다(§4.3).
     if (result.warning) {
       toast.warning(result.warning);
     } else {
       toast.success("투어를 삭제했습니다.");
     }
+    // 다이얼로그를 연 채 pending 유지 — 네비게이션 완료로 언마운트될 때까지
+    // 삭제된 엔티티 화면이 재노출·재조작되는 걸 막는다.
     router.push(`/${site}/tours`);
     router.refresh();
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!deleting) setOpen(next);
+      }}
+    >
       <DialogTrigger asChild>
         <Button type="button" variant="destructive">
           삭제
@@ -69,7 +75,7 @@ export function DeleteTourButton({
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="button" variant="outline">
+            <Button type="button" variant="outline" disabled={deleting}>
               취소
             </Button>
           </DialogClose>
