@@ -24,9 +24,16 @@ export async function publishOrWarn(
   try {
     const result = await publish(tags, site);
     if (result.ok) return null;
+    // 경고 토스트는 휘발성 — Vercel 함수 로그에 남겨 발행 실패를 사후 추적 가능하게.
+    console.error(
+      `[publish] 발행 실패 site=${result.site} mode=${mode} tags=${tags.join(",")} error=${result.error ?? "알 수 없는 오류"}`,
+    );
     return `${prefix} 사이트 반영(발행)에 실패했습니다: ${result.site} (${result.error ?? "알 수 없는 오류"}). ${retry}`;
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
+    console.error(
+      `[publish] 발행 예외 site=${site} mode=${mode} tags=${tags.join(",")} error=${reason}`,
+    );
     return `${prefix} 사이트 반영(발행)에 실패했습니다: ${site} (${reason}). ${retry}`;
   }
 }
