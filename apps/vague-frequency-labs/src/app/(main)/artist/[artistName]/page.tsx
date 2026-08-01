@@ -30,10 +30,11 @@ export async function generateMetadata(props: {
   if (!domainArtist) notFound();
   const artist = toArtistProfile(domainArtist);
 
+  // 1200×630 고정 선언은 세로 원본과 안 맞는 거짓 치수였다(PR #244에서 제거).
+  // CMS 전환 후 치수 메타데이터가 없으므로 선언 자체를 생략한다 — 거짓 치수보다
+  // 무선언이 낫고, 스크레이퍼는 이미지를 fetch해 실치수를 얻는다.
   const cardImage = {
     alt: artist.name,
-    width: 1200,
-    height: 630,
     url: artist.image,
     type: "image/webp",
   } as const;

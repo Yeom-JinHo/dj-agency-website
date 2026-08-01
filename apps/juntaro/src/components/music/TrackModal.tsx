@@ -166,6 +166,12 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
               src={track.cover}
               alt={track.name}
               fill
+              {...(track.coverPlaceholder
+                ? ({
+                    placeholder: "blur",
+                    blurDataURL: track.coverPlaceholder,
+                  } as const)
+                : {})}
               sizes="148px"
               className="object-cover"
             />
@@ -189,7 +195,9 @@ export function TrackModal({ track, onClose, triggerRef }: TrackModalProps) {
               {track.name}
             </h2>
             {track.shortDescription && (
-              <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#111111]/60">
+              /* font-mono: 서체 미지정 시 시스템 산세리프 폴백 — Anton+IBM Plex Mono
+                 2서체 체계 밖 제3서체 노출을 막는다 */
+              <p className="mt-2 line-clamp-2 font-mono text-sm leading-relaxed text-[#111111]/60">
                 {track.shortDescription}
               </p>
             )}

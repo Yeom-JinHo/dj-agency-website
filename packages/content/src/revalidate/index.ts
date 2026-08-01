@@ -62,7 +62,9 @@ export function createRevalidateHandler() {
       );
     }
 
-    tags.forEach((tag) => revalidateTag(tag));
+    // Next 16: 2번째 인자 필수. 웹훅(admin 발행)은 즉시 만료가 계약 — "max"(SWR)는
+    // 첫 방문자에게 stale을 서빙하므로 쓰지 않는다(공식 문서의 웹훅 권장 패턴).
+    tags.forEach((tag) => revalidateTag(tag, { expire: 0 }));
 
     return NextResponse.json(
       { revalidated: true, tags },

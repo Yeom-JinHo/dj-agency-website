@@ -40,6 +40,7 @@ function toTrack(release: Release): JuntaroTrack {
     name: release.title,
     artist: release.artistCredit ?? undefined,
     cover: mediaUrl(release.artworkPath) ?? "",
+    coverPlaceholder: release.artworkPlaceholder ?? undefined,
     shortDescription: release.shortDescriptionEn ?? undefined,
     links: LINK_SPECS.flatMap((spec) => {
       const href = release.platformLinks[spec.key];

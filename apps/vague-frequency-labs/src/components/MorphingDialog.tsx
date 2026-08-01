@@ -21,6 +21,7 @@ import {
   useState,
 } from "react";
 import Image from "next/image";
+import type { StaticImageData } from "next/image";
 import useClickOutside from "@/hooks/useClickOutside";
 import {
   AnimatePresence,
@@ -433,7 +434,7 @@ function MorphingDialogDescription({
 }
 
 export interface MorphingDialogImageProps {
-  src: string;
+  src: string | StaticImageData;
   alt: string;
   className?: string;
   style?: CSSProperties;

@@ -102,6 +102,7 @@ export function toMusicInfo(release: Release): MusicInfo {
     artist: (release.artistCredit ?? "") as ArtistName,
     label: release.label ?? undefined,
     image: mediaUrl(release.artworkPath) ?? "",
+    imagePlaceholder: release.artworkPlaceholder ?? "",
     shortDescription:
       release.shortDescriptionEn ?? release.shortDescriptionKo ?? "",
     fullDescription: combineDescription(

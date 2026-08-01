@@ -85,23 +85,34 @@ const CHROME_BUTTON =
 interface ArtistModalProps {
   artists: Artist[];
   index: number;
+  /** true면 exit 애니메이션 재생 중 — 끝나면 onExited로 언마운트를 알린다. */
+  closing: boolean;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  onExited: () => void;
 }
 
 export function ArtistModal({
   artists,
   index,
+  closing,
   onClose,
   onPrev,
   onNext,
+  onExited,
 }: ArtistModalProps) {
   const artist = artists[index];
   const total = artists.length;
   const dialogRef = useRef<HTMLDivElement>(null);
   const modalInnerRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // closing 중 prev/next 차단용(onKey 화살표 + 버튼 인라인 가드) — 넘어가면
+  // aria-live 오낭독 + 포커스 복원이 엉뚱한 카드로 착지한다.
+  // onClose(= setClosing(true))는 멱등이라 가드하지 않는다.
+  const closingRef = useRef(closing);
+  closingRef.current = closing;
 
   const handleBackdrop = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
@@ -116,11 +127,21 @@ export function ArtistModal({
     closeButtonRef.current?.focus();
   }, []);
 
+  // transitionend 유실(확장프로그램의 transition 무력화 등) 대비 언마운트 폴백 —
+  // 없으면 body overflow:hidden이 영구 잔류할 수 있다.
+  useEffect(() => {
+    if (!closing) return;
+    const timer = setTimeout(onExited, 300);
+    return () => clearTimeout(timer);
+  }, [closing, onExited]);
+
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
 
     const onKey = (event: KeyboardEvent) => {
+      // Tab 포커스 트랩은 exit 중에도 유지 — aria-modal인 다이얼로그가 떠 있는
+      // 동안 포커스가 배경으로 새면 안 된다. Arrow만 closing 가드.
       if (event.key === "Escape") {
         onClose();
         return;
@@ -132,7 +153,7 @@ export function ArtistModal({
           target instanceof HTMLTextAreaElement ||
           target instanceof HTMLSelectElement ||
           target?.isContentEditable === true;
-        if (inEditable) return;
+        if (inEditable || closingRef.current) return;
         if (event.key === "ArrowLeft") onPrev();
         else onNext();
         return;
@@ -186,7 +207,17 @@ export function ArtistModal({
       aria-label={`${artist.name} profile`}
       tabIndex={-1}
       onClick={handleBackdrop}
-      className="animate-modal-fade fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px]"
+      onTransitionEnd={(event) => {
+        if (
+          closing &&
+          event.target === event.currentTarget &&
+          event.propertyName === "opacity"
+        )
+          onExited();
+      }}
+      className={`${
+        closing ? "opacity-0" : "animate-modal-fade"
+      } fixed inset-0 z-[100] overflow-y-auto bg-[rgba(5,5,5,0.86)] outline-none backdrop-blur-[8px] transition-opacity duration-150 ease-in`}
     >
       <div
         role="status"
@@ -199,9 +230,11 @@ export function ArtistModal({
       <div className="flex min-h-full items-center justify-center p-4 sm:p-8 lg:p-12">
         <div
           ref={modalInnerRef}
-          className="animate-modal-pop relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]"
+          className={`${
+            closing ? "scale-[0.97] translate-y-[6px]" : "animate-modal-pop"
+          } relative flex max-h-[calc(100dvh-32px)] w-full flex-col border border-ca-line bg-ca-bg transition-transform duration-150 ease-in sm:max-h-[calc(100dvh-64px)] sm:max-w-[clamp(720px,90vw,1100px)] lg:max-h-[calc(100dvh-96px)]`}
         >
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-3 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-ca-line bg-ca-bg px-5 py-2 font-mono text-[12px] uppercase tracking-[0.14em] text-ca-muted lg:text-[13px]">
             <span>
               [ {idxLabel} / {totalLabel} ]
             </span>
@@ -210,7 +243,7 @@ export function ArtistModal({
               type="button"
               onClick={onClose}
               aria-label={`Close ${artist.name} profile`}
-              className={`${CHROME_BUTTON} p-2`}
+              className={`${CHROME_BUTTON} flex min-h-[44px] min-w-[44px] items-center justify-center`}
             >
               <IconX size={14} stroke={1.75} />
             </button>
@@ -218,10 +251,13 @@ export function ArtistModal({
 
           <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_1fr] overflow-hidden lg:grid-cols-[minmax(460px,520px)_1fr] lg:grid-rows-1">
             <div className="flex justify-center border-b border-ca-line p-4 sm:p-5 lg:items-start lg:border-b-0 lg:border-r lg:p-0">
-              <div className="relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none">
+              <div
+                key={artist.id}
+                className="ca-portrait-in relative aspect-[3/4] w-3/4 max-w-[320px] overflow-hidden bg-ca-bg-2 lg:w-full lg:max-w-none"
+              >
                 <ArtistPortrait
-                  key={artist.id}
                   image={artist.image}
+                  imagePlaceholder={artist.imagePlaceholder}
                   name={artist.name}
                   variant="modal"
                   sizes="(max-width: 1024px) 60vw, 600px"
@@ -304,7 +340,9 @@ export function ArtistModal({
           <div className="flex flex-shrink-0 items-center justify-between border-t border-ca-line px-5 py-3">
             <button
               type="button"
-              onClick={onPrev}
+              onClick={() => {
+                if (!closingRef.current) onPrev();
+              }}
               aria-label={`Previous artist: ${prevArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
@@ -312,7 +350,9 @@ export function ArtistModal({
             </button>
             <button
               type="button"
-              onClick={onNext}
+              onClick={() => {
+                if (!closingRef.current) onNext();
+              }}
               aria-label={`Next artist: ${nextArtist.name}`}
               className={`${CHROME_BUTTON} px-4 py-2.5 font-mono text-[12px] uppercase tracking-[0.14em] lg:text-[13px]`}
             >
@@ -320,7 +360,10 @@ export function ArtistModal({
             </button>
           </div>
 
-          {(prevArtist.image ?? nextArtist.image) ? (
+          {/* prev/next 프리로드: eager가 없으면 lazy + size-0 조합으로 fetch
+              자체가 생략된다. priority(high)는 메인 포트레이트와 대역폭을
+              경쟁하므로 쓰지 않는다. */}
+          {(prevArtist.image || nextArtist.image) ? (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
@@ -329,9 +372,11 @@ export function ArtistModal({
                 <div className="relative aspect-[3/4] w-[600px]">
                   <ArtistPortrait
                     image={prevArtist.image}
+                    imagePlaceholder={prevArtist.imagePlaceholder}
                     name={prevArtist.name}
                     variant="modal"
                     sizes="(max-width: 1024px) 60vw, 600px"
+                    loading="eager"
                   />
                 </div>
               ) : null}
@@ -339,9 +384,11 @@ export function ArtistModal({
                 <div className="relative aspect-[3/4] w-[600px]">
                   <ArtistPortrait
                     image={nextArtist.image}
+                    imagePlaceholder={nextArtist.imagePlaceholder}
                     name={nextArtist.name}
                     variant="modal"
                     sizes="(max-width: 1024px) 60vw, 600px"
+                    loading="eager"
                   />
                 </div>
               ) : null}

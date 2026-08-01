@@ -72,7 +72,10 @@ export default async function ArtistPage(): Promise<ReactElement> {
           <FancyLine className={"mt-16"} />
           <div className="mt-16 flex flex-wrap justify-center gap-16">
             {artists.map((artist, index) => (
-              <BlurFade key={index} inView duration={0.6}>
+              // 이미지 placeholder blur와 진입 blur가 겹치면 blur-up이 두 번
+              // 일어나므로 진입은 fade/rise만 남긴다 (PR #228과 같은 원칙).
+              // CMS 이미지도 imagePlaceholder(blurDataURL)를 가져 동일하게 적용.
+              <BlurFade key={index} inView duration={0.6} blur="0px">
                 <Link
                   href={`/artist/${encodeURIComponent(artist.slug)}`}
                   className="cursor-pointer"

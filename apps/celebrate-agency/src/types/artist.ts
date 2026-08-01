@@ -27,6 +27,8 @@ export interface Artist {
   id: string;
   name: string;
   image?: string;
+  /** blurDataURL(placeholder). CMS가 업로드 시 생성 — 없으면 blur 생략. */
+  imagePlaceholder?: string;
   bio: string;
   city: string;
   selectedWorks: ArtistWork[];

@@ -68,6 +68,7 @@ function toArtist(a: ContentArtist): Artist {
     id: a.slug,
     name: a.name,
     image: mediaUrl(a.imagePath) ?? undefined,
+    imagePlaceholder: a.imagePlaceholder ?? undefined,
     bio: toBio(a.fullDescriptionEn, a.fullDescriptionKo),
     city: a.city ?? "",
     selectedWorks: a.selectedWorks.map(toWork),

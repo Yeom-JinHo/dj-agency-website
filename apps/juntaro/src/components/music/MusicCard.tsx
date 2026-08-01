@@ -73,6 +73,12 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
             src={track.cover}
             alt={track.name}
             priority={priority}
+            {...(track.coverPlaceholder
+              ? ({
+                  placeholder: "blur",
+                  blurDataURL: track.coverPlaceholder,
+                } as const)
+              : {})}
             sizes="(max-width: 767px) 150px, (max-width: 1023px) 240px, (max-width: 1279px) 300px, (max-width: 1535px) 360px, 400px"
             className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105 motion-reduce:transition-none"
           />
@@ -97,7 +103,7 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
               /* truncate + title: hover 라벨은 순간적 글랜스 상태라 1줄로 잘라 스캔성을
                  유지한다. 전체 콜라보 크레딧은 한 클릭 거리의 모달에서 온전히 노출되고,
                  데스크톱은 title 네이티브 툴팁으로 잘린 이름을 보완한다. */
-              <p className="truncate text-xs text-neutral-300" title={track.artist}>
+              <p className="truncate font-mono text-xs text-neutral-300" title={track.artist}>
                 {track.artist}
               </p>
             )}

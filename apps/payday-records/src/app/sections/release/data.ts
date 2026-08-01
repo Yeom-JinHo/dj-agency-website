@@ -17,6 +17,7 @@ export async function getReleaseItems(): Promise<Release[]> {
     title: release.title,
     artist: release.artistCredit ?? "",
     artwork: mediaUrl(release.artworkPath) ?? undefined,
+    artworkPlaceholder: release.artworkPlaceholder ?? undefined,
     label: release.label ?? undefined,
     catalogNo: release.catalogNo ?? undefined,
     links: release.platformLinks,

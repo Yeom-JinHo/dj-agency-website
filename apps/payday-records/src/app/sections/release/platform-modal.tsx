@@ -31,7 +31,7 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 py-[6vh]"
+      className="fixed inset-0 z-[1000] flex items-center justify-center px-4 py-[6vh]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -67,6 +67,12 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
                 alt={release.title}
                 fill
                 sizes="360px"
+                {...(release.artworkPlaceholder
+                  ? ({
+                      placeholder: "blur",
+                      blurDataURL: release.artworkPlaceholder,
+                    } as const)
+                  : {})}
                 className="object-cover"
               />
             ) : (

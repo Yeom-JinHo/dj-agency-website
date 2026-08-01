@@ -1,6 +1,6 @@
 # v.f.labs
 
-Turborepo monorepo with three Next.js 15 apps and shared packages. pnpm workspaces, Node 18+, TypeScript 5.9, React 19.
+Turborepo monorepo with four Next.js 15 apps and shared packages. pnpm workspaces, Node 18+, TypeScript 5.9, React 19.
 
 ## Commands
 
@@ -23,8 +23,9 @@ apps/
   vague-frequency-labs/  Next.js app, port 3004 (main brand site)
   payday-records/        Next.js app, port 3002
   celebrate-agency/      Next.js app, port 3003
+  juntaro/               Next.js app, port 3005 (juntaro artist site)
 packages/
-  ui/                    @repo/ui — shared React components (exports ./fancy/link, ./common/*, ./*)
+  ui/                    @repo/ui — shared React components (exports: see packages/ui/package.json)
   next-config/           @repo/next-config — shared Next.js base config (createNextConfig)
   utils/                 shared utilities
   types/                 shared TS types
@@ -39,14 +40,14 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 - **Next.js 15.5** App Router + React 19. Dev ports are fixed per app (see `package.json`).
 - **Styling**: Tailwind CSS v4 (`@tailwindcss/postcss`), `tailwind-merge`, `tailwindcss-animate`, `class-variance-authority`.
 - **Animation/icons**: `motion`, `@tabler/icons-react`.
-- **Catalog versions** pinned in `pnpm-workspace.yaml` — add shared deps there rather than per-app to keep versions in sync.
+- **Catalog versions** pinned in `pnpm-workspace.yaml` — add shared deps there rather than per-app to keep versions in sync. The catalog is the source of truth for version numbers cited in this doc.
 - **Turbo**: `build` depends on `^build`, caches `.next/**` (excl. cache); `dev` is `cache: false, persistent: true`.
 
 ## Environment
 
 See `.env.example`. All `.env*` files are gitignored.
 
-- **Cross-site URLs** (root `.env`): `NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL`, `NEXT_PUBLIC_PAYDAY_RECORDS_URL`, `NEXT_PUBLIC_CELEBRATE_AGENCY_URL` — used for inter-app links. Consumed by `packages/utils/src/app-urls.ts`; falls back to `http://localhost:{port}` when unset.
+- **Cross-site URLs** (root `.env`): `NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL`, `NEXT_PUBLIC_PAYDAY_RECORDS_URL`, `NEXT_PUBLIC_CELEBRATE_AGENCY_URL` — used for inter-app links. Consumed by `packages/utils/src/app-urls.ts`; falls back to `http://localhost:{port}` when unset. `juntaro` is not a cross-site link target and is intentionally excluded from `app-urls.ts`.
 - **VFL Maps** (`apps/vague-frequency-labs/.env.example`): `NEXT_PUBLIC_NAVER_CLIENT_ID` (NCP Maps, used by the contact page `KoreaCinematic`). Falls back to a Naver Map search link when the key is unset, the script fails to load, or it times out after 5s. Register deploy domains in the NCP console's domain allowlist.
 
 ## Assets
@@ -64,4 +65,5 @@ See `.env.example`. All `.env*` files are gitignored.
 - Always refresh `origin/master` before starting work and branch from it (`git fetch origin master`). Create new branches/worktrees from the updated `origin/master`, not a stale local `master`.
 - PRs MUST target `master`.
 - Before any `git push` (including `-u`, `--force`, `--force-with-lease`), run `git rev-parse --abbrev-ref HEAD` and show the user the current branch + remote target; proceed only after explicit confirmation. Never push directly to `master`.
-- For multi-step git workflows (branch + commit + push + PR, rebase, cherry-pick, refactors spanning >1 commit, parallel agents), Claude MUST operate in an isolated git worktree (`Agent({ isolation: "worktree" })` or `git worktree add`). After the work is merged, remove the worktree. Single-file edits or single quick commits on the current branch don't require a worktree.
+- For multi-step git workflows (branch + commit + push + PR, rebase, cherry-pick, refactors spanning >1 commit, parallel agents), Claude MUST operate in an isolated git worktree (`Agent({ isolation: "worktree" })` or `git worktree add`). After the work is merged, remove the worktree.
+- Create worktrees inside the repo at `.worktrees/<slug>` — never directly under the github folder. Single-file edits or single quick commits on the current branch don't require a worktree.
