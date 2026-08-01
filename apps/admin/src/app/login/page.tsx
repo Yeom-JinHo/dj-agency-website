@@ -43,14 +43,16 @@ export default function LoginPage() {
     // 브라우저 클라이언트는 제출 시점에만 생성 — 렌더/프리렌더에서 호출되지 않게 한다.
     const supabase = createBrowserSupabaseClient();
     const { error } = await supabase.auth.signInWithPassword(values);
-    setSubmitting(false);
 
     if (error) {
+      setSubmitting(false);
       // 원문(계정 존재 여부 등 노출 가능)은 로그로만, 사용자에겐 고정 문구.
       console.error("[login] signIn failed:", error.message);
       toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
       return;
     }
+    // 성공 시 pending 유지 — 네비게이션 완료 전에 버튼이 원래 라벨로
+    // 돌아와 재클릭을 유발하는 죽은 시간을 없앤다.
     router.replace("/");
     router.refresh();
   }
