@@ -21,6 +21,9 @@ export const CATEGORIES = [
   { segment: "tours", label: "투어" },
 ] as const;
 
+/** 카테고리 라우트 세그먼트. 카운트를 세그먼트 키로 다루는 화면들이 공유한다. */
+export type CategorySegment = (typeof CATEGORIES)[number]["segment"];
+
 /** 임의 문자열이 유효한 사이트 슬러그인지 좁힘(라우트 site 파라미터 검증용). */
 export function isSiteSlug(value: string): value is SiteSlug {
   return (SITE_SLUGS as readonly string[]).includes(value);
