@@ -2,7 +2,8 @@ import type { CollectionPage, WithContext } from "schema-dts";
 import React, { ReactElement } from "react";
 import Link from "next/link";
 import { metadata as meta } from "@/app/config";
-import { artistProfile } from "@/source";
+import { getArtists } from "@repo/content/queries";
+import { toArtistProfile, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
@@ -53,7 +54,9 @@ const jsonLd: WithContext<CollectionPage> = {
   // })),
 };
 
-export default function ArtistPage(): ReactElement {
+export default async function ArtistPage(): Promise<ReactElement> {
+  const artists = (await getArtists(VFL_SITE)).map(toArtistProfile);
+
   return (
     <main className="my-16 flex-1">
       <JsonLd items={jsonLd} />
@@ -68,12 +71,13 @@ export default function ArtistPage(): ReactElement {
 
           <FancyLine className={"mt-16"} />
           <div className="mt-16 flex flex-wrap justify-center gap-16">
-            {artistProfile.getPages().map((artist, index) => (
+            {artists.map((artist, index) => (
               // 이미지 placeholder blur와 진입 blur가 겹치면 blur-up이 두 번
               // 일어나므로 진입은 fade/rise만 남긴다 (PR #228과 같은 원칙).
+              // CMS 이미지도 imagePlaceholder(blurDataURL)를 가져 동일하게 적용.
               <BlurFade key={index} inView duration={0.6} blur="0px">
                 <Link
-                  href={`/artist/${artist.name}`}
+                  href={`/artist/${encodeURIComponent(artist.slug)}`}
                   className="cursor-pointer"
                 >
                   <ArtistSimpleCard artist={artist} />

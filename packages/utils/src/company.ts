@@ -13,4 +13,5 @@ export const COMPANY_SHORT_NAME = {
 export type AppId =
   | "vague-frequency-labs"
   | "payday-records"
-  | "celebrate-agency";
+  | "celebrate-agency"
+  | "juntaro";

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Image, { type StaticImageData } from "next/image";
+import Image from "next/image";
 
 interface ArtistPortraitProps {
-  image?: StaticImageData;
+  image?: string;
+  /** blurDataURL(placeholder). CMS가 업로드 시 생성 — 없으면 blur 생략. */
+  imagePlaceholder?: string;
   name: string;
   variant?: "card" | "modal";
   sizes?: string;
@@ -45,6 +47,7 @@ function NoPortrait({
 
 export function ArtistPortrait({
   image,
+  imagePlaceholder,
   name,
   variant = "card",
   sizes,
@@ -63,14 +66,16 @@ export function ArtistPortrait({
       ) : (
         <Image
           // 모달 prev/next처럼 인스턴스가 재사용될 때 errored 상태를 리셋한다.
-          key={image.src}
+          key={image}
           src={image}
           alt={name}
           fill
           sizes={sizes}
           priority={priority}
           loading={loading}
-          placeholder="blur"
+          {...(imagePlaceholder
+            ? ({ placeholder: "blur", blurDataURL: imagePlaceholder } as const)
+            : {})}
           className={`object-cover ${
             variant === "card"
               ? "transform-gpu transition-transform duration-700 ease-out group-hover:scale-[1.06]"

@@ -4,6 +4,7 @@ const DEV_FALLBACK: Record<AppId, string> = {
   "vague-frequency-labs": "http://localhost:3004",
   "payday-records": "http://localhost:3002",
   "celebrate-agency": "http://localhost:3003",
+  juntaro: "http://localhost:3005",
 };
 
 export function getAppUrls(): Record<AppId, string> {
@@ -17,6 +18,7 @@ export function getAppUrls(): Record<AppId, string> {
     "celebrate-agency":
       process.env.NEXT_PUBLIC_CELEBRATE_AGENCY_URL ??
       DEV_FALLBACK["celebrate-agency"],
+    juntaro: process.env.NEXT_PUBLIC_JUNTARO_URL ?? DEV_FALLBACK["juntaro"],
   };
 }
 

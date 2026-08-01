@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "baseUrl": ".",
+    "paths": {
+      // seed-cms.ts가 VFL source.ts를 직접 import하면 그 안의 `@/consts/artist`
+      // (ARTIST_NAME 값)가 런타임에 해석돼야 한다. 다른 앱들의 `@/` import는 전부
+      // `import type`(erase)라 런타임 해석이 없으므로 VFL 하나만 매핑하면 충분하다.
+      "@/*": ["../apps/vague-frequency-labs/src/*"]
+    },
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true
+  },
+  "include": ["seed-cms.ts"]
+}

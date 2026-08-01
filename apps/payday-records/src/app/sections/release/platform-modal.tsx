@@ -67,7 +67,12 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
                 alt={release.title}
                 fill
                 sizes="360px"
-                placeholder="blur"
+                {...(release.artworkPlaceholder
+                  ? ({
+                      placeholder: "blur",
+                      blurDataURL: release.artworkPlaceholder,
+                    } as const)
+                  : {})}
                 className="object-cover"
               />
             ) : (

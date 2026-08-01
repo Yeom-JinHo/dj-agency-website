@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { metadata as meta } from "@/app/config";
-import { artistProfile } from "@/source";
+import { getArtistBySlug } from "@repo/content/queries";
+import { toArtistProfile, VFL_SITE } from "@/utils/content-adapters";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import { Icon } from "@repo/ui/common/Icon";
@@ -13,27 +14,28 @@ import { buttonVariants } from "@repo/ui/common/Button";
 import ArtistImage from "@/app/sections/artistProfiles/ArtistImage";
 import SectionHeading from "@/components/SectionHeading";
 
-export function generateStaticParams() {
-  return artistProfile.getPages().map((artist) => ({
-    artistName: artist.name,
-  }));
-}
+// 신규 slug 동적 라우트: generateStaticParams 제거 → 요청 시 dynamic 렌더 +
+// getArtistBySlug의 unstable_cache 태그로 캐시(cms-plan §13). 아티스트 추가 시 빌드 불요.
+export const dynamicParams = true;
 
 export async function generateMetadata(props: {
   params: Promise<{ artistName: string }>;
 }) {
   const params = await props.params;
   const { artistName } = params;
-  const artist = artistProfile.getPage(decodeURIComponent(artistName));
-  if (!artist) notFound();
+  const domainArtist = await getArtistBySlug(
+    VFL_SITE,
+    decodeURIComponent(artistName),
+  );
+  if (!domainArtist) notFound();
+  const artist = toArtistProfile(domainArtist);
 
-  // 1200×630 고정 선언은 세로 원본과 안 맞는 거짓 치수였다 — 실치수를 선언한다.
-  // (전용 OG 카드 라우트는 공유 트래픽 대비 과투자로 기각)
+  // 1200×630 고정 선언은 세로 원본과 안 맞는 거짓 치수였다(PR #244에서 제거).
+  // CMS 전환 후 치수 메타데이터가 없으므로 선언 자체를 생략한다 — 거짓 치수보다
+  // 무선언이 낫고, 스크레이퍼는 이미지를 fetch해 실치수를 얻는다.
   const cardImage = {
     alt: artist.name,
-    width: artist.image.width,
-    height: artist.image.height,
-    url: artist.image.src,
+    url: artist.image,
     type: "image/webp",
   } as const;
 
@@ -49,7 +51,7 @@ export async function generateMetadata(props: {
       images: [cardImage],
     },
     alternates: {
-      canonical: `/artist/${encodeURIComponent(artist.name)}`,
+      canonical: `/artist/${encodeURIComponent(artist.slug)}`,
     },
   }) satisfies Metadata;
 }
@@ -59,8 +61,12 @@ export default async function ProjectPage(props0: {
 }) {
   const params = await props0.params;
   const { artistName } = params;
-  const artist = artistProfile.getPage(decodeURIComponent(artistName));
-  if (!artist) notFound();
+  const domainArtist = await getArtistBySlug(
+    VFL_SITE,
+    decodeURIComponent(artistName),
+  );
+  if (!domainArtist) notFound();
+  const artist = toArtistProfile(domainArtist);
 
   return (
     <main className="my-16 flex-1">

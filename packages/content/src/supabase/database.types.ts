@@ -1,0 +1,281 @@
+/**
+ * Supabase Database 타입. §6 스키마를 손으로 미러링했으며, 마이그레이션 확정 후
+ * `supabase gen types typescript`로 재생성할 수 있다. snake_case = DB 원본 컬럼명.
+ */
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+export interface Database {
+  public: {
+    Tables: {
+      sites: {
+        Row: { slug: string; name: string };
+        Insert: { slug: string; name: string };
+        Update: { slug?: string; name?: string };
+        Relationships: [];
+      };
+      artists: {
+        Row: {
+          id: string;
+          site_slug: string;
+          slug: string;
+          name: string;
+          nickname: string | null;
+          short_description_en: string | null;
+          short_description_ko: string | null;
+          full_description_en: string | null;
+          full_description_ko: string | null;
+          image_path: string | null;
+          logo_image_path: string | null;
+          image_placeholder: string | null;
+          city: string | null;
+          selected_works: Json;
+          socials: Json;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          site_slug: string;
+          slug: string;
+          name: string;
+          nickname?: string | null;
+          short_description_en?: string | null;
+          short_description_ko?: string | null;
+          full_description_en?: string | null;
+          full_description_ko?: string | null;
+          image_path?: string | null;
+          logo_image_path?: string | null;
+          image_placeholder?: string | null;
+          city?: string | null;
+          selected_works?: Json;
+          socials?: Json;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          site_slug?: string;
+          slug?: string;
+          name?: string;
+          nickname?: string | null;
+          short_description_en?: string | null;
+          short_description_ko?: string | null;
+          full_description_en?: string | null;
+          full_description_ko?: string | null;
+          image_path?: string | null;
+          logo_image_path?: string | null;
+          image_placeholder?: string | null;
+          city?: string | null;
+          selected_works?: Json;
+          socials?: Json;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "artists_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
+        ];
+      };
+      releases: {
+        Row: {
+          id: string;
+          site_slug: string;
+          slug: string;
+          title: string;
+          primary_artist_id: string | null;
+          artist_credit: string | null;
+          featured_artists: string[];
+          label: string | null;
+          catalog_no: string | null;
+          artwork_path: string | null;
+          artwork_placeholder: string | null;
+          short_description_en: string | null;
+          short_description_ko: string | null;
+          full_description_en: string | null;
+          full_description_ko: string | null;
+          release_date: string | null;
+          platform_links: Json;
+          socials: Json;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          site_slug: string;
+          slug: string;
+          title: string;
+          primary_artist_id?: string | null;
+          artist_credit?: string | null;
+          featured_artists?: string[];
+          label?: string | null;
+          catalog_no?: string | null;
+          artwork_path?: string | null;
+          artwork_placeholder?: string | null;
+          short_description_en?: string | null;
+          short_description_ko?: string | null;
+          full_description_en?: string | null;
+          full_description_ko?: string | null;
+          release_date?: string | null;
+          platform_links?: Json;
+          socials?: Json;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          site_slug?: string;
+          slug?: string;
+          title?: string;
+          primary_artist_id?: string | null;
+          artist_credit?: string | null;
+          featured_artists?: string[];
+          label?: string | null;
+          catalog_no?: string | null;
+          artwork_path?: string | null;
+          artwork_placeholder?: string | null;
+          short_description_en?: string | null;
+          short_description_ko?: string | null;
+          full_description_en?: string | null;
+          full_description_ko?: string | null;
+          release_date?: string | null;
+          platform_links?: Json;
+          socials?: Json;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "releases_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
+          {
+            foreignKeyName: "releases_primary_artist_id_fkey";
+            columns: ["primary_artist_id"];
+            isOneToOne: false;
+            referencedRelation: "artists";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tours: {
+        Row: {
+          id: string;
+          site_slug: string;
+          slug: string;
+          title: string;
+          artist_id: string | null;
+          venue: string | null;
+          city: string | null;
+          country: string | null;
+          event_date: string;
+          door_time: string | null;
+          ticket_url: string | null;
+          poster_path: string | null;
+          poster_placeholder: string | null;
+          description_en: string | null;
+          description_ko: string | null;
+          status: string;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          site_slug: string;
+          slug: string;
+          title: string;
+          artist_id?: string | null;
+          venue?: string | null;
+          city?: string | null;
+          country?: string | null;
+          event_date: string;
+          door_time?: string | null;
+          ticket_url?: string | null;
+          poster_path?: string | null;
+          poster_placeholder?: string | null;
+          description_en?: string | null;
+          description_ko?: string | null;
+          status?: string;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          site_slug?: string;
+          slug?: string;
+          title?: string;
+          artist_id?: string | null;
+          venue?: string | null;
+          city?: string | null;
+          country?: string | null;
+          event_date?: string;
+          door_time?: string | null;
+          ticket_url?: string | null;
+          poster_path?: string | null;
+          poster_placeholder?: string | null;
+          description_en?: string | null;
+          description_ko?: string | null;
+          status?: string;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tours_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
+          {
+            foreignKeyName: "tours_artist_id_fkey";
+            columns: ["artist_id"];
+            isOneToOne: false;
+            referencedRelation: "artists";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      editors: {
+        Row: { user_id: string };
+        Insert: { user_id: string };
+        Update: { user_id?: string };
+        Relationships: [
+          {
+            foreignKeyName: "editors_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+    };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
+  };
+}

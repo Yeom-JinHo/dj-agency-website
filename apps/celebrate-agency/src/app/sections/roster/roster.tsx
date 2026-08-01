@@ -4,7 +4,8 @@ import { useCallback, useMemo, useRef, useState } from "react";
 
 import { SectionHead } from "@/components/SectionHead";
 import { TapeCorners } from "@/components/Tape";
-import { ARTIST_ROLE_LABEL, ARTISTS } from "@/consts/artists";
+import { ARTIST_ROLE_LABEL } from "@/consts/artists";
+import type { Artist } from "@/types/artist";
 
 import { ArtistModal } from "./ArtistModal";
 import { ArtistPortrait } from "./ArtistPortrait";
@@ -13,23 +14,22 @@ import { BookingFiller, ReservedFiller } from "./RosterFiller";
 const MOBILE_COLS = 2;
 const DESKTOP_COLS = 4;
 
-const mobileFillerCount =
-  (MOBILE_COLS - (ARTISTS.length % MOBILE_COLS)) % MOBILE_COLS;
-const desktopFillerCount =
-  (DESKTOP_COLS - (ARTISTS.length % DESKTOP_COLS)) % DESKTOP_COLS;
+export default function Roster({ artists }: { artists: Artist[] }) {
+  const mobileFillerCount =
+    (MOBILE_COLS - (artists.length % MOBILE_COLS)) % MOBILE_COLS;
+  const desktopFillerCount =
+    (DESKTOP_COLS - (artists.length % DESKTOP_COLS)) % DESKTOP_COLS;
+  const reservedSlotLabel = String(artists.length + 2).padStart(2, "0");
 
-const reservedSlotLabel = String(ARTISTS.length + 2).padStart(2, "0");
+  const getFillerVisibility = (index: number): string | null => {
+    const onMobile = index < mobileFillerCount;
+    const onDesktop = index < desktopFillerCount;
+    if (!onMobile && !onDesktop) return null;
+    if (onMobile && onDesktop) return "block";
+    if (onDesktop) return "hidden lg:block";
+    return "block lg:hidden";
+  };
 
-function getFillerVisibility(index: number): string | null {
-  const onMobile = index < mobileFillerCount;
-  const onDesktop = index < desktopFillerCount;
-  if (!onMobile && !onDesktop) return null;
-  if (onMobile && onDesktop) return "block";
-  if (onDesktop) return "hidden lg:block";
-  return "block lg:hidden";
-}
-
-export default function Roster() {
   const bookingVisibility = getFillerVisibility(0);
   const reservedVisibility = getFillerVisibility(1);
 
@@ -79,19 +79,19 @@ export default function Roster() {
       setActiveIndex((current) =>
         current === null
           ? current
-          : (current + delta + ARTISTS.length) % ARTISTS.length
+          : (current + delta + artists.length) % artists.length
       ),
-    []
+    [artists.length]
   );
   const onPrev = useCallback(() => step(-1), [step]);
   const onNext = useCallback(() => step(1), [step]);
 
-  // open이 stable이라 카드 목록은 마운트에 1번만 생성된다. 엘리먼트 동일성
-  // bailout으로 모달 open/close/step마다 카드 전체(+ref 콜백 detach/attach)가
-  // 재조정되는 것을 차단.
+  // open이 stable이라 카드 목록은 artists가 바뀌지 않는 한 1번만 생성된다.
+  // 엘리먼트 동일성 bailout으로 모달 open/close/step마다 카드 전체
+  // (+ref 콜백 detach/attach)가 재조정되는 것을 차단.
   const cards = useMemo(
     () =>
-      ARTISTS.map((artist, index) => (
+      artists.map((artist, index) => (
         <button
           key={artist.id}
           ref={(el) => {
@@ -107,6 +107,7 @@ export default function Roster() {
             <div className="absolute inset-0 overflow-hidden bg-ca-bg-2">
               <ArtistPortrait
                 image={artist.image}
+                imagePlaceholder={artist.imagePlaceholder}
                 name={artist.name}
                 variant="card"
                 sizes="(max-width: 1024px) 50vw, 25vw"
@@ -123,7 +124,7 @@ export default function Roster() {
           </div>
         </button>
       )),
-    [open]
+    [artists, open]
   );
 
   return (
@@ -137,7 +138,7 @@ export default function Roster() {
         numLabel="TALENT"
         title="Roster"
         headingId="roster-heading"
-        aside={`${ARTISTS.length} artists · By invitation.`}
+        aside={`${artists.length} artists · By invitation.`}
       />
       <div className="grid grid-cols-2 gap-px border-y border-ca-line bg-ca-line lg:grid-cols-4">
         {cards}
@@ -156,7 +157,7 @@ export default function Roster() {
 
       {activeIndex !== null ? (
         <ArtistModal
-          artists={ARTISTS}
+          artists={artists}
           index={activeIndex}
           closing={closing}
           onClose={close}
