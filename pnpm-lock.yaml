@@ -78,9 +78,6 @@ catalogs:
     tailwindcss-animate:
       specifier: ^1.0.7
       version: 1.0.7
-    tsx:
-      specifier: ^4.20.6
-      version: 4.23.1
     typescript:
       specifier: 5.9.2
       version: 5.9.2
@@ -95,9 +92,6 @@ importers:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
-      tsx:
-        specifier: 'catalog:'
-        version: 4.23.1
       turbo:
         specifier: ^2.6.0
         version: 2.6.0
@@ -3832,11 +3826,6 @@ packages:
     resolution: {integrity: sha512-EQsFzMUJkCKGr1ePqlYADkIUmHW1s3ZXr5Yqy6wbGrfUCphpl2maM/kyOIRA2HpP3AaFQTZXD4ldjek+nccddA==}
     engines: {node: '>=14.14'}
 
-  fsevents@2.3.3:
-    resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
-    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
-    os: [darwin]
-
   function-bind@1.1.2:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
 
@@ -5263,11 +5252,6 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tsx@4.23.1:
-    resolution: {integrity: sha512-GQHnkIfxyx1wYCOS/wonik5MVRZU9hi1TEZmzGZSCJB1y9YgoZ8H6itNE/u4suE+yLmOzuE4E5S4TZ/ZX2wcWQ==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
-
   turbo-darwin-64@2.6.0:
     resolution: {integrity: sha512-6vHnLAubHj8Ib45Knu+oY0ZVCLO7WcibzAvt5b1E72YHqAs4y8meMAGMZM0jLqWPh/9maHDc16/qBCMxtW4pXg==}
     cpu: [x64]
@@ -5599,7 +5583,7 @@ snapshots:
   '@apm-js-collab/tracing-hooks@0.13.0':
     dependencies:
       '@apm-js-collab/code-transformer': 0.18.0
-      debug: 4.4.1
+      debug: 4.4.3
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -8005,7 +7989,7 @@ snapshots:
       dot-prop: 10.1.0
       env-paths: 3.0.0
       json-schema-typed: 8.0.2
-      semver: 7.7.3
+      semver: 7.8.5
       uint8array-extras: 1.5.0
 
   confbox@0.2.4: {}
@@ -8330,6 +8314,7 @@ snapshots:
       '@esbuild/win32-arm64': 0.28.1
       '@esbuild/win32-ia32': 0.28.1
       '@esbuild/win32-x64': 0.28.1
+    optional: true
 
   escalade@3.2.0: {}
 
@@ -8352,7 +8337,7 @@ snapshots:
   eslint-plugin-react-hooks@7.1.1(eslint@9.38.0(jiti@2.7.0)):
     dependencies:
       '@babel/core': 7.29.0
-      '@babel/parser': 7.29.7
+      '@babel/parser': 7.29.8
       eslint: 9.38.0(jiti@2.7.0)
       hermes-parser: 0.25.1
       zod: 4.4.3
@@ -8638,9 +8623,6 @@ snapshots:
       graceful-fs: 4.2.11
       jsonfile: 6.2.1
       universalify: 2.0.1
-
-  fsevents@2.3.3:
-    optional: true
 
   function-bind@1.1.2: {}
 
@@ -9152,8 +9134,8 @@ snapshots:
 
   magicast@0.5.3:
     dependencies:
-      '@babel/parser': 7.29.7
-      '@babel/types': 7.29.7
+      '@babel/parser': 7.29.8
+      '@babel/types': 7.29.8
       source-map-js: 1.2.1
 
   math-intrinsics@1.1.0: {}
@@ -9703,7 +9685,7 @@ snapshots:
   react-doctor@0.9.3(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))(@types/react@19.2.0)(eslint@9.38.0(jiti@2.7.0)):
     dependencies:
       '@astrojs/compiler': 4.0.0
-      '@babel/code-frame': 7.29.0
+      '@babel/code-frame': 7.29.7
       '@sentry/node': 10.67.0(@opentelemetry/core@2.9.0(@opentelemetry/api@1.9.1))
       agent-install: 0.0.5
       conf: 15.1.0
@@ -9875,7 +9857,7 @@ snapshots:
 
   require-in-the-middle@8.0.1:
     dependencies:
-      debug: 4.4.1
+      debug: 4.4.3
       module-details-from-path: 1.0.4
     transitivePeerDependencies:
       - supports-color
@@ -10337,12 +10319,6 @@ snapshots:
       strip-bom: 3.0.0
 
   tslib@2.8.1: {}
-
-  tsx@4.23.1:
-    dependencies:
-      esbuild: 0.28.1
-    optionalDependencies:
-      fsevents: 2.3.3
 
   turbo-darwin-64@2.6.0:
     optional: true
