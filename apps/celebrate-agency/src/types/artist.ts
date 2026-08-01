@@ -4,6 +4,11 @@ export type ArtistSocialPlatform =
   | "youtube"
   | "x"
   | "soundcloud"
+  | "beatport"
+  | "appleMusic"
+  | "youtubeMusic"
+  | "bandcamp"
+  | "tiktok"
   | "etc";
 
 export interface ArtistSocial {
