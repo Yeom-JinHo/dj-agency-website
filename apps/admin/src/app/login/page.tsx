@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/form";
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("이메일 형식이 올바르지 않습니다."),
+  password: z.string().min(1, "비밀번호를 입력해주세요."),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -43,14 +43,16 @@ export default function LoginPage() {
     // 브라우저 클라이언트는 제출 시점에만 생성 — 렌더/프리렌더에서 호출되지 않게 한다.
     const supabase = createBrowserSupabaseClient();
     const { error } = await supabase.auth.signInWithPassword(values);
-    setSubmitting(false);
 
     if (error) {
+      setSubmitting(false);
       // 원문(계정 존재 여부 등 노출 가능)은 로그로만, 사용자에겐 고정 문구.
       console.error("[login] signIn failed:", error.message);
       toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
       return;
     }
+    // 성공 시 pending 유지 — 네비게이션 완료 전에 버튼이 원래 라벨로
+    // 돌아와 재클릭을 유발하는 죽은 시간을 없앤다.
     router.replace("/");
     router.refresh();
   }
@@ -63,7 +65,7 @@ export default function LoginPage() {
             ye0m2 admin
           </h1>
           <p className="text-muted-foreground text-sm">
-            Sign in to manage content.
+            로그인 후 콘텐츠를 관리할 수 있습니다.
           </p>
         </div>
 
@@ -74,7 +76,7 @@ export default function LoginPage() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input
                       type="email"
@@ -92,7 +94,7 @@ export default function LoginPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>비밀번호</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
@@ -105,7 +107,7 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Signing in…" : "Sign in"}
+              {submitting ? "로그인 중…" : "로그인"}
             </Button>
           </form>
         </Form>

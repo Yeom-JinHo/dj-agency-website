@@ -17,7 +17,7 @@ import { nullify, normalizeSocials } from "@/lib/form-normalize";
  * 이 스키마 하나를 client RHF resolver와 server 재검증이 공유한다.
  */
 export const artistFormSchema = z.object({
-  name: z.string().trim().min(1, "Name is required"),
+  name: z.string().trim().min(1, "이름을 입력해주세요."),
   nickname: z.string(),
   shortDescriptionEn: z.string(),
   shortDescriptionKo: z.string(),
