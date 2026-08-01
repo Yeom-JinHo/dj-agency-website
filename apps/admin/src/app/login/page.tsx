@@ -38,6 +38,12 @@ export default function LoginPage() {
     defaultValues: { email: "", password: "" },
   });
 
+  /** 검증 실패 시 RHF가 첫 오류 필드에 포커스하지만, 폼 위쪽에서
+   * "아무 일도 없는" 것처럼 보이지 않게 토스트로도 알린다(artist-form과 동일 패턴). */
+  function onInvalid() {
+    toast.error("입력값을 확인해주세요.");
+  }
+
   async function onSubmit(values: LoginValues) {
     setSubmitting(true);
     // 브라우저 클라이언트는 제출 시점에만 생성 — 렌더/프리렌더에서 호출되지 않게 한다.
@@ -70,45 +76,48 @@ export default function LoginPage() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>이메일</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@example.com"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>비밀번호</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      autoComplete="current-password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "로그인 중…" : "로그인"}
-            </Button>
+          <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+            {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다(폼 3종과 동일 패턴). */}
+            <fieldset disabled={submitting} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>이메일</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@example.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>비밀번호</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        autoComplete="current-password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? "로그인 중…" : "로그인"}
+              </Button>
+            </fieldset>
           </form>
         </Form>
       </div>
