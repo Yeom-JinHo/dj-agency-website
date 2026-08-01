@@ -6,6 +6,7 @@ import { MusicInfo } from "./types/music";
 export const artistProfilesData: ArtistProfile[] = [
   {
     name: ARTIST_NAME.JUNTARO,
+    slug: ARTIST_NAME.JUNTARO,
     image: "/images/artist/juntaro/profile.webp",
     logoImage: "/images/artist/juntaro/logo.webp",
     imagePlaceholder:
@@ -52,6 +53,7 @@ EP와 싱글을 발매하며 프로듀서로서의 실력을 입증했습니다.
   },
   {
     name: ARTIST_NAME.SIELO,
+    slug: ARTIST_NAME.SIELO,
     image: "/images/artist/sielo/profile.webp",
     logoImage: "/images/artist/sielo/logo.webp",
     imagePlaceholder:
@@ -113,6 +115,7 @@ World DJ Festival, Micro Seoul, Strike Music Festival 등 주요 페스티벌에
   },
   {
     name: ARTIST_NAME.LOOZBONE,
+    slug: ARTIST_NAME.LOOZBONE,
     image: "/images/artist/loozbone/profile.webp",
     logoImage: "/images/artist/loozbone/logo.webp",
     imagePlaceholder:
@@ -172,6 +175,7 @@ LOOZBONE은 빠르게 떠오르는 일렉트로닉 댄스 뮤직 신의 스타�
   },
   {
     name: ARTIST_NAME.SAM,
+    slug: ARTIST_NAME.SAM,
     image: "/images/artist/sam/profile.webp",
     logoImage: "/images/artist/sam/logo.webp",
     imagePlaceholder:
@@ -199,6 +203,7 @@ LOOZBONE은 빠르게 떠오르는 일렉트로닉 댄스 뮤직 신의 스타�
   },
   {
     name: ARTIST_NAME.DEARBOI,
+    slug: ARTIST_NAME.DEARBOI,
     image: "/images/artist/dearboi/profile.webp",
     logoImage: "/images/artist/dearboi/logo.webp",
     imagePlaceholder:
@@ -234,6 +239,7 @@ Dearboi는 서울을 기반으로 활동하는 하우스/테크 하우스 DJ로,
   },
   {
     name: ARTIST_NAME.PLAYMODE,
+    slug: ARTIST_NAME.PLAYMODE,
     image: "/images/artist/playmode/profile.webp",
     logoImage: "/images/artist/playmode/logo.webp",
     imagePlaceholder:

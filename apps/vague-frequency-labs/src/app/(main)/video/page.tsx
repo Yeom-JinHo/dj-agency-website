@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import React from "react";
-import { musicInfo } from "@/source";
+import { getReleases } from "@repo/content/queries";
+import { toMusicInfo, VFL_SITE } from "@/utils/content-adapters";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import { createMetadata } from "@/utils/index";
@@ -29,14 +30,10 @@ export const metadata = createMetadata({
   },
 });
 
-export default function VideoPage(): ReactElement {
-  const musicInfos = [
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-    ...musicInfo.getInfos(),
-  ];
+export default async function VideoPage(): Promise<ReactElement> {
+  const releases = (await getReleases(VFL_SITE)).map(toMusicInfo);
+  // 카드 수만 결정(내용은 인덱스 기반 하드코딩). 라이브 파리티로 5회 반복.
+  const musicInfos = Array.from({ length: 5 }, () => releases).flat();
 
   return (
     <main className="my-16 flex-1">
