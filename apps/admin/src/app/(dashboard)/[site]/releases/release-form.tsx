@@ -16,6 +16,12 @@ import {
 import { slugify } from "@/lib/media";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -198,334 +204,355 @@ export function ReleaseForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
         {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. */}
-        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-8">
+        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-6">
         {/* 기본 정보 */}
-        <section className="space-y-4">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>제목</FormLabel>
-                <FormControl>
-                  <Input placeholder="릴리즈 제목" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormItem>
-            <FormLabel>Slug</FormLabel>
-            <Input value={slugPreview} readOnly disabled />
-            <p className="text-muted-foreground text-xs">
-              {mode === "create"
-                ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
-                : "slug는 생성 후 변경할 수 없습니다."}
-            </p>
-          </FormItem>
-
-          <FormField
-            control={form.control}
-            name="primaryArtistId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>주요 아티스트</FormLabel>
-                <Select
-                  value={field.value === "" ? NO_ARTIST : field.value}
-                  onValueChange={(v) =>
-                    field.onChange(v === NO_ARTIST ? "" : v)
-                  }
-                >
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="아티스트 선택" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value={NO_ARTIST}>없음</SelectItem>
-                    {artists.map((artist) => (
-                      <SelectItem key={artist.id} value={artist.id}>
-                        {artist.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-muted-foreground text-xs">
-                  이 사이트 소속 로스터의 아티스트. 로스터 밖 표기는 아티스트
-                  크레딧을 사용하세요.
-                </p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="artistCredit"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>아티스트 크레딧</FormLabel>
-                <FormControl>
-                  <Input placeholder="예: Sam Collins" {...field} />
-                </FormControl>
-                <p className="text-muted-foreground text-xs">
-                  로스터에 없는 외부 아티스트 표시용 자유 텍스트.
-                </p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="featuredArtists"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>피처링 아티스트</FormLabel>
-                <FormControl>
-                  <Input placeholder="콤마로 구분 (예: A, B, C)" {...field} />
-                </FormControl>
-                <p className="text-muted-foreground text-xs">
-                  콤마로 구분해 여러 명을 입력할 수 있습니다.
-                </p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="grid gap-4 sm:grid-cols-2">
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">기본 정보</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <FormField
               control={form.control}
-              name="label"
+              name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>레이블</FormLabel>
+                  <FormLabel>제목</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input placeholder="릴리즈 제목" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="catalogNo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>카탈로그 번호</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+            <FormItem>
+              <FormLabel>Slug</FormLabel>
+              <Input value={slugPreview} readOnly disabled />
+              <p className="text-muted-foreground text-xs">
+                {mode === "create"
+                  ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
+                  : "slug는 생성 후 변경할 수 없습니다."}
+              </p>
+            </FormItem>
+
             <FormField
               control={form.control}
-              name="releaseDate"
+              name="primaryArtistId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>발매일</FormLabel>
-                  <FormControl>
-                    <Input type="date" {...field} className="w-48" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="sortOrder"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>정렬 순서</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      className="w-32"
-                      value={field.value}
-                      onChange={(e) =>
-                        field.onChange(Number(e.target.value) || 0)
-                      }
-                    />
-                  </FormControl>
+                  <FormLabel>주요 아티스트</FormLabel>
+                  <Select
+                    value={field.value === "" ? NO_ARTIST : field.value}
+                    onValueChange={(v) =>
+                      field.onChange(v === NO_ARTIST ? "" : v)
+                    }
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="아티스트 선택" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_ARTIST}>없음</SelectItem>
+                      {artists.map((artist) => (
+                        <SelectItem key={artist.id} value={artist.id}>
+                          {artist.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <p className="text-muted-foreground text-xs">
-                    사이트 내 노출 순서(작을수록 먼저).
+                    이 사이트 소속 로스터의 아티스트. 로스터 밖 표기는 아티스트
+                    크레딧을 사용하세요.
                   </p>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
-        </section>
 
-        {/* 설명 (en/ko × short/full) */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">설명</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {(
-              [
-                ["shortDescriptionEn", "짧은 설명 (EN)"],
-                ["shortDescriptionKo", "짧은 설명 (KO)"],
-                ["fullDescriptionEn", "전체 설명 (EN)"],
-                ["fullDescriptionKo", "전체 설명 (KO)"],
-              ] as const
-            ).map(([name, label]) => (
+            <FormField
+              control={form.control}
+              name="artistCredit"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>아티스트 크레딧</FormLabel>
+                  <FormControl>
+                    <Input placeholder="예: Sam Collins" {...field} />
+                  </FormControl>
+                  <p className="text-muted-foreground text-xs">
+                    로스터에 없는 외부 아티스트 표시용 자유 텍스트.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="featuredArtists"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>피처링 아티스트</FormLabel>
+                  <FormControl>
+                    <Input placeholder="콤마로 구분 (예: A, B, C)" {...field} />
+                  </FormControl>
+                  <p className="text-muted-foreground text-xs">
+                    콤마로 구분해 여러 명을 입력할 수 있습니다.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
-                key={name}
                 control={form.control}
-                name={name}
+                name="label"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel>레이블</FormLabel>
                     <FormControl>
-                      <Textarea
-                        rows={name.startsWith("full") ? 5 : 2}
-                        {...field}
-                      />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            ))}
-          </div>
-        </section>
-
-        {/* Platform links (5개 확정 키) */}
-        <section className="space-y-3">
-          <h2 className="text-sm font-medium">플랫폼 링크</h2>
-          <div className="space-y-3">
-            {PLATFORM_LINK_KEYS.map((key) => (
               <FormField
-                key={key}
                 control={form.control}
-                name={`platformLinks.${key}`}
+                name="catalogNo"
                 render={({ field }) => (
-                  <FormItem className="flex items-start gap-3">
-                    <FormLabel className="mt-2.5 w-28 shrink-0">
-                      {PLATFORM_LABELS[key]}
-                    </FormLabel>
-                    <div className="flex-1 space-y-1">
-                      <FormControl>
-                        <Input placeholder="https://…" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </div>
+                  <FormItem>
+                    <FormLabel>카탈로그 번호</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />
-            ))}
-          </div>
-        </section>
+            </div>
 
-        {/* Socials */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium">소셜</h2>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                socials.append({ platform: "instagram", url: "", label: "" })
-              }
-            >
-              <PlusIcon /> 추가
-            </Button>
-          </div>
-          {socials.fields.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              등록된 소셜이 없습니다.
-            </p>
-          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="releaseDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>발매일</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} className="w-48" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="sortOrder"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>정렬 순서</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        className="w-32"
+                        value={field.value}
+                        onChange={(e) =>
+                          field.onChange(Number(e.target.value) || 0)
+                        }
+                      />
+                    </FormControl>
+                    <p className="text-muted-foreground text-xs">
+                      사이트 내 노출 순서(작을수록 먼저).
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 설명 (en/ko × short/full) */}
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">설명</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {(
+                [
+                  ["shortDescriptionEn", "짧은 설명 (EN)"],
+                  ["shortDescriptionKo", "짧은 설명 (KO)"],
+                  ["fullDescriptionEn", "전체 설명 (EN)"],
+                  ["fullDescriptionKo", "전체 설명 (KO)"],
+                ] as const
+              ).map(([name, label]) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{label}</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={name.startsWith("full") ? 5 : 2}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Platform links (5개 확정 키) */}
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">플랫폼 링크</h2>
+          </CardHeader>
+          <CardContent className="space-y-3">
             <div className="space-y-3">
-              {socials.fields.map((row, index) => (
-                <div key={row.id} className="flex items-start gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`socials.${index}.platform`}
-                    render={({ field }) => (
-                      <FormItem className="w-40 shrink-0">
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="플랫폼" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {SOCIAL_PLATFORMS.map((platform) => (
-                              <SelectItem key={platform} value={platform}>
-                                {platform}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`socials.${index}.url`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
+              {PLATFORM_LINK_KEYS.map((key) => (
+                <FormField
+                  key={key}
+                  control={form.control}
+                  name={`platformLinks.${key}`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-start gap-3">
+                      <FormLabel className="mt-2.5 w-28 shrink-0">
+                        {PLATFORM_LABELS[key]}
+                      </FormLabel>
+                      <div className="flex-1 space-y-1">
                         <FormControl>
                           <Input placeholder="https://…" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`socials.${index}.label`}
-                    render={({ field }) => (
-                      <FormItem className="w-32 shrink-0">
-                        <FormControl>
-                          <Input
-                            placeholder="라벨"
-                            {...field}
-                            value={field.value ?? ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => socials.remove(index)}
-                    aria-label="소셜 제거"
-                  >
-                    <Trash2Icon />
-                  </Button>
-                </div>
+                      </div>
+                    </FormItem>
+                  )}
+                />
               ))}
             </div>
-          )}
-        </section>
+          </CardContent>
+        </Card>
+
+        {/* Socials */}
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">소셜</h2>
+            <CardAction>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  socials.append({ platform: "instagram", url: "", label: "" })
+                }
+              >
+                <PlusIcon /> 추가
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {socials.fields.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                등록된 소셜이 없습니다.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {socials.fields.map((row, index) => (
+                  <div key={row.id} className="flex items-start gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`socials.${index}.platform`}
+                      render={({ field }) => (
+                        <FormItem className="w-40 shrink-0">
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="플랫폼" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {SOCIAL_PLATFORMS.map((platform) => (
+                                <SelectItem key={platform} value={platform}>
+                                  {platform}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`socials.${index}.url`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input placeholder="https://…" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`socials.${index}.label`}
+                      render={({ field }) => (
+                        <FormItem className="w-32 shrink-0">
+                          <FormControl>
+                            <Input
+                              placeholder="라벨"
+                              {...field}
+                              value={field.value ?? ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => socials.remove(index)}
+                      aria-label="소셜 제거"
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* 이미지 */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">아트워크</h2>
-          <ImageField
-            label="아트워크 이미지"
-            initialUrl={initialArtworkUrl}
-            file={artworkFile}
-            onFile={setArtworkFile}
-          />
-        </section>
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">아트워크</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ImageField
+              label="아트워크 이미지"
+              initialUrl={initialArtworkUrl}
+              file={artworkFile}
+              onFile={setArtworkFile}
+            />
+          </CardContent>
+        </Card>
 
         <FormActions>
           <Button type="submit" disabled={submitting}>

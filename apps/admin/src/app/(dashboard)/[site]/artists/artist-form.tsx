@@ -12,6 +12,12 @@ import { SOCIAL_PLATFORMS, type SiteSlug } from "@repo/content/schema";
 import { slugify } from "@/lib/media";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+} from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -188,291 +194,312 @@ export function ArtistForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
         {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. */}
-        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-8">
+        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-6">
         {/* 기본 정보 */}
-        <section className="space-y-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>이름</FormLabel>
-                <FormControl>
-                  <Input placeholder="아티스트 이름" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">기본 정보</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>이름</FormLabel>
+                  <FormControl>
+                    <Input placeholder="아티스트 이름" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormItem>
-            <FormLabel>Slug</FormLabel>
-            <Input value={slugPreview} readOnly disabled />
-            <p className="text-muted-foreground text-xs">
-              {mode === "create"
-                ? "이름에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
-                : "slug는 생성 후 변경할 수 없습니다."}
-            </p>
-          </FormItem>
+            <FormItem>
+              <FormLabel>Slug</FormLabel>
+              <Input value={slugPreview} readOnly disabled />
+              <p className="text-muted-foreground text-xs">
+                {mode === "create"
+                  ? "이름에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
+                  : "slug는 생성 후 변경할 수 없습니다."}
+              </p>
+            </FormItem>
 
-          <FormField
-            control={form.control}
-            name="nickname"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>닉네임</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="nickname"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>닉네임</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>도시</FormLabel>
-                <FormControl>
-                  <Input placeholder="서울" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>도시</FormLabel>
+                  <FormControl>
+                    <Input placeholder="서울" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="sortOrder"
-            render={({ field }) => (
-              <FormItem className="w-40">
-                <FormLabel>정렬 순서</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={0}
-                    value={field.value}
-                    onChange={(e) =>
-                      field.onChange(Number(e.target.value) || 0)
-                    }
-                    onBlur={field.onBlur}
-                    name={field.name}
-                    ref={field.ref}
-                  />
-                </FormControl>
-                <p className="text-muted-foreground text-xs">
-                  사이트 목록에서 오름차순으로 노출됩니다.
-                </p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </section>
+            <FormField
+              control={form.control}
+              name="sortOrder"
+              render={({ field }) => (
+                <FormItem className="w-40">
+                  <FormLabel>정렬 순서</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={field.value}
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 0)
+                      }
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
+                  </FormControl>
+                  <p className="text-muted-foreground text-xs">
+                    사이트 목록에서 오름차순으로 노출됩니다.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
         {/* 설명 (en/ko × short/full) */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">설명</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {(
-              [
-                ["shortDescriptionEn", "짧은 설명 (EN)"],
-                ["shortDescriptionKo", "짧은 설명 (KO)"],
-                ["fullDescriptionEn", "전체 설명 (EN)"],
-                ["fullDescriptionKo", "전체 설명 (KO)"],
-              ] as const
-            ).map(([name, label]) => (
-              <FormField
-                key={name}
-                control={form.control}
-                name={name}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{label}</FormLabel>
-                    <FormControl>
-                      <Textarea rows={name.startsWith("full") ? 5 : 2} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-          </div>
-        </section>
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">설명</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {(
+                [
+                  ["shortDescriptionEn", "짧은 설명 (EN)"],
+                  ["shortDescriptionKo", "짧은 설명 (KO)"],
+                  ["fullDescriptionEn", "전체 설명 (EN)"],
+                  ["fullDescriptionKo", "전체 설명 (KO)"],
+                ] as const
+              ).map(([name, label]) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{label}</FormLabel>
+                      <FormControl>
+                        <Textarea rows={name.startsWith("full") ? 5 : 2} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Socials */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
+        <Card className="gap-4 py-4">
+          <CardHeader>
             <h2 className="text-sm font-medium">소셜</h2>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                socials.append({ platform: "instagram", url: "", label: "" })
-              }
-            >
-              <PlusIcon /> 추가
-            </Button>
-          </div>
-          {socials.fields.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              등록된 소셜이 없습니다.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {socials.fields.map((row, index) => (
-                <div key={row.id} className="flex items-start gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`socials.${index}.platform`}
-                    render={({ field }) => (
-                      <FormItem className="w-40 shrink-0">
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
+            <CardAction>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  socials.append({ platform: "instagram", url: "", label: "" })
+                }
+              >
+                <PlusIcon /> 추가
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {socials.fields.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                등록된 소셜이 없습니다.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {socials.fields.map((row, index) => (
+                  <div key={row.id} className="flex items-start gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`socials.${index}.platform`}
+                      render={({ field }) => (
+                        <FormItem className="w-40 shrink-0">
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="플랫폼" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {SOCIAL_PLATFORMS.map((platform) => (
+                                <SelectItem key={platform} value={platform}>
+                                  {platform}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`socials.${index}.url`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
                           <FormControl>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="플랫폼" />
-                            </SelectTrigger>
+                            <Input placeholder="https://…" {...field} />
                           </FormControl>
-                          <SelectContent>
-                            {SOCIAL_PLATFORMS.map((platform) => (
-                              <SelectItem key={platform} value={platform}>
-                                {platform}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`socials.${index}.url`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input placeholder="https://…" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`socials.${index}.label`}
-                    render={({ field }) => (
-                      <FormItem className="w-32 shrink-0">
-                        <FormControl>
-                          <Input
-                            placeholder="라벨"
-                            {...field}
-                            value={field.value ?? ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => socials.remove(index)}
-                    aria-label="소셜 제거"
-                  >
-                    <Trash2Icon />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`socials.${index}.label`}
+                      render={({ field }) => (
+                        <FormItem className="w-32 shrink-0">
+                          <FormControl>
+                            <Input
+                              placeholder="라벨"
+                              {...field}
+                              value={field.value ?? ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => socials.remove(index)}
+                      aria-label="소셜 제거"
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Selected works (celebrate roster) */}
-        <section className="space-y-3">
-          <div className="flex items-center justify-between">
+        <Card className="gap-4 py-4">
+          <CardHeader>
             <h2 className="text-sm font-medium">대표 작업</h2>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => works.append({ title: "", meta: "" })}
-            >
-              <PlusIcon /> 추가
-            </Button>
-          </div>
-          {works.fields.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              등록된 작업이 없습니다.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {works.fields.map((row, index) => (
-                <div key={row.id} className="flex items-start gap-2">
-                  <FormField
-                    control={form.control}
-                    name={`selectedWorks.${index}.title`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input placeholder="제목" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name={`selectedWorks.${index}.meta`}
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormControl>
-                          <Input
-                            placeholder="메타(선택)"
-                            {...field}
-                            value={field.value ?? ""}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => works.remove(index)}
-                    aria-label="작업 제거"
-                  >
-                    <Trash2Icon />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+            <CardAction>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => works.append({ title: "", meta: "" })}
+              >
+                <PlusIcon /> 추가
+              </Button>
+            </CardAction>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {works.fields.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                등록된 작업이 없습니다.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {works.fields.map((row, index) => (
+                  <div key={row.id} className="flex items-start gap-2">
+                    <FormField
+                      control={form.control}
+                      name={`selectedWorks.${index}.title`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input placeholder="제목" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`selectedWorks.${index}.meta`}
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormControl>
+                            <Input
+                              placeholder="메타(선택)"
+                              {...field}
+                              value={field.value ?? ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => works.remove(index)}
+                      aria-label="작업 제거"
+                    >
+                      <Trash2Icon />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* 이미지 */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">이미지</h2>
-          <ImageField
-            label="프로필 이미지"
-            initialUrl={initialProfileUrl}
-            file={profileFile}
-            onFile={setProfileFile}
-          />
-          <ImageField
-            label="로고 이미지"
-            initialUrl={initialLogoUrl}
-            file={logoFile}
-            onFile={setLogoFile}
-          />
-        </section>
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">이미지</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ImageField
+              label="프로필 이미지"
+              initialUrl={initialProfileUrl}
+              file={profileFile}
+              onFile={setProfileFile}
+            />
+            <ImageField
+              label="로고 이미지"
+              initialUrl={initialLogoUrl}
+              file={logoFile}
+              onFile={setLogoFile}
+            />
+          </CardContent>
+        </Card>
 
         <FormActions>
           <Button type="submit" disabled={submitting}>
