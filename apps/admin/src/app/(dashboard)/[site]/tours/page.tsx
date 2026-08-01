@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminListArtists, adminListTours } from "@repo/content/admin-queries";
@@ -8,36 +7,10 @@ import { MapPin } from "lucide-react";
 import { mediaUrl } from "@/lib/media";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { ToursTable, type TourRow } from "./tours-table";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 제외.
 export const dynamic = "force-dynamic";
-
-/**
- * status 뱃지(라벨 + 시맨틱 컬러). soldout=amber·cancelled=red, scheduled만 중립.
- */
-const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  scheduled: {
-    label: "예정",
-    className: "border-border text-muted-foreground",
-  },
-  soldout: {
-    label: "매진",
-    className:
-      "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400",
-  },
-  cancelled: {
-    label: "취소",
-    className: "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-400",
-  },
-};
 
 /**
  * event_date(timestamptz) → `2026-10-03 21:00` 고정 포맷. Asia/Seoul로 타임존을
@@ -78,6 +51,18 @@ export default async function ToursPage({
   const artistName = new Map(artists.map((a) => [a.id, a.name]));
   const now = Date.now();
 
+  // 검색·정렬은 클라이언트가 하므로 셀에 쓰는 필드만 직렬화해 넘긴다.
+  const rows: TourRow[] = tours.map((tour) => ({
+    id: tour.id,
+    title: tour.title,
+    artist: (tour.artistId && artistName.get(tour.artistId)) || null,
+    venueCity: [tour.venue, tour.city].filter(Boolean).join(", "),
+    eventDate: formatEventDate(tour.eventDate),
+    status: tour.status,
+    isPast: new Date(tour.eventDate).getTime() < now,
+    thumb: mediaUrl(tour.posterPath),
+  }));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -86,14 +71,14 @@ export default async function ToursPage({
           <p className="text-muted-foreground text-sm">예정된 공연 일정.</p>
         </div>
         {/* 빈 상태에서는 CTA가 EmptyState 안에 있으므로 우상단 버튼을 숨긴다. */}
-        {tours.length > 0 ? (
+        {rows.length > 0 ? (
           <Button asChild>
             <Link href={`/${site}/tours/new`}>새 투어</Link>
           </Button>
         ) : null}
       </div>
 
-      {tours.length === 0 ? (
+      {rows.length === 0 ? (
         <EmptyState
           icon={MapPin}
           title="아직 투어가 없습니다"
@@ -105,77 +90,7 @@ export default async function ToursPage({
           }
         />
       ) : (
-        <div className="rounded-lg border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-14"></TableHead>
-                <TableHead>제목</TableHead>
-                <TableHead>아티스트</TableHead>
-                <TableHead>장소</TableHead>
-                <TableHead>일시</TableHead>
-                <TableHead>상태</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tours.map((tour) => {
-                const thumb = mediaUrl(tour.posterPath);
-                // 지난 공연은 시각적으로 muted 처리(§13 'past'는 event_date로 유도).
-                const isPast = new Date(tour.eventDate).getTime() < now;
-                const venueCity = [tour.venue, tour.city]
-                  .filter(Boolean)
-                  .join(", ");
-                return (
-                  <TableRow
-                    key={tour.id}
-                    className={`relative cursor-pointer${isPast ? " opacity-50" : ""}`}
-                  >
-                    <TableCell>
-                      <div className="bg-muted flex size-9 items-center justify-center overflow-hidden rounded-md">
-                        {thumb ? (
-                          <Image
-                            src={thumb}
-                            alt=""
-                            width={36}
-                            height={36}
-                            className="size-full object-cover"
-                          />
-                        ) : null}
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <Link
-                        href={`/${site}/tours/${tour.id}`}
-                        className="after:absolute after:inset-0"
-                      >
-                        {tour.title}
-                      </Link>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {(tour.artistId && artistName.get(tour.artistId)) ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {venueCity || "—"}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground tabular-nums">
-                      {formatEventDate(tour.eventDate)}
-                    </TableCell>
-                    <TableCell>
-                      <span
-                        className={`rounded border px-1.5 py-0.5 text-xs ${
-                          STATUS_BADGE[tour.status]?.className ??
-                          "border-border text-muted-foreground"
-                        }`}
-                      >
-                        {STATUS_BADGE[tour.status]?.label ?? tour.status}
-                      </span>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
+        <ToursTable rows={rows} basePath={`/${site}/tours`} />
       )}
     </div>
   );
