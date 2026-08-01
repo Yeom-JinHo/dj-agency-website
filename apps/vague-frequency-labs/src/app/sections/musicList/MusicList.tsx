@@ -1,7 +1,7 @@
 import type { MusicInfo } from "@/types/music";
 import Link from "next/link";
 import { getReleases } from "@repo/content/queries";
-import { toMusicInfo, VFL_SITE } from "@/utils/content-adapters";
+import { toMusicInfos, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import MusicInfoCard from "./MusicInfoCard";
 import SectionHeading from "@/components/SectionHeading";
@@ -37,7 +37,7 @@ function buildCards(
 }
 
 async function MusicList() {
-  const baseMusicInfos = (await getReleases(VFL_SITE)).map(toMusicInfo);
+  const baseMusicInfos = toMusicInfos(await getReleases(VFL_SITE));
   const desktopCards = buildCards(baseMusicInfos, 5, 3); // 15
   const mobileCards = buildCards(baseMusicInfos, 2, 4); // 8
 

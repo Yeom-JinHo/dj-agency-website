@@ -6,13 +6,16 @@ import { mapArtist, mapRelease, mapTour } from "./mappers";
 import { contentTags } from "../tags";
 
 // 소속 모델: 사이트 필터는 단순 컬럼 조건 + sort_order 정렬(이전 조인 테이블 no-op 소멸).
+// created_at 2차 정렬: admin 신규 생성 기본 sort_order=0이라 동률이 반드시 생기고,
+// Postgres는 동률 순서를 보장하지 않아 tie-break 없이는 목록 순서가 비결정적이다.
 async function fetchArtists(siteSlug: SiteSlug): Promise<Artist[]> {
   const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("artists")
     .select("*")
     .eq("site_slug", siteSlug)
-    .order("sort_order");
+    .order("sort_order")
+    .order("created_at");
   if (error) throw error;
   return (data ?? []).map(mapArtist);
 }
@@ -38,7 +41,8 @@ async function fetchReleases(siteSlug: SiteSlug): Promise<Release[]> {
     .from("releases")
     .select("*")
     .eq("site_slug", siteSlug)
-    .order("sort_order");
+    .order("sort_order")
+    .order("created_at");
   if (error) throw error;
   return (data ?? []).map(mapRelease);
 }
@@ -64,7 +68,8 @@ async function fetchTours(siteSlug: SiteSlug): Promise<Tour[]> {
     .from("tours")
     .select("*")
     .eq("site_slug", siteSlug)
-    .order("sort_order");
+    .order("sort_order")
+    .order("created_at");
   if (error) throw error;
   return (data ?? []).map(mapTour);
 }

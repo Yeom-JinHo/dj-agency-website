@@ -86,6 +86,17 @@ export function toArtistProfile(artist: Artist): ArtistProfile {
   };
 }
 
+/**
+ * 릴리즈 목록 → MusicInfo 목록. 아트워크 없는 릴리즈는 제외한다 — MusicInfoCard가
+ * <Image src>를 요구해 빈 문자열은 next/image 에러(juntaro /music과 동일한 가드).
+ * VFL 음원 소비처(홈 콜라주·/music·/video)는 반드시 이 함수를 거칠 것.
+ */
+export function toMusicInfos(releases: Release[]): MusicInfo[] {
+  return releases
+    .filter((release) => mediaUrl(release.artworkPath) !== null)
+    .map(toMusicInfo);
+}
+
 /** 도메인 Release → 기존 MusicInfo props. platform_links + socials를 정준 순서로 재병합. */
 export function toMusicInfo(release: Release): MusicInfo {
   const urls = new Map<SocialPlatform, string>();

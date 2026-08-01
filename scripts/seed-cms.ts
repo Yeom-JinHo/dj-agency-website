@@ -1,10 +1,13 @@
 /**
  * CMS 시드 스크립트 (P4) — 하드코딩 소스 → Supabase.
  *
- * 실행:  pnpm seed:cms [--dry-run] [--cleanup-test]
- *   --dry-run        DB·Storage 접근 없이 변환 결과(행 수·slug·경로·검수 목록)만 stdout.
- *   --cleanup-test   시드 없이 VFL slug='test' 테스트 행 + 이미지만 정리하고 종료.
- *   (기본)           테스트 행 정리 → 이미지 업로드 → 멱등 upsert.
+ * 실행:  pnpm seed:cms [--apply] [--cleanup-test]
+ *   (기본)           dry-run — DB·Storage 접근 없이 변환 결과만 stdout. 실수 재실행이
+ *                    admin 편집 내용을 소스값으로 회귀시키는 사고를 막는 fail-safe.
+ *   --apply          실 시드: 테스트 행 정리 → 이미지 업로드 → 멱등 upsert.
+ *                    (pnpm seed:cms:apply 로 실행)
+ *   --cleanup-test   시드 없이 VFL slug='test' 테스트 행 + 이미지만 정리하고 종료
+ *                    (--apply 필요 — DB 쓰기이므로).
  *
  * 설계 규칙(cms-plan §10·§13):
  *   - 병합 없음: 각 앱 데이터는 해당 사이트 소속 행으로만 시드한다.
@@ -17,7 +20,7 @@
  *
  * ⚠️ 시드는 사실상 1회성이다 — admin에서 수기 편집(카피 교정·발매일 입력 등)을 시작한
  *    뒤 재실행하면 upsert가 행 전체를 소스값으로 되돌려 편집 내용이 소실된다.
- *    admin 편집 개시 후에는 재실행 금지(--cleanup-test·--dry-run은 무해).
+ *    admin 편집 개시 후에는 --apply 재실행 금지(기본 dry-run·--cleanup-test는 무해).
  *
  * 러너: tsx (루트 devDependency). 앱 TS 소스와 packages/content 소스를 직접 import한다.
  * 서버 전용 모듈(sharp/service role)은 실행 경로에서만 dynamic import → --dry-run은
@@ -692,7 +695,9 @@ async function runSeed(
 // ─────────────────────────────────────────────────────────────────────────
 async function main() {
   const args = new Set(process.argv.slice(2));
-  const dryRun = args.has("--dry-run");
+  // fail-safe 기본값: --apply 없이는 어떤 DB·Storage 쓰기도 하지 않는다.
+  // (admin 편집 개시 후 실수 재실행 → 편집 내용 소스값 회귀 사고 방지)
+  const dryRun = !args.has("--apply");
   const cleanupOnly = args.has("--cleanup-test");
 
   if (cleanupOnly && !dryRun) {
@@ -713,7 +718,9 @@ async function main() {
   printReport(artists, releases, tours, dryRun);
 
   if (dryRun) {
-    console.log("dry-run — DB 변경 없음. 실 시드는 env(서비스 키) 준비 후 --dry-run 없이 실행.");
+    console.log(
+      "dry-run(기본) — DB 변경 없음. 실 시드는 env(서비스 키) 준비 후 pnpm seed:cms:apply.",
+    );
     return;
   }
 
