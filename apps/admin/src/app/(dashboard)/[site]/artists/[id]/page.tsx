@@ -10,8 +10,6 @@ import { ArtistForm } from "../artist-form";
 import { type ArtistFormValues } from "../schema";
 import { deleteArtist } from "../actions";
 
-export const dynamic = "force-dynamic";
-
 export default async function EditArtistPage({
   params,
 }: {

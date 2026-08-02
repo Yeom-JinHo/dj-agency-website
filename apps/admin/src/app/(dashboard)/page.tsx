@@ -15,9 +15,6 @@ import {
   type CategorySegment,
 } from "@/lib/sites";
 
-// 인증 세션(쿠키)·비캐시 admin 카운트에 의존하므로 정적 프리렌더 제외.
-export const dynamic = "force-dynamic";
-
 // 사이트-우선 라우트(§8): 대시보드는 4개 사이트 카드 → /[site].
 export default async function DashboardPage() {
   // 4개 사이트 × 3엔티티 = 12개 카운트를 모두 병렬로 던진다.

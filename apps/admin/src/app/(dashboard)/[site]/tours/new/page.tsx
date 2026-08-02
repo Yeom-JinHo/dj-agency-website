@@ -6,8 +6,6 @@ import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { TourForm } from "../tour-form";
 import { emptyTourFormValues } from "../schema";
 
-export const dynamic = "force-dynamic";
-
 export default async function NewTourPage({
   params,
 }: {

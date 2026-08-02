@@ -10,8 +10,6 @@ import { TourForm } from "../tour-form";
 import { type TourFormValues } from "../schema";
 import { deleteTour } from "../actions";
 
-export const dynamic = "force-dynamic";
-
 export default async function EditTourPage({
   params,
 }: {

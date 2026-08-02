@@ -10,6 +10,7 @@ import { SignOutButton } from "@/components/sign-out-button";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 대상에서 제외한다 —
 // 빌드 타임에 서버 클라이언트를 호출하지 않는다.
+// 하위 (dashboard)/** 전체가 이 레이아웃을 거치므로, 각 page.tsx의 개별 선언은 제거했다 — 이 선언 하나가 트리 전체를 커버한다.
 export const dynamic = "force-dynamic";
 
 async function signOut() {

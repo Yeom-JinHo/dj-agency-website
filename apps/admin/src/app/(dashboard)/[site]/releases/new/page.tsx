@@ -6,8 +6,6 @@ import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { ReleaseForm } from "../release-form";
 import { emptyReleaseFormValues } from "../schema";
 
-export const dynamic = "force-dynamic";
-
 export default async function NewReleasePage({
   params,
 }: {

@@ -15,9 +15,6 @@ import {
   type CategorySegment,
 } from "@/lib/sites";
 
-// 인증 세션(쿠키)·비캐시 admin 카운트에 의존하므로 정적 프리렌더 제외.
-export const dynamic = "force-dynamic";
-
 // 사이트 홈(§8): 카테고리 3카드 → /[site]/artists 등.
 export default async function SiteHomePage({
   params,
