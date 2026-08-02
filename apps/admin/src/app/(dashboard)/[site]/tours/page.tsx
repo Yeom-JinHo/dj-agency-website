@@ -10,9 +10,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { ToursTable, type TourRow } from "./tours-table";
 
-// 인증 세션(쿠키)에 의존하므로 정적 프리렌더 제외.
-export const dynamic = "force-dynamic";
-
 export default async function ToursPage({
   params,
 }: {

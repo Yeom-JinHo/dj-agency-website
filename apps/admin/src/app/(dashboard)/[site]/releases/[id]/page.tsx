@@ -13,8 +13,6 @@ import { ReleaseForm } from "../release-form";
 import { type ReleaseFormValues } from "../schema";
 import { deleteRelease } from "../actions";
 
-export const dynamic = "force-dynamic";
-
 export default async function EditReleasePage({
   params,
 }: {
