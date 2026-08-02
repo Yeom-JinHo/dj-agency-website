@@ -1,21 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { toast } from "sonner";
 import { TOUR_STATUSES, type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
-import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
+import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
+import {
+  EMPTY_IMAGE_FIELD,
+  ImageField,
+  isImageFieldDirty,
+  type ImageFieldValue,
+} from "@/components/image-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -76,55 +78,6 @@ interface TourFormProps {
   initialPosterUrl?: string | null;
 }
 
-/** 파일 선택 + 미리보기(업로드 전 클라이언트 표시, §4.4). */
-function ImageField({
-  label,
-  initialUrl,
-  file,
-  onFile,
-}: {
-  label: string;
-  initialUrl: string | null;
-  file: File | null;
-  onFile: (file: File | null) => void;
-}) {
-  const [preview, setPreview] = useState<string | null>(initialUrl);
-
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-          {preview ? (
-            <Image
-              src={preview}
-              alt={label}
-              width={80}
-              height={80}
-              unoptimized
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xs">No image</span>
-          )}
-        </div>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function TourForm({
   mode,
   site,
@@ -135,9 +88,7 @@ export function TourForm({
   artists,
   initialPosterUrl = null,
 }: TourFormProps) {
-  const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [poster, setPoster] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
 
   const form = useForm<TourFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -156,65 +107,27 @@ export function TourForm({
 
   const listHref = `/${site}/tours`;
 
-  // 파일 선택은 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
-  const hasUnsaved = form.formState.isDirty || posterFile !== null;
-  useUnsavedWarning(hasUnsaved && !submitting);
-
-  /** 검증 실패 시 RHF가 첫 오류 필드에 포커스하지만, sticky 저장 바에서
-   * "아무 일도 없는" 것처럼 보이지 않게 토스트로도 알린다. */
-  function onInvalid() {
-    toast.error("입력값을 확인해주세요.");
-  }
-
-  async function onSubmit(values: TourFormValues) {
-    setSubmitting(true);
-    // datetime-local → ISO 변환은 여기(클라이언트)에서 — 브라우저 TZ 기준.
-    const payload = { ...values, eventDate: localInputToIso(values.eventDate) };
-    const fd = new FormData();
-    fd.set("payload", JSON.stringify(payload));
-    if (posterFile) fd.set("posterImage", posterFile);
-
-    const result = await (
-      mode === "create"
-        ? createTour(site, fd)
-        : updateTour(site, tourId!, fd)
-    ).catch((error: unknown) => {
-      // 액션 호출 자체의 실패(오프라인·게이트웨이 오류)는 reject로 온다.
-      console.error("[admin] save failed:", error);
-      return null;
-    });
-
-    if (!result) {
-      setSubmitting(false);
-      toast.error("요청을 처리하지 못했습니다. 네트워크 상태를 확인해주세요.");
-      return;
-    }
-    if (!result.ok) {
-      setSubmitting(false);
-      toast.error(result.error);
-      return;
-    }
-    // 성공 시 pending 유지는 라우트가 실제로 바뀌는 경로에만 — 그래야
-    // 네비게이션 완료 전 버튼 라벨 복귀(재클릭 유발)를 막으면서도 잠금이 안 남는다.
-    // 부분 성공(생성됐지만 포스터 저장 실패): 편집 화면으로 안내해 이어서 저장.
-    if (result.warning && result.id) {
-      toast.warning(result.warning);
-      if (mode === "create") {
-        router.push(`${listHref}/${result.id}`);
-        router.refresh();
-        return;
-      }
-      // edit 모드는 같은 URL이라 언마운트가 없다 — 잠금을 풀어야 재시도 가능.
-      setSubmitting(false);
-      router.refresh();
-      return;
-    }
-    toast.success(
-      mode === "create" ? "투어를 만들었습니다." : "변경사항을 저장했습니다.",
-    );
-    router.push(listHref);
-    router.refresh();
-  }
+  const { submitting, onSubmit, onInvalid, onCancel } = useEntityFormSubmit({
+    mode,
+    listHref,
+    createdMessage: "투어를 만들었습니다.",
+    // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
+    hasUnsaved: form.formState.isDirty || isImageFieldDirty(poster),
+    buildFormData: (values: TourFormValues) => {
+      const fd = new FormData();
+      // datetime-local → ISO 변환은 여기(클라이언트)에서 — 브라우저 TZ 기준.
+      const payload = {
+        ...values,
+        eventDate: localInputToIso(values.eventDate),
+      };
+      fd.set("payload", JSON.stringify(payload));
+      if (poster.file) fd.set("posterImage", poster.file);
+      if (poster.removed) fd.set("removePosterImage", "1");
+      return fd;
+    },
+    create: (fd) => createTour(site, fd),
+    update: (fd) => updateTour(site, tourId!, fd),
+  });
 
   return (
     <Form {...form}>
@@ -467,8 +380,8 @@ export function TourForm({
             <ImageField
               label="포스터 이미지"
               initialUrl={initialPosterUrl}
-              file={posterFile}
-              onFile={setPosterFile}
+              value={poster}
+              onChange={setPoster}
             />
           </CardContent>
         </Card>
@@ -481,21 +394,7 @@ export function TourForm({
                 ? "투어 만들기"
                 : "변경사항 저장"}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              if (
-                hasUnsaved &&
-                !window.confirm(
-                  "저장하지 않은 변경사항이 있습니다. 나갈까요?",
-                )
-              ) {
-                return;
-              }
-              router.push(listHref);
-            }}
-          >
+          <Button type="button" variant="outline" onClick={onCancel}>
             취소
           </Button>
         </FormActions>

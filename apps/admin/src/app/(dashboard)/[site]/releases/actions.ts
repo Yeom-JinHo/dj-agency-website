@@ -8,21 +8,15 @@ import { contentTags } from "@repo/content/tags";
 
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
+import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
+  imageRemoved,
   removeImages,
   uploadEntityImage,
   validateImageFile,
 } from "@/lib/entity-media";
 import { releaseFormSchema, formValuesToDbInput } from "./schema";
-
-export type ReleaseActionResult =
-  | { ok: true; id?: string; warning?: string }
-  | { ok: false; error: string };
-
-function toErrorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
 
 /**
  * primary_artist_id same-site 검증: select UI는 같은 사이트만 노출하지만(클라이언트 방어)
@@ -46,7 +40,7 @@ async function assertArtistInSite(
 export async function createRelease(
   siteInput: string,
   formData: FormData,
-): Promise<ReleaseActionResult> {
+): Promise<EntityActionResult> {
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — artist/tour 액션과 동일 패턴.
     const site = siteSlugSchema.parse(siteInput);
@@ -145,7 +139,7 @@ export async function updateRelease(
   siteInput: string,
   id: string,
   formData: FormData,
-): Promise<ReleaseActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const values = releaseFormSchema.parse(
@@ -185,11 +179,18 @@ export async function updateRelease(
         )
       : null;
 
+    // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
+    const removeArtwork =
+      !artwork && imageRemoved(formData, "removeArtworkImage");
+
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지.
     const imageColumns: Database["public"]["Tables"]["releases"]["Update"] = {};
     if (artworkUpload) {
       imageColumns.artwork_path = artworkUpload.path;
       imageColumns.artwork_placeholder = artworkUpload.placeholder;
+    } else if (removeArtwork) {
+      imageColumns.artwork_path = null;
+      imageColumns.artwork_placeholder = null;
     }
 
     // site_slug·slug는 update 대상에서 제외(불변) — columns에 둘 다 없음.
@@ -200,12 +201,11 @@ export async function updateRelease(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
-    // 교체된 이전 이미지 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
-    // 방금 올린 파일을 지우게 되므로 제외한다.
+    // 교체·제거된 이전 이미지 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
+    // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.
     const oldArtworkPath =
-      artworkUpload &&
-      existing.artwork_path &&
-      existing.artwork_path !== artworkUpload.path
+      (artworkUpload && existing.artwork_path !== artworkUpload.path) ||
+      removeArtwork
         ? existing.artwork_path
         : null;
     await removeImages(supabase, [oldArtworkPath]);
@@ -227,7 +227,7 @@ export async function updateRelease(
 export async function deleteRelease(
   siteInput: string,
   id: string,
-): Promise<ReleaseActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const supabase = await createServerSupabaseClient();

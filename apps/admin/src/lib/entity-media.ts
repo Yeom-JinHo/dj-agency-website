@@ -5,20 +5,22 @@ import { toWebp } from "@repo/content/image";
 import type { SiteSlug } from "@repo/content/schema";
 import type { Database } from "@repo/content/supabase/types";
 
+import {
+  ALLOWED_IMAGE_LABEL,
+  ALLOWED_IMAGE_MIME,
+  MAX_UPLOAD_BYTES,
+  MAX_UPLOAD_MB,
+} from "@/lib/image-constraints";
+
 /**
  * Admin 전용 이미지 쓰기 헬퍼(Artist/Release/Tour 공용). 서버 전용 —
  * toWebp(sharp)·node:crypto를 쓰므로 클라이언트 번들 유입 금지(§7.1 경계:
- * @repo/content에는 두지 않는 admin 쓰기 경로).
+ * @repo/content에는 두지 않는 admin 쓰기 경로). 제한 상수는 클라이언트 사전
+ * 검증과 공유해야 해 image-constraints로 분리돼 있다.
  */
 
 const MEDIA_BUCKET = "media";
-const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 원본 8MB 상한
-const ALLOWED_MIME = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/avif",
-]);
+const ALLOWED_MIME = new Set<string>(ALLOWED_IMAGE_MIME);
 
 type Supabase = SupabaseClient<Database>;
 
@@ -29,18 +31,26 @@ export function imageFile(formData: FormData, key: string): File | null {
 }
 
 /**
+ * 새 파일 없이 "기존 이미지를 지운다"는 의사 표시(ImageField 제거 버튼).
+ * 파일과 같은 FormData 레인으로 받아 payload(zod) 스키마를 건드리지 않는다.
+ */
+export function imageRemoved(formData: FormData, key: string): boolean {
+  return formData.get(key) === "1";
+}
+
+/**
  * toWebp/업로드 전 값싼 게이트: MIME 화이트리스트 + 원본 크기 상한.
  * insert-first 흐름에서 행 생성 전에 호출해 불량 입력이 행을 만들지 않게 한다.
  */
 export function validateImageFile(file: File): void {
   if (!ALLOWED_MIME.has(file.type)) {
     throw new Error(
-      `지원하지 않는 이미지 형식입니다(${file.type || "unknown"}). PNG·JPEG·WEBP·AVIF만 업로드할 수 있습니다.`,
+      `지원하지 않는 이미지 형식입니다(${file.type || "unknown"}). ${ALLOWED_IMAGE_LABEL}만 업로드할 수 있습니다.`,
     );
   }
   if (file.size > MAX_UPLOAD_BYTES) {
     throw new Error(
-      `이미지가 너무 큽니다(${(file.size / 1024 / 1024).toFixed(1)}MB). 8MB 이하만 업로드할 수 있습니다.`,
+      `이미지가 너무 큽니다(${(file.size / 1024 / 1024).toFixed(1)}MB). ${MAX_UPLOAD_MB}MB 이하만 업로드할 수 있습니다.`,
     );
   }
 }

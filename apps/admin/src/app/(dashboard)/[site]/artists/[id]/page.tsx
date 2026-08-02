@@ -5,9 +5,10 @@ import { adminGetArtistById } from "@repo/content/admin-queries";
 
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
+import { DeleteEntityButton } from "@/components/delete-entity-button";
 import { ArtistForm } from "../artist-form";
 import { type ArtistFormValues } from "../schema";
-import { DeleteArtistButton } from "../delete-artist-button";
+import { deleteArtist } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -55,10 +56,12 @@ export default async function EditArtistPage({
             아티스트를 편집합니다. 저장하면 즉시 사이트에 반영됩니다.
           </p>
         </div>
-        <DeleteArtistButton
-          site={site}
-          artistId={artist.id}
-          artistName={artist.name}
+        {/* site·id를 bind한 서버 액션을 넘긴다(공용 버튼은 엔티티를 모른다). */}
+        <DeleteEntityButton
+          entityLabel="아티스트"
+          entityName={artist.name}
+          listHref={`/${site}/artists`}
+          onDelete={deleteArtist.bind(null, site, artist.id)}
         />
       </div>
       <ArtistForm

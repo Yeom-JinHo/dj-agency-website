@@ -1,16 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { toast } from "sonner";
 import { PlusIcon, Trash2Icon } from "lucide-react";
-import { SOCIAL_PLATFORMS, type SiteSlug } from "@repo/content/schema";
+import { type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
-import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
+import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,16 +16,15 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
+import { SocialsFieldArray } from "@/components/socials-field-array";
+import {
+  EMPTY_IMAGE_FIELD,
+  ImageField,
+  isImageFieldDirty,
+  type ImageFieldValue,
+} from "@/components/image-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -52,55 +48,6 @@ interface ArtistFormProps {
   initialLogoUrl?: string | null;
 }
 
-/** 파일 선택 + 미리보기(업로드 전 클라이언트 표시, §4.4). */
-function ImageField({
-  label,
-  initialUrl,
-  file,
-  onFile,
-}: {
-  label: string;
-  initialUrl: string | null;
-  file: File | null;
-  onFile: (file: File | null) => void;
-}) {
-  const [preview, setPreview] = useState<string | null>(initialUrl);
-
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-          {preview ? (
-            <Image
-              src={preview}
-              alt={label}
-              width={80}
-              height={80}
-              unoptimized
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xs">이미지 없음</span>
-          )}
-        </div>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function ArtistForm({
   mode,
   site,
@@ -110,11 +57,9 @@ export function ArtistForm({
   initialProfileUrl = null,
   initialLogoUrl = null,
 }: ArtistFormProps) {
-  const router = useRouter();
   const listHref = `/${site}/artists`;
-  const [submitting, setSubmitting] = useState(false);
-  const [profileFile, setProfileFile] = useState<File | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [profile, setProfile] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
+  const [logo, setLogo] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
 
   const form = useForm<ArtistFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -122,73 +67,32 @@ export function ArtistForm({
     defaultValues,
   });
 
-  const socials = useFieldArray({ control: form.control, name: "socials" });
   const works = useFieldArray({ control: form.control, name: "selectedWorks" });
 
   const nameValue = form.watch("name");
   const slugPreview = mode === "create" ? slugify(nameValue) : (slug ?? "");
 
-  // 파일 선택은 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
-  const hasUnsaved =
-    form.formState.isDirty || profileFile !== null || logoFile !== null;
-  useUnsavedWarning(hasUnsaved && !submitting);
-
-  /** 검증 실패 시 RHF가 첫 오류 필드에 포커스하지만, sticky 저장 바에서
-   * "아무 일도 없는" 것처럼 보이지 않게 토스트로도 알린다. */
-  function onInvalid() {
-    toast.error("입력값을 확인해주세요.");
-  }
-
-  async function onSubmit(values: ArtistFormValues) {
-    setSubmitting(true);
-    const fd = new FormData();
-    fd.set("payload", JSON.stringify(values));
-    if (profileFile) fd.set("profileImage", profileFile);
-    if (logoFile) fd.set("logoImage", logoFile);
-
-    const result = await (
-      mode === "create"
-        ? createArtist(site, fd)
-        : updateArtist(site, artistId!, fd)
-    ).catch((error: unknown) => {
-      // 액션 호출 자체의 실패(오프라인·게이트웨이 오류)는 reject로 온다.
-      console.error("[admin] save failed:", error);
-      return null;
-    });
-
-    if (!result) {
-      setSubmitting(false);
-      toast.error("요청을 처리하지 못했습니다. 네트워크 상태를 확인해주세요.");
-      return;
-    }
-    if (!result.ok) {
-      setSubmitting(false);
-      toast.error(result.error);
-      return;
-    }
-    // 성공 시 pending 유지는 라우트가 실제로 바뀌는 경로에만 — 그래야
-    // 네비게이션 완료 전 버튼 라벨 복귀(재클릭 유발)를 막으면서도 잠금이 안 남는다.
-    // 부분 성공(생성됐지만 이미지 저장 실패): 편집 화면으로 안내해 이어서 저장.
-    if (result.warning && result.id) {
-      toast.warning(result.warning);
-      if (mode === "create") {
-        router.push(`${listHref}/${result.id}`);
-        router.refresh();
-        return;
-      }
-      // edit 모드는 같은 URL이라 언마운트가 없다 — 잠금을 풀어야 재시도 가능.
-      setSubmitting(false);
-      router.refresh();
-      return;
-    }
-    toast.success(
-      mode === "create"
-        ? "아티스트를 만들었습니다."
-        : "변경사항을 저장했습니다.",
-    );
-    router.push(listHref);
-    router.refresh();
-  }
+  const { submitting, onSubmit, onInvalid, onCancel } = useEntityFormSubmit({
+    mode,
+    listHref,
+    createdMessage: "아티스트를 만들었습니다.",
+    // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
+    hasUnsaved:
+      form.formState.isDirty ||
+      isImageFieldDirty(profile) ||
+      isImageFieldDirty(logo),
+    buildFormData: (values: ArtistFormValues) => {
+      const fd = new FormData();
+      fd.set("payload", JSON.stringify(values));
+      if (profile.file) fd.set("profileImage", profile.file);
+      if (profile.removed) fd.set("removeProfileImage", "1");
+      if (logo.file) fd.set("logoImage", logo.file);
+      if (logo.removed) fd.set("removeLogoImage", "1");
+      return fd;
+    },
+    create: (fd) => createArtist(site, fd),
+    update: (fd) => updateArtist(site, artistId!, fd),
+  });
 
   return (
     <Form {...form}>
@@ -316,101 +220,7 @@ export function ArtistForm({
           </CardContent>
         </Card>
 
-        {/* Socials */}
-        <Card className="gap-4 py-4">
-          <CardHeader>
-            <h2 className="text-sm font-medium">소셜</h2>
-            <CardAction>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  socials.append({ platform: "instagram", url: "", label: "" })
-                }
-              >
-                <PlusIcon /> 추가
-              </Button>
-            </CardAction>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {socials.fields.length === 0 ? (
-              <p className="text-muted-foreground text-sm">
-                등록된 소셜이 없습니다.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {socials.fields.map((row, index) => (
-                  <div key={row.id} className="flex items-start gap-2">
-                    <FormField
-                      control={form.control}
-                      name={`socials.${index}.platform`}
-                      render={({ field }) => (
-                        <FormItem className="w-40 shrink-0">
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="플랫폼" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {SOCIAL_PLATFORMS.map((platform) => (
-                                <SelectItem key={platform} value={platform}>
-                                  {platform}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`socials.${index}.url`}
-                      render={({ field }) => (
-                        <FormItem className="flex-1">
-                          <FormControl>
-                            <Input placeholder="https://…" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`socials.${index}.label`}
-                      render={({ field }) => (
-                        <FormItem className="w-32 shrink-0">
-                          <FormControl>
-                            <Input
-                              placeholder="라벨"
-                              {...field}
-                              value={field.value ?? ""}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => socials.remove(index)}
-                      aria-label="소셜 제거"
-                    >
-                      <Trash2Icon />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <SocialsFieldArray />
 
         {/* Selected works (celebrate roster) */}
         <Card className="gap-4 py-4">
@@ -489,14 +299,14 @@ export function ArtistForm({
             <ImageField
               label="프로필 이미지"
               initialUrl={initialProfileUrl}
-              file={profileFile}
-              onFile={setProfileFile}
+              value={profile}
+              onChange={setProfile}
             />
             <ImageField
               label="로고 이미지"
               initialUrl={initialLogoUrl}
-              file={logoFile}
-              onFile={setLogoFile}
+              value={logo}
+              onChange={setLogo}
             />
           </CardContent>
         </Card>
@@ -509,21 +319,7 @@ export function ArtistForm({
                 ? "아티스트 만들기"
                 : "변경사항 저장"}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              if (
-                hasUnsaved &&
-                !window.confirm(
-                  "저장하지 않은 변경사항이 있습니다. 나갈까요?",
-                )
-              ) {
-                return;
-              }
-              router.push(listHref);
-            }}
-          >
+          <Button type="button" variant="outline" onClick={onCancel}>
             취소
           </Button>
         </FormActions>

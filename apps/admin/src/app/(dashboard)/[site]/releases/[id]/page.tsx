@@ -8,9 +8,10 @@ import { PLATFORM_LINK_KEYS, siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
+import { DeleteEntityButton } from "@/components/delete-entity-button";
 import { ReleaseForm } from "../release-form";
 import { type ReleaseFormValues } from "../schema";
-import { DeleteReleaseButton } from "../delete-release-button";
+import { deleteRelease } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -72,10 +73,12 @@ export default async function EditReleasePage({
             릴리즈를 편집합니다. 저장하면 즉시 반영됩니다.
           </p>
         </div>
-        <DeleteReleaseButton
-          site={siteSlug}
-          releaseId={release.id}
-          releaseTitle={release.title}
+        {/* site·id를 bind한 서버 액션을 넘긴다(공용 버튼은 엔티티를 모른다). */}
+        <DeleteEntityButton
+          entityLabel="릴리즈"
+          entityName={release.title}
+          listHref={`/${siteSlug}/releases`}
+          onDelete={deleteRelease.bind(null, siteSlug, release.id)}
         />
       </div>
       <ReleaseForm

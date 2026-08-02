@@ -8,21 +8,15 @@ import type { Database } from "@repo/content/supabase/types";
 
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
+import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
+  imageRemoved,
   removeImages,
   uploadEntityImage,
   validateImageFile,
 } from "@/lib/entity-media";
 import { tourFormSchema, formValuesToDbColumns } from "./schema";
-
-export type TourActionResult =
-  | { ok: true; id?: string; warning?: string }
-  | { ok: false; error: string };
-
-function toErrorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
 
 /**
  * artist_id same-site 검증: select UI는 같은 사이트만 노출하지만(클라이언트 방어)
@@ -57,7 +51,7 @@ function revalidateTours(site: SiteSlug, id?: string): void {
 export async function createTour(
   siteInput: string,
   formData: FormData,
-): Promise<TourActionResult> {
+): Promise<EntityActionResult> {
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — 소속 모델은 site_slug 자동 부여.
     const site = siteSlugSchema.parse(siteInput);
@@ -145,7 +139,7 @@ export async function updateTour(
   siteInput: string,
   id: string,
   formData: FormData,
-): Promise<TourActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const values = tourFormSchema.parse(
@@ -186,11 +180,17 @@ export async function updateTour(
         )
       : null;
 
+    // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
+    const removePoster = !poster && imageRemoved(formData, "removePosterImage");
+
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지.
     const imageColumns: Database["public"]["Tables"]["tours"]["Update"] = {};
     if (posterUpload) {
       imageColumns.poster_path = posterUpload.path;
       imageColumns.poster_placeholder = posterUpload.placeholder;
+    } else if (removePoster) {
+      imageColumns.poster_path = null;
+      imageColumns.poster_placeholder = null;
     }
 
     const { error } = await supabase
@@ -200,12 +200,11 @@ export async function updateTour(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
-    // 교체된 이전 포스터 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
-    // 방금 올린 파일을 지우게 되므로 제외한다.
+    // 교체·제거된 이전 포스터 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
+    // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.
     const oldPosterPath =
-      posterUpload &&
-      existing.poster_path &&
-      existing.poster_path !== posterUpload.path
+      (posterUpload && existing.poster_path !== posterUpload.path) ||
+      removePoster
         ? existing.poster_path
         : null;
     await removeImages(supabase, [oldPosterPath]);
@@ -223,7 +222,7 @@ export async function updateTour(
 export async function deleteTour(
   siteInput: string,
   id: string,
-): Promise<TourActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const supabase = await createServerSupabaseClient();

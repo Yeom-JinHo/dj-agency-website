@@ -5,9 +5,10 @@ import { siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
+import { DeleteEntityButton } from "@/components/delete-entity-button";
 import { TourForm } from "../tour-form";
 import { type TourFormValues } from "../schema";
-import { DeleteTourButton } from "../delete-tour-button";
+import { deleteTour } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -60,10 +61,12 @@ export default async function EditTourPage({
             투어를 편집합니다. 저장하면 즉시 사이트에 반영됩니다.
           </p>
         </div>
-        <DeleteTourButton
-          site={site}
-          tourId={tour.id}
-          tourTitle={tour.title}
+        {/* site·id를 bind한 서버 액션을 넘긴다(공용 버튼은 엔티티를 모른다). */}
+        <DeleteEntityButton
+          entityLabel="투어"
+          entityName={tour.title}
+          listHref={`/${site}/tours`}
+          onDelete={deleteTour.bind(null, site, tour.id)}
         />
       </div>
       <TourForm
