@@ -83,7 +83,15 @@ export function DeleteEntityButton({
       }}
     >
       <DialogTrigger asChild>
-        <Button type="button" variant="destructive">
+        {/* 트리거는 outline으로 낮춘다 — 편집 화면 우상단의 red filled는 저장(하단
+            sticky)보다 강한 최상위 CTA로 읽혔고, 목록의 "새 릴리즈"(filled)와 같은
+            자리라 습관 클릭 위험도 있었다. 파괴 의사를 확정하는 다이얼로그 안의
+            확인 버튼만 destructive filled를 유지한다. */}
+        <Button
+          type="button"
+          variant="outline"
+          className="text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+        >
           삭제
         </Button>
       </DialogTrigger>
