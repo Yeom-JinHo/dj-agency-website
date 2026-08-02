@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { TOUR_STATUSES, type SiteSlug } from "@repo/content/schema";
@@ -17,6 +17,7 @@ import {
   type ImageFieldValue,
 } from "@/components/image-field";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -104,6 +105,7 @@ export function TourForm({
 
   const titleValue = form.watch("title");
   const slugPreview = mode === "create" ? slugify(titleValue) : (slug ?? "");
+  const slugFieldId = useId();
 
   const listHref = `/${site}/tours`;
 
@@ -154,15 +156,25 @@ export function TourForm({
               )}
             />
 
-            <FormItem>
-              <FormLabel>Slug</FormLabel>
-              <Input value={slugPreview} readOnly disabled className="font-mono" />
+            {/* slug는 RHF 필드가 아니라 제목에서 파생되는 읽기 전용 표시라 FormItem/FormLabel을 쓰지 않는다 —
+                FormLabel의 htmlFor는 FormControl이 부여하는 id를 가리키는데 여기엔 FormControl이 없어
+                라벨이 존재하지 않는 id를 가리키고 있었다(스크린리더가 이름 없는 필드로 읽음).
+                RHF 관여가 없으니 일반 Label + useId로 직접 연결한다. 마크업(grid gap-2)은 FormItem과 동일. */}
+            <div className="grid gap-2">
+              <Label htmlFor={slugFieldId}>Slug</Label>
+              <Input
+                id={slugFieldId}
+                value={slugPreview}
+                readOnly
+                disabled
+                className="font-mono"
+              />
               <p className="text-muted-foreground text-xs">
                 {mode === "create"
                   ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
                   : "slug는 생성 후 변경할 수 없습니다."}
               </p>
-            </FormItem>
+            </div>
 
             <FormField
               control={form.control}

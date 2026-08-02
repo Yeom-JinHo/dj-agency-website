@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Search } from "lucide-react";
@@ -116,6 +116,30 @@ export function DataTable<T extends { id: string }>({
     });
   }, [filtered, sortId, sortDir, columns]);
 
+  // 검색 결과 변화는 화면 아래쪽에서만 일어나고 포커스는 입력에 머물러 있어, 라이브 리전이
+  // 없으면 스크린리더 사용자에게 결과가 몇 건인지 전달되지 않는다.
+  // 과다 발화는 두 겹으로 억제한다 — (1) 글자마다 낭독하면 입력을 방해하므로 타이핑이
+  // 500ms 멎은 뒤의 최종 결과만 넣고(URL 반영 throttle 300ms보다 길게 잡아 중간 상태가
+  // 새지 않게 한다), (2) 검색어가 비어 있는 전체 목록 상태는 "결과"가 아니므로 문구를
+  // 비워 아무것도 알리지 않는다(빈 문자열로 되돌리는 것은 발화를 만들지 않는다).
+  const trimmedQuery = query.trim();
+  const resultCount = visible.length;
+  const [announcement, setAnnouncement] = useState("");
+  useEffect(() => {
+    if (!trimmedQuery) {
+      setAnnouncement("");
+      return;
+    }
+    const timer = setTimeout(() => {
+      setAnnouncement(
+        resultCount === 0
+          ? "검색 결과가 없습니다"
+          : `${resultCount}건이 검색되었습니다`,
+      );
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [trimmedQuery, resultCount]);
+
   // 오름차순 → 내림차순 → 해제 3단 순환. sort_order가 실제 사이트 노출 순서라
   // 정렬을 걸어본 뒤 원래 순서로 돌아올 수단이 반드시 있어야 한다.
   // 해제는 두 값을 null로 — clearOnDefault 기본값 덕에 URL에서 파라미터가 사라진다.
@@ -144,6 +168,11 @@ export function DataTable<T extends { id: string }>({
           aria-label={searchPlaceholder}
           className="pl-9"
         />
+      </div>
+
+      {/* 결과 개수 알림 전용 리전(시각적으로 숨김). assertive는 타이핑 자체를 끊으므로 polite. */}
+      <div aria-live="polite" className="sr-only">
+        {announcement}
       </div>
 
       {/* 목록 자체가 빈 경우는 상위 페이지가 EmptyState로 먼저 걸러내므로, 여기서 0건은 곧 검색 0건이다.
