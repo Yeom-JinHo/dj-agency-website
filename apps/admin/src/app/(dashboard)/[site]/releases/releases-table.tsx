@@ -40,7 +40,9 @@ const columns: DataTableColumn<ReleaseRow>[] = [
           />
         ) : (
           // 이미지가 없으면 빈 회색 박스만 남아 "미등록"인지 "로딩 실패"인지 읽히지 않는다.
-          <ThumbIcon className="text-muted-foreground/60 size-4" aria-hidden />
+          // 의미를 나르는 아이콘이라 장식으로 면제되지 않는다 — /60(bg-muted 위 2.21:1)은
+          // 1.4.11의 3:1에 미달해 불투명 muted-foreground(4.35:1)로 올린다.
+          <ThumbIcon className="text-muted-foreground size-4" aria-hidden />
         )}
       </div>
     ),

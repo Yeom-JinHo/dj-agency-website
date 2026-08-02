@@ -9,14 +9,18 @@ import { cn } from "@/lib/utils"
  * 다크모드를 폐기했으므로 shadcn 원본에 있는 dark: 유틸리티는 옮겨오지 않는다.
  *
  * 변형은 이 앱이 실제로 쓰는 세 가지만 둔다(shadcn 기본 default/secondary는
- * 쓸 자리가 없어 두면 그대로 죽는다). 셋 다 테두리 + 옅은 배경으로 톤을 맞춘다.
+ * 쓸 자리가 없어 두면 그대로 죽는다). 셋 다 테두리 + 옅은 배경으로 톤을 맞춘다 —
+ * neutral만 배경이 빠져 있어 주석과 코드가 어긋나 있었고, 그 탓에 목록에서 가장 흔한
+ * '예정'이 매진·취소보다 존재감이 약했다. bg-muted/50을 채워 문법을 통일한다.
+ * 대비는 #FAFAFA 위 #737373 = 4.54:1로 AA를 넘긴다(muted를 통째로 깔면 4.35:1로
+ * 미달하므로 /50이 상한이다).
  */
 const badgeVariants = cva(
   "inline-flex w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-md border px-1.5 py-0.5 text-xs whitespace-nowrap [&>svg]:pointer-events-none [&>svg]:size-3",
   {
     variants: {
       variant: {
-        neutral: "border-border text-muted-foreground",
+        neutral: "border-border bg-muted/50 text-muted-foreground",
         warning: "border-amber-500/40 bg-amber-500/10 text-amber-700",
         danger: "border-red-500/40 bg-red-500/10 text-red-700",
       },
