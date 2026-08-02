@@ -67,13 +67,18 @@ function DialogContent({
         {...props}
       >
         {children}
+        {/* 포커스 링은 앱 공통 어휘(button·input·data-table의 focus-visible:ring-[3px])로 맞췄다.
+            shadcn 원본은 focus:ring-2였는데, focus라서 마우스로 닫기를 누른 뒤에도 링이 남아
+            잔상으로 보였다. ring-offset-background는 offset 유틸리티가 사라져 함께 걷어냈다. */}
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+            className="absolute top-4 right-4 rounded-xs opacity-70 transition-opacity outline-none hover:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            {/* 문서가 lang="ko"라 "Close"는 한국어 음성 엔진에서 음차되거나 철자로 읽힌다.
+                삭제·로그아웃 확인 다이얼로그의 탈출 경로라 이름이 흐려지면 안 된다. */}
+            <span className="sr-only">닫기</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Content>
@@ -109,9 +114,11 @@ function DialogFooter({
       {...props}
     >
       {children}
+      {/* 현재 사용처는 없지만 라벨을 한국어로 미리 맞춰 둔다 — 다음에 켜는 사람이
+          영어 라벨을 그대로 화면에 내보내는 재발을 막기 위해서다. */}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant="outline">Close</Button>
+          <Button variant="outline">닫기</Button>
         </DialogPrimitive.Close>
       )}
     </div>
