@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import type { EntityActionResult } from "@/lib/action-result";
+import { withSearch } from "@/lib/list-search";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 
 /**
@@ -33,6 +34,10 @@ export function useEntityFormSubmit<TValues>({
   update: (formData: FormData) => Promise<EntityActionResult>;
 }) {
   const router = useRouter();
+  // 목록의 검색·정렬 쿼리를 상세까지 실어온 것을 복귀 경로에 그대로 되돌려준다 —
+  // 이게 없으면 저장/취소 때마다 쿼리 없는 목록으로 가서 검색어가 날아간다.
+  // listHref는 항상 쿼리 없는 base로 받는다(부분 성공의 `${listHref}/${id}` 조립이 깨지지 않게).
+  const searchParams = useSearchParams();
   const [submitting, setSubmitting] = useState(false);
 
   useUnsavedWarning(hasUnsaved && !submitting);
@@ -71,7 +76,8 @@ export function useEntityFormSubmit<TValues>({
     if (result.warning && result.id) {
       toast.warning(result.warning);
       if (mode === "create") {
-        router.push(`${listHref}/${result.id}`);
+        // 쿼리는 경로 뒤에 붙인다 — base와 id 사이에 끼면 URL이 깨진다.
+        router.push(withSearch(`${listHref}/${result.id}`, searchParams));
         router.refresh();
         return;
       }
@@ -81,7 +87,7 @@ export function useEntityFormSubmit<TValues>({
       return;
     }
     toast.success(mode === "create" ? createdMessage : "변경사항을 저장했습니다.");
-    router.push(listHref);
+    router.push(withSearch(listHref, searchParams));
     router.refresh();
   }
 
@@ -93,7 +99,7 @@ export function useEntityFormSubmit<TValues>({
     ) {
       return;
     }
-    router.push(listHref);
+    router.push(withSearch(listHref, searchParams));
   }
 
   return { submitting, onSubmit, onInvalid, onCancel };
