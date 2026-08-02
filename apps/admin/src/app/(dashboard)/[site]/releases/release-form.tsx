@@ -361,24 +361,22 @@ export function ReleaseForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-semibold">플랫폼 링크</h2>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-3">
+          <CardContent>
+            {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명
+                카드와 폼 문법이 갈렸다. 설명 카드와 같은 2열 그리드로 통일한다. */}
+            <div className="grid gap-4 sm:grid-cols-2">
               {PLATFORM_LINK_KEYS.map((key) => (
                 <FormField
                   key={key}
                   control={form.control}
                   name={`platformLinks.${key}`}
                   render={({ field }) => (
-                    <FormItem className="flex items-start gap-3">
-                      <FormLabel className="mt-2.5 w-28 shrink-0">
-                        {PLATFORM_LABELS[key]}
-                      </FormLabel>
-                      <div className="flex-1 space-y-1">
-                        <FormControl>
-                          <Input placeholder="https://…" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </div>
+                    <FormItem>
+                      <FormLabel>{PLATFORM_LABELS[key]}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://…" {...field} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
