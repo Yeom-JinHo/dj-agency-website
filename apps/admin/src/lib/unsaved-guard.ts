@@ -12,10 +12,15 @@ export function setUnsavedGuard(value: boolean) {
   unsaved = value;
 }
 
-/** 미저장 변경이 있을 때만 confirm을 띄운다. 문구를 한 곳에 모아 헤더 내비
- * (GuardedLink·SiteSwitcher)가 공유한다 — 폼 취소 버튼은 로컬 hasUnsaved
- * 조건을 쓰므로 이 헬퍼와 별개로 둔다. */
+/** "나갈까요?" 확인 문구. 헤더 내비의 confirmLeaveUnsaved()와 폼 취소 버튼
+ * (use-entity-form-submit)이 공유한다 — 판단 조건(모듈 스코프 플래그 vs.
+ * 로컬 hasUnsaved)은 서로 달라 헬퍼 자체는 합치지 않지만, 같은 상황에서
+ * 다른 말이 나오지 않도록 문구만 한 곳에서 관리한다. */
+export const UNSAVED_LEAVE_CONFIRM_MESSAGE =
+  "저장하지 않은 변경사항이 있습니다. 나갈까요?";
+
+/** 미저장 변경이 있을 때만 confirm을 띄운다. 헤더 내비(GuardedLink·SiteSwitcher)가 공유한다. */
 export function confirmLeaveUnsaved(): boolean {
   if (!unsaved) return true;
-  return window.confirm("저장하지 않은 변경사항이 있습니다. 나갈까요?");
+  return window.confirm(UNSAVED_LEAVE_CONFIRM_MESSAGE);
 }
