@@ -49,6 +49,21 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-svh flex-col">
+      {/* 스킵 링크(WCAG 2.4.1 Bypass Blocks) — 헤더 로고·로그아웃·사이트 Select·
+          카테고리 3링크로 매 페이지 앞에 고정 탭 스톱 6개가 놓인다. 편집자 동선이
+          "목록→상세→저장→목록"으로 라우트를 계속 오가는 구조라 이 6탭을 반복
+          통과하게 된다.
+          시각 스타일을 전부 focus: 아래 두는 이유 — sr-only는 padding·border를 0으로
+          되돌리므로 접두사 없이 주면 숨은 상태에서도 박스가 24px 넓어진다.
+          한계: 사이드바는 [site]/layout.tsx가 <main> 안에서 렌더하므로 #main으로
+          뛰어도 사이드바 링크까지 건너뛰지는 못한다. 사이드바를 <main> 밖으로 빼는
+          구조 변경은 이번 범위가 아니다(별도 티어). */}
+      <a
+        href="#main"
+        className="focus:bg-background focus-visible:ring-ring/50 sr-only outline-none focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:border focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:shadow-md focus-visible:ring-[3px]"
+      >
+        본문으로 건너뛰기
+      </a>
       <header className="flex shrink-0 items-center justify-between border-b px-6 py-3">
         <GuardedLink
           href="/"
@@ -74,7 +89,12 @@ export default async function DashboardLayout({
       {/* 사이트 사이드바(§8)는 [site]/layout.tsx가 스스로 폭·패딩을 갖는다 —
           여기서 p-6을 주면 사이드바가 topbar·좌측 끝에서 24px 띄워진다.
           대신 사이드바 없는 페이지(대시보드 홈·로딩·404·에러)가 각자 패딩을 진다. */}
-      <main className="flex-1">{children}</main>
+      {/* tabIndex={-1} — 해시 이동만으로는 브라우저별로 포커스가 따라오지 않아
+          다음 Tab이 다시 헤더로 돌아가는 일이 생긴다. 프로그램적 포커스만 받고
+          탭 순서에는 끼지 않도록 -1을 준다. */}
+      <main id="main" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
     </div>
   );
 }

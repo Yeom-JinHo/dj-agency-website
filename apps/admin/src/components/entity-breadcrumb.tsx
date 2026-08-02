@@ -22,12 +22,16 @@ import {
 } from "@/lib/sites";
 
 /**
- * 목록·상세([id])·새로 만들기(new) 공용 브레드크럼 — `사이트 > 카테고리 > 엔티티`.
+ * 목록·상세([id])·새로 만들기(new) 공용 브레드크럼 — `대시보드 > 사이트 > 카테고리 > 엔티티`.
  * 사이드바가 사이트를 Select로만 보여주는데 Select는 "입력 컨트롤"로 읽히지
  * "현재 위치"로 읽히지 않아, 사이트 4곳이 같은 카테고리·닮은 엔티티를 갖는 이 화면에서
  * 엉뚱한 사이트를 편집할 위험이 남았다. 현재 위치 표시는 시선이 머무는 콘텐츠 컬럼의
  * 이 브레드크럼이 맡고, 사이드바 Select는 전환 수단으로만 둔다 — 사이트명을 사이드바에
  * 한 번 더 크게 박아 두 곳에서 같은 말을 반복하지 않기 위해서다.
+ *
+ * 최상위 `대시보드` 단을 두는 이유 — 전체 사이트 목록으로 나가는 경로가 헤더의 20px
+ * 로고 하나뿐이라, 릴리즈 상세를 보다 나가려면 브레드크럼 시선 밖 좌상단을 찾아야 했다.
+ * "현재 위치 표시는 브레드크럼이 맡는다"고 자임하면서 정작 최상위가 비어 있었다.
  *
  * `current`가 없으면 카테고리가 곧 현재 위치(목록 페이지)다. 9곳
  * (artists·releases·tours × 목록/[id]/new)이 이 한 컴포넌트를 공유해 중복 배선을 없앤다.
@@ -46,13 +50,19 @@ export function EntityBreadcrumb({
   const label =
     CATEGORIES.find((c) => c.segment === category)?.label ?? category;
   // 목록의 검색·정렬 쿼리를 카테고리 링크에도 실어준다 — 저장·취소 복귀와 같은 규약이라
-  // 브레드크럼으로 되돌아갈 때만 검색어가 날아가는 일이 없다. 사이트 링크는 카테고리를
-  // 벗어나므로 쿼리를 버린다.
+  // 브레드크럼으로 되돌아갈 때만 검색어가 날아가는 일이 없다. 사이트·대시보드 링크는
+  // 카테고리를 벗어나므로 쿼리를 버린다(사이트 링크와 같은 규약).
   const searchParams = useSearchParams();
 
   return (
     <Breadcrumb aria-label="현재 위치">
       <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink asChild>
+            <GuardedLink href="/">대시보드</GuardedLink>
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
             <GuardedLink
