@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminListArtists, adminListTours } from "@repo/content/admin-queries";
@@ -10,7 +11,19 @@ import { EmptyState } from "@/components/empty-state";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { NewEntityButton } from "@/components/new-entity-button";
 import { Button } from "@/components/ui/button";
+import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ToursTable, type TourRow } from "./tours-table";
+
+// 제목 규약은 (dashboard)/page.tsx 주석 참고. params만 읽으므로 DB 조회는 늘지 않는다.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ site: string }>;
+}): Promise<Metadata> {
+  const { site } = await params;
+  if (!isSiteSlug(site)) return { title: "ye0m2 admin" };
+  return { title: `투어 · ${SITE_LABELS[site]} | ye0m2 admin` };
+}
 
 export default async function ToursPage({
   params,
@@ -48,7 +61,9 @@ export default async function ToursPage({
       <EntityBreadcrumb site={site} category="tours" />
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">투어</h1>
+          {/* 위 브레드크럼이 이미 "여기가 어디인지"를 말하므로 h1은 최상위(대시보드·사이트 홈
+              text-2xl)보다 한 단 작다 — 드릴다운할수록 제목이 작아져 방향감이 생긴다. */}
+          <h1 className="text-xl font-semibold tracking-tight">투어</h1>
           <p className="text-muted-foreground text-sm">예정된 공연 일정.</p>
         </div>
         {/* 빈 상태에서는 CTA가 EmptyState 안에 있으므로 우상단 버튼을 숨긴다. */}

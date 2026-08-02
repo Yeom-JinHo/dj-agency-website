@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import {
@@ -13,7 +14,21 @@ import { EmptyState } from "@/components/empty-state";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { NewEntityButton } from "@/components/new-entity-button";
 import { Button } from "@/components/ui/button";
+import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ReleasesTable, type ReleaseRow } from "./releases-table";
+
+// 제목 규약은 (dashboard)/page.tsx 주석 참고. 가운데 단은 화면의 h1 어휘("릴리즈")를 쓴다 —
+// 카드·브레드크럼의 CATEGORIES 라벨("뮤직")과 다르지만, 탭 제목은 눈앞의 제목과 같아야
+// 어나운스와 히스토리가 같은 말을 한다. params만 읽으므로 DB 조회는 늘지 않는다.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ site: string }>;
+}): Promise<Metadata> {
+  const { site } = await params;
+  if (!isSiteSlug(site)) return { title: "ye0m2 admin" };
+  return { title: `릴리즈 · ${SITE_LABELS[site]} | ye0m2 admin` };
+}
 
 export default async function ReleasesPage({
   params,
@@ -55,7 +70,9 @@ export default async function ReleasesPage({
       <EntityBreadcrumb site={siteSlug} category="releases" />
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">릴리즈</h1>
+          {/* 위 브레드크럼이 이미 "여기가 어디인지"를 말하므로 h1은 최상위(대시보드·사이트 홈
+              text-2xl)보다 한 단 작다 — 드릴다운할수록 제목이 작아져 방향감이 생긴다. */}
+          <h1 className="text-xl font-semibold tracking-tight">릴리즈</h1>
           <p className="text-muted-foreground text-sm">
             이 사이트의 릴리즈.
           </p>
