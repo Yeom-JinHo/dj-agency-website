@@ -29,7 +29,11 @@ export function EmptyState({
         className
       )}
     >
-      <div className="bg-muted text-muted-foreground flex size-11 items-center justify-center rounded-full">
+      {/* 원형 아이콘만 primary 틴트로 둔다 — 신규 사이트 세팅 초기에 가장 자주 보는 화면인데
+          완전 무채색이면 "비었다"로만 읽히고 "채울 자리"라는 초대가 되지 않았다.
+          바로 아래 CTA(primary 버튼)와 색을 이어 시선이 아이콘 → 문구 → 버튼으로 흐른다.
+          #EAEDF6 위 #2B4EA7 = 6.52:1. */}
+      <div className="bg-primary/10 text-primary flex size-11 items-center justify-center rounded-full">
         <Icon className="size-5" aria-hidden />
       </div>
       <div className="space-y-1">

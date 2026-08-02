@@ -29,6 +29,7 @@ export type TourRow = {
 /**
  * status → 뱃지 라벨 + 변형. soldout=amber(warning)·cancelled=red(danger),
  * scheduled만 중립 — 색 조립은 Badge가 들고 여기는 의미만 정한다.
+ * 지난 공연(isPast)은 status 컬럼이 아니라 event_date에서 파생되므로 여기 없다.
  */
 const STATUS_BADGE: Record<
   string,
@@ -56,7 +57,9 @@ const columns: DataTableColumn<TourRow>[] = [
           />
         ) : (
           // 이미지가 없으면 빈 회색 박스만 남아 "미등록"인지 "로딩 실패"인지 읽히지 않는다.
-          <ThumbIcon className="text-muted-foreground/60 size-4" aria-hidden />
+          // 의미를 나르는 아이콘이라 장식으로 면제되지 않는다 — /60(bg-muted 위 2.21:1)은
+          // 1.4.11의 3:1에 미달해 불투명 muted-foreground(4.35:1)로 올린다.
+          <ThumbIcon className="text-muted-foreground size-4" aria-hidden />
         )}
       </div>
     ),
@@ -93,12 +96,23 @@ const columns: DataTableColumn<TourRow>[] = [
   {
     id: "status",
     header: "상태",
-    // 모르는 status가 들어오면 원문을 중립 뱃지로 그대로 노출한다(빈 셀보다 낫다).
-    cell: (row) => (
-      <Badge variant={STATUS_BADGE[row.status]?.variant}>
-        {STATUS_BADGE[row.status]?.label ?? row.status}
-      </Badge>
-    ),
+    cell: (row) => {
+      const status = STATUS_BADGE[row.status];
+      // 지난 공연에 '예정'은 이미 사실이 아니므로 '지남'이 그 자리를 대신하고,
+      // 매진·취소는 공연이 지나도 남는 사실이라 '지남'과 나란히 둔다.
+      const showStatus = !(row.isPast && row.status === "scheduled");
+      return (
+        <span className="flex items-center gap-1">
+          {row.isPast ? <Badge>지남</Badge> : null}
+          {/* 모르는 status가 들어오면 원문을 중립 뱃지로 그대로 노출한다(빈 셀보다 낫다). */}
+          {showStatus ? (
+            <Badge variant={status?.variant}>
+              {status?.label ?? row.status}
+            </Badge>
+          ) : null}
+        </span>
+      );
+    },
   },
 ];
 
@@ -114,8 +128,11 @@ export function ToursTable({
       rows={rows}
       columns={columns}
       rowHref={(row) => `${basePath}/${row.id}`}
-      // 지난 공연은 시각적으로 muted 처리(§13 'past'는 event_date로 유도).
-      rowClassName={(row) => (row.isPast ? "opacity-50" : undefined)}
+      // 지난 공연에 걸던 행 전체 opacity-50은 걷어냈다. 제목이 3.69:1, muted 셀이
+      // 1.96:1까지 무너져 WCAG 1.4.3에 한참 못 미쳤는데, 지난 공연은 '안 읽어도 되는 것'이
+      // 아니라 편집·삭제 대상이라 흐리게 만들 근거가 없다. 게다가 isPast가 시각 채널에만
+      // 있어 스크린리더에는 아예 닿지 않았다 — 상태 컬럼의 '지남' 뱃지가 두 채널을 함께
+      // 덮으므로 별도의 시각적 후퇴는 두지 않는다(후퇴 대신 라벨 추가로 방향을 뒤집었다).
       searchText={(row) => `${row.title} ${row.artist ?? ""} ${row.venueCity}`}
       searchPlaceholder="제목·아티스트·장소로 검색"
     />

@@ -57,7 +57,11 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        // hover만 무채색 대신 아주 옅은 인디고 틴트로 옮긴다(행을 겨눈 순간에만 브랜드가 비친다).
+        // 알파는 /[0.03]이 상한이다 — 요청받은 /5(#F4F6FB)면 muted-foreground 셀(아티스트·장소·
+        // 일시)이 4.39:1로 AA 아래로 떨어진다. /[0.03]은 4.54:1로, 걷어낸 bg-muted/50과
+        // 명도 단차(흰 배경 대비 1.04)까지 같아 hover의 세기는 그대로 두고 색만 바꾼 셈이다.
+        "border-b transition-colors hover:bg-primary/[0.03] has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
       {...props}

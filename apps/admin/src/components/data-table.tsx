@@ -68,14 +68,12 @@ export function DataTable<T extends { id: string }>({
   rows,
   columns,
   rowHref,
-  rowClassName,
   searchText,
   searchPlaceholder,
 }: {
   rows: T[];
   columns: DataTableColumn<T>[];
   rowHref: (row: T) => string;
-  rowClassName?: (row: T) => string | undefined;
   searchText: (row: T) => string;
   searchPlaceholder: string;
 }) {
@@ -203,7 +201,9 @@ export function DataTable<T extends { id: string }>({
       </div>
 
       {/* 목록 자체가 빈 경우는 상위 페이지가 EmptyState로 먼저 걸러내므로, 여기서 0건은 곧 검색 0건이다.
-          EmptyState가 점선 테두리를 이미 갖고 있어 테두리가 겹치지 않도록 border 컨테이너를 아예 대체한다. */}
+          EmptyState가 점선 테두리를 이미 갖고 있어 테두리가 겹치지 않도록 border 컨테이너를 아예 대체한다.
+          표 쪽 컨테이너의 shadow-sm은 배경에서 한 겹 띄우는 용도다 — 테두리만으로는 흰 배경 위 흰 표가
+          평면에 그려진 선처럼 보여 "표 = 다룰 수 있는 면"이라는 감각이 약했다. */}
       {visible.length === 0 ? (
         <EmptyState
           icon={Search}
@@ -220,7 +220,7 @@ export function DataTable<T extends { id: string }>({
           }
         />
       ) : (
-        <div className="rounded-lg border">
+        <div className="rounded-lg border shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
@@ -256,14 +256,27 @@ export function DataTable<T extends { id: string }>({
                         <button
                           type="button"
                           onClick={() => toggleSort(column.id)}
-                          className="hover:text-foreground focus-visible:ring-ring/50 -mx-1 inline-flex items-center gap-1 rounded px-1 outline-none focus-visible:ring-[3px]"
+                          // 활성 컬럼은 primary로 물들여 "지금 이 기준으로 정렬 중"을
+                          // 아이콘 모양 말고 색으로도 알린다(7.64:1). 활성일 때 hover가
+                          // foreground로 되돌아가면 정렬 표시가 커서에 따라 깜빡이므로,
+                          // hover 대비는 primary 안에서 흐린다.
+                          className={cn(
+                            "focus-visible:ring-ring/50 -mx-1 inline-flex items-center gap-1 rounded px-1 outline-none focus-visible:ring-[3px]",
+                            active
+                              ? "text-primary hover:text-primary/80"
+                              : "hover:text-foreground",
+                          )}
                           aria-label={`${column.header} 기준 ${nextAction}`}
                         >
                           {column.header}
+                          {/* 미정렬 아이콘은 "이 컬럼은 정렬 가능하다"는 유일한 시각 어포던스다.
+                              /50(흰 배경 1.96:1)은 1.4.11의 3:1에 한참 못 미쳐 불투명으로 올린다(4.74:1). */}
                           <SortIcon
                             className={cn(
                               "size-3.5",
-                              active ? "" : "text-muted-foreground/50",
+                              // 활성일 땐 버튼의 primary를 그대로 물려받는다 —
+                              // 여기서 다시 지정하면 hover 감쇠 때 라벨만 흐려진다.
+                              active ? "" : "text-muted-foreground",
                             )}
                             aria-hidden
                           />
@@ -282,7 +295,7 @@ export function DataTable<T extends { id: string }>({
                   key={row.id}
                   // 행 전체가 여전히 클릭 가능하므로 포인터 커서는 유지한다. 텍스트 위에서
                   // 커서가 I빔으로 바뀌지 않아도 드래그 선택 자체는 그대로 된다.
-                  className={cn("cursor-pointer", rowClassName?.(row))}
+                  className="cursor-pointer"
                   onClick={(e) => handleRowClick(e, row)}
                 >
                   {columns.map((column) => (
