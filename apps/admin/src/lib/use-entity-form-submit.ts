@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import type { EntityActionResult } from "@/lib/action-result";
 import { withSearch } from "@/lib/list-search";
+import { UNSAVED_LEAVE_CONFIRM_MESSAGE } from "@/lib/unsaved-guard";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 
 /**
@@ -93,10 +94,7 @@ export function useEntityFormSubmit<TValues>({
 
   /** 취소 — 미저장 변경이 있으면 확인 후 목록으로. */
   function onCancel() {
-    if (
-      hasUnsaved &&
-      !window.confirm("저장하지 않은 변경사항이 있습니다. 나갈까요?")
-    ) {
+    if (hasUnsaved && !window.confirm(UNSAVED_LEAVE_CONFIRM_MESSAGE)) {
       return;
     }
     router.push(withSearch(listHref, searchParams));
