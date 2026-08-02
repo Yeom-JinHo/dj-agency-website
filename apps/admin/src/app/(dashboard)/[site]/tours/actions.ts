@@ -8,6 +8,7 @@ import type { Database } from "@repo/content/supabase/types";
 
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
+import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
   removeImages,
@@ -15,14 +16,6 @@ import {
   validateImageFile,
 } from "@/lib/entity-media";
 import { tourFormSchema, formValuesToDbColumns } from "./schema";
-
-export type TourActionResult =
-  | { ok: true; id?: string; warning?: string }
-  | { ok: false; error: string };
-
-function toErrorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
 
 /**
  * artist_id same-site 검증: select UI는 같은 사이트만 노출하지만(클라이언트 방어)
@@ -57,7 +50,7 @@ function revalidateTours(site: SiteSlug, id?: string): void {
 export async function createTour(
   siteInput: string,
   formData: FormData,
-): Promise<TourActionResult> {
+): Promise<EntityActionResult> {
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — 소속 모델은 site_slug 자동 부여.
     const site = siteSlugSchema.parse(siteInput);
@@ -145,7 +138,7 @@ export async function updateTour(
   siteInput: string,
   id: string,
   formData: FormData,
-): Promise<TourActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const values = tourFormSchema.parse(
@@ -223,7 +216,7 @@ export async function updateTour(
 export async function deleteTour(
   siteInput: string,
   id: string,
-): Promise<TourActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const supabase = await createServerSupabaseClient();

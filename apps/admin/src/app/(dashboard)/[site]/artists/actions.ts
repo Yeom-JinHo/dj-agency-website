@@ -8,6 +8,7 @@ import type { Database } from "@repo/content/supabase/types";
 
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
+import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
   removeImages,
@@ -16,18 +17,10 @@ import {
 } from "@/lib/entity-media";
 import { artistFormSchema, formValuesToDbColumns } from "./schema";
 
-export type ArtistActionResult =
-  | { ok: true; id?: string; warning?: string }
-  | { ok: false; error: string };
-
-function toErrorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
-
 export async function createArtist(
   siteParam: SiteSlug,
   formData: FormData,
-): Promise<ArtistActionResult> {
+): Promise<EntityActionResult> {
   try {
     // 소속 사이트는 라우트 세그먼트에서 결정 — 서버측에서도 유효성 방어.
     const site = siteSlugSchema.parse(siteParam);
@@ -133,7 +126,7 @@ export async function updateArtist(
   siteParam: SiteSlug,
   id: string,
   formData: FormData,
-): Promise<ArtistActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteParam);
     const values = artistFormSchema.parse(
@@ -231,7 +224,7 @@ export async function updateArtist(
 export async function deleteArtist(
   siteParam: SiteSlug,
   id: string,
-): Promise<ArtistActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteParam);
     const supabase = await createServerSupabaseClient();

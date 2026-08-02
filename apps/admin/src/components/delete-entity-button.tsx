@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { SiteSlug } from "@repo/content/schema";
 
+import type { EntityActionResult } from "@/lib/action-result";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,17 +16,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { deleteRelease } from "./actions";
 
-/** 릴리즈 삭제 — confirm 다이얼로그 후 실행(§8). */
-export function DeleteReleaseButton({
-  site,
-  releaseId,
-  releaseTitle,
+/**
+ * 엔티티 삭제 — confirm 다이얼로그 후 실행(§8, Artist/Release/Tour 공용).
+ * onDelete는 상세 페이지(서버 컴포넌트)에서 site·id를 bind한 서버 액션을 받는다.
+ */
+export function DeleteEntityButton({
+  entityLabel,
+  entityName,
+  listHref,
+  onDelete,
 }: {
-  site: SiteSlug;
-  releaseId: string;
-  releaseTitle: string;
+  /** "아티스트"·"릴리즈"·"투어" — 다이얼로그 제목과 성공 토스트에 쓰인다. */
+  entityLabel: string;
+  entityName: string;
+  listHref: string;
+  onDelete: () => Promise<EntityActionResult>;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -34,7 +39,7 @@ export function DeleteReleaseButton({
 
   async function onConfirm() {
     setDeleting(true);
-    const result = await deleteRelease(site, releaseId);
+    const result = await onDelete();
 
     if (!result.ok) {
       setDeleting(false);
@@ -45,11 +50,11 @@ export function DeleteReleaseButton({
     if (result.warning) {
       toast.warning(result.warning);
     } else {
-      toast.success("릴리즈를 삭제했습니다.");
+      toast.success(`${entityLabel}를 삭제했습니다.`);
     }
     // 다이얼로그를 연 채 pending 유지 — 네비게이션 완료로 언마운트될 때까지
     // 삭제된 엔티티 화면이 재노출·재조작되는 걸 막는다.
-    router.push(`/${site}/releases`);
+    router.push(listHref);
     router.refresh();
   }
 
@@ -67,9 +72,9 @@ export function DeleteReleaseButton({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>릴리즈 삭제</DialogTitle>
+          <DialogTitle>{entityLabel} 삭제</DialogTitle>
           <DialogDescription>
-            &ldquo;{releaseTitle}&rdquo;을(를) 삭제합니다. 이 작업은 되돌릴 수
+            &ldquo;{entityName}&rdquo;을(를) 삭제합니다. 이 작업은 되돌릴 수
             없습니다.
           </DialogDescription>
         </DialogHeader>

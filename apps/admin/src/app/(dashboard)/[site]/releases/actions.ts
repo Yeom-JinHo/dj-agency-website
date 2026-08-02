@@ -8,6 +8,7 @@ import { contentTags } from "@repo/content/tags";
 
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
+import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
   removeImages,
@@ -15,14 +16,6 @@ import {
   validateImageFile,
 } from "@/lib/entity-media";
 import { releaseFormSchema, formValuesToDbInput } from "./schema";
-
-export type ReleaseActionResult =
-  | { ok: true; id?: string; warning?: string }
-  | { ok: false; error: string };
-
-function toErrorMessage(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
 
 /**
  * primary_artist_id same-site 검증: select UI는 같은 사이트만 노출하지만(클라이언트 방어)
@@ -46,7 +39,7 @@ async function assertArtistInSite(
 export async function createRelease(
   siteInput: string,
   formData: FormData,
-): Promise<ReleaseActionResult> {
+): Promise<EntityActionResult> {
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — artist/tour 액션과 동일 패턴.
     const site = siteSlugSchema.parse(siteInput);
@@ -145,7 +138,7 @@ export async function updateRelease(
   siteInput: string,
   id: string,
   formData: FormData,
-): Promise<ReleaseActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const values = releaseFormSchema.parse(
@@ -227,7 +220,7 @@ export async function updateRelease(
 export async function deleteRelease(
   siteInput: string,
   id: string,
-): Promise<ReleaseActionResult> {
+): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const supabase = await createServerSupabaseClient();
