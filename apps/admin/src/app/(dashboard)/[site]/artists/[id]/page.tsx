@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { siteSlugSchema } from "@repo/content/schema";
@@ -6,9 +7,35 @@ import { adminGetArtistById } from "@repo/content/admin-queries";
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { DeleteEntityButton } from "@/components/delete-entity-button";
+import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ArtistForm } from "../artist-form";
 import { type ArtistFormValues } from "../schema";
 import { deleteArtist } from "../actions";
+
+/**
+ * 제목에 아티스트명을 넣지 않고 정적 문구를 쓴다 — generateMetadata는 페이지와 별개로
+ * 실행되므로 이름을 쓰려면 adminGetArtistById를 한 번 더 불러야 하는데, 그 중복이
+ * 사라진다는 보장이 없기 때문이다: 이 함수는 React `cache()`로 감싸여 있지 않고
+ * (admin-queries는 §7.4에 따라 캐시 계층을 의도적으로 배제한다) 호출마다
+ * createServerSupabaseClient로 클라이언트를 새로 만든다. supabase-js가 내부적으로
+ * 전역 fetch를 쓰긴 하지만, Next의 요청 메모이제이션이 그 래핑된 호출까지 확실히
+ * 잡아준다고 볼 근거가 이 저장소 안에는 없다. 확인되지 않은 dedupe에 기대어 상세
+ * 진입마다 DB 왕복을 두 배로 만드느니 제목을 고정한다.
+ *
+ * 어나운서 관점의 손실은 크지 않다: 목록("아티스트 · …") → 상세("아티스트 편집 · …")는
+ * 제목이 바뀌므로 발화한다. 아티스트 A 상세에서 B 상세로 곧장 가는 경우만 침묵하는데,
+ * 이 앱의 동선은 항상 목록을 거친다. 나중에 admin-queries가 cache()로 감싸이면
+ * 그때 이름을 넣는 편이 안전하다.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ site: string }>;
+}): Promise<Metadata> {
+  const { site } = await params;
+  if (!isSiteSlug(site)) return { title: "ye0m2 admin" };
+  return { title: `아티스트 편집 · ${SITE_LABELS[site]} | ye0m2 admin` };
+}
 
 export default async function EditArtistPage({
   params,
@@ -47,7 +74,8 @@ export default async function EditArtistPage({
       <EntityBreadcrumb site={site} category="artists" current={artist.name} />
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          {/* 브레드크럼이 위치를 말하므로 h1은 최상위보다 한 단 작다(목록·new와 같은 규칙). */}
+          <h1 className="text-xl font-semibold tracking-tight">
             {artist.name}
           </h1>
           <p className="text-muted-foreground text-sm">

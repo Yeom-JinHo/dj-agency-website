@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
@@ -30,9 +31,17 @@ export default function SiteError({
           일시적인 오류일 수 있습니다. 다시 시도해주세요.
         </p>
       </div>
-      <Button type="button" variant="outline" onClick={reset}>
-        다시 시도
-      </Button>
+      {/* 원인이 지속되면 reset()은 같은 에러를 다시 렌더할 뿐이다. 여긴 사이드바가
+          살아 있어 (dashboard)/error.tsx보다 급하진 않지만 본문 안에 탈출구가 없는 건
+          같으므로 같은 위치의 not-found.tsx와 같은 문구·마크업으로 복귀 링크를 나란히 둔다. */}
+      <div className="flex items-center gap-2">
+        <Button type="button" variant="outline" onClick={reset}>
+          다시 시도
+        </Button>
+        <Button asChild variant="outline">
+          <Link href="/">대시보드로 돌아가기</Link>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -18,9 +18,11 @@ export default function SiteLoading() {
         {Array.from({ length: 3 }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-4 rounded-lg border p-5"
+            className="flex items-center gap-4 rounded-lg border p-5 shadow-sm"
           >
-            <Skeleton className="size-10 shrink-0 rounded-md" />
+            {/* 아이콘 슬롯은 실제 카드(page.tsx)와 같은 size-8 — 예전 size-10은 40px이라
+                데이터 도착 시 칩이 눈에 띄게 줄어들었다. shadow-sm도 같은 이유로 맞춘다. */}
+            <Skeleton className="size-8 shrink-0 rounded-md" />
             <div className="min-w-0 flex-1 space-y-1.5">
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-8" />

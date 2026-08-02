@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { adminGetTourById, adminListArtists } from "@repo/content/admin-queries";
@@ -6,9 +7,22 @@ import { siteSlugSchema } from "@repo/content/schema";
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { DeleteEntityButton } from "@/components/delete-entity-button";
+import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { TourForm } from "../tour-form";
 import { type TourFormValues } from "../schema";
 import { deleteTour } from "../actions";
+
+// 투어명 대신 정적 문구를 쓰는 이유는 artists/[id]/page.tsx 주석 참고
+// (generateMetadata에서 adminGetTourById를 다시 부르면 dedupe 보장 없이 DB 왕복이 두 배).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ site: string }>;
+}): Promise<Metadata> {
+  const { site } = await params;
+  if (!isSiteSlug(site)) return { title: "ye0m2 admin" };
+  return { title: `투어 편집 · ${SITE_LABELS[site]} | ye0m2 admin` };
+}
 
 export default async function EditTourPage({
   params,
@@ -52,7 +66,8 @@ export default async function EditTourPage({
       <EntityBreadcrumb site={site} category="tours" current={tour.title} />
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
+          {/* 브레드크럼이 위치를 말하므로 h1은 최상위보다 한 단 작다(목록·new와 같은 규칙). */}
+          <h1 className="text-xl font-semibold tracking-tight">
             {tour.title}
           </h1>
           <p className="text-muted-foreground text-sm">

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -14,6 +15,22 @@ import {
   SITE_LABELS,
   type CategorySegment,
 } from "@/lib/sites";
+
+/**
+ * 사이트 라벨이 params에 달려 있어 정적 metadata로는 만들 수 없다(제목 규약은
+ * (dashboard)/page.tsx 주석 참고). 라벨은 SITE_LABELS 단일 출처를 쓰고, DB는 건드리지
+ * 않으므로 조회가 늘지 않는다. 무효 슬러그는 페이지가 notFound()로 보내므로 여기선
+ * 원문 파라미터를 제목에 반사하지 않고 앱 이름만 남긴다.
+ */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ site: string }>;
+}): Promise<Metadata> {
+  const { site } = await params;
+  if (!isSiteSlug(site)) return { title: "ye0m2 admin" };
+  return { title: `${SITE_LABELS[site]} | ye0m2 admin` };
+}
 
 // 사이트 홈(§8): 카테고리 3카드 → /[site]/artists 등.
 export default async function SiteHomePage({
@@ -38,6 +55,8 @@ export default async function SiteHomePage({
   return (
     <div className="space-y-6">
       <div className="space-y-1">
+        {/* 브레드크럼이 없는 최상위 화면이라 h1이 위치를 혼자 말한다 — 대시보드와 같은 text-2xl.
+            브레드크럼이 붙는 하위(목록·상세·new)는 그 줄이 이미 위치를 말하므로 text-xl로 한 단 낮춘다. */}
         <h1 className="text-2xl font-semibold tracking-tight">
           {SITE_LABELS[site]}
         </h1>
@@ -48,10 +67,14 @@ export default async function SiteHomePage({
 
       {/* 드릴다운 카드 어휘는 대시보드 홈((dashboard)/page.tsx)과 한 벌이다 — 32px 아이콘 슬롯 +
           제목/카운트 2줄 텍스트, 가로 배치·gap-4·p-5·rounded-lg·hover:bg-muted/50까지 같다.
-          아이콘 "채움"만 다르다: 여긴 단색 lucide 글리프라 bg-muted 판을 깔아 몸을 주고,
+          아이콘 "채움"만 다르다: 여긴 단색 lucide 글리프라 판을 깔아 몸을 주고,
           대시보드는 자기 색을 가진 브랜드 래스터라 판 없이 헤어라인 ring만 두른다.
-          글리프 16px은 사이드바 nav와 같은 크기 — 카드에서 고른 아이콘이 이동 후 nav에서
-          같은 무게로 다시 보인다. */}
+          판을 무채색(bg-muted)으로 두면 브랜드색이 있던 대시보드에서 드릴다운하는 순간
+          화면에서 색이 통째로 사라졌다 — primary 틴트를 얹어 그 낙차를 없앤다
+          ("primary/ring만 유채색" 원칙의 이 완화는 사용자 승인 범위).
+          글리프 16px은 사이드바 nav와 같은 크기이고 nav의 active도 같은 인디고라,
+          카드에서 고른 아이콘이 이동 후 nav에서 같은 무게·같은 색으로 다시 보인다.
+          표면감·포커스 링은 대시보드 카드와 같은 처방 — 근거는 (dashboard)/page.tsx 주석. */}
       <div className="grid gap-4 sm:grid-cols-3">
         {CATEGORIES.map((category) => {
           const Icon = CATEGORY_ICONS[category.segment];
@@ -60,9 +83,9 @@ export default async function SiteHomePage({
             <Link
               key={category.segment}
               href={`/${site}/${category.segment}`}
-              className="hover:bg-muted/50 flex items-center gap-4 rounded-lg border p-5 transition-colors"
+              className="hover:bg-muted/50 focus-visible:ring-ring/50 flex items-center gap-4 rounded-lg border p-5 shadow-sm transition-[box-shadow,transform,background-color] outline-none hover:-translate-y-0.5 hover:shadow-md focus-visible:ring-[3px]"
             >
-              <div className="bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-md">
+              <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-md">
                 <Icon className="size-4" aria-hidden />
               </div>
               <div className="min-w-0">
