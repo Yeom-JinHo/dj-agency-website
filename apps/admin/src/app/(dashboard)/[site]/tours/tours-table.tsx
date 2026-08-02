@@ -29,12 +29,11 @@ const STATUS_BADGE: Record<string, { label: string; className: string }> = {
   },
   soldout: {
     label: "매진",
-    className:
-      "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    className: "border-amber-500/40 bg-amber-500/10 text-amber-700",
   },
   cancelled: {
     label: "취소",
-    className: "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-400",
+    className: "border-red-500/40 bg-red-500/10 text-red-700",
   },
 };
 
