@@ -7,6 +7,7 @@ import {
 import { PLATFORM_LINK_KEYS, siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
+import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { ReleaseForm } from "../release-form";
 import { type ReleaseFormValues } from "../schema";
 import { DeleteReleaseButton } from "../delete-release-button";
@@ -57,6 +58,11 @@ export default async function EditReleasePage({
 
   return (
     <div className="space-y-6">
+      <EntityBreadcrumb
+        site={siteSlug}
+        category="releases"
+        current={release.title}
+      />
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { siteSlugSchema } from "@repo/content/schema";
 
+import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { ArtistForm } from "../artist-form";
 import { emptyArtistFormValues } from "../schema";
 
@@ -16,6 +17,7 @@ export default async function NewArtistPage({
 
   return (
     <div className="space-y-6">
+      <EntityBreadcrumb site={site} category="artists" current="새 아티스트" />
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">새 아티스트</h1>
         <p className="text-muted-foreground text-sm">
