@@ -51,7 +51,7 @@ function revalidateTours(site: SiteSlug, id?: string): void {
 export async function createTour(
   siteInput: string,
   formData: FormData,
-): Promise<EntityActionResult> {
+): Promise<EntityActionResult<"title" | "artistId">> {
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — 소속 모델은 site_slug 자동 부여.
     const site = siteSlugSchema.parse(siteInput);
@@ -62,7 +62,12 @@ export async function createTour(
 
     const slug = slugify(values.title);
     if (!slug) {
-      return { ok: false, error: "제목에서 slug를 만들 수 없습니다." };
+      // slug는 제목에서만 파생되므로 고칠 곳은 항상 title 필드다.
+      return {
+        ok: false,
+        error: "제목에서 slug를 만들 수 없습니다.",
+        field: "title",
+      };
     }
 
     // createServerSupabaseClient는 인증 세션을 실어 RLS(editors)가 서버측 방어로 동작.
@@ -77,7 +82,8 @@ export async function createTour(
       columns.artist_id ?? null,
       site,
     );
-    if (artistError) return { ok: false, error: artistError };
+    if (artistError)
+      return { ok: false, error: artistError, field: "artistId" };
 
     // insert-first: (site_slug, slug) 확보를 먼저 해 사이트 내 제목 중복(23505)에서
     // Storage 고아를 막고 update 경로와 대칭이 되게 한다.
@@ -87,11 +93,16 @@ export async function createTour(
       .select("id")
       .single();
     if (error) {
-      const message =
-        error.code === "23505"
-          ? `slug "${slug}"가 이미 존재합니다(사이트 내 제목 중복).`
-          : error.message;
-      return { ok: false, error: message };
+      // 23505는 (site_slug, slug) 유니크 위반 = 제목 중복이라 title 필드에 귀속시킨다.
+      // 그 밖의 DB 오류는 고칠 필드를 특정할 수 없어 토스트로 남긴다.
+      if (error.code === "23505") {
+        return {
+          ok: false,
+          error: `slug "${slug}"가 이미 존재합니다(사이트 내 제목 중복).`,
+          field: "title",
+        };
+      }
+      return { ok: false, error: error.message };
     }
     const id = data.id;
 
@@ -139,7 +150,7 @@ export async function updateTour(
   siteInput: string,
   id: string,
   formData: FormData,
-): Promise<EntityActionResult> {
+): Promise<EntityActionResult<"artistId">> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const values = tourFormSchema.parse(
@@ -166,7 +177,8 @@ export async function updateTour(
       columns.artist_id ?? null,
       site,
     );
-    if (artistError) return { ok: false, error: artistError };
+    if (artistError)
+      return { ok: false, error: artistError, field: "artistId" };
 
     const poster = imageFile(formData, "posterImage");
     const posterUpload = poster

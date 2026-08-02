@@ -40,7 +40,7 @@ async function assertArtistInSite(
 export async function createRelease(
   siteInput: string,
   formData: FormData,
-): Promise<EntityActionResult> {
+): Promise<EntityActionResult<"title" | "primaryArtistId">> {
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — artist/tour 액션과 동일 패턴.
     const site = siteSlugSchema.parse(siteInput);
@@ -51,7 +51,12 @@ export async function createRelease(
 
     const slug = slugify(values.title);
     if (!slug) {
-      return { ok: false, error: "제목에서 slug를 만들 수 없습니다." };
+      // slug는 제목에서만 파생되므로 고칠 곳은 항상 title 필드다.
+      return {
+        ok: false,
+        error: "제목에서 slug를 만들 수 없습니다.",
+        field: "title",
+      };
     }
 
     const publishTags = [contentTags.release(site, slug), contentTags.releases(site)];
@@ -68,7 +73,8 @@ export async function createRelease(
       columns.primary_artist_id ?? null,
       site,
     );
-    if (artistError) return { ok: false, error: artistError };
+    if (artistError)
+      return { ok: false, error: artistError, field: "primaryArtistId" };
 
     // insert-first: slug 확보를 먼저 해 (site_slug, slug) 중복(23505) 같은 흔한
     // 실패에서 Storage 고아를 막고 update 경로와 대칭이 되게 한다.
@@ -79,11 +85,16 @@ export async function createRelease(
       .select("id")
       .single();
     if (error) {
-      const message =
-        error.code === "23505"
-          ? `slug "${slug}"가 이미 존재합니다(사이트 내 제목 중복).`
-          : error.message;
-      return { ok: false, error: message };
+      // 23505는 (site_slug, slug) 유니크 위반 = 제목 중복이라 title 필드에 귀속시킨다.
+      // 그 밖의 DB 오류는 고칠 필드를 특정할 수 없어 토스트로 남긴다.
+      if (error.code === "23505") {
+        return {
+          ok: false,
+          error: `slug "${slug}"가 이미 존재합니다(사이트 내 제목 중복).`,
+          field: "title",
+        };
+      }
+      return { ok: false, error: error.message };
     }
     const id = data.id;
 
@@ -139,7 +150,7 @@ export async function updateRelease(
   siteInput: string,
   id: string,
   formData: FormData,
-): Promise<EntityActionResult> {
+): Promise<EntityActionResult<"primaryArtistId">> {
   try {
     const site = siteSlugSchema.parse(siteInput);
     const values = releaseFormSchema.parse(
@@ -165,7 +176,8 @@ export async function updateRelease(
       columns.primary_artist_id ?? null,
       site,
     );
-    if (artistError) return { ok: false, error: artistError };
+    if (artistError)
+      return { ok: false, error: artistError, field: "primaryArtistId" };
 
     const artwork = imageFile(formData, "artworkImage");
     const artworkUpload = artwork

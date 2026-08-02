@@ -21,7 +21,7 @@ import { artistFormSchema, formValuesToDbColumns } from "./schema";
 export async function createArtist(
   siteParam: SiteSlug,
   formData: FormData,
-): Promise<EntityActionResult> {
+): Promise<EntityActionResult<"name">> {
   try {
     // 소속 사이트는 라우트 세그먼트에서 결정 — 서버측에서도 유효성 방어.
     const site = siteSlugSchema.parse(siteParam);
@@ -32,7 +32,12 @@ export async function createArtist(
 
     const slug = slugify(values.name);
     if (!slug) {
-      return { ok: false, error: "이름에서 slug를 만들 수 없습니다." };
+      // slug는 이름에서만 파생되므로 고칠 곳은 항상 name 필드다.
+      return {
+        ok: false,
+        error: "이름에서 slug를 만들 수 없습니다.",
+        field: "name",
+      };
     }
 
     // 아티스트명은 릴리즈·투어 표시에 쓰이므로 교차 엔티티 리스트 태그도 무효화(§13 🔴).
@@ -60,11 +65,16 @@ export async function createArtist(
       .select("id")
       .single();
     if (error) {
-      const message =
-        error.code === "23505"
-          ? `이 사이트에 slug "${slug}"가 이미 존재합니다(이름 중복).`
-          : error.message;
-      return { ok: false, error: message };
+      // 23505는 (site_slug, slug) 유니크 위반 = 이름 중복이라 name 필드에 귀속시킨다.
+      // 그 밖의 DB 오류는 고칠 필드를 특정할 수 없어 토스트로 남긴다.
+      if (error.code === "23505") {
+        return {
+          ok: false,
+          error: `이 사이트에 slug "${slug}"가 이미 존재합니다(이름 중복).`,
+          field: "name",
+        };
+      }
+      return { ok: false, error: error.message };
     }
     const id = data.id;
 

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 
 import type { EntityActionResult } from "@/lib/action-result";
@@ -10,11 +11,20 @@ import { UNSAVED_LEAVE_CONFIRM_MESSAGE } from "@/lib/unsaved-guard";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 
 /**
+ * 폼 제출 액션. 실패 시 실을 수 있는 field를 그 폼에 실제로 존재하는 이름으로
+ * 좁히는 게 목적이라 별칭으로 둔다(create/update 두 곳에서 같은 형태).
+ */
+type EntitySubmitAction<TValues extends FieldValues> = (
+  formData: FormData,
+) => Promise<EntityActionResult<FieldPath<TValues>>>;
+
+/**
  * Artist/Release/Tour 폼의 제출·이탈 처리(세 폼이 동일했던 부분만 모은다).
- * 엔티티별로 다른 건 FormData 조립·액션·문구뿐이라 그 셋만 파라미터로 받는다.
+ * 엔티티별로 다른 건 FormData 조립·액션·문구뿐이라 그것만 파라미터로 받는다.
  * 필드 정의·파일 상태 등 폼 고유 부분은 각 폼이 계속 소유한다.
  */
-export function useEntityFormSubmit<TValues>({
+export function useEntityFormSubmit<TValues extends FieldValues>({
+  form,
   mode,
   listHref,
   createdMessage,
@@ -23,6 +33,12 @@ export function useEntityFormSubmit<TValues>({
   create,
   update,
 }: {
+  /**
+   * RHF 인스턴스. 서버 오류의 필드 귀속(setError+setFocus)을 여기서 처리하려면
+   * 훅이 폼을 알아야 한다 — 콜백만 받으면 세 폼이 각자 같은 배선을 복제하게 되고
+   * 한쪽만 고쳐지는 표류가 생긴다. 필드 이름 타입도 이 인스턴스에서 파생된다.
+   */
+  form: UseFormReturn<TValues>;
   mode: "create" | "edit";
   /** 목록 경로. 성공 후 이동 및 부분 성공 시 편집 경로(`${listHref}/${id}`) 조립에 쓴다. */
   listHref: string;
@@ -31,8 +47,8 @@ export function useEntityFormSubmit<TValues>({
   /** RHF isDirty + 폼이 소유한 파일 상태를 합친 미저장 여부. */
   hasUnsaved: boolean;
   buildFormData: (values: TValues) => FormData;
-  create: (formData: FormData) => Promise<EntityActionResult>;
-  update: (formData: FormData) => Promise<EntityActionResult>;
+  create: EntitySubmitAction<TValues>;
+  update: EntitySubmitAction<TValues>;
 }) {
   const router = useRouter();
   // 목록의 검색·정렬 쿼리를 상세까지 실어온 것을 복귀 경로에 그대로 되돌려준다 —
@@ -68,6 +84,15 @@ export function useEntityFormSubmit<TValues>({
     }
     if (!result.ok) {
       setSubmitting(false);
+      // 필드를 특정할 수 있는 실패(slug 중복 등)는 사라지는 토스트 대신 그 필드에
+      // 붙인다 — 포커스 이동이 브라우저 기본 동작으로 스크롤까지 데려가므로
+      // 오류 필드가 화면 밖이어도 편집자가 바로 도달한다.
+      // 필드를 특정할 수 없는 실패(DB·네트워크 등)는 기존대로 토스트.
+      if (result.field) {
+        form.setError(result.field, { type: "server", message: result.error });
+        form.setFocus(result.field, { shouldSelect: true });
+        return;
+      }
       toast.error(result.error);
       return;
     }
