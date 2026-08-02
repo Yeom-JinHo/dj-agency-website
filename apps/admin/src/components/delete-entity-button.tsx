@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import type { EntityActionResult } from "@/lib/action-result";
+import { withSearch } from "@/lib/list-search";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,6 +35,8 @@ export function DeleteEntityButton({
   onDelete: () => Promise<EntityActionResult>;
 }) {
   const router = useRouter();
+  // 목록에서 실어온 검색·정렬 쿼리를 삭제 후 복귀 경로에 되돌려준다(폼 제출과 동일 규약).
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -54,7 +57,7 @@ export function DeleteEntityButton({
     }
     // 다이얼로그를 연 채 pending 유지 — 네비게이션 완료로 언마운트될 때까지
     // 삭제된 엔티티 화면이 재노출·재조작되는 걸 막는다.
-    router.push(listHref);
+    router.push(withSearch(listHref, searchParams));
     router.refresh();
   }
 
