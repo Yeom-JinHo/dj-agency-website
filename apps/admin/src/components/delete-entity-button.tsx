@@ -18,6 +18,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
+/** 삭제 실패 토스트는 수동 해제라 저절로 사라지지 않는다 — 같은 id로 덮어써서
+ *  재시도할 때마다 영구 토스트가 쌓이는 걸 막고, 성공 시 이 id로 거둔다. */
+const DELETE_ERROR_TOAST = "delete-entity-error";
+
 /**
  * 엔티티 삭제 — confirm 다이얼로그 후 실행(§8, Artist/Release/Tour 공용).
  * onDelete는 상세 페이지(서버 컴포넌트)에서 site·id를 bind한 서버 액션을 받는다.
@@ -46,12 +50,22 @@ export function DeleteEntityButton({
 
     if (!result.ok) {
       setDeleting(false);
-      toast.error(result.error);
+      // 실패는 자동으로 사라지면 안 된다 — 되돌릴 수 없는 작업의 결과이고, 4초 안에
+      // 우하단으로 시선을 옮기지 못한 사용자는 삭제됐는지조차 알 수 없게 된다.
+      toast.error(result.error, {
+        id: DELETE_ERROR_TOAST,
+        duration: Infinity,
+      });
       return;
     }
+    // 재시도로 성공한 경우 앞선 실패 토스트를 거둔다 — 수동 해제라 그냥 두면
+    // 성공 후에도 목록 화면에 실패 문구가 그대로 남는다.
+    toast.dismiss(DELETE_ERROR_TOAST);
     // 삭제는 성공했으나 사이트 반영(발행)만 실패한 경우 경고로 알린다(§4.3).
     if (result.warning) {
-      toast.warning(result.warning);
+      // 편집자가 직접 재발행해야 하는 사후 조치라 목록으로 이동한 뒤에도 남긴다.
+      // Toaster가 루트 레이아웃에 있어 클라이언트 네비게이션을 넘어 살아남는다.
+      toast.warning(result.warning, { duration: Infinity });
     } else {
       toast.success(`${entityLabel}를 삭제했습니다.`);
     }
