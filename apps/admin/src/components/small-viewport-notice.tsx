@@ -1,4 +1,6 @@
-import { Monitor } from "lucide-react";
+import Image from "next/image";
+
+import adminLogo from "@/assets/admin-logo.webp";
 
 /**
  * 좁은 뷰포트에서 앱 대신 표시하는 안내. admin은 데스크톱 전용이라
@@ -18,8 +20,22 @@ import { Monitor } from "lucide-react";
 export function SmallViewportNotice() {
   return (
     <div className="bg-background fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 p-6 text-center lg:hidden">
-      <Monitor className="text-muted-foreground size-10" aria-hidden />
-      <p className="text-base font-medium">더 큰 화면에서 열어주세요</p>
+      {/* 앱의 유일한 무맥락 전면 화면이었다 — 어느 앱인지(브랜드), 왜 막혔는지(임계값),
+          어떻게 하면 되는지(대안)를 로그인 카드와 같은 어휘(로고+제목)로 채운다. */}
+      <Image
+        src={adminLogo}
+        alt=""
+        aria-hidden
+        width={40}
+        height={40}
+        className="ring-border size-10 rounded-lg ring-1"
+      />
+      <div className="space-y-1">
+        <p className="text-base font-medium">더 큰 화면에서 열어주세요</p>
+        <p className="text-muted-foreground text-sm">
+          ye0m2 admin은 데스크톱 전용입니다. 1024px 이상 화면이 필요합니다.
+        </p>
+      </div>
     </div>
   );
 }
