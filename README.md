@@ -2,7 +2,7 @@
 
 # dj-agency-website
 
-Turborepo monorepo — three Next.js 15 sites + shared packages.
+Turborepo monorepo — four Next.js 15 sites + shared packages.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15-000?style=flat-square&logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-000?style=flat-square&logo=react)
@@ -10,7 +10,7 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 ![Turborepo](https://img.shields.io/badge/Turborepo-000?style=flat-square&logo=turborepo)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-000?style=flat-square&logo=tailwindcss)
 
-**Live** &nbsp;·&nbsp; [Vague Frequency Labs](https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme) &nbsp;·&nbsp; [Payday Records](https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme) &nbsp;·&nbsp; [Celebrate Agency](https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme)
+**Live** &nbsp;·&nbsp; [Vague Frequency Labs](https://vague-frequency-labs.vercel.app/?utm_source=github&utm_content=repo_readme) &nbsp;·&nbsp; [Payday Records](https://payday-records.vercel.app/?utm_source=github&utm_content=repo_readme) &nbsp;·&nbsp; [Celebrate Agency](https://celebrate-agency.vercel.app/?utm_source=github&utm_content=repo_readme) &nbsp;·&nbsp; [Juntaro](https://juntaroinyourarea.vercel.app/?utm_source=github&utm_content=repo_readme)
 
 </div>
 
@@ -62,13 +62,27 @@ Turborepo monorepo — three Next.js 15 sites + shared packages.
 
 </details>
 
+## [Juntaro](https://juntaroinyourarea.vercel.app/?utm_source=github&utm_content=repo_readme)
+
+<a href="https://juntaroinyourarea.vercel.app/?utm_source=github&utm_content=repo_readme">
+  <img src="docs/previews/juntaro.webp" alt="Juntaro homepage" />
+</a>
+
+<details>
+<summary><strong>Sections</strong> — Music · Tour</summary>
+
+![Juntaro — Music](docs/previews/juntaro-music.webp)
+![Juntaro — Tour](docs/previews/juntaro-tour.webp)
+
+</details>
+
 ---
 
 ## Dev
 
 ```sh
 pnpm install
-pnpm dev                                 # all apps (3002 / 3003 / 3004)
+pnpm dev                                 # all apps (3002 / 3003 / 3004 / 3005)
 pnpm dev --filter=vague-frequency-labs   # one app
 pnpm build | pnpm lint | pnpm check-types
 ```
