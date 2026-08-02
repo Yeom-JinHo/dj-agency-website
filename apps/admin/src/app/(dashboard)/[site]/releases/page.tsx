@@ -18,8 +18,8 @@ import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ReleasesTable, type ReleaseRow } from "./releases-table";
 
 // 제목 규약은 (dashboard)/page.tsx 주석 참고. 가운데 단은 화면의 h1 어휘("릴리즈")를 쓴다 —
-// 카드·브레드크럼의 CATEGORIES 라벨("뮤직")과 다르지만, 탭 제목은 눈앞의 제목과 같아야
-// 어나운스와 히스토리가 같은 말을 한다. params만 읽으므로 DB 조회는 늘지 않는다.
+// CATEGORIES 라벨도 릴리즈로 통일돼 내비·브레드크럼·탭 제목이 같은 말을 한다.
+// params만 읽으므로 DB 조회는 늘지 않는다.
 export async function generateMetadata({
   params,
 }: {

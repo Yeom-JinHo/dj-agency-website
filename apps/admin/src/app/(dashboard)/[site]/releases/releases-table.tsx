@@ -71,7 +71,8 @@ const columns: DataTableColumn<ReleaseRow>[] = [
   },
   {
     id: "sortOrder",
-    header: "정렬",
+    // 아티스트 목록·폼 라벨과 같은 말("정렬 순서") — 화면마다 다른 이름을 쓰지 않는다.
+    header: "정렬 순서",
     cellClassName: "text-muted-foreground tabular-nums",
     cell: (row) => row.sortOrder,
     sortValue: (row) => row.sortOrder,
