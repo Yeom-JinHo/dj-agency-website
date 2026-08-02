@@ -42,7 +42,7 @@ export function SocialsFieldArray() {
   return (
     <Card className="gap-4 py-4">
       <CardHeader>
-        <h2 className="text-sm font-medium">소셜</h2>
+        <h2 className="text-base font-semibold">소셜</h2>
         <CardAction>
           <Button
             type="button"
