@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { SITE_SLUGS } from "@repo/content/schema";
 
@@ -10,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
+import { isSiteSlug, SITE_ICONS, SITE_LABELS } from "@/lib/sites";
 import { confirmLeaveUnsaved } from "@/lib/unsaved-guard";
 
 /**
@@ -39,6 +40,14 @@ export function SiteSwitcher() {
       <SelectContent>
         {SITE_SLUGS.map((site) => (
           <SelectItem key={site} value={site}>
+            <Image
+              src={SITE_ICONS[site]}
+              alt=""
+              aria-hidden
+              width={16}
+              height={16}
+              className="ring-border size-4 shrink-0 rounded-[4px] ring-1"
+            />
             {SITE_LABELS[site]}
           </SelectItem>
         ))}

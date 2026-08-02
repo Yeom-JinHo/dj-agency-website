@@ -30,7 +30,7 @@ export function NavLinks() {
             className={cn(
               "rounded-md px-3 py-1.5 text-sm transition-colors",
               active
-                ? "bg-muted text-foreground font-medium"
+                ? "bg-muted text-primary font-medium"
                 : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
             )}
           >

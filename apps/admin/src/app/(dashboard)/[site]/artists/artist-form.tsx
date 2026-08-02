@@ -217,7 +217,7 @@ export function ArtistForm({
 
             <FormItem>
               <FormLabel>Slug</FormLabel>
-              <Input value={slugPreview} readOnly disabled />
+              <Input value={slugPreview} readOnly disabled className="font-mono" />
               <p className="text-muted-foreground text-xs">
                 {mode === "create"
                   ? "이름에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."

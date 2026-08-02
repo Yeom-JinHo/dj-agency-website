@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 
+import adminLogo from "@/assets/admin-logo.webp";
 import { GuardedLink } from "@/components/guarded-link";
 import { NavLinks } from "@/components/nav-links";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -52,8 +54,16 @@ export default async function DashboardLayout({
         <div className="flex items-center gap-4">
           <GuardedLink
             href="/"
-            className="text-sm font-semibold tracking-tight whitespace-nowrap"
+            className="flex items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap"
           >
+            <Image
+              src={adminLogo}
+              alt=""
+              aria-hidden
+              width={20}
+              height={20}
+              className="ring-border size-5 shrink-0 rounded-[4px] ring-1"
+            />
             ye0m2 admin
           </GuardedLink>
           <SiteSwitcher />

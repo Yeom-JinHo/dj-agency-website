@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SITE_SLUGS } from "@repo/content/schema";
 import {
@@ -7,7 +8,12 @@ import {
 } from "@repo/content/admin-queries";
 
 import { safeCount } from "@/lib/safe-count";
-import { CATEGORIES, SITE_LABELS, type CategorySegment } from "@/lib/sites";
+import {
+  CATEGORIES,
+  SITE_ICONS,
+  SITE_LABELS,
+  type CategorySegment,
+} from "@/lib/sites";
 
 // 인증 세션(쿠키)·비캐시 admin 카운트에 의존하므로 정적 프리렌더 제외.
 export const dynamic = "force-dynamic";
@@ -52,8 +58,18 @@ export default async function DashboardPage() {
               href={`/${site}`}
               className="hover:bg-muted/50 rounded-lg border p-5 transition-colors"
             >
-              <h2 className="text-base font-medium">{SITE_LABELS[site]}</h2>
-              <p className="text-muted-foreground mt-1 text-sm">{site}</p>
+              <h2 className="flex items-center gap-2 text-base font-medium">
+                <Image
+                  src={SITE_ICONS[site]}
+                  alt=""
+                  aria-hidden
+                  width={18}
+                  height={18}
+                  className="ring-border size-[18px] shrink-0 rounded-[4px] ring-1"
+                />
+                {SITE_LABELS[site]}
+              </h2>
+              <p className="text-muted-foreground mt-1 font-mono text-sm">{site}</p>
               {summary ? (
                 <p className="text-muted-foreground mt-3 text-xs tabular-nums">
                   {summary}

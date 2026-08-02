@@ -47,7 +47,7 @@ const columns: DataTableColumn<ArtistRow>[] = [
   {
     id: "slug",
     header: "Slug",
-    cellClassName: "text-muted-foreground",
+    cellClassName: "text-muted-foreground font-mono",
     cell: (row) => row.slug,
     sortValue: (row) => row.slug,
   },
