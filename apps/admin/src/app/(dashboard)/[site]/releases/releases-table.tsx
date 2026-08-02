@@ -2,7 +2,12 @@
 
 import Image from "next/image";
 
+import { CATEGORY_ICONS } from "@/components/category-icons";
 import { DataTable, type DataTableColumn } from "@/components/data-table";
+
+// 썸네일이 비었을 때 채울 아이콘. 사이드바·사이트 홈 카드가 쓰는 카테고리 아이콘을
+// 그대로 재사용해 "릴리즈 = 디스크"라는 대응이 화면마다 어긋나지 않게 한다.
+const ThumbIcon = CATEGORY_ICONS.releases;
 
 /**
  * 목록 셀에 쓰는 필드만 뽑은 직렬화 가능한 행. 날짜는 서버에서 KST로 포맷해
@@ -33,7 +38,10 @@ const columns: DataTableColumn<ReleaseRow>[] = [
             height={36}
             className="size-full object-cover"
           />
-        ) : null}
+        ) : (
+          // 이미지가 없으면 빈 회색 박스만 남아 "미등록"인지 "로딩 실패"인지 읽히지 않는다.
+          <ThumbIcon className="text-muted-foreground/60 size-4" aria-hidden />
+        )}
       </div>
     ),
   },
@@ -43,7 +51,7 @@ const columns: DataTableColumn<ReleaseRow>[] = [
     cellClassName: "font-medium",
     cell: (row) => row.title,
     sortValue: (row) => row.title,
-    stretched: true,
+    linked: true,
   },
   {
     id: "artist",
