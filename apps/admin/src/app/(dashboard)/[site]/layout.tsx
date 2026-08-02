@@ -19,8 +19,10 @@ export default async function SiteLayout({
   const { site } = await params;
   if (!isSiteSlug(site)) notFound();
 
+  // flex-1 — 부모 main(flex flex-col)의 남은 높이를 그대로 받아 사이드바 배경이
+  // 짧은 페이지에서도 뷰포트 바닥까지 이어진다(min-h-full은 %라 해석되지 않았다).
   return (
-    <div className="grid min-h-full grid-cols-[16rem_1fr]">
+    <div className="grid flex-1 grid-cols-[16rem_1fr]">
       <SiteSidebar site={site} />
       <div className="min-w-0 p-6">{children}</div>
     </div>
