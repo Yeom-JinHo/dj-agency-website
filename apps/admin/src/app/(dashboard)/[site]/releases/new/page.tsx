@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { adminListArtists } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
 
+import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { ReleaseForm } from "../release-form";
 import { emptyReleaseFormValues } from "../schema";
 
@@ -22,6 +23,7 @@ export default async function NewReleasePage({
 
   return (
     <div className="space-y-6">
+      <EntityBreadcrumb site={siteSlug} category="releases" current="새 릴리즈" />
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold tracking-tight">새 릴리즈</h1>
         <p className="text-muted-foreground text-sm">

@@ -4,6 +4,7 @@ import { adminGetTourById, adminListArtists } from "@repo/content/admin-queries"
 import { siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
+import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { TourForm } from "../tour-form";
 import { type TourFormValues } from "../schema";
 import { DeleteTourButton } from "../delete-tour-button";
@@ -49,6 +50,7 @@ export default async function EditTourPage({
 
   return (
     <div className="space-y-6">
+      <EntityBreadcrumb site={site} category="tours" current={tour.title} />
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">

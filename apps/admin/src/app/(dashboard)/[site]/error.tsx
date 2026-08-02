@@ -5,11 +5,12 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
 /**
- * (dashboard) 그룹 에러 바운더리 — 여기 두면 헤더(로고·로그아웃)는 살아있는 채
- * 본문만 교체돼 사용자가 스스로 복구할 수 있다. 사이트 사이드바가 있는 화면의
- * 오류는 [site]/error.tsx가 더 가까운 경계에서 잡아 사이드바를 유지한다.
+ * [site] 그룹 에러 바운더리 — 사이드바([site]/layout.tsx)를 유지한 채 콘텐츠
+ * 컬럼만 이 화면으로 교체한다((dashboard)/error.tsx는 사이드바가 없는 대시보드
+ * 홈 오류만 잡는다). 콘텐츠 컬럼은 grid stretch로 이미 전체 높이를 확보하므로
+ * min-h-[60vh] 대신 min-h-full로 그 안에서 중앙 정렬한다.
  */
-export default function DashboardError({
+export default function SiteError({
   error,
   reset,
 }: {
@@ -22,7 +23,7 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
+    <div className="flex min-h-full flex-col items-center justify-center gap-4 text-center">
       <div className="space-y-1">
         <h1 className="text-lg font-semibold">문제가 발생했습니다</h1>
         <p className="text-muted-foreground text-sm">

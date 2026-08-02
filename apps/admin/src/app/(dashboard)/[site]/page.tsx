@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Disc3, MapPin, Users, type LucideIcon } from "lucide-react";
 import {
   adminCountArtists,
   adminCountReleases,
   adminCountTours,
 } from "@repo/content/admin-queries";
 
+import { CATEGORY_ICONS } from "@/components/category-icons";
 import { safeCount } from "@/lib/safe-count";
 import {
   CATEGORIES,
@@ -17,14 +17,6 @@ import {
 
 // 인증 세션(쿠키)·비캐시 admin 카운트에 의존하므로 정적 프리렌더 제외.
 export const dynamic = "force-dynamic";
-
-// 카테고리 세그먼트 → 아이콘. lucide 의존을 라우트에 가둬 lib/sites(클라이언트
-// 컴포넌트도 소비)를 순수 데이터로 유지한다.
-const CATEGORY_ICONS: Record<CategorySegment, LucideIcon> = {
-  artists: Users,
-  releases: Disc3,
-  tours: MapPin,
-};
 
 // 사이트 홈(§8): 카테고리 3카드 → /[site]/artists 등.
 export default async function SiteHomePage({

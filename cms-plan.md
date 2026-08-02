@@ -425,8 +425,8 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
 
 - Next.js 15 앱, 포트 3006, `@repo/next-config`/`@repo/eslint-config`/`@repo/typescript-config` 사용.
 - **라우트 구조는 사이트-우선**: `/[site]/artists · /[site]/releases · /[site]/tours`.
-  대시보드(`/`)는 사이트 4카드, 각 사이트 홈은 카테고리 3카드. 헤더에 사이트 스위처 +
-  카테고리 내비(활성 강조). 엔티티 폼에서 "사이트 노출" UI는 없음 — 소속은 라우트 컨텍스트로
+  대시보드(`/`)는 사이트 4카드, 각 사이트 홈은 카테고리 3카드. `[site]` 하위는 사이드바
+  (헤드에 사이트 스위처, 카테고리 3종 nav·활성 강조)를 공유. 엔티티 폼에서 "사이트 노출" UI는 없음 — 소속은 라우트 컨텍스트로
   자동 결정되고, 정렬은 엔티티 `sort_order` 필드로 편집.
 - `middleware.ts`로 전체 라우트 인증 가드 → 미로그인 시 `/login`.
 - 초기 편집자는 **본인 1명**(`o1086291943@gmail.com`), Supabase Auth 콘솔에서 초대. 회원가입 UI 없음.

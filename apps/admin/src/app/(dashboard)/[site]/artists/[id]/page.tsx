@@ -4,6 +4,7 @@ import { siteSlugSchema } from "@repo/content/schema";
 import { adminGetArtistById } from "@repo/content/admin-queries";
 
 import { mediaUrl } from "@/lib/media";
+import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { ArtistForm } from "../artist-form";
 import { type ArtistFormValues } from "../schema";
 import { DeleteArtistButton } from "../delete-artist-button";
@@ -44,6 +45,7 @@ export default async function EditArtistPage({
 
   return (
     <div className="space-y-6">
+      <EntityBreadcrumb site={site} category="artists" current={artist.name} />
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight">
