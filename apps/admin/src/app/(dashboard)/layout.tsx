@@ -6,9 +6,7 @@ import { createServerSupabaseClient } from "@repo/content/supabase/server";
 
 import adminLogo from "@/assets/admin-logo.webp";
 import { GuardedLink } from "@/components/guarded-link";
-import { NavLinks } from "@/components/nav-links";
 import { SignOutButton } from "@/components/sign-out-button";
-import { SiteSwitcher } from "@/components/site-switcher";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 대상에서 제외한다 —
 // 빌드 타임에 서버 클라이언트를 호출하지 않는다.
@@ -49,26 +47,22 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-svh">
-      <header className="flex items-center justify-between border-b px-6 py-3">
-        <div className="flex items-center gap-4">
-          <GuardedLink
-            href="/"
-            className="flex items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap"
-          >
-            <Image
-              src={adminLogo}
-              alt=""
-              aria-hidden
-              width={20}
-              height={20}
-              className="ring-border size-5 shrink-0 rounded-[4px] ring-1"
-            />
-            ye0m2 admin
-          </GuardedLink>
-          <SiteSwitcher />
-          <NavLinks />
-        </div>
+    <div className="flex min-h-svh flex-col">
+      <header className="flex shrink-0 items-center justify-between border-b px-6 py-3">
+        <GuardedLink
+          href="/"
+          className="flex items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap"
+        >
+          <Image
+            src={adminLogo}
+            alt=""
+            aria-hidden
+            width={20}
+            height={20}
+            className="ring-border size-5 shrink-0 rounded-[4px] ring-1"
+          />
+          ye0m2 admin
+        </GuardedLink>
         <div className="flex items-center gap-3">
           {user.email ? (
             <span className="text-muted-foreground text-sm">{user.email}</span>
@@ -76,7 +70,10 @@ export default async function DashboardLayout({
           <SignOutButton action={signOut} />
         </div>
       </header>
-      <main className="p-6">{children}</main>
+      {/* 사이트 사이드바(§8)는 [site]/layout.tsx가 스스로 폭·패딩을 갖는다 —
+          여기서 p-6을 주면 사이드바가 topbar·좌측 끝에서 24px 띄워진다.
+          대신 사이드바 없는 페이지(대시보드 홈·로딩·404·에러)가 각자 패딩을 진다. */}
+      <main className="flex-1">{children}</main>
     </div>
   );
 }
