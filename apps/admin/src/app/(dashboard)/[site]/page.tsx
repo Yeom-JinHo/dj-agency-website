@@ -79,8 +79,8 @@ export default async function SiteHomePage({
           글리프 16px은 사이드바 nav와 같은 크기이고 nav의 active도 같은 인디고라,
           카드에서 고른 아이콘이 이동 후 nav에서 같은 무게·같은 색으로 다시 보인다.
           표면감·포커스 링은 대시보드 카드와 같은 처방 — 근거는 (dashboard)/page.tsx 주석. */}
-      {/* max-w-5xl — 대시보드 홈과 같은 캡. 근거는 (dashboard)/page.tsx 주석. */}
-      <div className="grid max-w-5xl gap-4 sm:grid-cols-3">
+      {/* max-w-6xl — 대시보드 홈과 같은 캡. 근거는 (dashboard)/page.tsx 주석. */}
+      <div className="grid max-w-6xl gap-4 sm:grid-cols-3">
         {CATEGORIES.map((category) => {
           const Icon = CATEGORY_ICONS[category.segment];
           const count = counts[category.segment];
