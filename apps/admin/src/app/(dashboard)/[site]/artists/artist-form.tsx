@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { PlusIcon, Trash2Icon } from "lucide-react";
@@ -18,9 +17,14 @@ import {
 } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
 import { SocialsFieldArray } from "@/components/socials-field-array";
+import {
+  EMPTY_IMAGE_FIELD,
+  ImageField,
+  isImageFieldDirty,
+  type ImageFieldValue,
+} from "@/components/image-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -44,55 +48,6 @@ interface ArtistFormProps {
   initialLogoUrl?: string | null;
 }
 
-/** 파일 선택 + 미리보기(업로드 전 클라이언트 표시, §4.4). */
-function ImageField({
-  label,
-  initialUrl,
-  file,
-  onFile,
-}: {
-  label: string;
-  initialUrl: string | null;
-  file: File | null;
-  onFile: (file: File | null) => void;
-}) {
-  const [preview, setPreview] = useState<string | null>(initialUrl);
-
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-          {preview ? (
-            <Image
-              src={preview}
-              alt={label}
-              width={80}
-              height={80}
-              unoptimized
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xs">이미지 없음</span>
-          )}
-        </div>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function ArtistForm({
   mode,
   site,
@@ -103,8 +58,8 @@ export function ArtistForm({
   initialLogoUrl = null,
 }: ArtistFormProps) {
   const listHref = `/${site}/artists`;
-  const [profileFile, setProfileFile] = useState<File | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [profile, setProfile] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
+  const [logo, setLogo] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
 
   const form = useForm<ArtistFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -121,14 +76,18 @@ export function ArtistForm({
     mode,
     listHref,
     createdMessage: "아티스트를 만들었습니다.",
-    // 파일 선택은 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
+    // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved:
-      form.formState.isDirty || profileFile !== null || logoFile !== null,
+      form.formState.isDirty ||
+      isImageFieldDirty(profile) ||
+      isImageFieldDirty(logo),
     buildFormData: (values: ArtistFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));
-      if (profileFile) fd.set("profileImage", profileFile);
-      if (logoFile) fd.set("logoImage", logoFile);
+      if (profile.file) fd.set("profileImage", profile.file);
+      if (profile.removed) fd.set("removeProfileImage", "1");
+      if (logo.file) fd.set("logoImage", logo.file);
+      if (logo.removed) fd.set("removeLogoImage", "1");
       return fd;
     },
     create: (fd) => createArtist(site, fd),
@@ -340,14 +299,14 @@ export function ArtistForm({
             <ImageField
               label="프로필 이미지"
               initialUrl={initialProfileUrl}
-              file={profileFile}
-              onFile={setProfileFile}
+              value={profile}
+              onChange={setProfile}
             />
             <ImageField
               label="로고 이미지"
               initialUrl={initialLogoUrl}
-              file={logoFile}
-              onFile={setLogoFile}
+              value={logo}
+              onChange={setLogo}
             />
           </CardContent>
         </Card>

@@ -11,6 +11,7 @@ import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
+  imageRemoved,
   removeImages,
   uploadEntityImage,
   validateImageFile,
@@ -178,11 +179,18 @@ export async function updateRelease(
         )
       : null;
 
+    // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
+    const removeArtwork =
+      !artwork && imageRemoved(formData, "removeArtworkImage");
+
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지.
     const imageColumns: Database["public"]["Tables"]["releases"]["Update"] = {};
     if (artworkUpload) {
       imageColumns.artwork_path = artworkUpload.path;
       imageColumns.artwork_placeholder = artworkUpload.placeholder;
+    } else if (removeArtwork) {
+      imageColumns.artwork_path = null;
+      imageColumns.artwork_placeholder = null;
     }
 
     // site_slug·slug는 update 대상에서 제외(불변) — columns에 둘 다 없음.
@@ -193,12 +201,11 @@ export async function updateRelease(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
-    // 교체된 이전 이미지 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
-    // 방금 올린 파일을 지우게 되므로 제외한다.
+    // 교체·제거된 이전 이미지 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
+    // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.
     const oldArtworkPath =
-      artworkUpload &&
-      existing.artwork_path &&
-      existing.artwork_path !== artworkUpload.path
+      (artworkUpload && existing.artwork_path !== artworkUpload.path) ||
+      removeArtwork
         ? existing.artwork_path
         : null;
     await removeImages(supabase, [oldArtworkPath]);

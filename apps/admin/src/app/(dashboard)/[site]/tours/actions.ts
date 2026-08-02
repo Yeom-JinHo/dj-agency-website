@@ -11,6 +11,7 @@ import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
+  imageRemoved,
   removeImages,
   uploadEntityImage,
   validateImageFile,
@@ -179,11 +180,17 @@ export async function updateTour(
         )
       : null;
 
+    // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
+    const removePoster = !poster && imageRemoved(formData, "removePosterImage");
+
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지.
     const imageColumns: Database["public"]["Tables"]["tours"]["Update"] = {};
     if (posterUpload) {
       imageColumns.poster_path = posterUpload.path;
       imageColumns.poster_placeholder = posterUpload.placeholder;
+    } else if (removePoster) {
+      imageColumns.poster_path = null;
+      imageColumns.poster_placeholder = null;
     }
 
     const { error } = await supabase
@@ -193,12 +200,11 @@ export async function updateTour(
       .eq("site_slug", site);
     if (error) return { ok: false, error: error.message };
 
-    // 교체된 이전 포스터 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
-    // 방금 올린 파일을 지우게 되므로 제외한다.
+    // 교체·제거된 이전 포스터 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
+    // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.
     const oldPosterPath =
-      posterUpload &&
-      existing.poster_path &&
-      existing.poster_path !== posterUpload.path
+      (posterUpload && existing.poster_path !== posterUpload.path) ||
+      removePoster
         ? existing.poster_path
         : null;
     await removeImages(supabase, [oldPosterPath]);

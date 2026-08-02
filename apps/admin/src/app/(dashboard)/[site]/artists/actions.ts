@@ -11,6 +11,7 @@ import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
   imageFile,
+  imageRemoved,
   removeImages,
   uploadEntityImage,
   validateImageFile,
@@ -169,14 +170,23 @@ export async function updateArtist(
         )
       : null;
 
+    // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
+    const removeProfile = !profile && imageRemoved(formData, "removeProfileImage");
+    const removeLogo = !logo && imageRemoved(formData, "removeLogoImage");
+
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지. site_slug·slug는 컬럼에서 제외(불변).
     const imageColumns: Database["public"]["Tables"]["artists"]["Update"] = {};
     if (profileUpload) {
       imageColumns.image_path = profileUpload.path;
       imageColumns.image_placeholder = profileUpload.placeholder;
+    } else if (removeProfile) {
+      imageColumns.image_path = null;
+      imageColumns.image_placeholder = null;
     }
     if (logoUpload) {
       imageColumns.logo_image_path = logoUpload.path;
+    } else if (removeLogo) {
+      imageColumns.logo_image_path = null;
     }
 
     const { error } = await supabase
@@ -185,18 +195,15 @@ export async function updateArtist(
       .eq("id", id);
     if (error) return { ok: false, error: error.message };
 
-    // 교체된 이전 이미지 삭제(best-effort). 새 경로와 동일하면(동일 콘텐츠 해시)
-    // 방금 올린 파일을 지우게 되므로 제외한다.
+    // 교체·제거된 이전 이미지 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
+    // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.
     const oldProfilePath =
-      profileUpload &&
-      existing.image_path &&
-      existing.image_path !== profileUpload.path
+      (profileUpload && existing.image_path !== profileUpload.path) ||
+      removeProfile
         ? existing.image_path
         : null;
     const oldLogoPath =
-      logoUpload &&
-      existing.logo_image_path &&
-      existing.logo_image_path !== logoUpload.path
+      (logoUpload && existing.logo_image_path !== logoUpload.path) || removeLogo
         ? existing.logo_image_path
         : null;
     await removeImages(supabase, [oldProfilePath, oldLogoPath]);

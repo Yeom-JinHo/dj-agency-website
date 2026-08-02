@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { TOUR_STATUSES, type SiteSlug } from "@repo/content/schema";
@@ -11,9 +10,14 @@ import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
+import {
+  EMPTY_IMAGE_FIELD,
+  ImageField,
+  isImageFieldDirty,
+  type ImageFieldValue,
+} from "@/components/image-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -74,55 +78,6 @@ interface TourFormProps {
   initialPosterUrl?: string | null;
 }
 
-/** 파일 선택 + 미리보기(업로드 전 클라이언트 표시, §4.4). */
-function ImageField({
-  label,
-  initialUrl,
-  file,
-  onFile,
-}: {
-  label: string;
-  initialUrl: string | null;
-  file: File | null;
-  onFile: (file: File | null) => void;
-}) {
-  const [preview, setPreview] = useState<string | null>(initialUrl);
-
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-          {preview ? (
-            <Image
-              src={preview}
-              alt={label}
-              width={80}
-              height={80}
-              unoptimized
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xs">No image</span>
-          )}
-        </div>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function TourForm({
   mode,
   site,
@@ -133,7 +88,7 @@ export function TourForm({
   artists,
   initialPosterUrl = null,
 }: TourFormProps) {
-  const [posterFile, setPosterFile] = useState<File | null>(null);
+  const [poster, setPoster] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
 
   const form = useForm<TourFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -156,8 +111,8 @@ export function TourForm({
     mode,
     listHref,
     createdMessage: "투어를 만들었습니다.",
-    // 파일 선택은 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
-    hasUnsaved: form.formState.isDirty || posterFile !== null,
+    // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
+    hasUnsaved: form.formState.isDirty || isImageFieldDirty(poster),
     buildFormData: (values: TourFormValues) => {
       const fd = new FormData();
       // datetime-local → ISO 변환은 여기(클라이언트)에서 — 브라우저 TZ 기준.
@@ -166,7 +121,8 @@ export function TourForm({
         eventDate: localInputToIso(values.eventDate),
       };
       fd.set("payload", JSON.stringify(payload));
-      if (posterFile) fd.set("posterImage", posterFile);
+      if (poster.file) fd.set("posterImage", poster.file);
+      if (poster.removed) fd.set("removePosterImage", "1");
       return fd;
     },
     create: (fd) => createTour(site, fd),
@@ -424,8 +380,8 @@ export function TourForm({
             <ImageField
               label="포스터 이미지"
               initialUrl={initialPosterUrl}
-              file={posterFile}
-              onFile={setPosterFile}
+              value={poster}
+              onChange={setPoster}
             />
           </CardContent>
         </Card>

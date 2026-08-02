@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { PLATFORM_LINK_KEYS, type SiteSlug } from "@repo/content/schema";
@@ -12,9 +11,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
 import { SocialsFieldArray } from "@/components/socials-field-array";
+import {
+  EMPTY_IMAGE_FIELD,
+  ImageField,
+  isImageFieldDirty,
+  type ImageFieldValue,
+} from "@/components/image-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -58,55 +62,6 @@ interface ReleaseFormProps {
   initialArtworkUrl?: string | null;
 }
 
-/** 파일 선택 + 미리보기(업로드 전 클라이언트 표시, §4.4). */
-function ImageField({
-  label,
-  initialUrl,
-  file,
-  onFile,
-}: {
-  label: string;
-  initialUrl: string | null;
-  file: File | null;
-  onFile: (file: File | null) => void;
-}) {
-  const [preview, setPreview] = useState<string | null>(initialUrl);
-
-  useEffect(() => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
-
-  return (
-    <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-          {preview ? (
-            <Image
-              src={preview}
-              alt={label}
-              width={80}
-              height={80}
-              unoptimized
-              className="size-full object-cover"
-            />
-          ) : (
-            <span className="text-muted-foreground text-xs">No image</span>
-          )}
-        </div>
-        <Input
-          type="file"
-          accept="image/*"
-          onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-        />
-      </div>
-    </div>
-  );
-}
-
 export function ReleaseForm({
   mode,
   site,
@@ -117,7 +72,7 @@ export function ReleaseForm({
   initialArtworkUrl = null,
 }: ReleaseFormProps) {
   const listHref = `/${site}/releases`;
-  const [artworkFile, setArtworkFile] = useState<File | null>(null);
+  const [artwork, setArtwork] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
 
   const form = useForm<ReleaseFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -132,12 +87,13 @@ export function ReleaseForm({
     mode,
     listHref,
     createdMessage: "릴리즈를 만들었습니다.",
-    // 파일 선택은 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
-    hasUnsaved: form.formState.isDirty || artworkFile !== null,
+    // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
+    hasUnsaved: form.formState.isDirty || isImageFieldDirty(artwork),
     buildFormData: (values: ReleaseFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));
-      if (artworkFile) fd.set("artworkImage", artworkFile);
+      if (artwork.file) fd.set("artworkImage", artwork.file);
+      if (artwork.removed) fd.set("removeArtworkImage", "1");
       return fd;
     },
     create: (fd) => createRelease(site, fd),
@@ -398,8 +354,8 @@ export function ReleaseForm({
             <ImageField
               label="아트워크 이미지"
               initialUrl={initialArtworkUrl}
-              file={artworkFile}
-              onFile={setArtworkFile}
+              value={artwork}
+              onChange={setArtwork}
             />
           </CardContent>
         </Card>
