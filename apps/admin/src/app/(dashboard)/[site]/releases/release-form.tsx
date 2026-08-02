@@ -108,7 +108,7 @@ export function ReleaseForm({
         {/* 기본 정보 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">기본 정보</h2>
+            <h2 className="text-base font-semibold">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -278,7 +278,7 @@ export function ReleaseForm({
         {/* 설명 (en/ko × short/full) */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">설명</h2>
+            <h2 className="text-base font-semibold">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -315,7 +315,7 @@ export function ReleaseForm({
         {/* Platform links (5개 확정 키) */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">플랫폼 링크</h2>
+            <h2 className="text-base font-semibold">플랫폼 링크</h2>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-3">
@@ -348,7 +348,7 @@ export function ReleaseForm({
         {/* 이미지 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">아트워크</h2>
+            <h2 className="text-base font-semibold">아트워크</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <ImageField

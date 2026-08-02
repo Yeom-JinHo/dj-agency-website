@@ -102,7 +102,7 @@ export function ArtistForm({
         {/* 기본 정보 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">기본 정보</h2>
+            <h2 className="text-base font-semibold">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -189,7 +189,7 @@ export function ArtistForm({
         {/* 설명 (en/ko × short/full) */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">설명</h2>
+            <h2 className="text-base font-semibold">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -225,7 +225,7 @@ export function ArtistForm({
         {/* Selected works (celebrate roster) */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">대표 작업</h2>
+            <h2 className="text-base font-semibold">대표 작업</h2>
             <CardAction>
               <Button
                 type="button"
@@ -293,7 +293,7 @@ export function ArtistForm({
         {/* 이미지 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">이미지</h2>
+            <h2 className="text-base font-semibold">이미지</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <ImageField

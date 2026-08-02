@@ -137,7 +137,7 @@ export function TourForm({
         {/* 기본 정보 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">기본 정보</h2>
+            <h2 className="text-base font-semibold">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -253,7 +253,7 @@ export function TourForm({
         {/* 일정 · 장소 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">일정 · 장소</h2>
+            <h2 className="text-base font-semibold">일정 · 장소</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -342,7 +342,7 @@ export function TourForm({
         {/* 설명 (en/ko) */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">설명</h2>
+            <h2 className="text-base font-semibold">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -374,7 +374,7 @@ export function TourForm({
         {/* 포스터 */}
         <Card className="gap-4 py-4">
           <CardHeader>
-            <h2 className="text-sm font-medium">포스터</h2>
+            <h2 className="text-base font-semibold">포스터</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <ImageField
