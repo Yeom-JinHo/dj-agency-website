@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
+import { confirmLeaveUnsaved } from "@/lib/unsaved-guard";
 
 /**
  * 헤더 사이트 스위처(§8). 현재 라우트 첫 세그먼트로 활성 사이트를 표시하고,
@@ -27,7 +28,10 @@ export function SiteSwitcher() {
   return (
     <Select
       value={current}
-      onValueChange={(site) => router.push(`/${site}`)}
+      onValueChange={(site) => {
+        if (!confirmLeaveUnsaved()) return;
+        router.push(`/${site}`);
+      }}
     >
       <SelectTrigger size="sm" className="w-[200px]" aria-label="사이트 선택">
         <SelectValue placeholder="사이트 선택" />

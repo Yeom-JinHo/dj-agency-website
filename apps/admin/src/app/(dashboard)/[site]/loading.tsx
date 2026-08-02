@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
 /**
- * [site] 하위 공용 로딩 폴백 — 카테고리 홈·목록·상세·새로 만들기 전부 커버.
- * 목록(테이블)과 폼 양쪽에 무난한 "헤더 + 행 목록" 골격 하나로 통일한다.
+ * [site] 하위 로딩 폴백 — 목록·카테고리 홈 전용이다([id]·new 같은 폼 라우트는
+ * FormLoadingSkeleton을 쓴다). 목록(테이블)에 맞춘 "헤더 + 행 목록" 골격.
  */
 export default function SiteLoading() {
   return (

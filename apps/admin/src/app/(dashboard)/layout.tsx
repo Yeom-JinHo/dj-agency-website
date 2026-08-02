@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
 
+import { GuardedLink } from "@/components/guarded-link";
 import { NavLinks } from "@/components/nav-links";
 import { SignOutButton } from "@/components/sign-out-button";
 import { SiteSwitcher } from "@/components/site-switcher";
@@ -50,12 +50,12 @@ export default async function DashboardLayout({
     <div className="min-h-svh">
       <header className="flex items-center justify-between border-b px-6 py-3">
         <div className="flex items-center gap-4">
-          <Link
+          <GuardedLink
             href="/"
             className="text-sm font-semibold tracking-tight whitespace-nowrap"
           >
             ye0m2 admin
-          </Link>
+          </GuardedLink>
           <SiteSwitcher />
           <NavLinks />
         </div>
