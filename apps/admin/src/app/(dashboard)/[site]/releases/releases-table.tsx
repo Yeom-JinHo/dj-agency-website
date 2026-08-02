@@ -100,6 +100,8 @@ export function ReleasesTable({
       rowHref={(row) => `${basePath}/${row.id}`}
       searchText={(row) => `${row.title} ${row.artist ?? ""}`}
       searchPlaceholder="제목·아티스트로 검색"
+      // 서버 기본 순서(admin-queries의 sort_order asc)를 헤더에 드러낸다.
+      defaultSort={{ id: "sortOrder", dir: "asc" }}
     />
   );
 }

@@ -70,12 +70,17 @@ export function DataTable<T extends { id: string }>({
   rowHref,
   searchText,
   searchPlaceholder,
+  defaultSort,
 }: {
   rows: T[];
   columns: DataTableColumn<T>[];
   rowHref: (row: T) => string;
   searchText: (row: T) => string;
   searchPlaceholder: string;
+  /** 정렬 미선택 상태에서 서버가 준 순서(예: sort_order asc). 지정하면 그 컬럼에
+   *  무채색 방향 화살표 + aria-sort로 "지금 이 순서다"를 알린다 — 이전엔 기본
+   *  정렬 기준이 시각·보조기기 어디에도 드러나지 않았다. */
+  defaultSort?: { id: string; dir: "asc" | "desc" };
 }) {
   // 입력값 자체는 nuqs가 동기로 돌려주므로 타이핑은 즉시 반영되고, 늦춰지는 건 URL 기록뿐이다.
   // debounce 대신 throttle: 타이핑 도중 행을 클릭해 이탈해도 마지막 URL 반영이 300ms 안에 끝나
@@ -170,7 +175,15 @@ export function DataTable<T extends { id: string }>({
   // 해제는 두 값을 null로 — clearOnDefault 기본값 덕에 URL에서 파라미터가 사라진다.
   function toggleSort(id: string) {
     if (sortId !== id) {
-      setSort({ sort: id, dir: "asc" });
+      // 기본 정렬 컬럼은 이미 그 방향으로 놓여 있다 — 첫 클릭이 같은 순서를
+      // 반복하지 않고 반대 방향부터 시작하게 한다.
+      const startDir =
+        !sortId && defaultSort?.id === id
+          ? defaultSort.dir === "asc"
+            ? "desc"
+            : "asc"
+          : "asc";
+      setSort({ sort: id, dir: startDir });
     } else if (sortDir === "asc") {
       setSort({ sort: id, dir: "desc" });
     } else {
@@ -226,26 +239,42 @@ export function DataTable<T extends { id: string }>({
               <TableRow>
                 {columns.map((column) => {
                   const active = sortId === column.id;
-                  const SortIcon = !active
-                    ? ChevronsUpDown
-                    : sortDir === "asc"
+                  // 정렬 미선택 시 서버 기본 순서를 대표하는 컬럼 — 명시 정렬(primary)과
+                  // 구분되는 무채색 화살표로 "지금 이 순서"만 알린다.
+                  const defaulted =
+                    !sortId && !!column.sortValue && defaultSort?.id === column.id;
+                  const defaultDir = defaultSort?.dir ?? "asc";
+                  const SortIcon = active
+                    ? sortDir === "asc"
                       ? ArrowUp
-                      : ArrowDown;
+                      : ArrowDown
+                    : defaulted
+                      ? defaultDir === "asc"
+                        ? ArrowUp
+                        : ArrowDown
+                      : ChevronsUpDown;
                   // 라벨은 현재 상태가 아니라 클릭 시 일어날 다음 동작을 읽어준다.
-                  const nextAction = !active
-                    ? "오름차순 정렬"
-                    : sortDir === "asc"
+                  // 기본 정렬 컬럼은 이미 그 방향이므로 첫 동작이 반대 방향이다(toggleSort 참고).
+                  const nextAction = active
+                    ? sortDir === "asc"
                       ? "내림차순 정렬"
-                      : "정렬 해제";
+                      : "정렬 해제"
+                    : defaulted && defaultDir === "asc"
+                      ? "내림차순 정렬"
+                      : "오름차순 정렬";
                   // 정렬 불가 컬럼은 aria-sort 자체를 달지 않는다("none"은
                   // "정렬 가능하지만 지금은 미정렬"이라는 뜻이라 오독을 만든다).
                   const ariaSort = !column.sortValue
                     ? undefined
-                    : !active
-                      ? "none"
-                      : sortDir === "asc"
+                    : active
+                      ? sortDir === "asc"
                         ? "ascending"
-                        : "descending";
+                        : "descending"
+                      : defaulted
+                        ? defaultDir === "asc"
+                          ? "ascending"
+                          : "descending"
+                        : "none";
                   return (
                     <TableHead
                       key={column.id}
