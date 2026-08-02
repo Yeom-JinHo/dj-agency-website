@@ -6,8 +6,10 @@ import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { z } from "zod";
 import { toast } from "sonner";
+import Image from "next/image";
 import { createBrowserSupabaseClient } from "@repo/content/supabase/client";
 
+import adminLogo from "@/assets/admin-logo.webp";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -66,13 +68,25 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-svh items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-6">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            ye0m2 admin
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            로그인 후 콘텐츠를 관리할 수 있습니다.
-          </p>
+        <div className="flex flex-col items-center gap-3">
+          {/* 헤더 로고(20px·rounded-[4px])와 같은 어휘(ring+rounded)를 40px로 확대.
+              반경은 같은 비율(4/20)을 유지해 8px — rounded-lg는 --radius(10px)라 비율이 어긋난다. */}
+          <Image
+            src={adminLogo}
+            alt=""
+            aria-hidden
+            width={40}
+            height={40}
+            className="ring-border size-10 shrink-0 rounded-[8px] ring-1"
+          />
+          <div className="space-y-1 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              ye0m2 admin
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              로그인 후 콘텐츠를 관리할 수 있습니다.
+            </p>
+          </div>
         </div>
 
         <Form {...form}>
