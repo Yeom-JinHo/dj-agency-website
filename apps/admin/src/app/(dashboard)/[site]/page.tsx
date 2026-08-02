@@ -1,7 +1,30 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Disc3, MapPin, Users, type LucideIcon } from "lucide-react";
+import {
+  adminCountArtists,
+  adminCountReleases,
+  adminCountTours,
+} from "@repo/content/admin-queries";
 
-import { CATEGORIES, isSiteSlug, SITE_LABELS } from "@/lib/sites";
+import { safeCount } from "@/lib/safe-count";
+import {
+  CATEGORIES,
+  isSiteSlug,
+  SITE_LABELS,
+  type CategorySegment,
+} from "@/lib/sites";
+
+// 인증 세션(쿠키)·비캐시 admin 카운트에 의존하므로 정적 프리렌더 제외.
+export const dynamic = "force-dynamic";
+
+// 카테고리 세그먼트 → 아이콘. lucide 의존을 라우트에 가둬 lib/sites(클라이언트
+// 컴포넌트도 소비)를 순수 데이터로 유지한다.
+const CATEGORY_ICONS: Record<CategorySegment, LucideIcon> = {
+  artists: Users,
+  releases: Disc3,
+  tours: MapPin,
+};
 
 // 사이트 홈(§8): 카테고리 3카드 → /[site]/artists 등.
 export default async function SiteHomePage({
@@ -11,6 +34,17 @@ export default async function SiteHomePage({
 }) {
   const { site } = await params;
   if (!isSiteSlug(site)) notFound();
+
+  const [artists, releases, tours] = await Promise.all([
+    safeCount(adminCountArtists(site)),
+    safeCount(adminCountReleases(site)),
+    safeCount(adminCountTours(site)),
+  ]);
+  const counts: Record<CategorySegment, number | null> = {
+    artists,
+    releases,
+    tours,
+  };
 
   return (
     <div className="space-y-6">
@@ -24,15 +58,30 @@ export default async function SiteHomePage({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        {CATEGORIES.map((category) => (
-          <Link
-            key={category.segment}
-            href={`/${site}/${category.segment}`}
-            className="hover:bg-muted/50 rounded-lg border p-5 transition-colors"
-          >
-            <h2 className="text-base font-medium">{category.label}</h2>
-          </Link>
-        ))}
+        {CATEGORIES.map((category) => {
+          const Icon = CATEGORY_ICONS[category.segment];
+          const count = counts[category.segment];
+          return (
+            <Link
+              key={category.segment}
+              href={`/${site}/${category.segment}`}
+              className="hover:bg-muted/50 flex items-center gap-4 rounded-lg border p-5 transition-colors"
+            >
+              <div className="bg-muted text-muted-foreground flex size-10 shrink-0 items-center justify-center rounded-md">
+                <Icon className="size-5" aria-hidden />
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-base font-medium">{category.label}</h2>
+                {count !== null ? (
+                  // 분류사가 엔티티마다 달라(명/개/회) postfix 없이 숫자만 — 대시보드 홈 표기와 통일.
+                  <p className="text-muted-foreground mt-0.5 text-sm tabular-nums">
+                    {count}
+                  </p>
+                ) : null}
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

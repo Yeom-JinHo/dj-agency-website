@@ -17,6 +17,8 @@ export default function DashboardLoading() {
           <div key={i} className="space-y-2 rounded-lg border p-5">
             <Skeleton className="h-5 w-28" />
             <Skeleton className="h-4 w-36" />
+            {/* 카드 3번째 줄 = 엔티티 카운트 요약. */}
+            <Skeleton className="h-3 w-32" />
           </div>
         ))}
       </div>

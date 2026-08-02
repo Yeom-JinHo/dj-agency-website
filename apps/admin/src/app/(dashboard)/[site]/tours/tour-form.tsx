@@ -11,6 +11,7 @@ import { TOUR_STATUSES, type SiteSlug } from "@repo/content/schema";
 import { slugify } from "@/lib/media";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -219,241 +220,258 @@ export function TourForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
         {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. */}
-        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-8">
+        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-6">
         {/* 기본 정보 */}
-        <section className="space-y-4">
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>제목</FormLabel>
-                <FormControl>
-                  <Input placeholder="투어 제목" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormItem>
-            <FormLabel>Slug</FormLabel>
-            <Input value={slugPreview} readOnly disabled />
-            <p className="text-muted-foreground text-xs">
-              {mode === "create"
-                ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
-                : "slug는 생성 후 변경할 수 없습니다."}
-            </p>
-          </FormItem>
-
-          <FormField
-            control={form.control}
-            name="artistId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>아티스트</FormLabel>
-                <Select
-                  value={field.value ? field.value : NO_ARTIST}
-                  onValueChange={(v) =>
-                    field.onChange(v === NO_ARTIST ? "" : v)
-                  }
-                >
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">기본 정보</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>제목</FormLabel>
                   <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="아티스트 없음" />
-                    </SelectTrigger>
+                    <Input placeholder="투어 제목" {...field} />
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value={NO_ARTIST}>아티스트 없음</SelectItem>
-                    {artists.map((artist) => (
-                      <SelectItem key={artist.id} value={artist.id}>
-                        {artist.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>상태</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {TOUR_STATUSES.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {STATUS_LABELS[status]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormItem>
+              <FormLabel>Slug</FormLabel>
+              <Input value={slugPreview} readOnly disabled />
+              <p className="text-muted-foreground text-xs">
+                {mode === "create"
+                  ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
+                  : "slug는 생성 후 변경할 수 없습니다."}
+              </p>
+            </FormItem>
 
-          <FormField
-            control={form.control}
-            name="sortOrder"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>정렬 순서</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={0}
-                    className="w-32"
-                    name={field.name}
-                    ref={field.ref}
-                    onBlur={field.onBlur}
-                    value={field.value}
-                    onChange={(e) =>
-                      field.onChange(Number(e.target.value) || 0)
+            <FormField
+              control={form.control}
+              name="artistId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>아티스트</FormLabel>
+                  <Select
+                    value={field.value ? field.value : NO_ARTIST}
+                    onValueChange={(v) =>
+                      field.onChange(v === NO_ARTIST ? "" : v)
                     }
-                  />
-                </FormControl>
-                <p className="text-muted-foreground text-xs">
-                  사이트에서 노출되는 순서(작을수록 먼저).
-                </p>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </section>
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="아티스트 없음" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value={NO_ARTIST}>아티스트 없음</SelectItem>
+                      {artists.map((artist) => (
+                        <SelectItem key={artist.id} value={artist.id}>
+                          {artist.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>상태</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {TOUR_STATUSES.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {STATUS_LABELS[status]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="sortOrder"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>정렬 순서</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      className="w-32"
+                      name={field.name}
+                      ref={field.ref}
+                      onBlur={field.onBlur}
+                      value={field.value}
+                      onChange={(e) =>
+                        field.onChange(Number(e.target.value) || 0)
+                      }
+                    />
+                  </FormControl>
+                  <p className="text-muted-foreground text-xs">
+                    사이트에서 노출되는 순서(작을수록 먼저).
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CardContent>
+        </Card>
 
         {/* 일정 · 장소 */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">일정 · 장소</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="eventDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>공연 일시</FormLabel>
-                  <FormControl>
-                    <Input type="datetime-local" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="doorTime"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>도어 오픈</FormLabel>
-                  <FormControl>
-                    <Input placeholder="10PM" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="venue"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>장소</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>도시</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Seoul" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>국가</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="ticketUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>티켓 URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://…" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </section>
-
-        {/* 설명 (en/ko) */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">설명</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {(
-              [
-                ["descriptionEn", "설명 (EN)"],
-                ["descriptionKo", "설명 (KO)"],
-              ] as const
-            ).map(([name, label]) => (
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">일정 · 장소</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
-                key={name}
                 control={form.control}
-                name={name}
+                name="eventDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel>공연 일시</FormLabel>
                     <FormControl>
-                      <Textarea rows={4} {...field} />
+                      <Input type="datetime-local" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            ))}
-          </div>
-        </section>
+              <FormField
+                control={form.control}
+                name="doorTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>도어 오픈</FormLabel>
+                    <FormControl>
+                      <Input placeholder="10PM" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="venue"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>장소</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>도시</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Seoul" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>국가</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="ticketUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>티켓 URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://…" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 설명 (en/ko) */}
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">설명</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {(
+                [
+                  ["descriptionEn", "설명 (EN)"],
+                  ["descriptionKo", "설명 (KO)"],
+                ] as const
+              ).map(([name, label]) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{label}</FormLabel>
+                      <FormControl>
+                        <Textarea rows={4} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* 포스터 */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-medium">포스터</h2>
-          <ImageField
-            label="포스터 이미지"
-            initialUrl={initialPosterUrl}
-            file={posterFile}
-            onFile={setPosterFile}
-          />
-        </section>
+        <Card className="gap-4 py-4">
+          <CardHeader>
+            <h2 className="text-sm font-medium">포스터</h2>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ImageField
+              label="포스터 이미지"
+              initialUrl={initialPosterUrl}
+              file={posterFile}
+              onFile={setPosterFile}
+            />
+          </CardContent>
+        </Card>
 
         <FormActions>
           <Button type="submit" disabled={submitting}>

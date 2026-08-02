@@ -48,6 +48,41 @@ export async function adminListTours(siteSlug: SiteSlug): Promise<Tour[]> {
   return (data ?? []).map(mapTour);
 }
 
+/**
+ * 개수만 필요한 화면(대시보드 사이트 카드·사이트 홈 카테고리 카드)용 카운트 3종.
+ * `head: true`라 행 본문을 전혀 전송하지 않는다 — 목록 함수를 불러 length를 세는
+ * 대안은 4개 사이트 × 3엔티티 전량을 실어 나르게 되므로 배제.
+ */
+export async function adminCountArtists(siteSlug: SiteSlug): Promise<number> {
+  const supabase = await createServerSupabaseClient();
+  const { count, error } = await supabase
+    .from("artists")
+    .select("*", { count: "exact", head: true })
+    .eq("site_slug", siteSlug);
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export async function adminCountReleases(siteSlug: SiteSlug): Promise<number> {
+  const supabase = await createServerSupabaseClient();
+  const { count, error } = await supabase
+    .from("releases")
+    .select("*", { count: "exact", head: true })
+    .eq("site_slug", siteSlug);
+  if (error) throw error;
+  return count ?? 0;
+}
+
+export async function adminCountTours(siteSlug: SiteSlug): Promise<number> {
+  const supabase = await createServerSupabaseClient();
+  const { count, error } = await supabase
+    .from("tours")
+    .select("*", { count: "exact", head: true })
+    .eq("site_slug", siteSlug);
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function adminGetArtistById(id: string): Promise<Artist | null> {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase

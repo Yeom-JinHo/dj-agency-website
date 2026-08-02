@@ -11,6 +11,8 @@ export default function SiteLoading() {
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-9 w-28" />
       </div>
+      {/* 목록의 검색창 자리 — 폴백에서 테이블만 그리면 로드 후 위로 밀린다. */}
+      <Skeleton className="h-9 w-64" />
       <div className="rounded-md border">
         <div className="border-b px-4 py-3">
           <Skeleton className="h-4 w-full max-w-md" />
