@@ -41,8 +41,13 @@ export function SocialsFieldArray() {
 
   return (
     <Card className="gap-4 py-4">
-      <CardHeader>
-        <h2 className="text-base font-semibold">소셜</h2>
+      {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
+          한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
+          한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
+          카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
+          한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
+      <CardHeader className="border-b">
+        <h2 className="text-lg font-semibold">소셜</h2>
         <CardAction>
           <Button
             type="button"

@@ -47,6 +47,9 @@ export function ImageField({
   onChange: (value: ImageFieldValue) => void;
 }) {
   const inputId = useId();
+  // 형식·용량 제한은 없으면 올바르게 고를 수 없는 규칙이라 input에 aria-describedby로
+  // 묶는다. RHF 필드가 아니라 FormDescription을 쓸 수 없어 id를 직접 만든다.
+  const hintId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const file = value.file;
@@ -71,9 +74,13 @@ export function ImageField({
       onChange({ file: null, removed: value.removed });
       return;
     }
+    // 거부 토스트는 수동 해제(sonner 기본 4초 미적용) — 허용 형식·초과 용량 같은 값은
+    // 다시 정확히 읽어야 고칠 수 있는데, 토스트는 Tab으로 도달할 수 없어 화면을 확대해
+    // 쓰는 편집자는 시야에 넣기 전에 사라진다(WCAG 2.2.1).
     if (!(ALLOWED_IMAGE_MIME as readonly string[]).includes(next.type)) {
       toast.error(
         `지원하지 않는 형식입니다(${next.type || "unknown"}). ${ALLOWED_IMAGE_LABEL}만 올릴 수 있습니다.`,
+        { duration: Infinity },
       );
       resetInput();
       return;
@@ -81,6 +88,7 @@ export function ImageField({
     if (next.size > MAX_UPLOAD_BYTES) {
       toast.error(
         `이미지가 너무 큽니다(${(next.size / 1024 / 1024).toFixed(1)}MB). ${MAX_UPLOAD_MB}MB 이하만 올릴 수 있습니다.`,
+        { duration: Infinity },
       );
       resetInput();
       return;
@@ -108,7 +116,11 @@ export function ImageField({
               className="size-full object-cover"
             />
           ) : (
-            <span className="text-muted-foreground text-xs">이미지 없음</span>
+            /* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
+               (흰 배경 위 4.73:1이 배경이 bg-muted #F5F5F5로 바뀌며 뒤집힌다).
+               foreground 60%는 합성색 #686868 → 4.65:1로 통과하면서 본문 톤까지
+               올라가지는 않아 플레이스홀더의 위계를 유지한다. */
+            <span className="text-foreground/60 text-xs">이미지 없음</span>
           )}
         </div>
         <div className="min-w-0 flex-1 space-y-1">
@@ -118,6 +130,7 @@ export function ImageField({
               ref={inputRef}
               type="file"
               accept={ALLOWED_IMAGE_MIME.join(",")}
+              aria-describedby={hintId}
               onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
             />
             {value.removed ? (
@@ -145,7 +158,7 @@ export function ImageField({
               </Button>
             ) : null}
           </div>
-          <p className="text-muted-foreground text-xs">
+          <p id={hintId} className="text-muted-foreground text-xs">
             {ALLOWED_IMAGE_LABEL} · 최대 {MAX_UPLOAD_MB}MB
           </p>
         </div>

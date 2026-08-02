@@ -53,7 +53,7 @@ const useFormField = () => {
     throw new Error("useFormField should be used within <FormField>")
   }
 
-  const { id } = itemContext
+  const { id, hasDescription, setHasDescription } = itemContext
 
   return {
     id,
@@ -61,12 +61,21 @@ const useFormField = () => {
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
     formMessageId: `${id}-form-item-message`,
+    hasDescription,
+    setHasDescription,
     ...fieldState,
   }
 }
 
 type FormItemContextValue = {
   id: string
+  /**
+   * 이 필드에 FormDescription이 실제로 렌더됐는지. FormControl이 설명 id를
+   * 무조건 참조하면 설명 없는 필드는 존재하지 않는 요소를 가리키게 되고,
+   * 그 끊어진 IDREF는 스크린리더에서 aria-describedby 전체를 무의미하게 만든다.
+   */
+  hasDescription: boolean
+  setHasDescription: (value: boolean) => void
 }
 
 const FormItemContext = React.createContext<FormItemContextValue>(
@@ -75,9 +84,18 @@ const FormItemContext = React.createContext<FormItemContextValue>(
 
 function FormItem({ className, ...props }: React.ComponentProps<"div">) {
   const id = React.useId()
+  // 설명 유무를 children 검사로 알아내면 FormControl/FormMessage를 감싸는 div
+  // 같은 중첩 배치(release-form의 플랫폼 링크)에서 놓친다. FormDescription이
+  // 마운트하며 스스로 등록하게 두면 배치와 무관하게 정확하다 — 대가는 설명이
+  // 있는 필드에서 마운트 직후 1회 추가 렌더뿐이다.
+  const [hasDescription, setHasDescription] = React.useState(false)
+  const value = React.useMemo(
+    () => ({ id, hasDescription, setHasDescription }),
+    [id, hasDescription]
+  )
 
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={value}>
       <div
         data-slot="form-item"
         className={cn("grid gap-2", className)}
@@ -105,17 +123,26 @@ function FormLabel({
 }
 
 function FormControl({ ...props }: React.ComponentProps<typeof Slot.Root>) {
-  const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
+  const {
+    error,
+    formItemId,
+    formDescriptionId,
+    formMessageId,
+    hasDescription,
+  } = useFormField()
+
+  // 실제로 렌더된 요소만 참조한다 — 원본은 설명 id를 무조건 붙여 대부분의 필드가
+  // 끊어진 IDREF를 갖고 있었다. 참조할 게 없으면 속성 자체를 생략한다.
+  const describedBy =
+    [hasDescription ? formDescriptionId : null, error ? formMessageId : null]
+      .filter(Boolean)
+      .join(" ") || undefined
 
   return (
     <Slot.Root
       data-slot="form-control"
       id={formItemId}
-      aria-describedby={
-        !error
-          ? `${formDescriptionId}`
-          : `${formDescriptionId} ${formMessageId}`
-      }
+      aria-describedby={describedBy}
       aria-invalid={!!error}
       {...props}
     />
@@ -123,7 +150,13 @@ function FormControl({ ...props }: React.ComponentProps<typeof Slot.Root>) {
 }
 
 function FormDescription({ className, ...props }: React.ComponentProps<"p">) {
-  const { formDescriptionId } = useFormField()
+  const { formDescriptionId, setHasDescription } = useFormField()
+
+  // 조건부로 걸리거나 언마운트되는 설명도 있을 수 있으니 cleanup에서 되돌린다.
+  React.useEffect(() => {
+    setHasDescription(true)
+    return () => setHasDescription(false)
+  }, [setHasDescription])
 
   return (
     <p
