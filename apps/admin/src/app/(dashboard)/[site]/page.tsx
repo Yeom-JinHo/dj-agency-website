@@ -64,12 +64,21 @@ export default async function SiteHomePage({
               </div>
               <div className="min-w-0">
                 <h2 className="text-base font-medium">{category.label}</h2>
-                {count !== null ? (
-                  // 분류사가 엔티티마다 달라(명/개/회) postfix 없이 숫자만 — 대시보드 홈 표기와 통일.
-                  <p className="text-muted-foreground mt-0.5 text-sm tabular-nums">
-                    {count}
-                  </p>
-                ) : null}
+                <p className="text-muted-foreground mt-0.5 text-sm tabular-nums">
+                  {count === null ? (
+                    // 분류사가 엔티티마다 달라(명/개/회) postfix 없이 숫자만.
+                    // 조회 실패는 —로 채운다 — 대시보드 홈과 실패 표기 규칙을 통일.
+                    // aria-label은 role 없는 span에선 무시될 수 있어 sr-only 텍스트로 전달한다.
+                    <span title="카운트를 불러오지 못했습니다">
+                      <span aria-hidden>—</span>
+                      <span className="sr-only">
+                        {category.label} 카운트를 불러오지 못했습니다
+                      </span>
+                    </span>
+                  ) : (
+                    count
+                  )}
+                </p>
               </div>
             </Link>
           );

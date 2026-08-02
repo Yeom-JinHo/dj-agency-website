@@ -34,9 +34,16 @@ export default async function DashboardPage() {
         tours,
       };
       // 라벨은 CATEGORIES 단일 출처 — 사이트 홈 카드와 같은 표기를 쓴다.
-      return CATEGORIES.filter(({ segment }) => bySegment[segment] !== null)
-        .map(({ segment, label }) => `${label} ${bySegment[segment]}`)
-        .join(" · ");
+      // 조회 실패(null)를 필터링해 숨기지 않는다 — "원래 카운트 없음"과 구분이 안 되기 때문.
+      // site를 함께 담아 렌더에서 인덱스로 되찾지 않는다(짝이 어긋날 여지를 없앤다).
+      return {
+        site,
+        counts: CATEGORIES.map(({ segment, label }) => ({
+          segment,
+          label,
+          count: bySegment[segment],
+        })),
+      };
     }),
   );
 
@@ -50,8 +57,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {SITE_SLUGS.map((site, index) => {
-          const summary = summaries[index];
+        {summaries.map(({ site, counts }) => {
           return (
             <Link
               key={site}
@@ -70,11 +76,26 @@ export default async function DashboardPage() {
                 {SITE_LABELS[site]}
               </h2>
               <p className="text-muted-foreground mt-1 font-mono text-sm">{site}</p>
-              {summary ? (
-                <p className="text-muted-foreground mt-3 text-xs tabular-nums">
-                  {summary}
-                </p>
-              ) : null}
+              <p className="text-muted-foreground mt-3 text-xs tabular-nums">
+                {counts.map(({ segment, label, count }, i) => (
+                  <span key={segment}>
+                    {i > 0 ? " · " : ""}
+                    {label}{" "}
+                    {count === null ? (
+                      // 조회 실패는 —로 채워 자리를 남긴다. 빈 자리는 "원래 카운트 없음"으로 오독된다.
+                      // aria-label은 role 없는 span에선 무시될 수 있어 sr-only 텍스트로 전달한다.
+                      <span title="카운트를 불러오지 못했습니다">
+                        <span aria-hidden>—</span>
+                        <span className="sr-only">
+                          {label} 카운트를 불러오지 못했습니다
+                        </span>
+                      </span>
+                    ) : (
+                      count
+                    )}
+                  </span>
+                ))}
+              </p>
             </Link>
           );
         })}
