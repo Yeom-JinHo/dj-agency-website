@@ -146,6 +146,10 @@ export function ImageField({
               accept={ALLOWED_IMAGE_MIME.join(",")}
               aria-describedby={hintId}
               onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
+              // 네이티브 파일 버튼("파일 선택")이 무스타일로 노출돼 정돈된 폼 안에서
+              // 이질적이었다 — file: 수식어로 secondary 버튼 어휘를 입힌다(교체가
+              // 아니라 스타일링이라 키보드·폼 동작은 네이티브 그대로다).
+              className="file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80 py-0 file:mr-3 file:h-full file:rounded-none file:rounded-l-md file:border-0 file:px-3 file:transition-colors"
             />
             {value.removed ? (
               <Button
