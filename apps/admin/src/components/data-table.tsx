@@ -1,8 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Search } from "lucide-react";
 import {
   parseAsString,
@@ -28,7 +34,7 @@ import {
 
 /**
  * 목록 테이블의 컬럼 정의. `sortValue`가 있는 컬럼만 헤더 클릭 정렬이 켜지고,
- * `stretched`는 행 전체를 덮는 링크를 그 셀에 넣는다(행당 하나).
+ * `linked`는 상세로 가는 실제 링크를 그 셀에 넣는다(행당 하나 — 행의 접근 가능한 진입점).
  */
 export type DataTableColumn<T> = {
   id: string;
@@ -37,7 +43,7 @@ export type DataTableColumn<T> = {
   cellClassName?: string;
   cell: (row: T) => ReactNode;
   sortValue?: (row: T) => string | number;
-  stretched?: boolean;
+  linked?: boolean;
 };
 
 const SORT_DIRS = ["asc", "desc"] as const;
@@ -92,6 +98,7 @@ export function DataTable<T extends { id: string }>({
   // 행 링크에 실을 쿼리. 위 세 값을 다시 조립하지 않고 URL을 통째로 옮긴다 —
   // 나중에 파라미터가 늘어도 따라오고, nuqs가 쓴 URL이 곧 상세로 넘길 진실이다.
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -139,6 +146,26 @@ export function DataTable<T extends { id: string }>({
     }, 500);
     return () => clearTimeout(timer);
   }, [trimmedQuery, resultCount]);
+
+  /**
+   * 행 아무 데나 클릭하면 상세로 가는 편의 동선.
+   * 예전에는 제목 셀 링크를 `after:inset-0`로 늘려 행 전체를 덮었는데, 그러면 링크가
+   * slug·날짜 텍스트 위에 깔려 드래그 복사가 아예 되지 않고 행 안에 다른 조작(삭제·선택)을
+   * 넣을 자리도 없었다. 그래서 진짜 <Link>는 제목 셀에만 두고(포커스·Enter·수식키 클릭·
+   * 우클릭 새 탭이 전부 브라우저 기본 동작으로 남는다) 나머지 영역만 여기서 처리한다.
+   */
+  function handleRowClick(e: MouseEvent<HTMLTableRowElement>, row: T) {
+    // 수식키 클릭은 새 탭·새 창을 여는 의도다 — GuardedLink와 같은 어휘로 비켜준다.
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    // 자체 동작이 있는 요소(제목 셀 링크 등)는 그쪽에 맡긴다 — 이중 이동 방지.
+    if ((e.target as HTMLElement).closest("a,button,input,label,select")) return;
+    // 드래그로 텍스트를 고른 뒤의 mouseup도 click으로 도착한다. 선택이 남아 있으면
+    // 이동하지 않는다 — 복사하려던 순간 페이지가 바뀌면 덮개를 걷어낸 의미가 없다.
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) return;
+    // 링크와 같은 경로로 보낸다(검색·정렬 쿼리를 상세까지 실어 나르는 동작 유지).
+    router.push(withSearch(rowHref(row), searchParams));
+  }
 
   // 오름차순 → 내림차순 → 해제 3단 순환. sort_order가 실제 사이트 노출 순서라
   // 정렬을 걸어본 뒤 원래 순서로 돌아올 수단이 반드시 있어야 한다.
@@ -253,14 +280,19 @@ export function DataTable<T extends { id: string }>({
               {visible.map((row) => (
                 <TableRow
                   key={row.id}
-                  className={cn("relative cursor-pointer", rowClassName?.(row))}
+                  // 행 전체가 여전히 클릭 가능하므로 포인터 커서는 유지한다. 텍스트 위에서
+                  // 커서가 I빔으로 바뀌지 않아도 드래그 선택 자체는 그대로 된다.
+                  className={cn("cursor-pointer", rowClassName?.(row))}
+                  onClick={(e) => handleRowClick(e, row)}
                 >
                   {columns.map((column) => (
                     <TableCell key={column.id} className={column.cellClassName}>
-                      {column.stretched ? (
+                      {column.linked ? (
+                        // 히트 영역이 셀로 줄었으니 포커스 링도 링크 크기로 좁힌다
+                        // (헤더 정렬 버튼과 같은 링 어휘).
                         <Link
                           href={withSearch(rowHref(row), searchParams)}
-                          className="after:absolute after:inset-0"
+                          className="focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-[3px]"
                         >
                           {column.cell(row)}
                         </Link>
