@@ -85,7 +85,10 @@ export default async function DashboardPage() {
           포커스 링: p-5의 큰 히트 영역인데 링이 없어 브라우저 기본 1px 아웃라인으로 떨어졌다.
           키보드 사용자가 매 세션 처음 만나는 화면이라 앱 공통 어휘(button.tsx·data-table.tsx와
           같은 ring-ring/50 + ring-[3px])를 인라인으로 맞춘다. */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* max-w-5xl — 초광폭에서 카드가 화면 끝까지 늘어나 내용(아이콘+2줄) 대비
+          과도하게 헐거워졌다. 목록 테이블은 콘텐츠가 폭을 쓰므로 캡하지 않고,
+          진입 화면의 카드 그리드만 캡한다(사이트 홈과 같은 값). */}
+      <div className="grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {summaries.map(({ site, counts }) => {
           return (
             <Link
