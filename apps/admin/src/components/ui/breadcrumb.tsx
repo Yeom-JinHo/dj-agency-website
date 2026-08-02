@@ -43,7 +43,12 @@ function BreadcrumbLink({
   return (
     <Comp
       data-slot="breadcrumb-link"
-      className={cn("hover:text-foreground transition-colors", className)}
+      className={cn(
+        // 포커스 링은 앱 공통 어휘(button·input·data-table과 동일) — 없으면 브라우저
+        // 기본 1px 아웃라인으로 떨어져 다른 링크와 포커스 표시가 어긋난다.
+        "hover:text-foreground focus-visible:ring-ring/50 rounded-sm transition-colors outline-none focus-visible:ring-[3px]",
+        className
+      )}
       {...props}
     />
   )
