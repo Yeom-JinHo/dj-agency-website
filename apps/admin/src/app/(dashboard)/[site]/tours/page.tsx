@@ -64,7 +64,9 @@ export default async function ToursPage({
           {/* 위 브레드크럼이 이미 "여기가 어디인지"를 말하므로 h1은 최상위(대시보드·사이트 홈
               text-2xl)보다 한 단 작다 — 드릴다운할수록 제목이 작아져 방향감이 생긴다. */}
           <h1 className="text-xl font-semibold tracking-tight">투어</h1>
-          <p className="text-muted-foreground text-sm">예정된 공연 일정.</p>
+          {/* "예정된"을 빼는 이유 — 목록엔 지난 공연도 남고("지남" 뱃지) 대부분을
+              차지하므로 설명이 내용과 어긋났다. 릴리즈("이 사이트의 릴리즈.")와 같은 틀. */}
+          <p className="text-muted-foreground text-sm">이 사이트의 공연 일정.</p>
         </div>
         {/* 빈 상태에서는 CTA가 EmptyState 안에 있으므로 우상단 버튼을 숨긴다. */}
         {rows.length > 0 ? (
@@ -76,7 +78,7 @@ export default async function ToursPage({
         <EmptyState
           icon={MapPin}
           title="아직 투어가 없습니다"
-          description="예정된 공연 일정을 추가하세요."
+          description="이 사이트의 공연 일정을 추가하세요."
           action={
             // 목록 자체가 비어 있으면 돌아갈 검색 상태가 없으므로 쿼리를 싣지 않는다
             // (우상단 버튼과 달리 평범한 Link).
