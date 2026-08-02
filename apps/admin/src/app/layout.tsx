@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
+import { SmallViewportNotice } from "@/components/small-viewport-notice";
 import { Toaster } from "@/components/ui/sonner";
 import "@/styles/globals.css";
 
@@ -30,9 +31,15 @@ export default function RootLayout({
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="antialiased">
-        {/* 목록의 검색·정렬을 URL 쿼리에 담기 위한 nuqs 어댑터(useQueryState 사용처의 공통 전제). */}
-        <NuqsAdapter>{children}</NuqsAdapter>
-        <Toaster />
+        {/* 데스크톱 전용 도구라 lg 미만에서는 본문을 아예 내리고 안내만 남긴다(SmallViewportNotice).
+            숨기지 않고 오버레이로 덮기만 하면 보이지 않을 뿐 탭 순서·스크린리더에는 그대로 남는다.
+            wrapper는 높이를 제한하지 않으므로 하위의 min-h-svh·min-h-full 체인에 영향이 없다. */}
+        <div className="max-lg:hidden">
+          {/* 목록의 검색·정렬을 URL 쿼리에 담기 위한 nuqs 어댑터(useQueryState 사용처의 공통 전제). */}
+          <NuqsAdapter>{children}</NuqsAdapter>
+          <Toaster />
+        </div>
+        <SmallViewportNotice />
       </body>
     </html>
   );
