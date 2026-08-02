@@ -5,32 +5,13 @@ import { siteSlugSchema } from "@repo/content/schema";
 import { MapPin } from "lucide-react";
 
 import { mediaUrl } from "@/lib/media";
+import { formatDateTime } from "@/lib/format-date";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
 import { ToursTable, type TourRow } from "./tours-table";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 제외.
 export const dynamic = "force-dynamic";
-
-/**
- * event_date(timestamptz) → `2026-10-03 21:00` 고정 포맷. Asia/Seoul로 타임존을
- * 고정해 서버 실행 환경 TZ와 무관하게 KST 벽시계 시각을 표시(tour-form의
- * isoToLocalInput과 일관 — 단일 KST 편집자 기준). 부분 조합이라 로케일 비종속.
- */
-function formatEventDate(value: string): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(new Date(value));
-  const get = (type: string) =>
-    parts.find((p) => p.type === type)?.value ?? "";
-  return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${get("minute")}`;
-}
 
 export default async function ToursPage({
   params,
@@ -57,7 +38,7 @@ export default async function ToursPage({
     title: tour.title,
     artist: (tour.artistId && artistName.get(tour.artistId)) || null,
     venueCity: [tour.venue, tour.city].filter(Boolean).join(", "),
-    eventDate: formatEventDate(tour.eventDate),
+    eventDate: formatDateTime(tour.eventDate),
     status: tour.status,
     isPast: new Date(tour.eventDate).getTime() < now,
     thumb: mediaUrl(tour.posterPath),
