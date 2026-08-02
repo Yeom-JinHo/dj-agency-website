@@ -25,6 +25,17 @@ export interface ImageFieldValue {
 
 export const EMPTY_IMAGE_FIELD: ImageFieldValue = { file: null, removed: false };
 
+/**
+ * 거부 토스트 id의 접두사. duration: Infinity라 스스로 사라지지 않으니 id로 덮어쓰고
+ * 올바른 파일이 선택되면 거둔다 — 안 그러면 잘못된 파일을 고를 때마다 쌓이고,
+ * Toaster가 루트 레이아웃에 있어 저장 후 이동한 화면까지 따라온다.
+ *
+ * 모듈 상수 하나가 아니라 인스턴스별로 붙이는 이유: 아티스트 폼처럼 이미지 필드가
+ * 둘(프로필·로고)인 화면에서 id를 공유하면, 로고에 올바른 파일을 고를 때 아직
+ * 해소되지 않은 프로필의 거부 안내까지 함께 거둬간다.
+ */
+const REJECT_TOAST_PREFIX = "image-field-reject";
+
 /** 선택/제거된 상태가 하나라도 있으면 미저장(§4.4 파일은 RHF 밖 상태). */
 export function isImageFieldDirty(value: ImageFieldValue): boolean {
   return value.file !== null || value.removed;
@@ -50,6 +61,7 @@ export function ImageField({
   // 형식·용량 제한은 없으면 올바르게 고를 수 없는 규칙이라 input에 aria-describedby로
   // 묶는다. RHF 필드가 아니라 FormDescription을 쓸 수 없어 id를 직접 만든다.
   const hintId = useId();
+  const rejectToastId = `${REJECT_TOAST_PREFIX}-${inputId}`;
   const inputRef = useRef<HTMLInputElement>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const file = value.file;
@@ -80,7 +92,7 @@ export function ImageField({
     if (!(ALLOWED_IMAGE_MIME as readonly string[]).includes(next.type)) {
       toast.error(
         `지원하지 않는 형식입니다(${next.type || "unknown"}). ${ALLOWED_IMAGE_LABEL}만 올릴 수 있습니다.`,
-        { duration: Infinity },
+        { id: rejectToastId, duration: Infinity },
       );
       resetInput();
       return;
@@ -88,11 +100,13 @@ export function ImageField({
     if (next.size > MAX_UPLOAD_BYTES) {
       toast.error(
         `이미지가 너무 큽니다(${(next.size / 1024 / 1024).toFixed(1)}MB). ${MAX_UPLOAD_MB}MB 이하만 올릴 수 있습니다.`,
-        { duration: Infinity },
+        { id: rejectToastId, duration: Infinity },
       );
       resetInput();
       return;
     }
+    // 검증을 통과한 파일이 들어왔으니 앞선 거부 안내는 해소됐다.
+    toast.dismiss(rejectToastId);
     onChange({ file: next, removed: false });
   }
 

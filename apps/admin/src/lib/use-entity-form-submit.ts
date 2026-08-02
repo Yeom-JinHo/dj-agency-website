@@ -11,6 +11,17 @@ import { UNSAVED_LEAVE_CONFIRM_MESSAGE } from "@/lib/unsaved-guard";
 import { useUnsavedWarning } from "@/lib/use-unsaved-warning";
 
 /**
+ * 저장 실패 토스트의 고정 id. duration: Infinity라 스스로 사라지지 않으니 id로
+ * 덮어쓰고 상태가 해소되는 지점에서 거둔다 — 안 그러면 재시도할 때마다 쌓이고,
+ * Toaster가 루트 레이아웃에 있어 성공 후 이동한 목록 화면까지 따라온다.
+ *
+ * 네트워크 실패와 필드 미귀속 서버 오류가 id를 공유하는 이유: 한 번의 제출은
+ * 둘 중 하나로만 끝나고 둘 다 "이번 저장이 실패했다"는 같은 사실이라, 나눠 두면
+ * 거두는 자리마다 dismiss를 두 번 부르는 것 말고 얻는 게 없다.
+ */
+const SAVE_ERROR_TOAST = "entity-form-save-error";
+
+/**
  * 폼 제출 액션. 실패 시 실을 수 있는 field를 그 폼에 실제로 존재하는 이름으로
  * 좁히는 게 목적이라 별칭으로 둔다(create/update 두 곳에서 같은 형태).
  */
@@ -79,6 +90,9 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
     if (submittingRef.current) return;
     submittingRef.current = true;
     setSubmitting(true);
+    // 새 시도가 시작된 순간 이전 실패 안내는 이미 낡았다 — 여기서 거두지 않으면
+    // 실패할 때마다 같은 토스트가 쌓인다.
+    toast.dismiss(SAVE_ERROR_TOAST);
     const fd = buildFormData(values);
 
     const result = await (mode === "create" ? create(fd) : update(fd)).catch(
@@ -95,6 +109,7 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
       // 도달할 수 없고, 화면을 확대해 쓰는 편집자는 우하단 토스트를 시야에 넣기 전에
       // 4초가 끝난다(WCAG 2.2.1). 성공 토스트는 놓쳐도 손해가 없어 기본값 그대로 둔다.
       toast.error("요청을 처리하지 못했습니다. 네트워크 상태를 확인해주세요.", {
+        id: SAVE_ERROR_TOAST,
         duration: Infinity,
       });
       return;
@@ -111,9 +126,15 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
         return;
       }
       // 필드로 못 옮기는 오류라 이 토스트가 유일한 단서 — 위와 같은 이유로 수동 해제.
-      toast.error(result.error, { duration: Infinity });
+      toast.error(result.error, {
+        id: SAVE_ERROR_TOAST,
+        duration: Infinity,
+      });
       return;
     }
+    // 성공했으니 실패 안내를 거둔다. 진입 시 dismiss가 이미 지웠을 테지만, 성공한
+    // 화면을 떠나며 실패 토스트를 끌고 가는 경로가 하나도 없다는 걸 여기서 못 박는다.
+    toast.dismiss(SAVE_ERROR_TOAST);
     // 성공 시 pending 유지는 라우트가 실제로 바뀌는 경로에만 — 그래야
     // 네비게이션 완료 전 버튼 라벨 복귀(재클릭 유발)를 막으면서도 잠금이 안 남는다.
     // 부분 성공(생성됐지만 이미지 저장 실패): 편집 화면으로 안내해 이어서 저장.
@@ -140,6 +161,9 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
     if (hasUnsaved && !window.confirm(UNSAVED_LEAVE_CONFIRM_MESSAGE)) {
       return;
     }
+    // 폼을 아예 떠나므로 실패 안내도 여기서 끝난다 — 재시도 없이 취소로 나가는
+    // 이 경로가 남으면 실패 토스트가 목록 화면까지 따라간다.
+    toast.dismiss(SAVE_ERROR_TOAST);
     router.push(withSearch(listHref, searchParams));
   }
 
