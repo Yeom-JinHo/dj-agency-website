@@ -16,6 +16,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { FormActions } from "@/components/form-actions";
+import { FormSubmitButton } from "@/components/form-submit-button";
 import { SocialsFieldArray } from "@/components/socials-field-array";
 import {
   EMPTY_IMAGE_FIELD,
@@ -29,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -73,6 +75,9 @@ export function ArtistForm({
   const nameValue = form.watch("name");
   const slugPreview = mode === "create" ? slugify(nameValue) : (slug ?? "");
   const slugFieldId = useId();
+  // "생성 후 변경할 수 없습니다"는 지금 입력을 되돌릴 수 없다는 규칙이라 필드에 묶어야
+  // 낭독된다. RHF 필드가 아니라 FormDescription을 못 써 id를 직접 만든다(라벨과 같은 방식).
+  const slugHintId = useId();
 
   const { submitting, onSubmit, onInvalid, onCancel } = useEntityFormSubmit({
     form,
@@ -99,16 +104,27 @@ export function ArtistForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
-        {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다.
-            max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
+      <form
+        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
+        aria-busy={submitting}
+      >
+        {/* max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
             사이드바 도입 전 값(2xl)이 남기던 우측 여백을 회수한다. 긴 텍스트의 measure는
-            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다. */}
-        <fieldset disabled={submitting} className="max-w-4xl min-w-0 space-y-6">
-        {/* 기본 정보 */}
+            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다.
+            액션 바까지 이 폭 안에 있어야 sticky 바의 border-t가 폼과 같은 너비로 그어진다. */}
+        <div className="max-w-4xl min-w-0 space-y-6">
+        {/* 제출 중 입력 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. 저장·취소 버튼은
+            fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
+            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
+        <fieldset disabled={submitting} className="min-w-0 space-y-6">
+        {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
+            한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
+            한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
+            카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
+            한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
         <Card className="gap-4 py-4">
-          <CardHeader>
-            <h2 className="text-base font-semibold">기본 정보</h2>
+          <CardHeader className="border-b">
+            <h2 className="text-lg font-semibold">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -136,9 +152,10 @@ export function ArtistForm({
                 value={slugPreview}
                 readOnly
                 disabled
+                aria-describedby={slugHintId}
                 className="font-mono"
               />
-              <p className="text-muted-foreground text-xs">
+              <p id={slugHintId} className="text-muted-foreground text-xs">
                 {mode === "create"
                   ? "이름에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
                   : "slug는 생성 후 변경할 수 없습니다."}
@@ -192,9 +209,12 @@ export function ArtistForm({
                       ref={field.ref}
                     />
                   </FormControl>
-                  <p className="text-muted-foreground text-xs">
+                  {/* 생 <p> 대신 FormDescription — FormControl의 aria-describedby가
+                      이 요소를 가리켜야 정렬 규칙이 필드와 함께 낭독된다.
+                      text-xs는 기존 크기 유지용(기본값은 text-sm). */}
+                  <FormDescription className="text-xs">
                     사이트 목록에서 오름차순으로 노출됩니다.
-                  </p>
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -204,8 +224,8 @@ export function ArtistForm({
 
         {/* 설명 (en/ko × short/full) */}
         <Card className="gap-4 py-4">
-          <CardHeader>
-            <h2 className="text-base font-semibold">설명</h2>
+          <CardHeader className="border-b">
+            <h2 className="text-lg font-semibold">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -240,8 +260,8 @@ export function ArtistForm({
 
         {/* Selected works (celebrate roster) */}
         <Card className="gap-4 py-4">
-          <CardHeader>
-            <h2 className="text-base font-semibold">대표 작업</h2>
+          <CardHeader className="border-b">
+            <h2 className="text-lg font-semibold">대표 작업</h2>
             <CardAction>
               <Button
                 type="button"
@@ -308,8 +328,8 @@ export function ArtistForm({
 
         {/* 이미지 */}
         <Card className="gap-4 py-4">
-          <CardHeader>
-            <h2 className="text-base font-semibold">이미지</h2>
+          <CardHeader className="border-b">
+            <h2 className="text-lg font-semibold">이미지</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <ImageField
@@ -327,19 +347,29 @@ export function ArtistForm({
           </CardContent>
         </Card>
 
+        </fieldset>
+
         <FormActions>
-          <Button type="submit" disabled={submitting}>
+          <FormSubmitButton busy={submitting}>
             {submitting
               ? "저장 중…"
               : mode === "create"
                 ? "아티스트 만들기"
                 : "변경사항 저장"}
-          </Button>
-          <Button type="button" variant="outline" onClick={onCancel}>
+          </FormSubmitButton>
+          {/* 취소는 fieldset 밖으로 나왔지만 잠금은 유지 — 저장 왕복 중 이탈은 막아야
+              한다. 포커스를 쥔 채 disabled가 되는 경로가 없어(취소 버튼은 제출을
+              시작시키지 않는다) 저장 버튼과 달리 disabled를 그대로 쓴다. */}
+          <Button
+            type="button"
+            variant="outline"
+            disabled={submitting}
+            onClick={onCancel}
+          >
             취소
           </Button>
         </FormActions>
-        </fieldset>
+        </div>
       </form>
     </Form>
   );
