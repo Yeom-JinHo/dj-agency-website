@@ -132,9 +132,20 @@ export function ArtistForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>이름</FormLabel>
+                  {/* 필수 표시 — 별표는 시각 전용(aria-hidden), 의미는 aria-required가
+                      전달한다(release-form.tsx 제목 필드와 같은 패턴). */}
+                  <FormLabel>
+                    이름
+                    <span aria-hidden className="text-destructive -ml-1">
+                      *
+                    </span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="아티스트 이름" {...field} />
+                    <Input
+                      placeholder="아티스트 이름"
+                      aria-required
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

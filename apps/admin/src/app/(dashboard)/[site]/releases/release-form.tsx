@@ -138,9 +138,17 @@ export function ReleaseForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>제목</FormLabel>
+                  {/* 필수 표시 — 없으면 제출 후 서버·스키마 에러로만 알 수 있다.
+                      별표는 장식이 아니라 시각 전용 관례라 aria-hidden으로 숨기고,
+                      의미는 input의 aria-required가 전달한다(3개 폼 공통 패턴). */}
+                  <FormLabel>
+                    제목
+                    <span aria-hidden className="text-destructive -ml-1">
+                      *
+                    </span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="릴리즈 제목" {...field} />
+                    <Input placeholder="릴리즈 제목" aria-required {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
