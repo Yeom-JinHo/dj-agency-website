@@ -86,6 +86,7 @@ export function ReleaseForm({
   const slugFieldId = useId();
 
   const { submitting, onSubmit, onInvalid, onCancel } = useEntityFormSubmit({
+    form,
     mode,
     listHref,
     createdMessage: "릴리즈를 만들었습니다.",
@@ -105,8 +106,11 @@ export function ReleaseForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
-        {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. */}
-        <fieldset disabled={submitting} className="max-w-2xl min-w-0 space-y-6">
+        {/* 제출 중 전체 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다.
+            max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
+            사이드바 도입 전 값(2xl)이 남기던 우측 여백을 회수한다. 긴 텍스트의 measure는
+            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다. */}
+        <fieldset disabled={submitting} className="max-w-4xl min-w-0 space-y-6">
         {/* 기본 정보 */}
         <Card className="gap-4 py-4">
           <CardHeader>

@@ -12,7 +12,8 @@ export function FormLoadingSkeleton() {
         <Skeleton className="h-8 w-48" />
         <Skeleton className="h-4 w-80 max-w-full" />
       </div>
-      <div className="max-w-2xl min-w-0 space-y-4">
+      {/* 폭은 세 폼의 fieldset(max-w-4xl)과 같은 값 — 다르면 로드 직후 폼이 옆으로 튄다. */}
+      <div className="max-w-4xl min-w-0 space-y-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="space-y-2">
             <Skeleton className="h-4 w-20" />
