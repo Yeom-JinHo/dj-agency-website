@@ -16,7 +16,11 @@ export function FormLoadingSkeleton() {
             폭은 목록과 달리 w-48을 유지한다 — 여기 제목은 엔티티명(아티스트명·릴리즈
             제목)이라 길이를 알 수 없어 맞출 대상 자체가 없다. '새 아티스트'류만 고정이다. */}
         <Skeleton className="h-7 w-48" />
-        <Skeleton className="h-4 w-80 max-w-full" />
+        {/* h-5 = 20px = text-sm의 line-height, theme.css 실측 — ListLoadingSkeleton의
+            설명 줄과 같은 값이다. 종전 h-4(16px)는 4px 모자라 그만큼 폼이 당겨졌다.
+            폭 w-80(320px)은 '아티스트를 편집합니다. 저장하면 즉시 사이트에 반영됩니다.'
+            (≈24글자)에 맞는 값이라 유지한다. */}
+        <Skeleton className="h-5 w-80 max-w-full" />
       </div>
       {/* 폭은 세 폼의 fieldset(max-w-4xl)과 같은 값 — 다르면 로드 직후 폼이 옆으로 튄다. */}
       <div className="max-w-4xl min-w-0 space-y-4">
