@@ -20,10 +20,12 @@ export const SITE_LABELS: Record<SiteSlug, string> = {
   juntaro: "Juntaro",
 };
 
-/** 각 사이트 홈의 카테고리 3종. 라우트 세그먼트와 1:1. */
+/** 각 사이트 홈의 카테고리 3종. 라우트 세그먼트와 1:1.
+ * releases 라벨은 목록·버튼·빈 상태의 h1 어휘("릴리즈")와 같은 말을 쓴다 —
+ * 내비·브레드크럼·카운트만 "뮤직"이던 이중 어휘를 릴리즈로 통일했다. */
 export const CATEGORIES = [
   { segment: "artists", label: "아티스트" },
-  { segment: "releases", label: "뮤직" },
+  { segment: "releases", label: "릴리즈" },
   { segment: "tours", label: "투어" },
 ] as const;
 

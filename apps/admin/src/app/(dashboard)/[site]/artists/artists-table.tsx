@@ -92,6 +92,8 @@ export function ArtistsTable({
       rowHref={(row) => `${basePath}/${row.id}`}
       searchText={(row) => `${row.name} ${row.slug}`}
       searchPlaceholder="이름·slug로 검색"
+      // 서버 기본 순서(admin-queries의 sort_order asc)를 헤더에 드러낸다.
+      defaultSort={{ id: "sortOrder", dir: "asc" }}
     />
   );
 }
