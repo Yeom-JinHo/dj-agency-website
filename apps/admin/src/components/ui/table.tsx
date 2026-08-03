@@ -5,9 +5,10 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 /**
- * containerClassName은 스크롤 컨테이너(바깥 div)를 소비처가 조절하기 위한 통로다.
+ * containerClassName·containerRef는 스크롤 컨테이너(바깥 div)를 소비처가 다루기 위한 통로다.
  * sticky 헤더를 쓰려면 이 컨테이너가 세로 스크롤포트여야 해서 높이를 밖에서 정해야 하는데,
- * 그 값은 화면마다 다르므로 프리미티브가 들고 있을 수 없다. className은 종전대로 <table>에 간다.
+ * 그 값은 화면마다 다르므로 프리미티브가 들고 있을 수 없다. 스크롤 위치를 되감는 것도
+ * 스크롤포트가 여기라 이 div를 직접 잡아야 한다. className은 종전대로 <table>에 간다.
  *
  * overflow-x-auto → overflow-auto: 가로만 auto로 두면 브라우저가 overflow-y를 auto로 승격시켜
  * 이 컨테이너가 '스크롤되지 않는 스크롤포트'가 된다. 그 안의 sticky는 뷰포트가 아니라 이 컨테이너를
@@ -17,10 +18,15 @@ import { cn } from "@/lib/utils"
 function Table({
   className,
   containerClassName,
+  containerRef,
   ...props
-}: React.ComponentProps<"table"> & { containerClassName?: string }) {
+}: React.ComponentProps<"table"> & {
+  containerClassName?: string
+  containerRef?: React.Ref<HTMLDivElement>
+}) {
   return (
     <div
+      ref={containerRef}
       data-slot="table-container"
       className={cn("relative w-full overflow-auto", containerClassName)}
     >
