@@ -4,11 +4,25 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+/**
+ * containerClassName은 스크롤 컨테이너(바깥 div)를 소비처가 조절하기 위한 통로다.
+ * sticky 헤더를 쓰려면 이 컨테이너가 세로 스크롤포트여야 해서 높이를 밖에서 정해야 하는데,
+ * 그 값은 화면마다 다르므로 프리미티브가 들고 있을 수 없다. className은 종전대로 <table>에 간다.
+ *
+ * overflow-x-auto → overflow-auto: 가로만 auto로 두면 브라우저가 overflow-y를 auto로 승격시켜
+ * 이 컨테이너가 '스크롤되지 않는 스크롤포트'가 된다. 그 안의 sticky는 뷰포트가 아니라 이 컨테이너를
+ * 기준으로 삼는데 컨테이너가 세로로 움직이지 않으니 sticky가 조용히 무력해진다(실측: 스크롤 900px에서
+ * thead가 top 101px → -800px로 밀려남). 두 축을 함께 auto로 선언해 이 컨테이너를 진짜 스크롤포트로 만든다.
+ */
+function Table({
+  className,
+  containerClassName,
+  ...props
+}: React.ComponentProps<"table"> & { containerClassName?: string }) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className={cn("relative w-full overflow-auto", containerClassName)}
     >
       <table
         data-slot="table"
