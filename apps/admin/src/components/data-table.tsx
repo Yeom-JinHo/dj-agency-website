@@ -3,6 +3,7 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type MouseEvent,
   type ReactNode,
@@ -97,6 +98,8 @@ export function DataTable<T extends { id: string }>({
   // 나중에 파라미터가 늘어도 따라오고, nuqs가 쓴 URL이 곧 상세로 넘길 진실이다.
   const searchParams = useSearchParams();
   const router = useRouter();
+  // 스크롤포트가 페이지가 아니라 표 컨테이너라, 스크롤 위치를 되감으려면 그 div를 잡아야 한다.
+  const tableContainer = useRef<HTMLDivElement>(null);
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -165,10 +168,26 @@ export function DataTable<T extends { id: string }>({
     router.push(withSearch(rowHref(row), searchParams));
   }
 
+  /**
+   * 결과 순서가 바뀌면 표를 첫 행으로 되감는다. 표 영역이 자기 스크롤포트가 된 뒤로는
+   * 목록 중간에서도 헤더가 보여 거기서 정렬을 걸 수 있는데(sticky 이전에는 헤더가 화면
+   * 밖이라 이 동선 자체가 없었다), scrollTop이 그대로 남으면 새로 1등이 된 행이 화면
+   * 위쪽 보이지 않는 곳에 놓인다. 정렬한 사람이 보려던 것은 대개 그 첫 행이다.
+   *
+   * 브라우저는 내용이 줄면 scrollTop을 최대값으로 깎아줄 뿐이라(실측: 40행에서 3행으로
+   * 좁히면 600 → 0) 결과가 여전히 길 때는 중간에 머문다. 그래서 검색어 변경도 같이 되감는다.
+   * 사용자 조작(정렬 클릭·타이핑)에서만 부르고 effect로 걸지 않는다 — URL로 되돌아오는
+   * 뒤로가기까지 되감으면 브라우저의 스크롤 복원을 덮어쓴다.
+   */
+  function resetScroll() {
+    if (tableContainer.current) tableContainer.current.scrollTop = 0;
+  }
+
   // 오름차순 → 내림차순 → 해제 3단 순환. sort_order가 실제 사이트 노출 순서라
   // 정렬을 걸어본 뒤 원래 순서로 돌아올 수단이 반드시 있어야 한다.
   // 해제는 두 값을 null로 — clearOnDefault 기본값 덕에 URL에서 파라미터가 사라진다.
   function toggleSort(id: string) {
+    resetScroll();
     if (sortId !== id) {
       setSort({ sort: id, dir: "asc" });
     } else if (sortDir === "asc") {
@@ -188,7 +207,10 @@ export function DataTable<T extends { id: string }>({
         <Input
           type="search"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            resetScroll();
+            setQuery(e.target.value);
+          }}
           placeholder={searchPlaceholder}
           aria-label={searchPlaceholder}
           className="pl-9"
@@ -227,11 +249,24 @@ export function DataTable<T extends { id: string }>({
               (아티스트 38건 기준 문서 높이 약 4화면). 표 영역 자체를 스크롤포트로 만들고 헤더를 그 안에 고정한다.
               이 방식을 고른 이유는 sticky 기준이 '상단 셸'이 아니라 '이 컨테이너'가 되기 때문이다 —
               셸 헤더가 sticky가 되든 아니든 top-0이 그대로 옳아서, 헤더 높이를 여기서 알 필요가 없다.
-              높이는 표 위 크롬(셸 헤더 45 + 콘텐츠 패딩 24 + 브레드크럼·제목·검색 ~172 + 하단 여백 24 ≈ 265px)에서
-              잡았다. 남는 쪽으로 반올림해 17rem을 뺀다 — 모자라면 페이지와 표가 같이 스크롤되는 이중 스크롤이
-              되지만, 남으면 아래에 약간의 여백이 생길 뿐이다. 셸 헤더가 sticky가 되어도 이 값은 유효하다:
-              sticky는 fixed와 달리 흐름에서 자리를 계속 차지하므로 표 위 크롬 높이가 변하지 않는다. */}
-          <Table containerClassName="max-h-[calc(100svh-17rem)]">
+              셸 헤더가 sticky가 되어도 이 값은 유효하다: sticky는 fixed와 달리 흐름에서 자리를 계속
+              차지하므로 표 위 크롬 높이가 변하지 않는다.
+
+              높이는 실측으로 잡았다(1440 폭, 4개 목록 동일) — 컨테이너 top 248 + 테두리 상하 2
+              + 콘텐츠 컬럼 p-6 하단 24 = 274px = 17.125rem. 화면 높이·데이터 양과 무관한 상수라
+              한 번 맞으면 계속 맞는다. 처음 어림잡은 17rem은 2px 모자랐고, 그 2px 때문에 문서가
+              스크롤 가능한 채로 남아 트랙패드에서 목록이 미세하게 덜컹였다(하단 여백도 22px로
+              나머지 24px 패딩과 어긋났다). 값을 줄이는 쪽은 이렇게 이중 스크롤을 만들고,
+              늘리는 쪽은 아래 여백만 남기므로 흔들릴 때는 늘리는 쪽으로 갈 것.
+
+              scroll-pt-12: scroll-padding-top은 스크롤포트끼리 상속되지 않아, html에 걸어둔 값이
+              이 컨테이너에는 닿지 않는다. 안에서 scrollIntoView가 불리면 대상 행이 sticky 헤더
+              뒤로 숨으므로 헤더 높이(40px)만큼 밀어낸다. 8px을 더 얹어 48px로 두는 건 셀 패딩(p-2)과
+              같은 리듬으로 헤더 아래 한 칸 띄우기 위해서다 — 행 링크의 포커스 링 3px도 이 여유 안에 든다. */}
+          <Table
+            containerRef={tableContainer}
+            containerClassName="max-h-[calc(100svh-17.125rem)] scroll-pt-12"
+          >
             {/* 세로 테두리는 border-collapse 테이블에서 셀이 아니라 표 격자에 속해 sticky를 따라오지
                 않는다. 그래서 헤더 아래 선은 tr의 border-b가 아니라 th의 inset 그림자로 그린다.
                 z-10 — 이 컨테이너 안에서 행 위에만 있으면 되고, dialog·select(z-50)와 #289 안내(z-100)
