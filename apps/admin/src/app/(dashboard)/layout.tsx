@@ -47,8 +47,12 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  // --header-h는 sticky 헤더의 높이이자 사이드바의 top 오프셋·높이 계산의 단일 출처다.
+  // 사이드바(site-sidebar.tsx)가 이 변수를 상속받아 쓰므로 숫자가 두 파일에 흩어지지
+  // 않는다. 헤더는 py-3+버튼 h-8로 높이가 "파생"되게 두지 않고 이 변수로 "선언"한다 —
+  // 파생되게 두면 버튼 크기를 바꾸는 순간 사이드바 오프셋이 조용히 어긋난다.
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="flex min-h-svh flex-col [--header-h:3.5rem]">
       {/* 스킵 링크(WCAG 2.4.1 Bypass Blocks) — 헤더 로고·로그아웃·사이트 Select·
           카테고리 3링크로 매 페이지 앞에 고정 탭 스톱 6개가 놓인다. 편집자 동선이
           "목록→상세→저장→목록"으로 라우트를 계속 오가는 구조라 이 6탭을 반복
@@ -64,7 +68,12 @@ export default async function DashboardLayout({
       >
         본문으로 건너뛰기
       </a>
-      <header className="flex shrink-0 items-center justify-between border-b px-6 py-3">
+      {/* 헤더도 sticky로 둔다 — 사이드바만 고정하면 스크롤 시 사이드바가 헤더가
+          사라진 자리까지 올라가 상단이 빈다. 배경·blur는 FormActions(sticky bottom-0)와
+          같은 어휘를 그대로 쓴다. z-20은 FormActions(z-10) 위, dialog·select(z-50)와
+          좁은 뷰포트 안내(z-[100]) 아래다 — 짧은 뷰포트에서 상·하 바가 만나면 상단
+          앱 크롬이 이겨야 한다. */}
+      <header className="bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky top-0 z-20 flex h-(--header-h) shrink-0 items-center justify-between border-b px-6 backdrop-blur">
         <GuardedLink
           href="/"
           className="flex items-center gap-2 text-sm font-semibold tracking-tight whitespace-nowrap"

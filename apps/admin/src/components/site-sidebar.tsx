@@ -16,6 +16,15 @@ import { cn } from "@/lib/utils";
  * 전용(모바일 스코프 종결) — 반응형 대응 없음, 고정 폭은 부모([site]/layout.tsx)의
  * grid 컬럼이 지정한다.
  *
+ * 높이는 뷰포트에 걸고(`100svh - --header-h`) sticky로 헤더 바로 아래 고정한다.
+ * 이전에는 높이를 콘텐츠에 맡겨(부모의 min-h-full은 no-op이었다) 회색 패널과 우측
+ * 보더가 데이터 양에 따라 화면 한가운데서 끊겼고 — 빈 목록에서 458px — 긴 목록
+ * (38건, 문서 2328px)에서는 스크롤과 함께 내비가 통째로 화면 밖으로 사라졌다.
+ * --header-h는 (dashboard)/layout.tsx가 선언한 값을 상속받는다.
+ * overflow-y-auto는 두지 않는다 — 내용이 스위처+카테고리 3개(약 180px)로 고정이라
+ * 사실상 넘칠 수 없고, 스크롤 컨테이너를 하나 더 만들면 문서 스크롤 전제로 짜인
+ * 것들(html의 scroll-padding, scrollIntoView)이 이 안에서만 어긋난다.
+ *
  * 브랜드 액센트(인디고)를 primary/ring 밖으로 처음 확장한 지점이다. globals.css는
  * "primary/ring만 유채색"을 원칙으로 두지만, active 표시를 --sidebar-accent(0.97 무채색)
  * 배경에 맡기면 hover(50% 농도)와의 명도차가 육안으로 잡히지 않아 "지금 어느
@@ -25,7 +34,7 @@ export function SiteSidebar({ site }: { site: SiteSlug }) {
   const pathname = usePathname();
 
   return (
-    <div className="bg-sidebar text-sidebar-foreground border-sidebar-border flex flex-col border-r">
+    <div className="bg-sidebar text-sidebar-foreground border-sidebar-border sticky top-(--header-h) flex h-[calc(100svh-var(--header-h))] flex-col border-r">
       <div className="border-sidebar-border border-b p-3">
         <SiteSwitcher />
       </div>
