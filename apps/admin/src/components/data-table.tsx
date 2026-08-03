@@ -216,7 +216,9 @@ export function DataTable<T extends { id: string }>({
       {/* 목록 자체가 빈 경우는 상위 페이지가 EmptyState로 먼저 걸러내므로, 여기서 0건은 곧 검색 0건이다.
           EmptyState가 점선 테두리를 이미 갖고 있어 테두리가 겹치지 않도록 border 컨테이너를 아예 대체한다.
           표 쪽 컨테이너의 shadow-sm은 배경에서 한 겹 띄우는 용도다 — 테두리만으로는 흰 배경 위 흰 표가
-          평면에 그려진 선처럼 보여 "표 = 다룰 수 있는 면"이라는 감각이 약했다. */}
+          평면에 그려진 선처럼 보여 "표 = 다룰 수 있는 면"이라는 감각이 약했다. overflow-hidden은 안쪽
+          스크롤 컨테이너의 각진 모서리를 이 둥근 테두리로 잘라내기 위한 것이다 — sticky 헤더에 배경이
+          생기면서 상단 두 모서리가 흰색으로 메워져 보였다. */}
       {visible.length === 0 ? (
         <EmptyState
           icon={Search}
@@ -233,9 +235,21 @@ export function DataTable<T extends { id: string }>({
           }
         />
       ) : (
-        <div className="rounded-lg border shadow-sm">
-          <Table>
-            <TableHeader>
+        <div className="overflow-hidden rounded-lg border shadow-sm">
+          {/* 목록이 길어지면 헤더가 화면 밖으로 나가 어느 컬럼인지 확인하려면 맨 위로 돌아가야 했다
+              (아티스트 38건 기준 문서 높이 약 4화면). 표 영역 자체를 스크롤포트로 만들고 헤더를 그 안에 고정한다.
+              이 방식을 고른 이유는 sticky 기준이 '상단 셸'이 아니라 '이 컨테이너'가 되기 때문이다 —
+              셸 헤더가 sticky가 되든 아니든 top-0이 그대로 옳아서, 헤더 높이를 여기서 알 필요가 없다.
+              높이는 표 위 크롬(셸 헤더 45 + 콘텐츠 패딩 24 + 브레드크럼·제목·검색 ~172 + 하단 여백 24 ≈ 265px)에서
+              잡았다. 남는 쪽으로 반올림해 17rem을 뺀다 — 모자라면 페이지와 표가 같이 스크롤되는 이중 스크롤이
+              되지만, 남으면 아래에 약간의 여백이 생길 뿐이다. 셸 헤더가 sticky가 되어도 이 값은 유효하다:
+              sticky는 fixed와 달리 흐름에서 자리를 계속 차지하므로 표 위 크롬 높이가 변하지 않는다. */}
+          <Table containerClassName="max-h-[calc(100svh-17rem)]">
+            {/* 세로 테두리는 border-collapse 테이블에서 셀이 아니라 표 격자에 속해 sticky를 따라오지
+                않는다. 그래서 헤더 아래 선은 tr의 border-b가 아니라 th의 inset 그림자로 그린다.
+                z-10 — 이 컨테이너 안에서 행 위에만 있으면 되고, dialog·select(z-50)와 #289 안내(z-100)
+                아래에 남는다. */}
+            <TableHeader className="[&_th]:bg-background [&_th]:sticky [&_th]:top-0 [&_th]:z-10 [&_th]:shadow-[inset_0_-1px_0_var(--border)] [&_tr]:border-b-0">
               <TableRow>
                 {columns.map((column) => {
                   const active = sortId === column.id;
