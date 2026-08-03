@@ -103,7 +103,12 @@
      보정이 없으면 헤더 높이만큼이 그대로 가려진다. 실제 경로는 use-entity-form-submit의
      setFocus다 — 서버 오류를 필드에 귀속시키고 그 필드로 데려가는데, 필드가 헤더에 가려지면
      같은 파일 주석이 막으려던 "아무 일도 없는 것처럼 보이는" 상태로 되돌아간다.
-     폼 전용이 아니다. 목록·대시보드의 앵커 이동과 첫 오류 필드 포커스에도 걸리므로 html에 둔다.
+
+     적용 범위를 정확히 해 둔다 — scroll-padding은 스크롤포트끼리 상속되지 않는다.
+     이 선언은 문서(documentElement)가 스크롤할 때만 든다. 자체 스크롤 컨테이너를 가진
+     영역(overflow-y-auto를 쓰는 목록 테이블 등)은 그 컨테이너 자신의 scroll-padding-top을
+     보므로 거기서 따로 줘야 한다. html에 두는 이유는 "앱 전역을 덮어서"가 아니라
+     문서 스크롤이 폼·대시보드를 포함한 기본 경로이기 때문이다.
 
      --header-h는 여기서 실제로 해석되지 않는다 — 커스텀 속성은 아래로만 상속되는데 선언이
      (dashboard)/layout.tsx의 루트 div에 인라인으로 있어 html은 그것을 볼 수 없다. 항상
@@ -113,14 +118,20 @@
      올려 단일 출처로 만드는 쪽이 원래는 맞지만, 그러면 인라인 선언을 지우는 PR과 이 PR이
      서로를 필요로 하게 되어 머지 순서 의존이 늘어난다. 지금은 각 PR이 홀로 온전한 쪽을 택했다.
 
-     +1rem은 여백이다. 헤더 높이만큼만 주면 대상 상단이 헤더 밑변에 딱 붙어 3px 포커스 링이
-     헤더에 잘린다.
+     +2rem은 라벨 몫이다. 기준을 "입력창이 보이는가"가 아니라 "그게 무슨 필드인지 보이는가"로
+     잡았다 — 오류 필드로 점프했는데 라벨이 헤더에 가려지면 절반만 해결된 것이다. FormItem이
+     grid gap-2(8px)이고 라벨이 text-sm(약 20px)이라 라벨은 입력창보다 22px 위에 있다.
+     실측: 헤더 높이만큼(56px)이면 라벨이 화면 밖, +1rem(72px)이면 라벨 상단이 50px로 헤더
+     밑변(56px)에 6px 잘리고, +2rem(88px)이어야 66px에 놓여 온전히 드러난다.
+     입력 프리미티브(input·textarea·SelectTrigger)에 scroll-mt를 주는 방법도 있지만 —
+     스크롤 대상은 FormItem이 아니라 포커스를 받는 그 요소다 — 파일 세 곳에 같은 숫자가
+     또 늘어나고, 목록·대시보드의 앵커 이동에도 어차피 대상 위 여유는 필요하다.
 
      shorthand scroll-padding을 쓰지 말 것 — FormActions가 documentElement.style에
      scroll-padding-bottom을 인라인으로 설정하므로 shorthand는 서로를 덮는다. longhand끼리는
      충돌하지 않는다. */
   html {
-    scroll-padding-top: calc(var(--header-h, 3.5rem) + 1rem);
+    scroll-padding-top: calc(var(--header-h, 3.5rem) + 2rem);
   }
 
   /* OS "동작 줄이기"에 대한 앱 전체 모션의 단일 가드다. 컴포넌트마다 motion-reduce:
