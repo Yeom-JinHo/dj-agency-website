@@ -1,5 +1,7 @@
 import "server-only";
-import sharp from "sharp";
+import type sharpType from "sharp";
+
+type Sharp = typeof sharpType;
 
 const MAX_BYTES = 1024 * 1024; // 1MB (CLAUDE.md 이미지 규약)
 const START_QUALITY = 80;
@@ -9,7 +11,7 @@ const QUALITY_STEP = 10;
 const MAX_DIMENSIONS = [2400, 2000, 1600, 1200] as const;
 
 /** quality 80부터 ≤1MB가 될 때까지 낮추며 webp로 인코딩. */
-async function encodeStepDown(input: Buffer): Promise<Buffer> {
+async function encodeStepDown(sharp: Sharp, input: Buffer): Promise<Buffer> {
   let quality = START_QUALITY;
   let webp = await sharp(input).webp({ quality }).toBuffer();
   while (webp.byteLength > MAX_BYTES && quality > MIN_QUALITY) {
@@ -27,14 +29,18 @@ async function encodeStepDown(input: Buffer): Promise<Buffer> {
 export async function toWebp(
   input: Buffer,
 ): Promise<{ webp: Buffer; placeholder: string }> {
-  let webp = await encodeStepDown(input);
+  // sharp는 dlopen까지 수반하는 네이티브 모듈이라, 최상위 import면 로드 실패가
+  // 이 모듈을 그래프에 포함한 페이지 렌더 전체를 500으로 만든다(Vercel libvips
+  // 누락 사고). 변환 시점에 지연 로드해 실패 반경을 업로드 액션 오류로 격리한다.
+  const { default: sharp } = await import("sharp");
+  let webp = await encodeStepDown(sharp, input);
 
   if (webp.byteLength > MAX_BYTES) {
     for (const dim of MAX_DIMENSIONS) {
       const resized = await sharp(input)
         .resize(dim, dim, { fit: "inside", withoutEnlargement: true })
         .toBuffer();
-      webp = await encodeStepDown(resized);
+      webp = await encodeStepDown(sharp, resized);
       if (webp.byteLength <= MAX_BYTES) break;
     }
   }
