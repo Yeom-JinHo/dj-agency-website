@@ -77,11 +77,31 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        // hover만 무채색 대신 아주 옅은 인디고 틴트로 옮긴다(행을 겨눈 순간에만 브랜드가 비친다).
-        // 알파는 /[0.03]이 상한이다 — 요청받은 /5(#F4F6FB)면 muted-foreground 셀(아티스트·장소·
-        // 일시)이 4.39:1로 AA 아래로 떨어진다. /[0.03]은 4.54:1로, 걷어낸 bg-muted/50과
-        // 명도 단차(흰 배경 대비 1.04)까지 같아 hover의 세기는 그대로 두고 색만 바꾼 셈이다.
-        "border-b transition-colors hover:bg-primary/[0.03] has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b",
+        // ── 행 "겨눔" 상태 — 두 축(틴트 + 좌측 레일)을 hover와 키보드 포커스가 함께 쓴다.
+        //
+        // 틴트: 무채색 대신 아주 옅은 인디고(행을 겨눈 순간에만 브랜드가 비친다).
+        // 알파 /[0.03]은 취향이 아니라 천장이다. muted-foreground 셀(slug·아티스트·장소·일시)이
+        // 흰 배경에서 이미 4.742:1뿐이라 배경을 조금만 어둡게 해도 AA 4.5:1이 깨진다 —
+        // /[0.04]=4.47, /[0.05]=4.39, /[0.06]=4.31, 무채색 bg-muted(#F5F5F5)조차 4.35로 미달.
+        // /[0.03](#F9FAFC)만 4.540:1로 살아남는다. 즉 배경 축으로는 이 이상 세게 할 수 없다.
+        //
+        // 레일: 그래서 대비와 무관한 두 번째 축을 첫 셀 안쪽 그림자로 세운다. 텍스트 대비를
+        // 건드리지 않으면서 1.4.11(3:1)을 7.64:1로 크게 넘겨, 1.03:1짜리 틴트 혼자서는
+        // 사실상 보이지 않던 "클릭 가능한 행"을 실제로 읽히게 만든다. border가 아니라
+        // inset shadow인 이유는 레이아웃을 차지하지 않아 미겨눔 상태에 자리를 비워둘
+        // 필요가 없어서다. td에만 걸어 thead(th)에는 레일이 생기지 않는다.
+        //
+        // hover와 focus를 같은 값으로 둔 건 둘이 같은 사실("이 행이 대상이다")을 말하기
+        // 때문이다. 값을 다르게 하면 어휘가 둘로 늘고, 마우스를 올린 채 링크에 포커스가
+        // 있는 흔한 겹침에서 어느 쪽이 이겼는지가 무의미한 질문이 된다.
+        // 포커스 트리거는 a에만 건다 — thead 정렬 버튼은 <button>이라 행이 밝아지지 않는다.
+        // "어디에 포커스가 있는지"는 링크 자신의 ring이 계속 말하고, 여기 두 축은 보조 신호다.
+        "transition-colors hover:bg-primary/[0.03] has-[a:focus-visible]:bg-primary/[0.03]",
+        "[&>td:first-child]:transition-shadow",
+        "hover:[&>td:first-child]:shadow-[inset_2px_0_0_var(--color-primary)]",
+        "has-[a:focus-visible]:[&>td:first-child]:shadow-[inset_2px_0_0_var(--color-primary)]",
+        "has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted",
         className
       )}
       {...props}
