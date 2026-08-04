@@ -11,7 +11,6 @@ import {
   MAX_UPLOAD_MB,
 } from "@/lib/image-constraints";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 /**
@@ -139,18 +138,35 @@ export function ImageField({
         </div>
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2">
-            <Input
+            {/* 네이티브 파일 인풋은 스타일을 입혀도 "선택된 파일 없음" 문자열과 긴
+                빈 띠가 남아 폼 어휘에서 이질적이었다(designer 독립 리뷰). 인풋은
+                sr-only로 숨기고(라벨 연결·폼 동작 유지) 앱 공통 버튼이 대신 연다.
+                탭 스톱은 버튼 하나만 남긴다(인풋 tabIndex -1). */}
+            <input
               id={inputId}
               ref={inputRef}
               type="file"
               accept={ALLOWED_IMAGE_MIME.join(",")}
               aria-describedby={hintId}
               onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
-              // 네이티브 파일 버튼("파일 선택")이 무스타일로 노출돼 정돈된 폼 안에서
-              // 이질적이었다 — file: 수식어로 secondary 버튼 어휘를 입힌다(교체가
-              // 아니라 스타일링이라 키보드·폼 동작은 네이티브 그대로다).
-              className="file:bg-secondary file:text-secondary-foreground hover:file:bg-secondary/80 py-0 file:mr-3 file:h-full file:rounded-none file:rounded-l-md file:border-0 file:px-3 file:transition-colors"
+              tabIndex={-1}
+              className="sr-only"
             />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => inputRef.current?.click()}
+            >
+              {preview ? "이미지 교체" : "이미지 선택"}
+            </Button>
+            {/* 방금 고른 파일명 — 저장 전이라 썸네일만으로는 "바뀐 상태"임이
+                안 보일 수 있어 텍스트로도 남긴다. */}
+            {value.file ? (
+              <span className="text-muted-foreground min-w-0 truncate text-sm">
+                {value.file.name}
+              </span>
+            ) : null}
             {value.removed ? (
               <Button
                 type="button"

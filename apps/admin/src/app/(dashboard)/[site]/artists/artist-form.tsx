@@ -162,9 +162,8 @@ export function ArtistForm({
                 id={slugFieldId}
                 value={slugPreview}
                 readOnly
-                disabled
                 aria-describedby={slugHintId}
-                className="font-mono"
+                className="bg-muted font-mono"
               />
               <p id={slugHintId} className="text-muted-foreground text-xs">
                 {mode === "create"
@@ -173,33 +172,37 @@ export function ArtistForm({
               </p>
             </div>
 
-            <FormField
-              control={form.control}
-              name="nickname"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>닉네임</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* 닉네임·도시는 짧은 값인데 전체폭(≈1170px)을 차지해 폭이 값의 성격을
+                말하지 못했다 — 릴리즈 폼의 레이블·카탈로그 번호와 같은 2열 그리드. */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="nickname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>닉네임</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>도시</FormLabel>
-                  <FormControl>
-                    <Input placeholder="서울" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>도시</FormLabel>
+                    <FormControl>
+                      <Input placeholder="서울" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -314,8 +317,10 @@ export function ArtistForm({
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormControl>
+                            {/* "메타(선택)"만으로는 형식을 알 수 없었다 — 기존
+                                데이터가 따르는 표기(분류 · 연도)를 예시로 보인다. */}
                             <Input
-                              placeholder="메타(선택)"
+                              placeholder="예: MIX · 2025 (선택)"
                               {...field}
                               value={field.value ?? ""}
                             />

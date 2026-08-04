@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChevronRight } from "lucide-react";
 import {
   adminCountArtists,
   adminCountReleases,
@@ -114,6 +115,11 @@ export default async function SiteHomePage({
                   )}
                 </p>
               </div>
+              {/* 클릭 어포던스 — 대시보드 카드와 같은 처방(무채색 chevron). */}
+              <ChevronRight
+                className="text-muted-foreground ml-auto size-4 shrink-0"
+                aria-hidden
+              />
             </Link>
           );
         })}

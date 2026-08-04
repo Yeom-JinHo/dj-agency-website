@@ -21,6 +21,10 @@ const badgeVariants = cva(
     variants: {
       variant: {
         neutral: "border-border bg-muted/50 text-muted-foreground",
+        // 다가오는 상태(예정) 전용 — 목록에서 운영자가 가장 먼저 찾는 정보인데
+        // 종료와 같은 무채색이면 묻힌다. 브랜드 primary를 warning·danger와 같은
+        // 문법(테두리 + 옅은 배경)으로 쓴다.
+        accent: "border-primary/40 bg-primary/10 text-primary",
         warning: "border-amber-500/40 bg-amber-500/10 text-amber-700",
         danger: "border-red-500/40 bg-red-500/10 text-red-700",
       },
