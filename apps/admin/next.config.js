@@ -3,6 +3,16 @@ import { createNextConfig, baseConfig } from "@repo/next-config";
 export default createNextConfig({
   // sharp는 이미지 업로드(toWebp) 시 서버에서만 로드 — 번들 외부화.
   serverExternalPackages: ["sharp"],
+  // sharp의 .node 바이너리는 libvips-cpp.so를 dlopen으로 여는데, 정적 file
+  // tracing은 dlopen 의존성을 볼 수 없어 Vercel 함수 패키징에서 누락된다
+  // (ERR_DLOPEN_FAILED → sharp를 그래프에 포함한 라우트 전부 500). linux-x64
+  // libvips를 강제 포함해 보정한다. 키는 minimatch라 "/[site]/**" 꼴은
+  // 대괄호가 문자 클래스로 해석되므로 전체 라우트("/**")에 건다.
+  outputFileTracingIncludes: {
+    "/**": [
+      "../../node_modules/.pnpm/@img+sharp-libvips-linux-x64@*/**",
+    ],
+  },
   experimental: {
     ...baseConfig.experimental,
     serverActions: {
