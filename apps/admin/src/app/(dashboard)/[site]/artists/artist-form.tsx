@@ -162,9 +162,8 @@ export function ArtistForm({
                 id={slugFieldId}
                 value={slugPreview}
                 readOnly
-                disabled
                 aria-describedby={slugHintId}
-                className="font-mono"
+                className="bg-muted font-mono"
               />
               <p id={slugHintId} className="text-muted-foreground text-xs">
                 {mode === "create"
