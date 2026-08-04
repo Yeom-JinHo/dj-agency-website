@@ -86,6 +86,27 @@ export function SocialsFieldArray() {
           </p>
         ) : (
           <div className="space-y-3">
+            {/* 컬럼 헤더 한 줄 — 반복 행마다 FormLabel을 붙이면 4행 × 3필드로 라벨이
+                12개가 되어 카드가 라벨로 덮인다. 그렇다고 aria-label만 달면 시각
+                사용자는 값이 채워져 placeholder가 사라지는 순간 "@ye0m_2"가 URL인지
+                표시 이름인지 알 수 없다 — 그 문제는 화면에 남는 헤더만 풀 수 있다.
+                aria-hidden인 이유: 같은 이름이 이미 컨트롤마다 aria-label로 가 있어
+                보조기기에는 중복 낭독일 뿐이다.
+                폭은 아래 행과 같은 값(w-40 / flex-1 / w-36 + 버튼 자리 size-9)을
+                써야 컬럼이 어긋나지 않는다 — 행 마크업을 고치면 여기도 함께 고칠 것. */}
+            <div
+              aria-hidden
+              className="text-muted-foreground flex items-center gap-2 text-xs font-medium"
+            >
+              <span className="w-40 shrink-0">플랫폼</span>
+              <span className="flex-1">URL</span>
+              {/* 세 번째 컬럼은 스키마 필드명(label)이 아니라 placeholder가 말하는
+                  용도("표시 이름")로 부른다 — 화면에 두 표기가 공존하면 안 된다.
+                  "(선택)"은 헤더로 올리지 않는다: 선택 여부가 의미 있는 건 비어
+                  있을 때뿐이고 그때는 placeholder가 그대로 보인다. */}
+              <span className="w-36 shrink-0">표시 이름</span>
+              <span className="size-9 shrink-0" />
+            </div>
             {socials.fields.map((row, index) => (
               <div key={row.id} className="flex items-start gap-2">
                 <FormField
@@ -95,7 +116,19 @@ export function SocialsFieldArray() {
                     <FormItem className="w-40 shrink-0">
                       <Select value={field.value} onValueChange={field.onChange}>
                         <FormControl>
-                          <SelectTrigger className="w-full">
+                          {/* 행 번호를 이름에 넣는다 — "URL"만 네 번 읽히면 스크린리더
+                              사용자는 몇 번째 소셜을 편집 중인지 알 수 없다. 접두사는
+                              카드 제목과 같은 "소셜"로 간다: 빈 카피만 행의 실체(링크)를
+                              말할 뿐 섹션 이름은 소셜이고, "링크 1 URL"은 동어반복이다.
+                              트리거는 선택값을 텍스트로 갖고 있어 aria-label이 그 값을
+                              이름 자리에서 밀어내지만, 값은 combobox 값으로 따로 낭독된다
+                              — PLATFORM_DISPLAY 도입 후로는 그 값이 "Instagram"이라
+                              화면에 보이는 표기와 낭독이 같아졌다(종전엔 원시값이었다).
+                              site-switcher가 이미 쓰는 처방이다. */}
+                          <SelectTrigger
+                            className="w-full"
+                            aria-label={`소셜 ${index + 1} 플랫폼`}
+                          >
                             <SelectValue placeholder="플랫폼" />
                           </SelectTrigger>
                         </FormControl>
@@ -117,7 +150,11 @@ export function SocialsFieldArray() {
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormControl>
-                        <Input placeholder="https://…" {...field} />
+                        <Input
+                          placeholder="https://…"
+                          aria-label={`소셜 ${index + 1} URL`}
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -133,6 +170,7 @@ export function SocialsFieldArray() {
                             이름)와 선택 사항임을 placeholder가 직접 말한다. */}
                         <Input
                           placeholder="표시 이름 (선택)"
+                          aria-label={`소셜 ${index + 1} 표시 이름`}
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -146,7 +184,9 @@ export function SocialsFieldArray() {
                   variant="ghost"
                   size="icon"
                   onClick={() => socials.remove(index)}
-                  aria-label="소셜 제거"
+                  // 입력들이 행 번호로 불리는데 제거 버튼만 "소셜 제거"면 어느 행이
+                  // 사라지는지 모른 채 파괴적 동작을 누르게 된다 — 같은 어휘로 맞춘다.
+                  aria-label={`소셜 ${index + 1} 제거`}
                 >
                   <Trash2Icon />
                 </Button>
