@@ -16,8 +16,11 @@ export function FormActions({
 }) {
   return (
     <div
+      // 불투명 배경 — 반투명(80~95%)+blur는 스크롤 중간에 바 뒤로 필드 라벨이
+      // 반쯤 판독되는 상태를 만들었다(designer 독립 리뷰). 바 아래 콘텐츠는
+      // "가려져 있다"가 읽기 어중간하게 "비쳐 보인다"보다 낫다.
       className={cn(
-        "bg-background/95 supports-[backdrop-filter]:bg-background/80 sticky bottom-0 z-10 flex items-center gap-3 border-t py-4 backdrop-blur",
+        "bg-background sticky bottom-0 z-10 flex items-center gap-3 border-t py-4",
         className,
       )}
     >
