@@ -83,14 +83,14 @@ export function DeleteEntityButton({
       }}
     >
       <DialogTrigger asChild>
-        {/* 트리거는 outline으로 낮춘다 — 편집 화면 우상단의 red filled는 저장(하단
-            sticky)보다 강한 최상위 CTA로 읽혔고, 목록의 "새 릴리즈"(filled)와 같은
-            자리라 습관 클릭 위험도 있었다. 파괴 의사를 확정하는 다이얼로그 안의
-            확인 버튼만 destructive filled를 유지한다. */}
+        {/* 트리거는 ghost까지 낮춘다 — outline(빨간 테두리)로도 우상단에서 화면의
+            가장 강한 유채색이라 시선을 저장보다 먼저 잡았다(designer 독립 리뷰).
+            평시엔 muted로 가라앉고 hover에서만 destructive 의도를 드러낸다.
+            파괴 의사를 확정하는 다이얼로그 안의 확인 버튼만 filled를 유지한다. */}
         <Button
           type="button"
-          variant="outline"
-          className="text-destructive border-destructive/40 hover:bg-destructive/10 hover:text-destructive"
+          variant="ghost"
+          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
         >
           삭제
         </Button>
@@ -98,9 +98,13 @@ export function DeleteEntityButton({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{entityLabel} 삭제</DialogTitle>
+          {/* "을(를)" 병기는 다른 카피의 완성도에 비해 거칠다 — 이름 뒤에 받침
+              중립인 entityLabel(아티스트·릴리즈·투어, 모두 "를")을 붙여 조사를
+              엔티티명에서 떼어낸다. 성공 토스트("{entityLabel}를 삭제했습니다")와
+              같은 문형. */}
           <DialogDescription>
-            &ldquo;{entityName}&rdquo;을(를) 삭제합니다. 이 작업은 되돌릴 수
-            없습니다.
+            &ldquo;{entityName}&rdquo; {entityLabel}를 삭제합니다. 이 작업은
+            되돌릴 수 없습니다.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
