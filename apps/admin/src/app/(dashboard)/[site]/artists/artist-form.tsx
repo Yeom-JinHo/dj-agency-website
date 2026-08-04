@@ -297,6 +297,24 @@ export function ArtistForm({
               </p>
             ) : (
               <div className="space-y-3">
+                {/* 컬럼 헤더 한 줄 — socials 카드와 같은 처방이다(이유는
+                    socials-field-array.tsx 주석). 값이 채워지면 placeholder가
+                    사라져 "MIX · 2025"가 제목인지 메타인지 화면에서 알 수 없었다.
+                    두 번째 컬럼은 placeholder가 형식 예시("예: MIX · 2025")로 바뀌면서
+                    필드 이름을 아예 말하지 않게 됐다 — 비어 있을 때조차 이 헤더가
+                    유일한 이름이라 더 필요해졌다. "(선택)"은 헤더로 올리지 않는다:
+                    선택 여부가 의미 있는 건 비어 있을 때뿐이고 그땐 placeholder가 보인다.
+                    섹션 어휘는 "대표 작업"·"등록된 작업이 없습니다" 그대로라 라벨도
+                    제거 버튼과 같은 "작업"을 쓴다(#306은 socials 쪽만 손봤다).
+                    폭은 아래 행과 같은 값(flex-1 / flex-1 + 버튼 자리 size-9). */}
+                <div
+                  aria-hidden
+                  className="text-muted-foreground flex items-center gap-2 text-xs font-medium"
+                >
+                  <span className="flex-1">제목</span>
+                  <span className="flex-1">메타</span>
+                  <span className="size-9 shrink-0" />
+                </div>
                 {works.fields.map((row, index) => (
                   <div key={row.id} className="flex items-start gap-2">
                     <FormField
@@ -305,7 +323,13 @@ export function ArtistForm({
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormControl>
-                            <Input placeholder="제목" {...field} />
+                            {/* 행 번호는 스크린리더용 — "제목"만 세 번 읽히면 몇 번째
+                                작업인지 알 수 없다. 어휘는 제거 버튼의 "작업"에 맞춘다. */}
+                            <Input
+                              placeholder="제목"
+                              aria-label={`작업 ${index + 1} 제목`}
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -321,6 +345,7 @@ export function ArtistForm({
                                 데이터가 따르는 표기(분류 · 연도)를 예시로 보인다. */}
                             <Input
                               placeholder="예: MIX · 2025 (선택)"
+                              aria-label={`작업 ${index + 1} 메타`}
                               {...field}
                               value={field.value ?? ""}
                             />
@@ -334,7 +359,9 @@ export function ArtistForm({
                       variant="ghost"
                       size="icon"
                       onClick={() => works.remove(index)}
-                      aria-label="작업 제거"
+                      // 입력들이 행 번호로 불리는데 제거 버튼만 "작업 제거"면 어느
+                      // 행이 사라지는지 모른 채 파괴적 동작을 누르게 된다.
+                      aria-label={`작업 ${index + 1} 제거`}
                     >
                       <Trash2Icon />
                     </Button>
