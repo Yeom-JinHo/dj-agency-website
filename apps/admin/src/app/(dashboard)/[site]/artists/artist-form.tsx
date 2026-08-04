@@ -313,8 +313,10 @@ export function ArtistForm({
                       render={({ field }) => (
                         <FormItem className="flex-1">
                           <FormControl>
+                            {/* "메타(선택)"만으로는 형식을 알 수 없었다 — 기존
+                                데이터가 따르는 표기(분류 · 연도)를 예시로 보인다. */}
                             <Input
-                              placeholder="메타(선택)"
+                              placeholder="예: MIX · 2025 (선택)"
                               {...field}
                               value={field.value ?? ""}
                             />

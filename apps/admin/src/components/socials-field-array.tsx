@@ -31,6 +31,23 @@ interface SocialsFormValues {
   socials: Social[];
 }
 
+/** 셀렉트 표시용 정식 표기 — 저장 값은 소문자 enum 그대로 두고 표기만 매핑한다.
+ *  릴리즈 폼의 플랫폼 링크(Beatport·Apple Music…)가 정식 표기를 쓰는데 여기만
+ *  원시값(instagram)이 노출돼 같은 개념이 두 표기로 갈렸다(designer 독립 리뷰). */
+const PLATFORM_DISPLAY: Record<(typeof SOCIAL_PLATFORMS)[number], string> = {
+  instagram: "Instagram",
+  youtube: "YouTube",
+  soundcloud: "SoundCloud",
+  spotify: "Spotify",
+  beatport: "Beatport",
+  appleMusic: "Apple Music",
+  youtubeMusic: "YouTube Music",
+  bandcamp: "Bandcamp",
+  tiktok: "TikTok",
+  x: "X",
+  website: "웹사이트",
+};
+
 /**
  * socials 필드어레이 카드(artist·release 공용). control은 상위 <Form>(FormProvider)
  * 컨텍스트에서 받아 폼 전체 값 타입에 결합하지 않는다 — socials 부분만 알면 된다.
@@ -62,9 +79,10 @@ export function SocialsFieldArray() {
         </CardAction>
       </CardHeader>
       <CardContent className="space-y-3">
+        {/* 빈 카피는 "소셜이 없습니다" 대신 행의 실체(링크)로 말한다. */}
         {socials.fields.length === 0 ? (
           <p className="text-muted-foreground text-sm">
-            등록된 소셜이 없습니다.
+            등록된 링크가 없습니다.
           </p>
         ) : (
           <div className="space-y-3">
@@ -84,7 +102,7 @@ export function SocialsFieldArray() {
                         <SelectContent>
                           {SOCIAL_PLATFORMS.map((platform) => (
                             <SelectItem key={platform} value={platform}>
-                              {platform}
+                              {PLATFORM_DISPLAY[platform]}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -109,10 +127,12 @@ export function SocialsFieldArray() {
                   control={control}
                   name={`socials.${index}.label`}
                   render={({ field }) => (
-                    <FormItem className="w-32 shrink-0">
+                    <FormItem className="w-36 shrink-0">
                       <FormControl>
+                        {/* "라벨"만으로는 무슨 라벨인지 알 수 없었다 — 용도(표시
+                            이름)와 선택 사항임을 placeholder가 직접 말한다. */}
                         <Input
-                          placeholder="라벨"
+                          placeholder="표시 이름 (선택)"
                           {...field}
                           value={field.value ?? ""}
                         />
