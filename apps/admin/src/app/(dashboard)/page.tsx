@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import { SITE_SLUGS } from "@repo/content/schema";
 import {
   adminCountArtists,
@@ -139,6 +140,12 @@ export default async function DashboardPage() {
                   ))}
                 </p>
               </div>
+              {/* 클릭 어포던스 — 카드에 버튼·화살표가 없어 "누르는 것"이라는 신호가
+                  안내 문구뿐이었다. 무채색 chevron 하나로 방향을 알린다(액센트 불증가). */}
+              <ChevronRight
+                className="text-muted-foreground ml-auto size-4 shrink-0"
+                aria-hidden
+              />
             </Link>
           );
         })}
