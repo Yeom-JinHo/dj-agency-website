@@ -146,6 +146,9 @@ export default function LoginPage() {
                       <Input
                         type="password"
                         autoComplete="current-password"
+                        // 이메일(you@example.com)만 placeholder가 있어 두 필드의
+                        // 시각 균형이 어긋났다 — 마스킹 관례 표기로 맞춘다.
+                        placeholder="••••••••"
                         {...field}
                       />
                     </FormControl>

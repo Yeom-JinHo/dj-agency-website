@@ -138,9 +138,17 @@ export function ReleaseForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>제목</FormLabel>
+                  {/* 필수 표시 — 없으면 제출 후 서버·스키마 에러로만 알 수 있다.
+                      별표는 장식이 아니라 시각 전용 관례라 aria-hidden으로 숨기고,
+                      의미는 input의 aria-required가 전달한다(3개 폼 공통 패턴). */}
+                  <FormLabel>
+                    제목
+                    <span aria-hidden className="text-destructive -ml-1">
+                      *
+                    </span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="릴리즈 제목" {...field} />
+                    <Input placeholder="릴리즈 제목" aria-required {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -353,24 +361,22 @@ export function ReleaseForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-semibold">플랫폼 링크</h2>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="space-y-3">
+          <CardContent>
+            {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명
+                카드와 폼 문법이 갈렸다. 설명 카드와 같은 2열 그리드로 통일한다. */}
+            <div className="grid gap-4 sm:grid-cols-2">
               {PLATFORM_LINK_KEYS.map((key) => (
                 <FormField
                   key={key}
                   control={form.control}
                   name={`platformLinks.${key}`}
                   render={({ field }) => (
-                    <FormItem className="flex items-start gap-3">
-                      <FormLabel className="mt-2.5 w-28 shrink-0">
-                        {PLATFORM_LABELS[key]}
-                      </FormLabel>
-                      <div className="flex-1 space-y-1">
-                        <FormControl>
-                          <Input placeholder="https://…" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </div>
+                    <FormItem>
+                      <FormLabel>{PLATFORM_LABELS[key]}</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://…" {...field} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

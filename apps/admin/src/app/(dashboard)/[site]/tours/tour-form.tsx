@@ -167,9 +167,16 @@ export function TourForm({
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>제목</FormLabel>
+                  {/* 필수 표시 — 별표는 시각 전용(aria-hidden), 의미는 aria-required가
+                      전달한다(release-form.tsx 제목 필드와 같은 패턴). */}
+                  <FormLabel>
+                    제목
+                    <span aria-hidden className="text-destructive -ml-1">
+                      *
+                    </span>
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="투어 제목" {...field} />
+                    <Input placeholder="투어 제목" aria-required {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -298,9 +305,14 @@ export function TourForm({
                 name="eventDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>공연 일시</FormLabel>
+                    <FormLabel>
+                      공연 일시
+                      <span aria-hidden className="text-destructive -ml-1">
+                        *
+                      </span>
+                    </FormLabel>
                     <FormControl>
-                      <Input type="datetime-local" {...field} />
+                      <Input type="datetime-local" aria-required {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
