@@ -8,6 +8,7 @@ import {
 } from "@repo/content/admin-queries";
 
 import { CATEGORY_ICONS } from "@/components/category-icons";
+import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { safeCount } from "@/lib/safe-count";
 import {
   CATEGORIES,
@@ -54,10 +55,13 @@ export default async function SiteHomePage({
 
   return (
     <div className="space-y-6">
+      {/* 목록·상세엔 있던 브레드크럼이 이 화면에만 없어 대시보드로 나가는 경로가
+          헤더 로고뿐이었다 — category 생략형(대시보드 > 사이트)으로 채운다. */}
+      <EntityBreadcrumb site={site} />
       <div className="space-y-1">
-        {/* 브레드크럼이 없는 최상위 화면이라 h1이 위치를 혼자 말한다 — 대시보드와 같은 text-2xl.
-            브레드크럼이 붙는 하위(목록·상세·new)는 그 줄이 이미 위치를 말하므로 text-xl로 한 단 낮춘다. */}
-        <h1 className="text-2xl font-semibold tracking-tight">
+        {/* 브레드크럼이 위치를 말하므로 h1은 목록·상세와 같은 text-xl —
+            "브레드크럼이 붙으면 한 단 낮춘다" 규약을 이 화면에도 적용한다. */}
+        <h1 className="text-xl font-semibold tracking-tight">
           {SITE_LABELS[site]}
         </h1>
         <p className="text-muted-foreground text-sm">
@@ -75,7 +79,8 @@ export default async function SiteHomePage({
           글리프 16px은 사이드바 nav와 같은 크기이고 nav의 active도 같은 인디고라,
           카드에서 고른 아이콘이 이동 후 nav에서 같은 무게·같은 색으로 다시 보인다.
           표면감·포커스 링은 대시보드 카드와 같은 처방 — 근거는 (dashboard)/page.tsx 주석. */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      {/* max-w-6xl — 대시보드 홈과 같은 캡. 근거는 (dashboard)/page.tsx 주석. */}
+      <div className="grid max-w-6xl gap-4 sm:grid-cols-3">
         {CATEGORIES.map((category) => {
           const Icon = CATEGORY_ICONS[category.segment];
           const count = counts[category.segment];

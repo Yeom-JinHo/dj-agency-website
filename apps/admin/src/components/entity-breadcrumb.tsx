@@ -33,7 +33,8 @@ import {
  * 로고 하나뿐이라, 릴리즈 상세를 보다 나가려면 브레드크럼 시선 밖 좌상단을 찾아야 했다.
  * "현재 위치 표시는 브레드크럼이 맡는다"고 자임하면서 정작 최상위가 비어 있었다.
  *
- * `current`가 없으면 카테고리가 곧 현재 위치(목록 페이지)다. 9곳
+ * `category`가 없으면 사이트 홈이 현재 위치다(대시보드 > 사이트). `current`가
+ * 없으면 카테고리가 곧 현재 위치(목록 페이지)다. 사이트 홈 + 9곳
  * (artists·releases·tours × 목록/[id]/new)이 이 한 컴포넌트를 공유해 중복 배선을 없앤다.
  * 링크는 GuardedLink로 미저장 가드를 건다(사이드바·헤더 로고와 동일한 어휘).
  */
@@ -43,7 +44,8 @@ export function EntityBreadcrumb({
   current,
 }: {
   site: SiteSlug;
-  category: CategorySegment;
+  /** 사이트 홈에서는 생략 — 사이트가 마지막 단이 된다. */
+  category?: CategorySegment;
   /** 상세·새로 만들기에서만 준다. 없으면 카테고리가 마지막 단(목록). */
   current?: string;
 }) {
@@ -64,11 +66,8 @@ export function EntityBreadcrumb({
         </BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink asChild>
-            <GuardedLink
-              href={`/${site}`}
-              className="inline-flex items-center gap-1.5"
-            >
+          {category === undefined ? (
+            <BreadcrumbPage className="inline-flex items-center gap-1.5">
               <Image
                 src={SITE_ICONS[site]}
                 alt=""
@@ -78,23 +77,44 @@ export function EntityBreadcrumb({
                 className="ring-border size-4 shrink-0 rounded-[4px] ring-1"
               />
               {SITE_LABELS[site]}
-            </GuardedLink>
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          {current === undefined ? (
-            <BreadcrumbPage>{label}</BreadcrumbPage>
+            </BreadcrumbPage>
           ) : (
             <BreadcrumbLink asChild>
               <GuardedLink
-                href={withSearch(`/${site}/${category}`, searchParams)}
+                href={`/${site}`}
+                className="inline-flex items-center gap-1.5"
               >
-                {label}
+                <Image
+                  src={SITE_ICONS[site]}
+                  alt=""
+                  aria-hidden
+                  width={16}
+                  height={16}
+                  className="ring-border size-4 shrink-0 rounded-[4px] ring-1"
+                />
+                {SITE_LABELS[site]}
               </GuardedLink>
             </BreadcrumbLink>
           )}
         </BreadcrumbItem>
+        {category === undefined ? null : (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              {current === undefined ? (
+                <BreadcrumbPage>{label}</BreadcrumbPage>
+              ) : (
+                <BreadcrumbLink asChild>
+                  <GuardedLink
+                    href={withSearch(`/${site}/${category}`, searchParams)}
+                  >
+                    {label}
+                  </GuardedLink>
+                </BreadcrumbLink>
+              )}
+            </BreadcrumbItem>
+          </>
+        )}
         {current === undefined ? null : (
           <>
             <BreadcrumbSeparator />

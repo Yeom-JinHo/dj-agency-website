@@ -92,7 +92,10 @@ export default async function DashboardLayout({
       {/* tabIndex={-1} — 해시 이동만으로는 브라우저별로 포커스가 따라오지 않아
           다음 Tab이 다시 헤더로 돌아가는 일이 생긴다. 프로그램적 포커스만 받고
           탭 순서에는 끼지 않도록 -1을 준다. */}
-      <main id="main" tabIndex={-1} className="flex-1">
+      {/* flex flex-col — [site]/layout.tsx의 사이드바 컬럼이 flex-1로 남은 높이를
+          다 받게 한다. 이전의 min-h-full(%)은 flex-1 아이템의 불확정 높이에서 해석되지
+          않아 짧은 페이지(사이트 홈·빈 목록)에서 사이드바 배경이 콘텐츠 높이에 끊겼다. */}
+      <main id="main" tabIndex={-1} className="flex flex-1 flex-col">
         {children}
       </main>
     </div>
