@@ -118,13 +118,13 @@ export function ImageField({
     <div className="space-y-2">
       <Label htmlFor={inputId}>{label}</Label>
       <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+        <div className="bg-muted flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-md border">
           {preview ? (
             <Image
               src={preview}
               alt={label}
-              width={80}
-              height={80}
+              width={112}
+              height={112}
               unoptimized
               className="size-full object-cover"
             />
