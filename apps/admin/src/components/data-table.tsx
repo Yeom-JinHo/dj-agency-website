@@ -212,22 +212,39 @@ export function DataTable<T extends { id: string }>({
 
   return (
     <div className="space-y-3">
-      <div className="relative max-w-xs">
-        <Search
-          className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-          aria-hidden
-        />
-        <Input
-          type="search"
-          value={query}
-          onChange={(e) => {
-            resetScroll();
-            setQuery(e.target.value);
-          }}
-          placeholder={searchPlaceholder}
-          aria-label={searchPlaceholder}
-          className="pl-9"
-        />
+      <div className="flex items-center gap-3">
+        <div className="relative max-w-xs flex-1">
+          <Search
+            className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+            aria-hidden
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(e) => {
+              resetScroll();
+              setQuery(e.target.value);
+            }}
+            placeholder={searchPlaceholder}
+            aria-label={searchPlaceholder}
+            className="pl-9"
+          />
+        </div>
+        {/* 총 건수. 예전엔 목록 규모를 알려면 끝까지 스크롤하는 수밖에 없었다.
+            검색창 바로 옆에 두는 이유는 이 숫자를 바꾸는 유일한 조작이 검색이기 때문이다 —
+            제목 옆(상위 page 소유)이나 표 위에 두면 원인과 결과가 떨어진다.
+            검색 중엔 분모를 남긴 "N건 중 M건"으로 간다. 결과 수만 보이면 방금 몇 건에서
+            걸러낸 건지 알 수 없어, 정작 "규모를 알려달라"는 원래 문제가 검색 중에 되살아난다.
+            전부 일치해 "38건 중 38건"이 되는 경우도 그대로 둔다 — 타이핑하는 동안 문구 형식이
+            일치 개수에 따라 튀는 편이 숫자가 겹치는 것보다 읽기 나쁘다.
+            라이브 리전이 아니므로 여기 숫자가 바뀌어도 발화되지 않는다. 검색 결과 발화는
+            아래 sr-only 리전이 계속 전담하고(빈 검색어는 침묵), 이 텍스트는 스크린리더가
+            훑을 때 "전체 몇 건인지"를 더해줄 뿐이라 중복 발화가 생기지 않는다. */}
+        <p className="text-muted-foreground shrink-0 text-sm tabular-nums">
+          {trimmedQuery
+            ? `${rows.length}건 중 ${resultCount}건`
+            : `총 ${rows.length}건`}
+        </p>
       </div>
 
       {/* 결과 개수 알림 전용 리전(시각적으로 숨김). assertive는 타이핑 자체를 끊으므로 polite. */}
@@ -379,8 +396,11 @@ export function DataTable<T extends { id: string }>({
                   {columns.map((column) => (
                     <TableCell key={column.id} className={column.cellClassName}>
                       {column.linked ? (
-                        // 히트 영역이 셀로 줄었으니 포커스 링도 링크 크기로 좁힌다
-                        // (헤더 정렬 버튼과 같은 링 어휘).
+                        // 링은 링크 크기 그대로 둔다(헤더 정렬 버튼과 같은 링 어휘) —
+                        // 히트 영역은 여전히 행 전체지만, 링이 말해야 하는 건 "지금 무엇에
+                        // 포커스가 있는가"이고 그건 이 링크다. 대신 행 전체가 대상이라는
+                        // 사실은 TableRow의 has-[a:focus-visible]이 hover와 같은 틴트·레일로
+                        // 말한다 — 그래야 마우스 어포던스와 키보드 어포던스가 어긋나지 않는다.
                         <Link
                           href={withSearch(rowHref(row), searchParams)}
                           className="focus-visible:ring-ring/50 rounded-sm outline-none focus-visible:ring-[3px]"
