@@ -1,0 +1,62 @@
+@import "tailwindcss";
+@plugin 'tailwindcss-animate';
+
+@source '../**/*.{ts,tsx}';
+@source '../../../../packages/ui/src/**/*.{ts,tsx}';
+
+@custom-variant dark (&:is(.dark *));
+
+/* font-* 토큰은 next/font가 주입하는 런타임 CSS var를 참조하므로
+   Tailwind v4가 빌드 타임에 var()를 resolve하도록 @theme inline 필요. */
+@theme inline {
+  --font-display: var(--font-anton);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jbmono);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@layer base {
+  * {
+    @apply m-0 box-border p-0;
+  }
+
+  body {
+    background-color: #0a0a0a;
+    color: #f5f3ef;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-delay: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
