@@ -118,24 +118,36 @@ export function ImageField({
     <div className="space-y-2">
       <Label htmlFor={inputId}>{label}</Label>
       <div className="flex items-center gap-4">
-        <div className="bg-muted flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-md border">
-          {preview ? (
+        {preview ? (
+          /* 미리보기는 저장 전 마지막 검증 게이트다. 정사각 cover 크롭은 세로
+             원본(아티스트 1200×1800)의 33%를 숨겨 워터마크·보더 같은 "내렸어야
+             할 사유"가 발행 후에야 보이는 경로를 만든다 — 원본 비율 그대로,
+             크롭 없이 보여주고 클릭하면 원본을 새 탭으로 연다. */
+          <a
+            href={preview}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${label} 원본을 새 탭에서 열기`}
+            className="bg-muted shrink-0 overflow-hidden rounded-md border"
+          >
             <Image
               src={preview}
               alt={label}
-              width={112}
-              height={112}
+              width={208}
+              height={208}
               unoptimized
-              className="size-full object-cover"
+              className="h-52 w-auto max-w-80 object-contain"
             />
-          ) : (
-            /* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
+          </a>
+        ) : (
+          <div className="bg-muted flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+            {/* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
                (흰 배경 위 4.73:1이 배경이 bg-muted #F5F5F5로 바뀌며 뒤집힌다).
                foreground 60%는 합성색 #686868 → 4.65:1로 통과하면서 본문 톤까지
-               올라가지는 않아 플레이스홀더의 위계를 유지한다. */
+               올라가지는 않아 플레이스홀더의 위계를 유지한다. */}
             <span className="text-foreground/60 text-xs">이미지 없음</span>
-          )}
-        </div>
+          </div>
+        )}
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2">
             {/* 네이티브 파일 인풋은 스타일을 입혀도 "선택된 파일 없음" 문자열과 긴

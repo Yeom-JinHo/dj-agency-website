@@ -26,22 +26,24 @@ const columns: DataTableColumn<ArtistRow>[] = [
   {
     id: "thumb",
     header: "",
-    headClassName: "w-16",
+    headClassName: "w-24",
     cell: (row) => (
-      <div className="bg-muted flex size-12 items-center justify-center overflow-hidden rounded-md">
+      <div className="bg-muted flex size-20 items-center justify-center overflow-hidden rounded-md">
         {row.thumb ? (
+          // 세로 원본(1200×1800)의 중앙 크롭은 전신샷에서 얼굴을 잘라낸다(VARO) —
+          // 인물 사진은 얼굴이 상단에 오므로 크롭 기준점을 20%로 올린다.
           <Image
             src={row.thumb}
             alt=""
-            width={48}
-            height={48}
-            className="size-full object-cover"
+            width={80}
+            height={80}
+            className="size-full object-cover object-[50%_20%]"
           />
         ) : (
           // 이미지가 없으면 빈 회색 박스만 남아 "미등록"인지 "로딩 실패"인지 읽히지 않는다.
           // 의미를 나르는 아이콘이라 장식으로 면제되지 않는다 — /60(bg-muted 위 2.21:1)은
           // 1.4.11의 3:1에 미달해 불투명 muted-foreground(4.35:1)로 올린다.
-          <ThumbIcon className="text-muted-foreground size-5" aria-hidden />
+          <ThumbIcon className="text-muted-foreground size-8" aria-hidden />
         )}
       </div>
     ),
