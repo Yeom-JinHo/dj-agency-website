@@ -20,15 +20,21 @@ import { SITE_SLUGS, type SiteSlug } from "@repo/content/schema";
 
 export type AdminSession = {
   user: User;
+  /**
+   * editors 멤버십 통과 여부. false면 로그인은 됐지만 admin 사용자가 아니다 —
+   * 이 상태를 null(미로그인)과 뭉치면 로그인 → / → /login으로 되돌려보내는 것 외에
+   * 할 수 있는 게 없어져, 당사자는 자기 계정이 거부됐다는 사실조차 듣지 못한다.
+   */
+  isEditor: boolean;
   /** 이 편집자가 편집할 수 있는 사이트. SITE_SLUGS 순서를 유지한다(화면 정렬이 일정하도록). */
   allowedSites: SiteSlug[];
 };
 
 /**
- * 로그인 + editors 멤버십을 모두 통과한 세션, 아니면 null.
- * editors에 없으면 접근 가능한 사이트가 0개인 것과 구분하지 않고 null을 준다 —
- * 전자는 "admin 사용자가 아님", 후자는 "사용자지만 부여된 사이트가 없음"이라
- * 호출 측에서 안내를 다르게 줄 수 있어야 하므로 후자는 allowedSites: []로 살려둔다.
+ * 로그인 세션. 미로그인만 null이고, 로그인했다면 판정 결과를 세 단계로 구분해 돌려준다:
+ * `isEditor: false`(admin 사용자가 아님) / `allowedSites: []`(사용자지만 부여된 사이트 없음) /
+ * 부여 있음. 셋은 사용자가 취할 행동이 서로 다르므로(다른 계정으로 로그인 · 운영자에게
+ * 부여 요청 · 그냥 작업) 호출 측이 안내를 나눌 수 있게 여기서 뭉개지 않는다.
  *
  * 조회 자체가 실패하면 throw한다 — "권한 없음"으로 조용히 강등시키지 않는다(아래 참고).
  */
@@ -66,12 +72,20 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
 
   const { data: editor } = editorResult;
   const { data: grants } = grantsResult;
-  if (!editor) return null;
+
+  // editors에 없으면 부여 행이 남아 있어도 allowedSites는 비운다 — RLS 쓰기 정책이
+  // 두 조건의 AND라 여기서 부여를 살려두면 UI만 열려 있고 저장에서 거부되는,
+  // 가장 나쁜 종류의 불일치가 생긴다.
+  if (!editor) return { user, isEditor: false, allowedSites: [] };
 
   // DB의 site_slug는 text라 SITE_SLUGS로 교차 필터해 SiteSlug로 좁힌다 —
   // sites에 없는 값이 들어올 일은 FK가 막지만, 타입 경계는 여기서 닫는다.
   const granted = new Set(grants?.map((row) => row.site_slug) ?? []);
-  return { user, allowedSites: SITE_SLUGS.filter((slug) => granted.has(slug)) };
+  return {
+    user,
+    isEditor: true,
+    allowedSites: SITE_SLUGS.filter((slug) => granted.has(slug)),
+  };
 });
 
 /** 현재 편집자가 해당 사이트를 편집할 수 있는지. 미로그인·비편집자는 false. */
