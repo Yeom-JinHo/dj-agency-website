@@ -41,6 +41,12 @@ export default async function ReleasesPage({
   if (!parsedSite.success) notFound();
   const siteSlug = parsedSite.data;
 
+  // 투어 목록과 달리 로스터 조회를 유지한다 — 아래 artistNameById가 이 조회의 유일한
+  // 용처다. artistCredit 폴백은 행이 스스로 들고 있어 조회 없이도 되지만, credit이 비고
+  // primary_artist_id만 걸린 기존 행은 로스터에서 이름을 찾아야 목록에 뜬다. 아티스트를
+  // 관리하지 않는 사이트에선 그 FK를 새로 만들 수단이 없어 조회가 빈 결과여도 정상이며,
+  // 그렇다고 조회를 지우면 이미 걸린 FK의 이름이 조용히 "—"가 된다.
+  // (투어는 FK뿐이고 폴백도 없어 열째 감춘다: tours/tours-table.tsx 주석.)
   const [releases, artists] = await Promise.all([
     adminListReleases(siteSlug),
     adminListArtists(siteSlug),

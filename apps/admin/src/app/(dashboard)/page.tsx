@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { SITE_SLUGS } from "@repo/content/schema";
+import { SITE_SLUGS, type SiteSlug } from "@repo/content/schema";
 import {
   adminCountArtists,
   adminCountReleases,
@@ -11,11 +11,21 @@ import {
 
 import { safeCount } from "@/lib/safe-count";
 import {
-  CATEGORIES,
+  siteCategories,
   SITE_ICONS,
   SITE_LABELS,
   type CategorySegment,
 } from "@/lib/sites";
+
+/** 세그먼트 → 카운트 조회. 사이트마다 노출 카테고리가 달라 조회를 세그먼트로 고른다. */
+const COUNT_BY_SEGMENT: Record<
+  CategorySegment,
+  (site: SiteSlug) => Promise<number>
+> = {
+  artists: adminCountArtists,
+  releases: adminCountReleases,
+  tours: adminCountTours,
+};
 
 /**
  * 라우트별 제목 규약의 기준점. Next의 AppRouterAnnouncer는 `previousTitle !== currentTitle`
@@ -33,31 +43,22 @@ export const metadata: Metadata = {
 
 // 사이트-우선 라우트(§8): 대시보드는 4개 사이트 카드 → /[site].
 export default async function DashboardPage() {
-  // 4개 사이트 × 3엔티티 = 12개 카운트를 모두 병렬로 던진다.
+  // 사이트별 노출 카테고리(SITE_CATEGORY_SEGMENTS)만큼만 병렬로 던진다 —
+  // 4×3=12개를 무조건 세던 것에서 실제 노출분으로 줄었다(안 보여줄 수를 셀 이유가 없다).
   const summaries = await Promise.all(
     SITE_SLUGS.map(async (site) => {
-      const [artists, releases, tours] = await Promise.all([
-        safeCount(adminCountArtists(site)),
-        safeCount(adminCountReleases(site)),
-        safeCount(adminCountTours(site)),
-      ]);
-      const bySegment: Record<CategorySegment, number | null> = {
-        artists,
-        releases,
-        tours,
-      };
       // 라벨은 CATEGORIES 단일 출처 — 사이트 홈에서 카드 제목으로 쓰이는 그 문자열이다.
       // 조회 실패(null)를 필터링해 숨기지 않는다 — "원래 카운트 없음"과 구분이 안 되기 때문.
       // site를 함께 담아 렌더에서 인덱스로 되찾지 않는다(짝이 어긋날 여지를 없앤다).
-      return {
-        site,
-        counts: CATEGORIES.map(({ segment, label }) => ({
+      const counts = await Promise.all(
+        siteCategories(site).map(async ({ segment, label }) => ({
           segment,
           label,
-          count: bySegment[segment],
-        })),
-      };
-    }),
+          count: await safeCount(COUNT_BY_SEGMENT[segment](site)),
+        }))
+      );
+      return { site, counts };
+    })
   );
 
   return (
@@ -114,11 +115,11 @@ export default async function DashboardPage() {
               />
               <div className="min-w-0">
                 <h2 className="text-base font-medium">{SITE_LABELS[site]}</h2>
-                {/* 카드 하나가 카테고리 3개를 요약하므로 라벨이 없으면 "3 · 5 · 2"가 되어
-                    무엇의 수인지 알 수 없다. 사이트 홈은 카드마다 카운트가 하나뿐이고
-                    제목이 곧 라벨이라 숫자만 쓴다 — 표기가 다른 건 이 구조 차이 때문이다.
-                    text-xs도 같은 이유: lg:grid-cols-4 한 칸에 라벨+숫자 3쌍이 들어간다.
-                    (사이트 홈은 3칸에 숫자 하나뿐이라 text-sm.) */}
+                {/* 카드 하나가 그 사이트의 카테고리(최대 3개)를 한 줄로 요약하므로 라벨이
+                    없으면 "3 · 5 · 2"가 되어 무엇의 수인지 알 수 없다. 사이트 홈은 카드마다
+                    카운트가 하나뿐이고 제목이 곧 라벨이라 숫자만 쓴다 — 표기가 다른 건 이
+                    구조 차이 때문이다. text-xs도 같은 이유: lg:grid-cols-4 한 칸에 라벨+숫자가
+                    최대 3쌍 들어간다. (사이트 홈은 카드 하나에 숫자 하나뿐이라 text-sm.) */}
                 <p className="text-muted-foreground mt-0.5 text-xs tabular-nums">
                   {counts.map(({ segment, label, count }, i) => (
                     <span key={segment}>

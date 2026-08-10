@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import {
-  adminGetReleaseById,
-  adminListArtists,
-} from "@repo/content/admin-queries";
+import { adminGetReleaseById } from "@repo/content/admin-queries";
 import { PLATFORM_LINK_KEYS, siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { DeleteEntityButton } from "@/components/delete-entity-button";
+import { rosterOptions } from "@/lib/roster-options";
 import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ReleaseForm } from "../release-form";
 import { type ReleaseFormValues } from "../schema";
@@ -41,7 +39,8 @@ export default async function EditReleasePage({
 
   const [release, artists] = await Promise.all([
     adminGetReleaseById(id),
-    adminListArtists(siteSlug),
+    // 아티스트 미노출 사이트에선 빈 배열(rosterOptions 주석).
+    rosterOptions(siteSlug),
   ]);
 
   // 다른 사이트의 릴리즈를 이 라우트로 편집하지 못하게 소속 방어.
@@ -49,7 +48,7 @@ export default async function EditReleasePage({
 
   // platform_links → 5개 확정 키의 문자열 폼 표현(빈 키는 ""). Release는 이미 파싱된 도메인 객체.
   const platformLinks = Object.fromEntries(
-    PLATFORM_LINK_KEYS.map((k) => [k, release.platformLinks[k] ?? ""]),
+    PLATFORM_LINK_KEYS.map((k) => [k, release.platformLinks[k] ?? ""])
   ) as Record<(typeof PLATFORM_LINK_KEYS)[number], string>;
 
   const defaultValues: ReleaseFormValues = {

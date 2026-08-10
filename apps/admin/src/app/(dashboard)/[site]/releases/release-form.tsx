@@ -6,6 +6,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { PLATFORM_LINK_KEYS, type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
+import { hasSiteCategory } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -60,7 +61,7 @@ interface ReleaseFormProps {
   /** edit 모드: 기존 slug(불변, 읽기 전용 표시). */
   slug?: string;
   defaultValues: ReleaseFormValues;
-  /** primary artist select 옵션(같은 사이트 소속 로스터). */
+  /** primary artist select 옵션(같은 사이트 소속 로스터). 아티스트 미노출 사이트에선 빈 배열. */
   artists: { id: string; name: string }[];
   initialArtworkUrl?: string | null;
 }
@@ -76,6 +77,20 @@ export function ReleaseForm({
 }: ReleaseFormProps) {
   const listHref = `/${site}/releases`;
   const [artwork, setArtwork] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
+
+  /**
+   * 로스터 셀렉트는 아티스트를 노출하는 사이트에서만 낸다(SITE_CATEGORY_SEGMENTS).
+   * 아티스트 화면이 없는 사이트(payday·juntaro)에서 이 셀렉트만 남으면 "고를 수는 있는데
+   * 이름을 고치거나 새로 만들 화면은 없는" 막다른 필드가 된다. 그 사이트들은 공개 앱도
+   * artistCredit만 읽으므로(payday sections/release/data.ts, juntaro app/music/page.tsx)
+   * 아래 "아티스트 크레딧" 자유 입력이 그대로 대체한다.
+   *
+   * 필드를 폼 값에서 빼지 않고 **렌더만** 막는다 — formValuesToDbInput이
+   * `primary_artist_id: values.primaryArtistId || null`로 매핑하므로, 값을 지우면
+   * 기존에 연결돼 있던 FK가 저장할 때마다 null로 날아간다. defaultValues는 기존 행에서
+   * 오고 RHF는 렌더되지 않은 값도 그대로 들고 있어, 감춰도 저장 시 원래 id가 보존된다.
+   */
+  const showArtistSelect = hasSiteCategory(site, "artists");
 
   const form = useForm<ReleaseFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -97,6 +112,9 @@ export function ReleaseForm({
     createdMessage: "릴리즈를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved: form.formState.isDirty || isImageFieldDirty(artwork),
+    // 셀렉트를 감춘 사이트에선 서버의 primaryArtistId 오류(assertArtistInSite)를 붙일
+    // 자리가 없다 — 토스트로 받게 넘긴다(useEntityFormSubmit hiddenFields 주석).
+    hiddenFields: showArtistSelect ? undefined : (["primaryArtistId"] as const),
     buildFormData: (values: ReleaseFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));
@@ -175,43 +193,45 @@ export function ReleaseForm({
               </p>
             </div>
 
-            <FormField
-              control={form.control}
-              name="primaryArtistId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>주요 아티스트</FormLabel>
-                  <Select
-                    value={field.value === "" ? NO_ARTIST : field.value}
-                    onValueChange={(v) =>
-                      field.onChange(v === NO_ARTIST ? "" : v)
-                    }
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="아티스트 선택" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={NO_ARTIST}>없음</SelectItem>
-                      {artists.map((artist) => (
-                        <SelectItem key={artist.id} value={artist.id}>
-                          {artist.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {/* 생 <p> 대신 FormDescription — FormControl의 aria-describedby가
-                      이 요소를 가리켜야 "로스터 밖은 크레딧" 같은 입력 규칙이 필드와
-                      함께 낭독된다. text-xs는 기존 크기 유지용(기본값은 text-sm). */}
-                  <FormDescription className="text-xs">
-                    이 사이트 소속 로스터의 아티스트. 로스터 밖 표기는 아티스트
-                    크레딧을 사용하세요.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {showArtistSelect && (
+              <FormField
+                control={form.control}
+                name="primaryArtistId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>주요 아티스트</FormLabel>
+                    <Select
+                      value={field.value === "" ? NO_ARTIST : field.value}
+                      onValueChange={(v) =>
+                        field.onChange(v === NO_ARTIST ? "" : v)
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="아티스트 선택" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={NO_ARTIST}>없음</SelectItem>
+                        {artists.map((artist) => (
+                          <SelectItem key={artist.id} value={artist.id}>
+                            {artist.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {/* 생 <p> 대신 FormDescription — FormControl의 aria-describedby가
+                        이 요소를 가리켜야 "로스터 밖은 크레딧" 같은 입력 규칙이 필드와
+                        함께 낭독된다. text-xs는 기존 크기 유지용(기본값은 text-sm). */}
+                    <FormDescription className="text-xs">
+                      이 사이트 소속 로스터의 아티스트. 로스터 밖 표기는 아티스트
+                      크레딧을 사용하세요.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
@@ -222,8 +242,13 @@ export function ReleaseForm({
                   <FormControl>
                     <Input placeholder="예: Sam Collins" {...field} />
                   </FormControl>
+                  {/* 로스터 셀렉트가 없는 사이트에선 "로스터 밖"이라는 대비가 성립하지
+                      않는다(비교 대상이 화면에 없다) — 이 필드가 아티스트 표기의
+                      유일한 수단임을 그대로 말한다. */}
                   <FormDescription className="text-xs">
-                    로스터에 없는 외부 아티스트 표시용 자유 텍스트.
+                    {showArtistSelect
+                      ? "로스터에 없는 외부 아티스트 표시용 자유 텍스트."
+                      : "사이트에 표시되는 아티스트명."}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

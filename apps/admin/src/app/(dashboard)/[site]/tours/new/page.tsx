@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { adminListArtists } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
 
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
+import { rosterOptions } from "@/lib/roster-options";
 import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { TourForm } from "../tour-form";
 import { emptyTourFormValues } from "../schema";
@@ -29,8 +29,9 @@ export default async function NewTourPage({
   if (!parsed.success) notFound();
   const site = parsed.data;
 
-  // artist select는 같은 사이트 소속 로스터만.
-  const artists = await adminListArtists(site);
+  // artist select는 같은 사이트 소속 로스터만. 아티스트 미노출 사이트에선 빈 배열이고
+  // 폼도 셀렉트를 렌더하지 않는다(rosterOptions 주석).
+  const artists = await rosterOptions(site);
 
   return (
     <div className="space-y-6">

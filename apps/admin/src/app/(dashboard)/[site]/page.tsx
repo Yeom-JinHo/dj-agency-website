@@ -7,16 +7,27 @@ import {
   adminCountReleases,
   adminCountTours,
 } from "@repo/content/admin-queries";
+import type { SiteSlug } from "@repo/content/schema";
 
 import { CATEGORY_ICONS } from "@/components/category-icons";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { safeCount } from "@/lib/safe-count";
 import {
-  CATEGORIES,
   isSiteSlug,
+  siteCategories,
   SITE_LABELS,
   type CategorySegment,
 } from "@/lib/sites";
+
+/** 세그먼트 → 카운트 조회. 대시보드 홈과 같은 이유·같은 모양((dashboard)/page.tsx 주석). */
+const COUNT_BY_SEGMENT: Record<
+  CategorySegment,
+  (site: SiteSlug) => Promise<number>
+> = {
+  artists: adminCountArtists,
+  releases: adminCountReleases,
+  tours: adminCountTours,
+};
 
 /**
  * 사이트 라벨이 params에 달려 있어 정적 metadata로는 만들 수 없다(제목 규약은
@@ -34,7 +45,7 @@ export async function generateMetadata({
   return { title: `${SITE_LABELS[site]} | ye0m2 admin` };
 }
 
-// 사이트 홈(§8): 카테고리 3카드 → /[site]/artists 등.
+// 사이트 홈(§8): 그 사이트가 쓰는 카테고리 카드(최대 3장) → /[site]/artists 등.
 export default async function SiteHomePage({
   params,
 }: {
@@ -43,16 +54,14 @@ export default async function SiteHomePage({
   const { site } = await params;
   if (!isSiteSlug(site)) notFound();
 
-  const [artists, releases, tours] = await Promise.all([
-    safeCount(adminCountArtists(site)),
-    safeCount(adminCountReleases(site)),
-    safeCount(adminCountTours(site)),
-  ]);
-  const counts: Record<CategorySegment, number | null> = {
-    artists,
-    releases,
-    tours,
-  };
+  // 이 사이트가 쓰는 카테고리만 세고, 그만큼만 카드를 낸다(SITE_CATEGORY_SEGMENTS).
+  const categories = siteCategories(site);
+  const counts = await Promise.all(
+    categories.map(async (category) => ({
+      category,
+      count: await safeCount(COUNT_BY_SEGMENT[category.segment](site)),
+    }))
+  );
 
   return (
     <div className="space-y-6">
@@ -81,10 +90,12 @@ export default async function SiteHomePage({
           카드에서 고른 아이콘이 이동 후 nav에서 같은 무게·같은 색으로 다시 보인다.
           표면감·포커스 링은 대시보드 카드와 같은 처방 — 근거는 (dashboard)/page.tsx 주석. */}
       {/* max-w-6xl — 대시보드 홈과 같은 캡. 근거는 (dashboard)/page.tsx 주석. */}
+      {/* 카드가 1~2장인 사이트에서도 grid-cols-3을 유지한다 — 열 수를 개수에 맞추면
+          celebrate(1장)의 카드가 6xl 폭으로 늘어나 같은 카드가 사이트마다 다른 크기로
+          읽힌다. 오른쪽을 비워 두는 편이 카드 기하를 사이트 간 일정하게 지킨다. */}
       <div className="grid max-w-6xl gap-4 sm:grid-cols-3">
-        {CATEGORIES.map((category) => {
+        {counts.map(({ category, count }) => {
           const Icon = CATEGORY_ICONS[category.segment];
-          const count = counts[category.segment];
           return (
             <Link
               key={category.segment}
@@ -97,7 +108,7 @@ export default async function SiteHomePage({
               <div className="min-w-0">
                 <h2 className="text-base font-medium">{category.label}</h2>
                 {/* 카드마다 카운트가 하나뿐이고 제목이 곧 라벨이라 숫자만 쓴다. 대시보드는
-                    카드 하나가 카테고리 3개를 요약해 라벨이 필요하므로 표기가 다르다 —
+                    카드 하나가 카테고리 여러 개를 요약해 라벨이 필요하므로 표기가 다르다 —
                     구조가 달라서 다른 것이니 맞추지 않는다. 분류사도 엔티티마다 달라(명/개/회)
                     postfix는 붙이지 않는다. */}
                 <p className="text-muted-foreground mt-0.5 text-sm tabular-nums">

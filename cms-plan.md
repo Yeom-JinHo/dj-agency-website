@@ -551,6 +551,11 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
 - **celebrate-agency 범위** → **Artist만.** roster는 celebrate 소속 `artists` 행을 소비.
   work-case 쇼케이스·stats는 표현 전용이라 **기존 하드코딩 유지**(CMS 범위 밖).
   Music/Tour 노출은 향후 필요 시 재검토.
+- **사이트별 admin 노출 범위 → 정본은 코드**(`apps/admin/src/lib/sites.ts`의
+  `SITE_CATEGORY_SEGMENTS`). 위 celebrate 결정이 4개 사이트 전체로 확장되면서
+  범위가 사이트마다 달라졌다. 이 문서에 매트릭스를 복제하면 코드와 두 곳을 동기화해야
+  하고 반드시 한쪽이 낡으므로, **현행 범위는 항상 그 맵을 본다.** 유보한 카테고리와
+  그 재검토 조건도 같은 맵의 주석에 둔다.
 - **초기 편집자 계정** → **본인 1명** (`o1086291943@gmail.com`).
   코드/시드에는 넣지 않고 Supabase Auth 콘솔에서 초대. 추가 편집자는 이후 콘솔에서.
 - **`platform_links` 목록** → **5개 확정**: `beatport`, `spotify`, `appleMusic`,

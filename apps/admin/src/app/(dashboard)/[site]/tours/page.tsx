@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { adminListArtists, adminListTours } from "@repo/content/admin-queries";
+import { adminListTours } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
 import { MapPin } from "lucide-react";
 
@@ -11,7 +11,8 @@ import { EmptyState } from "@/components/empty-state";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { NewEntityButton } from "@/components/new-entity-button";
 import { Button } from "@/components/ui/button";
-import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
+import { rosterOptions } from "@/lib/roster-options";
+import { hasSiteCategory, isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ToursTable, type TourRow } from "./tours-table";
 
 // 제목 규약은 (dashboard)/page.tsx 주석 참고. params만 읽으므로 DB 조회는 늘지 않는다.
@@ -35,11 +36,16 @@ export default async function ToursPage({
   if (!parsed.success) notFound();
   const site = parsed.data;
 
+  // 아티스트를 관리하지 않는 사이트에선 목록에서도 아티스트 열을 내지 않는다 —
+  // 투어의 아티스트는 로스터 FK뿐이라 폼에서 셀렉트를 감춘 사이트에는 채울 수단이 없다
+  // (tours-table.tsx 주석). 그래서 이름 맵을 만들 로스터 조회도 함께 건너뛴다.
+  const showArtist = hasSiteCategory(site, "artists");
+
   // 목록은 소속 사이트 것만(adminListTours(site)). artistId→name 표시는 같은 사이트
   // 로스터에서 조립(Tour 스키마는 artistId만 담고 이름을 조인하지 않음).
   const [tours, artists] = await Promise.all([
     adminListTours(site),
-    adminListArtists(site),
+    rosterOptions(site),
   ]);
   const artistName = new Map(artists.map((a) => [a.id, a.name]));
   const now = Date.now();
@@ -88,7 +94,7 @@ export default async function ToursPage({
           }
         />
       ) : (
-        <ToursTable rows={rows} basePath={`/${site}/tours`} />
+        <ToursTable showArtist={showArtist} rows={rows} basePath={`/${site}/tours`} />
       )}
     </div>
   );

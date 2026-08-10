@@ -6,6 +6,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { TOUR_STATUSES, type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
+import { hasSiteCategory } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -76,7 +77,7 @@ interface TourFormProps {
   defaultValues: TourFormValues;
   /** edit 모드: 기존 event_date(ISO) — 클라이언트에서 datetime-local로 변환. */
   initialEventDateIso?: string;
-  /** artist select 옵션(같은 사이트 로스터 id+name). */
+  /** artist select 옵션(같은 사이트 로스터 id+name). 아티스트 미노출 사이트에선 빈 배열. */
   artists: { id: string; name: string }[];
   initialPosterUrl?: string | null;
 }
@@ -105,6 +106,16 @@ export function TourForm({
     },
   });
 
+  /**
+   * 로스터 셀렉트는 아티스트를 노출하는 사이트에서만(SITE_CATEGORY_SEGMENTS) —
+   * 릴리즈 폼과 같은 규칙이고 근거도 같다(release-form.tsx 주석). 다만 tours에는
+   * releases.artist_credit 같은 자유 텍스트 대체 필드가 없다. 지금 투어를 쓰는 juntaro는
+   * 공개 화면(app/tour/page.tsx·components/tour-list.tsx)에서 아티스트를 렌더하지 않아
+   * 감춰도 잃는 표시가 없고, 나중에 투어에 아티스트명을 내야 하면 그때 컬럼을 추가한다.
+   * 여기서도 값은 지우지 않고 렌더만 막는다 — 이유는 release-form.tsx 주석 참고.
+   */
+  const showArtistSelect = hasSiteCategory(site, "artists");
+
   const titleValue = form.watch("title");
   const slugPreview = mode === "create" ? slugify(titleValue) : (slug ?? "");
   const slugFieldId = useId();
@@ -121,6 +132,9 @@ export function TourForm({
     createdMessage: "투어를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved: form.formState.isDirty || isImageFieldDirty(poster),
+    // 셀렉트를 감춘 사이트에선 서버의 artistId 오류를 붙일 자리가 없다 — 릴리즈 폼과
+    // 같은 처방(useEntityFormSubmit hiddenFields 주석).
+    hiddenFields: showArtistSelect ? undefined : (["artistId"] as const),
     buildFormData: (values: TourFormValues) => {
       const fd = new FormData();
       // datetime-local → ISO 변환은 여기(클라이언트)에서 — 브라우저 TZ 기준.
@@ -203,36 +217,38 @@ export function TourForm({
               </p>
             </div>
 
-            <FormField
-              control={form.control}
-              name="artistId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>아티스트</FormLabel>
-                  <Select
-                    value={field.value ? field.value : NO_ARTIST}
-                    onValueChange={(v) =>
-                      field.onChange(v === NO_ARTIST ? "" : v)
-                    }
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="아티스트 없음" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value={NO_ARTIST}>아티스트 없음</SelectItem>
-                      {artists.map((artist) => (
-                        <SelectItem key={artist.id} value={artist.id}>
-                          {artist.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {showArtistSelect && (
+              <FormField
+                control={form.control}
+                name="artistId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>아티스트</FormLabel>
+                    <Select
+                      value={field.value ? field.value : NO_ARTIST}
+                      onValueChange={(v) =>
+                        field.onChange(v === NO_ARTIST ? "" : v)
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="아티스트 없음" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value={NO_ARTIST}>아티스트 없음</SelectItem>
+                        {artists.map((artist) => (
+                          <SelectItem key={artist.id} value={artist.id}>
+                            {artist.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <FormField
               control={form.control}
