@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { SITE_SLUGS } from "@repo/content/schema";
+import { ChevronRight, ShieldOff } from "lucide-react";
 import {
   adminCountArtists,
   adminCountReleases,
   adminCountTours,
 } from "@repo/content/admin-queries";
+import { getEditorSites } from "@repo/content/editors";
 
+import { EmptyState } from "@/components/empty-state";
 import { safeCount } from "@/lib/safe-count";
 import {
   CATEGORIES,
@@ -31,11 +32,15 @@ export const metadata: Metadata = {
   title: "대시보드 | ye0m2 admin",
 };
 
-// 사이트-우선 라우트(§8): 대시보드는 4개 사이트 카드 → /[site].
+// 사이트-우선 라우트(§8): 대시보드는 사이트 카드 → /[site].
 export default async function DashboardPage() {
-  // 4개 사이트 × 3엔티티 = 12개 카운트를 모두 병렬로 던진다.
+  // 권한 있는 사이트만 그린다(editor_sites). 전체 SITE_SLUGS를 돌면 만질 수 없는
+  // 사이트의 카드가 뜨고, 눌러도 [site] 레이아웃이 404로 막아 죽은 링크가 된다.
+  const sites = await getEditorSites();
+
+  // 사이트당 3엔티티 카운트를 모두 병렬로 던진다.
   const summaries = await Promise.all(
-    SITE_SLUGS.map(async (site) => {
+    sites.map(async (site) => {
       const [artists, releases, tours] = await Promise.all([
         safeCount(adminCountArtists(site)),
         safeCount(adminCountReleases(site)),
@@ -67,7 +72,9 @@ export default async function DashboardPage() {
             브레드크럼이 있는 하위(목록·상세·new)는 그 줄이 이미 위치를 말하므로 text-xl로 한 단 낮춘다. */}
         <h1 className="text-2xl font-semibold tracking-tight">대시보드</h1>
         <p className="text-muted-foreground text-sm">
-          관리할 사이트를 선택하세요.
+          {sites.length > 0
+            ? "관리할 사이트를 선택하세요."
+            : "접근 권한이 있는 사이트가 없습니다."}
         </p>
       </div>
 
@@ -86,10 +93,24 @@ export default async function DashboardPage() {
           포커스 링: p-5의 큰 히트 영역인데 링이 없어 브라우저 기본 1px 아웃라인으로 떨어졌다.
           키보드 사용자가 매 세션 처음 만나는 화면이라 앱 공통 어휘(button.tsx·data-table.tsx와
           같은 ring-ring/50 + ring-[3px])를 인라인으로 맞춘다. */}
+      {/* 권한이 하나도 없는 편집자(editors에는 있지만 editor_sites가 빈 경우). 빈 그리드만
+          남으면 "로딩이 덜 됐나" 싶은 화면이 되므로 원인을 말해준다. 스스로 고칠 수 있는
+          일이 아니라서 CTA는 두지 않는다 — 대신 누구에게 요청해야 하는지를 적는다. */}
+      {sites.length === 0 ? (
+        <EmptyState
+          icon={ShieldOff}
+          title="접근 가능한 사이트가 없습니다"
+          description="계정에 사이트 권한이 부여되지 않았습니다. 운영자에게 권한 부여를 요청해주세요."
+          className="max-w-6xl"
+        />
+      ) : null}
+
       {/* max-w-6xl — 초광폭에서 카드가 화면 끝까지 늘어나 내용(아이콘+2줄) 대비
           과도하게 헐거워졌다. 목록 테이블은 콘텐츠가 폭을 쓰므로 캡하지 않고,
           진입 화면의 카드 그리드만 캡한다(사이트 홈과 같은 값). 5xl까지 좁히면
-          4열에서 가장 긴 사이트명(Vague Frequency Labs)이 개행돼 6xl에 멈춘다. */}
+          4열에서 가장 긴 사이트명(Vague Frequency Labs)이 개행돼 6xl에 멈춘다.
+          권한 사이트가 4개 미만이면 카드가 왼쪽부터 채워지고 남은 칸은 비운다 —
+          열 수를 권한 수에 맞춰 줄이면 사용자마다 카드 폭이 달라진다. */}
       <div className="grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {summaries.map(({ site, counts }) => {
           return (

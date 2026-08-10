@@ -350,19 +350,37 @@ create table public.editors (
 );
 -- editors: RLS on + self-read만 (user_id = auth.uid() 조건 select). 쓰기 정책 없음(service_role/콘솔 전용).
 
--- 엔티티 테이블 RLS: 공개 읽기 + editors 화이트리스트 쓰기 (do $$ 루프로 일괄 생성)
+-- editor_sites 사이트 권한 (0002 마이그레이션 — §12 "Admin 권한 세분화"의 구현)
+create table public.editor_sites (
+  user_id   uuid not null references auth.users(id) on delete cascade,
+  site_slug text not null references public.sites(slug) on delete cascade,
+  primary key (user_id, site_slug)
+);
+-- editor_sites: editors와 동일하게 RLS on + self-read만. 두 축의 역할이 다르다 —
+--   editors      = admin에 들어올 수 있는가 (게이트)
+--   editor_sites = 그중 어느 사이트를 만질 수 있는가 (범위)
+
+-- 엔티티 테이블 RLS: 공개 읽기 + editors 게이트 & editor_sites 범위 쓰기 (do $$ 루프로 일괄 생성)
 --   create policy <t>_read  on public.<t> for select using (true);
 --   create policy <t>_write on public.<t> for all to authenticated
---     using (exists (select 1 from public.editors where user_id = auth.uid()))
---     with check (exists (select 1 from public.editors where user_id = auth.uid()));
+--     using / with check (
+--       exists (select 1 from public.editors where user_id = auth.uid())
+--       and exists (select 1 from public.editor_sites es
+--                   where es.user_id = auth.uid() and es.site_slug = <t>.site_slug))
+-- using·with check 양쪽에 같은 조건 — 한쪽만 걸면 사이트 경계를 넘는 update가 통과한다.
 -- sites는 읽기 전용(쓰기 정책 없음) — 참조 데이터 변경은 마이그레이션/service_role 경유만.
 
 -- Storage: media 버킷 (public read, editors write — 동일 exists 검증 결합)
 insert into storage.buckets (id, name, public) values ('media','media',true);
 create policy "media_public_read"   on storage.objects for select using (bucket_id = 'media');
 create policy "media_editors_write" on storage.objects for all to authenticated
-  using (bucket_id = 'media' and exists (select 1 from public.editors where user_id = auth.uid()))
-  with check (bucket_id = 'media' and exists (select 1 from public.editors where user_id = auth.uid()));
+  using / with check (
+    bucket_id = 'media'
+    and exists (select 1 from public.editors where user_id = auth.uid())
+    -- 경로 2번째 세그먼트가 사이트 슬러그(아래 경로 규칙) — 규약 밖 경로는 fail-closed.
+    and exists (select 1 from public.editor_sites es
+                where es.user_id = auth.uid()
+                  and es.site_slug = split_part(storage.objects.name, '/', 2)));
 ```
 
 > Storage 경로 규칙: `{entity}/{slug}/{kind}-{contentHash8}.webp`
@@ -425,11 +443,21 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
 
 - Next.js 15 앱, 포트 3006, `@repo/next-config`/`@repo/eslint-config`/`@repo/typescript-config` 사용.
 - **라우트 구조는 사이트-우선**: `/[site]/artists · /[site]/releases · /[site]/tours`.
-  대시보드(`/`)는 사이트 4카드, 각 사이트 홈은 카테고리 3카드. `[site]` 하위는 사이드바
+  대시보드(`/`)는 **권한 있는 사이트**의 카드, 각 사이트 홈은 카테고리 3카드. `[site]` 하위는 사이드바
   (헤드에 사이트 스위처, 카테고리 3종 nav·활성 강조)를 공유. 엔티티 폼에서 "사이트 노출" UI는 없음 — 소속은 라우트 컨텍스트로
   자동 결정되고, 정렬은 엔티티 `sort_order` 필드로 편집.
 - `middleware.ts`로 전체 라우트 인증 가드 → 미로그인 시 `/login`.
 - 초기 편집자는 **본인 1명**(`o1086291943@gmail.com`), Supabase Auth 콘솔에서 초대. 회원가입 UI 없음.
+- **인가는 3겹**(§6 RLS가 최종 강제, 앞의 둘은 UI를 그 강제와 일치시키는 역할):
+  1. `(dashboard)/layout.tsx` — `editors` 멤버십. 아니면 `/login`.
+  2. `(dashboard)/[site]/layout.tsx` — `editor_sites`에 그 사이트가 있는지. 없으면 children을
+     렌더하지 않고 "권한 없음" 화면으로 대체한다(404가 아니다 — `sites`는 공개 읽기이고 4개
+     사이트 모두 공개 브랜드라 감출 것이 없다. 404로 덮으면 권한이 회수된 편집자가 원인을
+     짐작하지 못한다). 하위 라우트 전부가 이 레이아웃을 거치므로 목록·상세·new가 각자 검사하지 않는다.
+  3. `lib/site-access.ts`의 `assertSiteAccess(site)` — **서버 액션은 레이아웃을 거치지 않으므로**
+     9개 CRUD 액션이 `siteSlugSchema.parse` 직후 각자 호출한다.
+  사이트 목록(`@repo/content/editors`의 `getEditorSites`)은 서버에서 조회해 사이드바·스위처로
+  내린다 — 스위처는 클라이언트 컴포넌트라 스스로 조회할 수 없다.
 - `serverExternalPackages: ['sharp']` 로 sharp 서버 외부화.
 - **UI는 직접 구축**: `pnpm dlx shadcn@latest init` (Tailwind v4 + React 19 지원).
   기본 세트: `table`, `form`, `dialog`, `input`, `select`, `sonner`(토스트).
@@ -525,13 +553,13 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
   피처링 아티스트에 프로필 링크·교차검색이 필요해지면 전환.
 - **언어 추가**: `*_en`/`*_ko` 패턴에 컬럼 추가, 또는 `translations` 테이블로 정규화.
 - **Storage 파일 라이프사이클**: 엔티티 삭제 시 고아 이미지 정리(트리거/배치).
-- **Admin 권한 세분화** — **방향 확정: 공유 editors 모델 유지 + 사이트 단위 권한으로 확장.**
-  편집자가 늘어 사이트별 권한 구분이 필요해지면, `editors`는 "admin 접근 가능"의 공유
-  화이트리스트로 유지하고 `editor_sites(user_id, site_slug)` 조인 테이블을 추가한다.
-  RLS 쓰기 정책의 editors exists 검증에 "대상 행의 `site_slug`가 그 편집자의 `editor_sites`에
-  존재" 조건을 결합하면 스키마·admin 인가 구조 변경 없이 확장된다(소속 모델이라 조건이
-  단일 컬럼 비교로 단순). 역할(role) 클레임 방식은 채택하지 않음. 편집자 1명인 현재는
-  구현하지 않는다.
+- ~~**Admin 권한 세분화**~~ — **구현 완료(0002_editor_sites.sql).** 확정해 둔 방향 그대로:
+  `editors`는 "admin 접근 가능"의 공유 화이트리스트로 유지하고 `editor_sites(user_id, site_slug)`
+  조인 테이블이 범위를 맡는다. RLS 쓰기 정책의 editors exists 검증에 "대상 행의 `site_slug`가
+  그 편집자의 `editor_sites`에 존재" 조건을 결합했다(소속 모델이라 단일 컬럼 비교). 역할(role)
+  클레임 방식은 채택하지 않음. 상세는 §6 RLS·§8 인가 참고.
+  - 남은 항목: 권한 부여/회수 UI. 지금은 §13 원칙대로 콘솔 SQL로 한다(0002 하단에 스니펫).
+    편집자가 더 늘어 운영자가 SQL을 자주 만지게 되면 admin에 화면을 붙인다.
 - **호스팅 이전 옵션**: Vercel 비용 이슈 시 Cloudflare Pages/Netlify로 사이트 이전(Supabase 유지).
 - **revalidate 방식 A(DB 웹훅) 승격**: admin 외 경로(Supabase Studio 수동 편집·SQL·벌크 임포트)의
   변경까지 자동 반영해야 할 때. Database Webhook + 오케스트레이터 Edge Function을 추가하며,

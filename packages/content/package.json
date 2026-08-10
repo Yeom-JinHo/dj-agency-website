@@ -12,6 +12,7 @@
     "./image": "./src/image/to-webp.ts",
     "./queries": "./src/queries/index.ts",
     "./admin-queries": "./src/admin-queries/index.ts",
+    "./editors": "./src/editors/index.ts",
     "./publish": "./src/publish/index.ts",
     "./revalidate": "./src/revalidate/index.ts",
     "./tags": "./src/tags.ts",

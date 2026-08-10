@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
+import { isEditor } from "@repo/content/editors";
 
 import adminLogo from "@/assets/admin-logo.webp";
 import { GuardedLink } from "@/components/guarded-link";
@@ -33,17 +33,12 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
-  // 인가: editors 멤버십 확인(초대된 편집자만 접근). self-read RLS로 본인 행만 조회 가능.
-  // NOTE(통합): editors 테이블 타입은 feat/admin-p1-content 마이그레이션에 추가 중이라
-  // 아직 database.types에 없다. 반영되면 이 SupabaseClient 캐스팅을 제거하고
-  // supabase.from("editors")를 직접 타입 지원받게 정리할 것.
-  const { data: editor } = await (supabase as SupabaseClient)
-    .from("editors")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!editor) {
+  // 인가 1단계: editors 멤버십(초대된 편집자만 admin에 들어온다). self-read RLS로
+  // 본인 행만 조회 가능하므로 user.id 조건은 불필요하다.
+  // 2단계(어느 사이트를 만질 수 있는가)는 editor_sites가 맡고, 대시보드·[site] 레이아웃이
+  // 각자 getEditorSites()로 확인한다 — 여기서 합치면 사이트가 없는 편집자가 로그인
+  // 자체를 못 하게 되어 "권한 없음"과 "계정 없음"이 구분되지 않는다.
+  if (!(await isEditor())) {
     redirect("/login");
   }
 

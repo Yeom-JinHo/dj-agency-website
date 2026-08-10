@@ -9,6 +9,7 @@ import type { Database } from "@repo/content/supabase/types";
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
+import { assertSiteAccess } from "@/lib/site-access";
 import {
   imageFile,
   imageRemoved,
@@ -55,6 +56,8 @@ export async function createTour(
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — 소속 모델은 site_slug 자동 부여.
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드([site]/layout.tsx)는 서버 액션에 적용되지 않는다 — 여기서 다시 확인한다.
+    await assertSiteAccess(site);
     const values = tourFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -153,6 +156,8 @@ export async function updateTour(
 ): Promise<EntityActionResult<"artistId">> {
   try {
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드([site]/layout.tsx)는 서버 액션에 적용되지 않는다 — 여기서 다시 확인한다.
+    await assertSiteAccess(site);
     const values = tourFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -237,6 +242,8 @@ export async function deleteTour(
 ): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드([site]/layout.tsx)는 서버 액션에 적용되지 않는다 — 여기서 다시 확인한다.
+    await assertSiteAccess(site);
     const supabase = await createServerSupabaseClient();
 
     // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.

@@ -9,6 +9,7 @@ import type { Database } from "@repo/content/supabase/types";
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
+import { assertSiteAccess } from "@/lib/site-access";
 import {
   imageFile,
   imageRemoved,
@@ -25,6 +26,8 @@ export async function createArtist(
   try {
     // 소속 사이트는 라우트 세그먼트에서 결정 — 서버측에서도 유효성 방어.
     const site = siteSlugSchema.parse(siteParam);
+    // 라우트 가드([site]/layout.tsx)는 서버 액션에 적용되지 않는다 — 여기서 다시 확인한다.
+    await assertSiteAccess(site);
     const values = artistFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -140,6 +143,8 @@ export async function updateArtist(
 ): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteParam);
+    // 라우트 가드([site]/layout.tsx)는 서버 액션에 적용되지 않는다 — 여기서 다시 확인한다.
+    await assertSiteAccess(site);
     const values = artistFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -244,6 +249,8 @@ export async function deleteArtist(
 ): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteParam);
+    // 라우트 가드([site]/layout.tsx)는 서버 액션에 적용되지 않는다 — 여기서 다시 확인한다.
+    await assertSiteAccess(site);
     const supabase = await createServerSupabaseClient();
 
     // slug는 삭제된 상세 페이지 캐시 태그 조립에, 이미지 경로는 Storage 정리에 쓴다.

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { SITE_SLUGS } from "@repo/content/schema";
+import type { SiteSlug } from "@repo/content/schema";
 
 import {
   Select,
@@ -24,8 +24,12 @@ import { confirmLeaveUnsaved } from "@/lib/unsaved-guard";
  * 보다 juntaro 뮤직을 본다"가 이 스위처의 주 용도인데 매번 사이트 홈으로 되돌리면
  * 카테고리를 다시 골라야 했다. 상세·새로 만들기(`new`)에서는 종전대로 사이트 홈으로
  * 보낸다.
+ *
+ * 목록은 SITE_SLUGS 전체가 아니라 서버가 내려준 권한 사이트(editor_sites)다 — 클라이언트
+ * 컴포넌트라 스스로 조회할 수 없다. 권한 밖 사이트를 띄우면 골라도 [site] 레이아웃이
+ * 404로 막아 "선택했는데 없는 페이지"가 된다.
  */
-export function SiteSwitcher() {
+export function SiteSwitcher({ sites }: { sites: SiteSlug[] }) {
   const pathname = usePathname();
   const router = useRouter();
   const [, first = "", category = "", detail] = pathname.split("/");
@@ -48,7 +52,7 @@ export function SiteSwitcher() {
         <SelectValue placeholder="사이트 선택" />
       </SelectTrigger>
       <SelectContent>
-        {SITE_SLUGS.map((site) => (
+        {sites.map((site) => (
           <SelectItem key={site} value={site}>
             <Image
               src={SITE_ICONS[site]}
