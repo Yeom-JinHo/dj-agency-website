@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
-import { SITE_SLUGS, type SiteSlug } from "@repo/content/schema";
+import { ChevronRight, Lock } from "lucide-react";
+import type { SiteSlug } from "@repo/content/schema";
 import {
   adminCountArtists,
   adminCountReleases,
   adminCountTours,
 } from "@repo/content/admin-queries";
 
+import { EmptyState } from "@/components/empty-state";
+import { getAdminSession } from "@/lib/auth";
 import { safeCount } from "@/lib/safe-count";
 import {
   siteCategories,
@@ -41,12 +43,17 @@ export const metadata: Metadata = {
   title: "대시보드 | ye0m2 admin",
 };
 
-// 사이트-우선 라우트(§8): 대시보드는 4개 사이트 카드 → /[site].
+// 사이트-우선 라우트(§8): 대시보드는 사이트 카드 → /[site].
 export default async function DashboardPage() {
-  // 사이트별 노출 카테고리(SITE_CATEGORY_SEGMENTS)만큼만 병렬로 던진다 —
-  // 4×3=12개를 무조건 세던 것에서 실제 노출분으로 줄었다(안 보여줄 수를 셀 이유가 없다).
+  // 카드는 이 편집자에게 부여된 사이트만 — 못 만지는 사이트를 보여주고 열면
+  // 404가 나는 것보다, 애초에 목록에 없는 편이 정직하다. (레이아웃이 이미
+  // 세션을 확인했으므로 여기서 null이면 그 사이 로그아웃된 것 — 카드 0개로 흐른다.)
+  const allowedSites = (await getAdminSession())?.allowedSites ?? [];
+
+  // 부여된 사이트 × 그 사이트의 노출 카테고리(SITE_CATEGORY_SEGMENTS)만큼만 병렬로
+  // 던진다 — 4×3=12개를 무조건 세던 것에서 실제로 보여줄 수만 남았다.
   const summaries = await Promise.all(
-    SITE_SLUGS.map(async (site) => {
+    allowedSites.map(async (site) => {
       // 라벨은 CATEGORIES 단일 출처 — 사이트 홈에서 카드 제목으로 쓰이는 그 문자열이다.
       // 조회 실패(null)를 필터링해 숨기지 않는다 — "원래 카운트 없음"과 구분이 안 되기 때문.
       // site를 함께 담아 렌더에서 인덱스로 되찾지 않는다(짝이 어긋날 여지를 없앤다).
@@ -71,6 +78,18 @@ export default async function DashboardPage() {
           관리할 사이트를 선택하세요.
         </p>
       </div>
+
+      {/* 부여된 사이트가 하나도 없는 편집자 — 빈 그리드만 남으면 "로딩이 덜 됐나"로
+          읽히므로 상태를 말로 알린다. 스스로 풀 수 있는 문제가 아니라서 CTA는 두지
+          않는다(부여는 운영자가 콘솔/SQL로만 한다). */}
+      {allowedSites.length === 0 ? (
+        <EmptyState
+          icon={Lock}
+          title="접근 가능한 사이트가 없습니다"
+          description="편집 권한이 부여된 사이트가 없습니다. 관리자에게 문의해주세요."
+          className="max-w-6xl"
+        />
+      ) : null}
 
       {/* 드릴다운 카드 어휘는 사이트 홈([site]/page.tsx)과 한 벌이다 — 32px 아이콘 슬롯 +
           제목/카운트 2줄 텍스트, 가로 배치·gap-4·p-5·rounded-lg·hover:bg-muted/50까지 같다.

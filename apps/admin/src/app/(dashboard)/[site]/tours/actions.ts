@@ -6,6 +6,7 @@ import { siteSlugSchema, type SiteSlug } from "@repo/content/schema";
 import { contentTags } from "@repo/content/tags";
 import type { Database } from "@repo/content/supabase/types";
 
+import { assertSiteAccess } from "@/lib/auth";
 import { publishOrWarn } from "@/lib/publish";
 import { assertSiteCategory } from "@/lib/sites";
 import { slugify } from "@/lib/media";
@@ -58,6 +59,7 @@ export async function createTour(
     const site = siteSlugSchema.parse(siteInput);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "tours");
+    await assertSiteAccess(site);
     const values = tourFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -158,6 +160,7 @@ export async function updateTour(
     const site = siteSlugSchema.parse(siteInput);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "tours");
+    await assertSiteAccess(site);
     const values = tourFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -244,6 +247,7 @@ export async function deleteTour(
     const site = siteSlugSchema.parse(siteInput);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "tours");
+    await assertSiteAccess(site);
     const supabase = await createServerSupabaseClient();
 
     // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.

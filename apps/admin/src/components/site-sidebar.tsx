@@ -22,13 +22,20 @@ import { cn } from "@/lib/utils";
  * 배경에 맡기면 hover(50% 농도)와의 명도차가 육안으로 잡히지 않아 "지금 어느
  * 카테고리인지"가 읽히지 않았다. 좌측 인디고 바 + 옅은 인디고 틴트로 승격한다.
  */
-export function SiteSidebar({ site }: { site: SiteSlug }) {
+export function SiteSidebar({
+  site,
+  sites,
+}: {
+  site: SiteSlug;
+  /** 스위처에 띄울 사이트 — 이 편집자에게 부여된 것만(서버 레이아웃이 판정해 내려준다). */
+  sites: readonly SiteSlug[];
+}) {
   const pathname = usePathname();
 
   return (
     <div className="bg-sidebar text-sidebar-foreground border-sidebar-border flex flex-col border-r">
       <div className="border-sidebar-border border-b p-3">
-        <SiteSwitcher />
+        <SiteSwitcher sites={sites} />
       </div>
       {/* 헤드(p-3 12px + SiteSwitcher 트리거 자체 px-3 12px = 24px)와 좌측
           기준선을 맞추려 px-3(12px) + GuardedLink 자체 px-3(12px) = 24px로 통일. */}

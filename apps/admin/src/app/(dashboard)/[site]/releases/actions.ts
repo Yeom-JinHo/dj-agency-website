@@ -6,6 +6,7 @@ import type { Database } from "@repo/content/supabase/types";
 import { siteSlugSchema } from "@repo/content/schema";
 import { contentTags } from "@repo/content/tags";
 
+import { assertSiteAccess } from "@/lib/auth";
 import { publishOrWarn } from "@/lib/publish";
 import { assertSiteCategory } from "@/lib/sites";
 import { slugify } from "@/lib/media";
@@ -47,6 +48,7 @@ export async function createRelease(
     const site = siteSlugSchema.parse(siteInput);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "releases");
+    await assertSiteAccess(site);
     const values = releaseFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -158,6 +160,7 @@ export async function updateRelease(
     const site = siteSlugSchema.parse(siteInput);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "releases");
+    await assertSiteAccess(site);
     const values = releaseFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -249,6 +252,7 @@ export async function deleteRelease(
     const site = siteSlugSchema.parse(siteInput);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "releases");
+    await assertSiteAccess(site);
     const supabase = await createServerSupabaseClient();
 
     // slug는 삭제된 상세 캐시 태그에, artwork_path는 Storage 정리에 쓴다.

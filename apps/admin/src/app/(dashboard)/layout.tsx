@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
@@ -7,6 +6,7 @@ import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import adminLogo from "@/assets/admin-logo.webp";
 import { GuardedLink } from "@/components/guarded-link";
 import { SignOutButton } from "@/components/sign-out-button";
+import { getAdminSession } from "@/lib/auth";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 대상에서 제외한다 —
 // 빌드 타임에 서버 클라이언트를 호출하지 않는다.
@@ -23,29 +23,15 @@ async function signOut() {
 export default async function DashboardLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // 인증(세션) 없으면 차단 — 미들웨어와 이중 방어.
-  if (!user) {
+  // 인증(세션) + 인가(editors 멤버십)를 한 번에 — 미들웨어와 이중 방어.
+  // 사이트 단위 권한(allowedSites)은 이 아래 화면들이 lib/auth에서 직접 읽는다
+  // (요청당 캐시되므로 중복 조회가 아니다): 대시보드는 카드 목록을 거기서 만들고,
+  // [site]/layout.tsx는 미부여 사이트를 notFound()로 끊는다.
+  const session = await getAdminSession();
+  if (!session) {
     redirect("/login");
   }
-
-  // 인가: editors 멤버십 확인(초대된 편집자만 접근). self-read RLS로 본인 행만 조회 가능.
-  // NOTE(통합): editors 테이블 타입은 feat/admin-p1-content 마이그레이션에 추가 중이라
-  // 아직 database.types에 없다. 반영되면 이 SupabaseClient 캐스팅을 제거하고
-  // supabase.from("editors")를 직접 타입 지원받게 정리할 것.
-  const { data: editor } = await (supabase as SupabaseClient)
-    .from("editors")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!editor) {
-    redirect("/login");
-  }
+  const { user } = session;
 
   return (
     <div className="flex min-h-svh flex-col">
