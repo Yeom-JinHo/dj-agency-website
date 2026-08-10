@@ -176,6 +176,8 @@ export const getArtist = (site: SiteSlug, slug: string) =>
 RLS 권한:
    anon (4개 사이트 읽기)        → SELECT 만 허용
    authenticated (admin)         → INSERT/UPDATE/DELETE 허용
+                                   단 editors 멤버십 + 대상 행의 site_slug 부여(editor_sites)
+                                   양쪽을 모두 만족할 때만 (마이그레이션 0002, §13)
    service_role                  → 서버 전용, 클라이언트 노출 금지
 ```
 
@@ -342,6 +344,10 @@ create index idx_tours_artist            on public.tours    (artist_id);
 create index idx_tours_event_date        on public.tours    (event_date desc);
 ```
 ### RLS & Storage
+
+> **갱신(마이그레이션 0002):** 아래 쓰기 정책은 `editors` 멤버십만 검사하던 초기 형태다.
+> 현재는 여기에 "대상 행의 `site_slug`가 그 편집자의 `editor_sites`에 있는가"가 결합돼 있다.
+> 정본은 `supabase/migrations/0002_editor_sites.sql` + §13 "사이트 단위 편집 권한".
 
 ```sql
 -- editors 화이트리스트 (P1 리뷰 반영으로 확정된 모델)

@@ -29,6 +29,8 @@ export type AdminSession = {
  * editors에 없으면 접근 가능한 사이트가 0개인 것과 구분하지 않고 null을 준다 —
  * 전자는 "admin 사용자가 아님", 후자는 "사용자지만 부여된 사이트가 없음"이라
  * 호출 측에서 안내를 다르게 줄 수 있어야 하므로 후자는 allowedSites: []로 살려둔다.
+ *
+ * 조회 자체가 실패하면 throw한다 — "권한 없음"으로 조용히 강등시키지 않는다(아래 참고).
  */
 export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
   const supabase = await createServerSupabaseClient();
@@ -39,7 +41,7 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
 
   // 두 조회는 서로 의존하지 않는다 — editors가 비어 있으면 아래에서 버릴 뿐이라
   // 왕복을 직렬로 쌓지 않는다. 둘 다 self-read RLS로 본인 행만 보인다.
-  const [{ data: editor }, { data: grants }] = await Promise.all([
+  const [editorResult, grantsResult] = await Promise.all([
     supabase
       .from("editors")
       .select("user_id")
@@ -48,6 +50,22 @@ export const getAdminSession = cache(async (): Promise<AdminSession | null> => {
     supabase.from("editor_sites").select("site_slug").eq("user_id", user.id),
   ]);
 
+  // 조회 실패를 "권한 없음"으로 흘려보내지 않는다. data만 보면 순단(Supabase pause·
+  // 네트워크 오류)이 곧 권한 박탈로 읽혀, 멀쩡한 편집자가 영문도 모른 채 사이트가
+  // 사라진 화면이나 로그인 페이지로 튕긴다. 판정 근거가 없으면 판정하지 않고
+  // 에러로 올려 재시도를 안내한다(§4.3 safeCount가 카운트에서 쓰는 것과 같은 원칙 —
+  // "실패"와 "0"은 다른 상태다).
+  if (editorResult.error) {
+    throw new Error(`편집자 확인에 실패했습니다: ${editorResult.error.message}`);
+  }
+  if (grantsResult.error) {
+    throw new Error(
+      `사이트 권한 조회에 실패했습니다: ${grantsResult.error.message}`,
+    );
+  }
+
+  const { data: editor } = editorResult;
+  const { data: grants } = grantsResult;
   if (!editor) return null;
 
   // DB의 site_slug는 text라 SITE_SLUGS로 교차 필터해 SiteSlug로 좁힌다 —
