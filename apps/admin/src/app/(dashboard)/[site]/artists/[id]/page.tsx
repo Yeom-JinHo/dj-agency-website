@@ -8,6 +8,7 @@ import {
 } from "@repo/content/admin-queries";
 
 import { mediaUrl } from "@/lib/media";
+import { safeCount } from "@/lib/safe-count";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { DeleteEntityButton } from "@/components/delete-entity-button";
 import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
@@ -55,16 +56,22 @@ export default async function EditArtistPage({
 
   // 참조 카운트는 삭제 다이얼로그의 파급 효과 안내용 — FK가 set null이라 아티스트를
   // 지우면 참조하는 릴리즈·투어의 아티스트 연결이 경고 없이 끊기던 것을 표면화한다.
+  // safeCount로 감싸는 건 이 앱의 규약이다: 안내용 수치 하나가 실패했다고 편집 화면
+  // 전체가 500이 되면 안 된다(대시보드 카운트와 같은 처리, 실패는 서버 로그에 남는다).
   const [artist, references] = await Promise.all([
     adminGetArtistById(id),
-    adminCountArtistReferences(id),
+    safeCount(adminCountArtistReferences(id)),
   ]);
   // 다른 사이트의 아티스트를 이 라우트로 편집하지 못하게 소속 방어.
   if (!artist || artist.siteSlug !== site) notFound();
 
+  // 카운트 조회가 실패하면(references === null) 안내를 생략한다 — 틀린 숫자를 보여
+  // 주느니 침묵이 낫고, 서버가 삭제를 막는 장치가 아니라 안내 UI라 손실도 여기서 끝난다.
   const referencedParts = [
-    references.releases > 0 ? `릴리즈 ${references.releases}개` : null,
-    references.tours > 0 ? `투어 ${references.tours}개` : null,
+    references && references.releases > 0
+      ? `릴리즈 ${references.releases}개`
+      : null,
+    references && references.tours > 0 ? `투어 ${references.tours}개` : null,
   ].filter(Boolean);
   const referenceNote =
     referencedParts.length > 0

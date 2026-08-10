@@ -22,6 +22,46 @@ import {
 } from "@/lib/entity-media";
 import { artistFormSchema, formValuesToDbColumns } from "./schema";
 
+type Supabase = Awaited<ReturnType<typeof createServerSupabaseClient>>;
+
+/**
+ * 방금 올린 이미지 중 행이 참조하지 않는 것만 지우는 보상 삭제.
+ *
+ * 고아 판정은 이 요청의 로드 시점 경로가 아니라 행의 "현재" 경로를 재조회해서 한다 —
+ * 두 탭이 같은 파일을 올리면 콘텐츠 해시가 같아 경로가 겹치는데, 로드 시점 기준으로
+ * 판정하면 진 쪽이 이긴 저장의 라이브 파일을 지우게 된다. 같은 이유로 create의 컬럼
+ * update 실패에도 재조회가 필요하다: 응답만 유실되고 서버에서 커밋됐다면 행이 이미
+ * 그 경로를 가리키므로, 무조건 지우면 고아가 아니라 깨진 참조(사이트에 404 이미지)가
+ * 남는다. 재조회에 실패하면 아무것도 지우지 않는다 — 고아 잔존(removeImages 로그로
+ * 추적 가능)이 라이브 파일 유실보다 낫다.
+ */
+async function removeUploadedOrphans(
+  supabase: Supabase,
+  id: string,
+  uploadedPaths: (string | null | undefined)[],
+): Promise<void> {
+  const uploaded = uploadedPaths.filter((p): p is string => Boolean(p));
+  if (uploaded.length === 0) return;
+  const { data: current, error } = await supabase
+    .from("artists")
+    .select("image_path, logo_image_path")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) {
+    console.error(
+      `[admin] 고아 이미지 판정용 재조회 실패 — 정리 보류: ${uploaded.join(", ")}`,
+      error.message,
+    );
+    return;
+  }
+  // 행이 사라진 경우(current null: 삭제가 레이스를 이김)엔 업로드 전부가 고아다.
+  const live = new Set([current?.image_path, current?.logo_image_path]);
+  await removeImages(
+    supabase,
+    uploaded.filter((p) => !live.has(p)),
+  );
+}
+
 export async function createArtist(
   siteParam: SiteSlug,
   formData: FormData,
@@ -121,7 +161,11 @@ export async function createArtist(
     } catch (postError) {
       // 업로드까지 됐지만 컬럼 update가 실패한 파일은 어떤 행도 참조하지 않는 고아 —
       // 편집 화면 재저장 시 같은 콘텐츠면 같은 해시 경로로 다시 올라가므로 지워도 안전.
-      await removeImages(supabase, [profileUpload?.path, logoUpload?.path]);
+      // 단, 판정은 행의 현재 경로 재조회로 한다(응답만 유실된 커밋 보호, 헬퍼 주석 참고).
+      await removeUploadedOrphans(supabase, id, [
+        profileUpload?.path,
+        logoUpload?.path,
+      ]);
       // 행은 저장됐으니 이미지 없이라도 사이트에 반영(발행). 발행 경고는 이미지 경고에 덧붙인다.
       const publishWarning = await publishOrWarn(publishTags, site);
       revalidatePath(`/${site}/artists`);
@@ -220,36 +264,9 @@ export async function updateArtist(
       imageColumns.logo_image_path = null;
     }
 
-    // update가 적용되지 못했을 때 방금 올린 새 이미지의 보상 삭제. 고아 판정은 이
-    // 요청의 로드 시점 경로가 아니라 행의 "현재" 경로를 재조회해서 한다 — 두 탭이
-    // 같은 파일을 올리면 콘텐츠 해시가 같아 경로가 겹치는데, 진 쪽이 로드 시점
-    // 기준으로 판정하면 이긴 저장이 방금 연결한 라이브 파일을 지우게 된다.
-    // 재조회에 실패하면 지우지 않는다 — 고아 잔존(removeImages 로그로 추적 가능)이
-    // 라이브 파일 유실보다 낫다.
-    const removeUploadedOrphans = async (): Promise<void> => {
-      const uploaded = [profileUpload?.path, logoUpload?.path].filter(
-        (p): p is string => Boolean(p),
-      );
-      if (uploaded.length === 0) return;
-      const { data: current, error: refetchError } = await supabase
-        .from("artists")
-        .select("image_path, logo_image_path")
-        .eq("id", id)
-        .maybeSingle();
-      if (refetchError) {
-        console.error(
-          `[admin] 고아 이미지 판정용 재조회 실패 — 정리 보류: ${uploaded.join(", ")}`,
-          refetchError.message,
-        );
-        return;
-      }
-      // 행이 사라진 경우(current null: 삭제가 레이스를 이김)엔 업로드 전부가 고아다.
-      const live = new Set([current?.image_path, current?.logo_image_path]);
-      await removeImages(
-        supabase,
-        uploaded.filter((p) => !live.has(p)),
-      );
-    };
+    // update가 적용되지 못했을 때 방금 올린 새 이미지는 보상 삭제 대상이다(판정 규칙은
+    // removeUploadedOrphans 주석 참고 — create의 실패 경로와 같은 헬퍼를 쓴다).
+    const uploadedPaths = [profileUpload?.path, logoUpload?.path];
 
     // updated_at 매치 조건이 2차(레이스) 검사다: 위 1차 검사 후 이 update 사이에 다른
     // 저장이 끼어들면 트리거가 updated_at을 바꿔 매치 0건이 된다 — select("id")로 실제
@@ -262,11 +279,11 @@ export async function updateArtist(
       .eq("updated_at", existing.updated_at)
       .select("id");
     if (error) {
-      await removeUploadedOrphans();
+      await removeUploadedOrphans(supabase, id, uploadedPaths);
       return { ok: false, error: error.message };
     }
     if (!updated || updated.length === 0) {
-      await removeUploadedOrphans();
+      await removeUploadedOrphans(supabase, id, uploadedPaths);
       return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
     }
 
