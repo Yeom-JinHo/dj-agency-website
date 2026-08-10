@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
 import { siteSlugSchema } from "@repo/content/schema";
-import { adminGetArtistById } from "@repo/content/admin-queries";
+import {
+  adminCountArtistReferences,
+  adminGetArtistById,
+} from "@repo/content/admin-queries";
 
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
@@ -50,9 +53,23 @@ export default async function EditArtistPage({
   // id도 site처럼 선검증 — 비-uuid 손입력 URL이 Postgres 22P02로 500이 되지 않게 404 처리.
   if (!z.string().uuid().safeParse(id).success) notFound();
 
-  const artist = await adminGetArtistById(id);
+  // 참조 카운트는 삭제 다이얼로그의 파급 효과 안내용 — FK가 set null이라 아티스트를
+  // 지우면 참조하는 릴리즈·투어의 아티스트 연결이 경고 없이 끊기던 것을 표면화한다.
+  const [artist, references] = await Promise.all([
+    adminGetArtistById(id),
+    adminCountArtistReferences(id),
+  ]);
   // 다른 사이트의 아티스트를 이 라우트로 편집하지 못하게 소속 방어.
   if (!artist || artist.siteSlug !== site) notFound();
+
+  const referencedParts = [
+    references.releases > 0 ? `릴리즈 ${references.releases}개` : null,
+    references.tours > 0 ? `투어 ${references.tours}개` : null,
+  ].filter(Boolean);
+  const referenceNote =
+    referencedParts.length > 0
+      ? `이 아티스트를 참조하는 ${referencedParts.join("·")}의 아티스트 연결이 함께 해제됩니다(해당 항목 자체는 삭제되지 않습니다).`
+      : null;
 
   // adminGetArtistById가 Artist로 파싱해 socials/selectedWorks는 이미 검증된 배열 —
   // 페이지 단위 재파싱 불필요(§7.4 쿼리 경계가 파싱 소유).
@@ -87,6 +104,7 @@ export default async function EditArtistPage({
           entityLabel="아티스트"
           entityName={artist.name}
           listHref={`/${site}/artists`}
+          referenceNote={referenceNote}
           onDelete={deleteArtist.bind(null, site, artist.id)}
         />
       </div>
@@ -95,6 +113,7 @@ export default async function EditArtistPage({
         site={site}
         artistId={artist.id}
         slug={artist.slug}
+        updatedAt={artist.updatedAt}
         defaultValues={defaultValues}
         initialProfileUrl={mediaUrl(artist.imagePath)}
         initialLogoUrl={mediaUrl(artist.logoImagePath)}

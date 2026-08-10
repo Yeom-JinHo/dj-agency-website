@@ -30,12 +30,18 @@ export function DeleteEntityButton({
   entityLabel,
   entityName,
   listHref,
+  referenceNote = null,
   onDelete,
 }: {
   /** "아티스트"·"릴리즈"·"투어" — 다이얼로그 제목과 성공 토스트에 쓰인다. */
   entityLabel: string;
   entityName: string;
   listHref: string;
+  /**
+   * 삭제의 파급 효과 안내(예: 이 아티스트를 참조하는 릴리즈·투어 건수).
+   * 호출 측이 문구까지 조립해 넘긴다 — 공용 버튼은 엔티티 관계를 모른다.
+   */
+  referenceNote?: string | null;
   onDelete: () => Promise<EntityActionResult>;
 }) {
   const router = useRouter();
@@ -105,6 +111,13 @@ export function DeleteEntityButton({
           <DialogDescription>
             &ldquo;{entityName}&rdquo; {entityLabel}를 삭제합니다. 이 작업은
             되돌릴 수 없습니다.
+            {/* DialogDescription(단일 <p>) 안에 block span으로 둔다 — 별도 <p>로 빼면
+                aria-describedby 밖이라 스크린리더가 확인 시점에 파급 효과를 못 듣는다. */}
+            {referenceNote && (
+              <span className="text-destructive mt-2 block">
+                {referenceNote}
+              </span>
+            )}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

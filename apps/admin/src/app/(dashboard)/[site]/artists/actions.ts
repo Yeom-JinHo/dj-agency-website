@@ -8,7 +8,11 @@ import type { Database } from "@repo/content/supabase/types";
 
 import { publishOrWarn } from "@/lib/publish";
 import { slugify } from "@/lib/media";
-import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
+import {
+  CONCURRENT_EDIT_MESSAGE,
+  type EntityActionResult,
+  toErrorMessage,
+} from "@/lib/action-result";
 import {
   imageFile,
   imageRemoved,
@@ -80,8 +84,11 @@ export async function createArtist(
 
     // 행 생성 이후 단계(이미지 업로드 → image 컬럼 update).
     // 여기서 실패해도 행은 이미 존재하므로 삭제하지 않고 편집 화면으로 안내(dead-end 회피).
+    // 업로드 결과는 catch에서도 보여야 한다(컬럼 update 실패 시 업로드된 파일 보상 삭제).
+    let profileUpload: { path: string; placeholder: string } | null = null;
+    let logoUpload: { path: string; placeholder: string } | null = null;
     try {
-      const profileUpload = profile
+      profileUpload = profile
         ? await uploadEntityImage(
             supabase,
             "artist",
@@ -91,7 +98,7 @@ export async function createArtist(
             profile,
           )
         : null;
-      const logoUpload = logo
+      logoUpload = logo
         ? await uploadEntityImage(supabase, "artist", site, slug, "logo", logo)
         : null;
 
@@ -112,6 +119,9 @@ export async function createArtist(
         if (updateError) throw new Error(updateError.message);
       }
     } catch (postError) {
+      // 업로드까지 됐지만 컬럼 update가 실패한 파일은 어떤 행도 참조하지 않는 고아 —
+      // 편집 화면 재저장 시 같은 콘텐츠면 같은 해시 경로로 다시 올라가므로 지워도 안전.
+      await removeImages(supabase, [profileUpload?.path, logoUpload?.path]);
       // 행은 저장됐으니 이미지 없이라도 사이트에 반영(발행). 발행 경고는 이미지 경고에 덧붙인다.
       const publishWarning = await publishOrWarn(publishTags, site);
       revalidatePath(`/${site}/artists`);
@@ -150,12 +160,23 @@ export async function updateArtist(
     // slug·site_slug는 불변(§13) — 기존 행에서 slug를 읽어 이미지 경로 조립·교체 삭제에 사용.
     const { data: existing, error: loadError } = await supabase
       .from("artists")
-      .select("slug, image_path, logo_image_path")
+      .select("slug, image_path, logo_image_path, updated_at")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
     if (loadError) return { ok: false, error: loadError.message };
     if (!existing) return { ok: false, error: "아티스트를 찾을 수 없습니다." };
+
+    // 낙관적 동시성 1차 검사: 폼이 로드했던 updated_at과 현재 행이 다르면 그사이
+    // 다른 곳에서 저장된 것 — last-write-wins로 덮어쓰기 전에, 그리고 이미지 업로드
+    // 같은 부수효과가 시작되기 전에 끊는다. 값이 없으면(구 폼) 검사를 건너뛴다.
+    const expectedUpdatedAt = formData.get("expectedUpdatedAt");
+    if (
+      typeof expectedUpdatedAt === "string" &&
+      expectedUpdatedAt !== existing.updated_at
+    ) {
+      return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
+    }
 
     const profile = imageFile(formData, "profileImage");
     const logo = imageFile(formData, "logoImage");
@@ -199,11 +220,35 @@ export async function updateArtist(
       imageColumns.logo_image_path = null;
     }
 
-    const { error } = await supabase
+    // update 실패 시 방금 올린 새 이미지는 어떤 행도 참조하지 않는 고아 — 보상 삭제
+    // 대상. 기존 경로와 같으면(동일 콘텐츠 해시, upsert) 라이브 파일이므로 제외한다.
+    const uploadedOrphanPaths = [
+      profileUpload && profileUpload.path !== existing.image_path
+        ? profileUpload.path
+        : null,
+      logoUpload && logoUpload.path !== existing.logo_image_path
+        ? logoUpload.path
+        : null,
+    ];
+
+    // updated_at 매치 조건이 2차(레이스) 검사다: 위 1차 검사 후 이 update 사이에 다른
+    // 저장이 끼어들면 트리거가 updated_at을 바꿔 매치 0건이 된다 — select("id")로 실제
+    // 갱신 행 수를 확인해 0건을 충돌로 처리한다. site_slug 스코프는 release/tour와 동일 패턴.
+    const { data: updated, error } = await supabase
       .from("artists")
       .update({ ...columns, ...imageColumns })
-      .eq("id", id);
-    if (error) return { ok: false, error: error.message };
+      .eq("id", id)
+      .eq("site_slug", site)
+      .eq("updated_at", existing.updated_at)
+      .select("id");
+    if (error) {
+      await removeImages(supabase, uploadedOrphanPaths);
+      return { ok: false, error: error.message };
+    }
+    if (!updated || updated.length === 0) {
+      await removeImages(supabase, uploadedOrphanPaths);
+      return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
+    }
 
     // 교체·제거된 이전 이미지 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
     // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.

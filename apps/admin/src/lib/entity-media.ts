@@ -83,15 +83,30 @@ export async function uploadEntityImage(
   return { path, placeholder };
 }
 
-/** best-effort Storage 삭제(고아 정리는 §12 향후 — 실패는 무시). 빈 경로는 스킵. */
+/**
+ * best-effort Storage 삭제 — 실패해도 호출 측 흐름은 막지 않되 로그는 남긴다.
+ * 정리 실패 = 영구 고아 파일인데 라이프사이클 배치가 없어(§12 향후) 지금 남는
+ * 로그가 고아를 발견할 유일한 단서다. 빈 경로는 스킵.
+ */
 export async function removeImages(
   supabase: Supabase,
   paths: (string | null | undefined)[],
 ): Promise<void> {
   const targets = paths.filter((p): p is string => Boolean(p));
   if (targets.length === 0) return;
-  await supabase.storage
-    .from(MEDIA_BUCKET)
-    .remove(targets)
-    .catch(() => undefined);
+  try {
+    // storage-js는 실패를 reject가 아니라 result.error로 반환한다 — 둘 다 잡는다.
+    const { error } = await supabase.storage.from(MEDIA_BUCKET).remove(targets);
+    if (error) {
+      console.error(
+        `[admin] Storage 이미지 정리 실패 — 고아 파일 잔존: ${targets.join(", ")}`,
+        error.message,
+      );
+    }
+  } catch (err) {
+    console.error(
+      `[admin] Storage 이미지 정리 실패 — 고아 파일 잔존: ${targets.join(", ")}`,
+      err,
+    );
+  }
 }

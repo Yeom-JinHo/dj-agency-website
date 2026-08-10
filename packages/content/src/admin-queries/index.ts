@@ -13,13 +13,16 @@ import { mapArtist, mapRelease, mapTour } from "../queries/mappers";
  * 조건 + sort_order 정렬, 단건은 전역 id로 조회한다.
  */
 
+// created_at 2차 정렬: 신규 생성 기본 sort_order=0이라 동률이 흔하고, tie-break 없이는
+// admin 목록 순서가 비결정적이 되어 같은 정렬을 쓰는 사이트(./queries)와 어긋난다.
 export async function adminListArtists(siteSlug: SiteSlug): Promise<Artist[]> {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("artists")
     .select("*")
     .eq("site_slug", siteSlug)
-    .order("sort_order");
+    .order("sort_order")
+    .order("created_at");
   if (error) throw error;
   return (data ?? []).map(mapArtist);
 }
@@ -32,7 +35,8 @@ export async function adminListReleases(
     .from("releases")
     .select("*")
     .eq("site_slug", siteSlug)
-    .order("sort_order");
+    .order("sort_order")
+    .order("created_at");
   if (error) throw error;
   return (data ?? []).map(mapRelease);
 }
@@ -43,7 +47,8 @@ export async function adminListTours(siteSlug: SiteSlug): Promise<Tour[]> {
     .from("tours")
     .select("*")
     .eq("site_slug", siteSlug)
-    .order("sort_order");
+    .order("sort_order")
+    .order("created_at");
   if (error) throw error;
   return (data ?? []).map(mapTour);
 }
@@ -81,6 +86,33 @@ export async function adminCountTours(siteSlug: SiteSlug): Promise<number> {
     .eq("site_slug", siteSlug);
   if (error) throw error;
   return count ?? 0;
+}
+
+/**
+ * 아티스트를 참조하는 릴리즈·투어 건수. FK가 on delete set null이라 아티스트 삭제는
+ * 참조 행을 지우지 않고 연결만 조용히 끊는다 — 삭제 확인 다이얼로그가 그 영향
+ * 범위를 미리 보여줄 수 있게 카운트만 제공한다(head: true, 본문 미전송).
+ */
+export async function adminCountArtistReferences(
+  artistId: string,
+): Promise<{ releases: number; tours: number }> {
+  const supabase = await createServerSupabaseClient();
+  const [releasesResult, toursResult] = await Promise.all([
+    supabase
+      .from("releases")
+      .select("*", { count: "exact", head: true })
+      .eq("primary_artist_id", artistId),
+    supabase
+      .from("tours")
+      .select("*", { count: "exact", head: true })
+      .eq("artist_id", artistId),
+  ]);
+  if (releasesResult.error) throw releasesResult.error;
+  if (toursResult.error) throw toursResult.error;
+  return {
+    releases: releasesResult.count ?? 0,
+    tours: toursResult.count ?? 0,
+  };
 }
 
 export async function adminGetArtistById(id: string): Promise<Artist | null> {
