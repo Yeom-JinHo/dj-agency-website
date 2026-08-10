@@ -225,13 +225,31 @@ export async function updateRelease(
       imageColumns.artwork_placeholder = null;
     }
 
-    // update 실패 시 방금 올린 새 아트워크는 어떤 행도 참조하지 않는 고아 — 보상 삭제
-    // 대상. 기존 경로와 같으면(동일 콘텐츠 해시, upsert) 라이브 파일이므로 제외한다.
-    const uploadedOrphanPaths = [
-      artworkUpload && artworkUpload.path !== existing.artwork_path
-        ? artworkUpload.path
-        : null,
-    ];
+    // update가 적용되지 못했을 때 방금 올린 새 아트워크의 보상 삭제. 고아 판정은 이
+    // 요청의 로드 시점 경로가 아니라 행의 "현재" 경로를 재조회해서 한다 — 두 탭이
+    // 같은 파일을 올리면 콘텐츠 해시가 같아 경로가 겹치는데, 진 쪽이 로드 시점
+    // 기준으로 판정하면 이긴 저장이 방금 연결한 라이브 파일을 지우게 된다.
+    // 재조회에 실패하면 지우지 않는다 — 고아 잔존(removeImages 로그로 추적 가능)이
+    // 라이브 파일 유실보다 낫다.
+    const removeUploadedOrphans = async (): Promise<void> => {
+      if (!artworkUpload) return;
+      const uploadedPath = artworkUpload.path;
+      const { data: current, error: refetchError } = await supabase
+        .from("releases")
+        .select("artwork_path")
+        .eq("id", id)
+        .maybeSingle();
+      if (refetchError) {
+        console.error(
+          `[admin] 고아 이미지 판정용 재조회 실패 — 정리 보류: ${uploadedPath}`,
+          refetchError.message,
+        );
+        return;
+      }
+      // 행이 사라진 경우(current null: 삭제가 레이스를 이김)엔 업로드가 곧 고아다.
+      if (current?.artwork_path === uploadedPath) return;
+      await removeImages(supabase, [uploadedPath]);
+    };
 
     // site_slug·slug는 update 대상에서 제외(불변) — columns에 둘 다 없음.
     // updated_at 매치 조건이 2차(레이스) 검사다: 위 1차 검사 후 이 update 사이에 다른
@@ -245,11 +263,11 @@ export async function updateRelease(
       .eq("updated_at", existing.updated_at)
       .select("id");
     if (error) {
-      await removeImages(supabase, uploadedOrphanPaths);
+      await removeUploadedOrphans();
       return { ok: false, error: error.message };
     }
     if (!updated || updated.length === 0) {
-      await removeImages(supabase, uploadedOrphanPaths);
+      await removeUploadedOrphans();
       return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
     }
 

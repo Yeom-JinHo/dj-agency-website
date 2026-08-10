@@ -220,16 +220,36 @@ export async function updateArtist(
       imageColumns.logo_image_path = null;
     }
 
-    // update 실패 시 방금 올린 새 이미지는 어떤 행도 참조하지 않는 고아 — 보상 삭제
-    // 대상. 기존 경로와 같으면(동일 콘텐츠 해시, upsert) 라이브 파일이므로 제외한다.
-    const uploadedOrphanPaths = [
-      profileUpload && profileUpload.path !== existing.image_path
-        ? profileUpload.path
-        : null,
-      logoUpload && logoUpload.path !== existing.logo_image_path
-        ? logoUpload.path
-        : null,
-    ];
+    // update가 적용되지 못했을 때 방금 올린 새 이미지의 보상 삭제. 고아 판정은 이
+    // 요청의 로드 시점 경로가 아니라 행의 "현재" 경로를 재조회해서 한다 — 두 탭이
+    // 같은 파일을 올리면 콘텐츠 해시가 같아 경로가 겹치는데, 진 쪽이 로드 시점
+    // 기준으로 판정하면 이긴 저장이 방금 연결한 라이브 파일을 지우게 된다.
+    // 재조회에 실패하면 지우지 않는다 — 고아 잔존(removeImages 로그로 추적 가능)이
+    // 라이브 파일 유실보다 낫다.
+    const removeUploadedOrphans = async (): Promise<void> => {
+      const uploaded = [profileUpload?.path, logoUpload?.path].filter(
+        (p): p is string => Boolean(p),
+      );
+      if (uploaded.length === 0) return;
+      const { data: current, error: refetchError } = await supabase
+        .from("artists")
+        .select("image_path, logo_image_path")
+        .eq("id", id)
+        .maybeSingle();
+      if (refetchError) {
+        console.error(
+          `[admin] 고아 이미지 판정용 재조회 실패 — 정리 보류: ${uploaded.join(", ")}`,
+          refetchError.message,
+        );
+        return;
+      }
+      // 행이 사라진 경우(current null: 삭제가 레이스를 이김)엔 업로드 전부가 고아다.
+      const live = new Set([current?.image_path, current?.logo_image_path]);
+      await removeImages(
+        supabase,
+        uploaded.filter((p) => !live.has(p)),
+      );
+    };
 
     // updated_at 매치 조건이 2차(레이스) 검사다: 위 1차 검사 후 이 update 사이에 다른
     // 저장이 끼어들면 트리거가 updated_at을 바꿔 매치 0건이 된다 — select("id")로 실제
@@ -242,11 +262,11 @@ export async function updateArtist(
       .eq("updated_at", existing.updated_at)
       .select("id");
     if (error) {
-      await removeImages(supabase, uploadedOrphanPaths);
+      await removeUploadedOrphans();
       return { ok: false, error: error.message };
     }
     if (!updated || updated.length === 0) {
-      await removeImages(supabase, uploadedOrphanPaths);
+      await removeUploadedOrphans();
       return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
     }
 
