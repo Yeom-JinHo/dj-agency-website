@@ -45,7 +45,7 @@ export async function generateMetadata({
   return { title: `${SITE_LABELS[site]} | ye0m2 admin` };
 }
 
-// 사이트 홈(§8): 카테고리 3카드 → /[site]/artists 등.
+// 사이트 홈(§8): 그 사이트가 쓰는 카테고리 카드(최대 3장) → /[site]/artists 등.
 export default async function SiteHomePage({
   params,
 }: {
@@ -108,7 +108,7 @@ export default async function SiteHomePage({
               <div className="min-w-0">
                 <h2 className="text-base font-medium">{category.label}</h2>
                 {/* 카드마다 카운트가 하나뿐이고 제목이 곧 라벨이라 숫자만 쓴다. 대시보드는
-                    카드 하나가 카테고리 3개를 요약해 라벨이 필요하므로 표기가 다르다 —
+                    카드 하나가 카테고리 여러 개를 요약해 라벨이 필요하므로 표기가 다르다 —
                     구조가 달라서 다른 것이니 맞추지 않는다. 분류사도 엔티티마다 달라(명/개/회)
                     postfix는 붙이지 않는다. */}
                 <p className="text-muted-foreground mt-0.5 text-sm tabular-nums">

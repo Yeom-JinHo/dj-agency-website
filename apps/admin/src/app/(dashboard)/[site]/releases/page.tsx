@@ -41,6 +41,9 @@ export default async function ReleasesPage({
   if (!parsedSite.success) notFound();
   const siteSlug = parsedSite.data;
 
+  // 투어 목록과 달리 로스터 조회를 유지한다 — 릴리즈의 아티스트 열은 artistCredit
+  // 폴백이 있어 아티스트를 관리하지 않는 사이트에서도 편집 가능한 값을 보여준다
+  // (투어는 FK뿐이라 열째 감춘다: tours/tours-table.tsx 주석).
   const [releases, artists] = await Promise.all([
     adminListReleases(siteSlug),
     adminListArtists(siteSlug),

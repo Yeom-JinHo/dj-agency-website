@@ -20,7 +20,9 @@ export const SITE_LABELS: Record<SiteSlug, string> = {
   juntaro: "Juntaro",
 };
 
-/** 각 사이트 홈의 카테고리 3종. 라우트 세그먼트와 1:1.
+/** admin이 다루는 카테고리 전체 목록. 라우트 세그먼트와 1:1.
+ * 어느 사이트가 이 중 무엇을 쓰는지는 아래 SITE_CATEGORY_SEGMENTS가 정한다 —
+ * 여기는 "카테고리가 무엇인지"만 담는 카탈로그다.
  * releases 라벨은 목록·버튼·빈 상태의 h1 어휘("릴리즈")와 같은 말을 쓴다 —
  * 내비·브레드크럼·카운트만 "뮤직"이던 이중 어휘를 릴리즈로 통일했다. */
 export const CATEGORIES = [
@@ -69,6 +71,27 @@ export function hasSiteCategory(
   segment: CategorySegment
 ): boolean {
   return SITE_CATEGORY_SEGMENTS[site].includes(segment);
+}
+
+/**
+ * 범위 밖 뮤테이션 차단(서버 액션용). 라우트 가드는 화면을 막을 뿐 Server Action은
+ * 그 자체가 엔드포인트라 여전히 호출된다 — 배포 직전에 열어둔 탭이나 라우터 캐시에
+ * 남은 숨김 라우트가 제출하면, 이제 admin이 보여주지 않는 사이트에 행이 생기거나
+ * 바뀐다(공개 앱도 그 엔티티를 렌더하지 않으니 아무도 못 보는 유령 행이 된다).
+ * 세 actions.ts가 이미 하는 `siteSlugSchema.parse(신뢰 경계 재검증)` 바로 옆에서,
+ * 같은 이유로 범위도 재검증한다.
+ *
+ * throw로 알리는 이유: 액션들이 전부 try/catch + toErrorMessage로 감싸고 있어
+ * 던진 메시지가 그대로 편집자에게 닿는다. 정상 흐름에선 도달할 수 없는 경로라
+ * 필드 귀속(field) 없이 폼 전역 오류로 충분하다.
+ */
+export function assertSiteCategory(
+  site: SiteSlug,
+  segment: CategorySegment
+): void {
+  if (hasSiteCategory(site, segment)) return;
+  const label = CATEGORIES.find((c) => c.segment === segment)?.label ?? segment;
+  throw new Error(`${SITE_LABELS[site]}에서는 ${label}를 관리하지 않습니다.`);
 }
 
 /** 사이트별 앱 아이콘(스위처·대시보드 카드 표시용). 각 앱 icon.png를 64px webp로 리사이즈한 복사본. */

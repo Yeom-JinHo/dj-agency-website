@@ -115,11 +115,11 @@ export default async function DashboardPage() {
               />
               <div className="min-w-0">
                 <h2 className="text-base font-medium">{SITE_LABELS[site]}</h2>
-                {/* 카드 하나가 카테고리 3개를 요약하므로 라벨이 없으면 "3 · 5 · 2"가 되어
-                    무엇의 수인지 알 수 없다. 사이트 홈은 카드마다 카운트가 하나뿐이고
-                    제목이 곧 라벨이라 숫자만 쓴다 — 표기가 다른 건 이 구조 차이 때문이다.
-                    text-xs도 같은 이유: lg:grid-cols-4 한 칸에 라벨+숫자 3쌍이 들어간다.
-                    (사이트 홈은 3칸에 숫자 하나뿐이라 text-sm.) */}
+                {/* 카드 하나가 그 사이트의 카테고리(최대 3개)를 한 줄로 요약하므로 라벨이
+                    없으면 "3 · 5 · 2"가 되어 무엇의 수인지 알 수 없다. 사이트 홈은 카드마다
+                    카운트가 하나뿐이고 제목이 곧 라벨이라 숫자만 쓴다 — 표기가 다른 건 이
+                    구조 차이 때문이다. text-xs도 같은 이유: lg:grid-cols-4 한 칸에 라벨+숫자가
+                    최대 3쌍 들어간다. (사이트 홈은 카드 하나에 숫자 하나뿐이라 text-sm.) */}
                 <p className="text-muted-foreground mt-0.5 text-xs tabular-nums">
                   {counts.map(({ segment, label, count }, i) => (
                     <span key={segment}>

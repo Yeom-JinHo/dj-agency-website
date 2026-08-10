@@ -151,14 +151,25 @@ const columns: DataTableColumn<TourRow>[] = [
 export function ToursTable({
   rows,
   basePath,
+  showArtist,
 }: {
   rows: TourRow[];
   basePath: string;
+  /** 아티스트를 관리하는 사이트인가(lib/sites.ts SITE_CATEGORY_SEGMENTS). */
+  showArtist: boolean;
 }) {
+  // 아티스트를 관리하지 않는 사이트에선 열을 통째로 뺀다. 투어의 아티스트는 로스터 FK
+  // 하나뿐이라(releases의 artist_credit 같은 자유 입력 대체가 없다) 폼에서 셀렉트를
+  // 감춘 사이트에는 값을 넣을 수단이 아예 없어 항상 "—"인 열만 남는다.
+  // 검색 문구도 함께 갈린다 — 없는 열을 검색 대상으로 안내하지 않는다.
+  const visibleColumns = showArtist
+    ? columns
+    : columns.filter((c) => c.id !== "artist");
+
   return (
     <DataTable
       rows={rows}
-      columns={columns}
+      columns={visibleColumns}
       rowHref={(row) => `${basePath}/${row.id}`}
       // 지난 공연에 걸던 행 전체 opacity-50은 걷어냈다. 제목이 3.69:1, muted 셀이
       // 1.96:1까지 무너져 WCAG 1.4.3에 한참 못 미쳤는데, 지난 공연은 '안 읽어도 되는 것'이
@@ -170,8 +181,14 @@ export function ToursTable({
       // 약 986px 떨어져 있어 판별하려면 우측 끝까지 시선을 옮겨 글자를 읽어야 했다.
       // 행 단위 처리로 돌아가지 말 것 — 행 전체를 건드리면 이미 muted-foreground인
       // 아티스트·장소·일시가 AA 아래로 떨어진다. 강조를 가진 셀은 제목뿐이라 손댈 곳도 제목뿐이다.
-      searchText={(row) => `${row.title} ${row.artist ?? ""} ${row.venueCity}`}
-      searchPlaceholder="제목·아티스트·장소로 검색"
+      searchText={(row) =>
+        showArtist
+          ? `${row.title} ${row.artist ?? ""} ${row.venueCity}`
+          : `${row.title} ${row.venueCity}`
+      }
+      searchPlaceholder={
+        showArtist ? "제목·아티스트·장소로 검색" : "제목·장소로 검색"
+      }
     />
   );
 }

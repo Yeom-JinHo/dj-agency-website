@@ -7,6 +7,7 @@ import { contentTags } from "@repo/content/tags";
 import type { Database } from "@repo/content/supabase/types";
 
 import { publishOrWarn } from "@/lib/publish";
+import { assertSiteCategory } from "@/lib/sites";
 import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
@@ -55,6 +56,8 @@ export async function createTour(
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — 소속 모델은 site_slug 자동 부여.
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
+    assertSiteCategory(site, "tours");
     const values = tourFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -153,6 +156,8 @@ export async function updateTour(
 ): Promise<EntityActionResult<"artistId">> {
   try {
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
+    assertSiteCategory(site, "tours");
     const values = tourFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -237,6 +242,8 @@ export async function deleteTour(
 ): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
+    assertSiteCategory(site, "tours");
     const supabase = await createServerSupabaseClient();
 
     // 이미지 경로를 먼저 읽어 행 삭제 후 Storage best-effort 정리.

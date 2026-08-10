@@ -7,6 +7,7 @@ import { siteSlugSchema } from "@repo/content/schema";
 import { contentTags } from "@repo/content/tags";
 
 import { publishOrWarn } from "@/lib/publish";
+import { assertSiteCategory } from "@/lib/sites";
 import { slugify } from "@/lib/media";
 import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
 import {
@@ -44,6 +45,8 @@ export async function createRelease(
   try {
     // 라우트에서 온 site를 서버측에서 재검증(신뢰 경계) — artist/tour 액션과 동일 패턴.
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
+    assertSiteCategory(site, "releases");
     const values = releaseFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -153,6 +156,8 @@ export async function updateRelease(
 ): Promise<EntityActionResult<"primaryArtistId">> {
   try {
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
+    assertSiteCategory(site, "releases");
     const values = releaseFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -242,6 +247,8 @@ export async function deleteRelease(
 ): Promise<EntityActionResult> {
   try {
     const site = siteSlugSchema.parse(siteInput);
+    // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
+    assertSiteCategory(site, "releases");
     const supabase = await createServerSupabaseClient();
 
     // slug는 삭제된 상세 캐시 태그에, artwork_path는 Storage 정리에 쓴다.
