@@ -45,6 +45,17 @@ export type CategorySegment = (typeof CATEGORIES)[number]["segment"];
  * 개발자 결정이다(cms-plan.md §13 "celebrate-agency 범위 → Artist만"). 편집자가 런타임에
  * 바꾸는 값이 아니므로 컬럼·조회를 늘리지 않는다. 공개 앱이나 publish/revalidate가
  * 이 범위로 분기해야 할 때 @repo/content로 승격한다 — 지금 소비처는 admin뿐.
+ *
+ * **이 맵이 노출 범위의 정본이다**(cms-plan.md §13이 여기를 가리킨다). 문서에 매트릭스를
+ * 복제하면 두 곳을 동기화해야 하고 반드시 한쪽이 낡는다 — 범위를 바꿀 땐 여기만 고친다.
+ *
+ * 유보한 카테고리와 재검토 조건(현재 범위에서 빠진 것들):
+ * - VFL 투어 — 공연 일정을 사이트에 싣기로 하면 연다. 지금 VFL엔 투어 화면이 없다.
+ * - payday 아티스트 — 릴리즈가 로스터 FK 없이 artist_credit 문자열만 쓴다. 로스터를
+ *   화면에 세우기로 하면 열고, 그때 기존 credit을 아티스트 행으로 옮길지 함께 정한다.
+ * - juntaro 아티스트 — 1인 아티스트 사이트라 로스터 개념이 없다. 투어의 artist_id도
+ *   공개 화면에서 쓰지 않는다(app/tour/page.tsx).
+ * - celebrate 릴리즈·투어 — §13의 "Music/Tour 노출은 향후 필요 시 재검토"가 그대로다.
  */
 export const SITE_CATEGORY_SEGMENTS: Record<
   SiteSlug,
