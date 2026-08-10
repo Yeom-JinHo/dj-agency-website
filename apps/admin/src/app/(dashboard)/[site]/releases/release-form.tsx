@@ -112,6 +112,9 @@ export function ReleaseForm({
     createdMessage: "릴리즈를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved: form.formState.isDirty || isImageFieldDirty(artwork),
+    // 셀렉트를 감춘 사이트에선 서버의 primaryArtistId 오류(assertArtistInSite)를 붙일
+    // 자리가 없다 — 토스트로 받게 넘긴다(useEntityFormSubmit hiddenFields 주석).
+    hiddenFields: showArtistSelect ? undefined : (["primaryArtistId"] as const),
     buildFormData: (values: ReleaseFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));

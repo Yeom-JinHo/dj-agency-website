@@ -132,6 +132,9 @@ export function TourForm({
     createdMessage: "투어를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved: form.formState.isDirty || isImageFieldDirty(poster),
+    // 셀렉트를 감춘 사이트에선 서버의 artistId 오류를 붙일 자리가 없다 — 릴리즈 폼과
+    // 같은 처방(useEntityFormSubmit hiddenFields 주석).
+    hiddenFields: showArtistSelect ? undefined : (["artistId"] as const),
     buildFormData: (values: TourFormValues) => {
       const fd = new FormData();
       // datetime-local → ISO 변환은 여기(클라이언트)에서 — 브라우저 TZ 기준.

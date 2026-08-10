@@ -40,6 +40,7 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
   listHref,
   createdMessage,
   hasUnsaved,
+  hiddenFields,
   buildFormData,
   create,
   update,
@@ -57,6 +58,15 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
   createdMessage: string;
   /** RHF isDirty + 폼이 소유한 파일 상태를 합친 미저장 여부. */
   hasUnsaved: boolean;
+  /**
+   * 이번 렌더에서 폼이 그리지 않는 필드. 서버가 그 필드에 오류를 붙여 오면 setError를
+   * 걸어도 FormMessage가 화면에 없어 아무 흔적이 남지 않고, setFocus도 ref가 없어
+   * 조용히 실패한다 — 편집자에겐 저장 버튼만 되돌아온 것처럼 보인다. 그래서 이 목록에
+   * 든 필드의 오류는 필드 귀속을 건너뛰고 토스트로 보낸다.
+   * 어떤 필드를 그리는지는 폼만 알기에(사이트별 노출 범위 등) 값으로 받는다 —
+   * RHF에 "등록된 필드" 공개 API가 없어 훅이 스스로 알아낼 수단도 없다.
+   */
+  hiddenFields?: readonly FieldPath<TValues>[];
   buildFormData: (values: TValues) => FormData;
   create: EntitySubmitAction<TValues>;
   update: EntitySubmitAction<TValues>;
@@ -120,7 +130,9 @@ export function useEntityFormSubmit<TValues extends FieldValues>({
       // 붙인다 — 포커스 이동이 브라우저 기본 동작으로 스크롤까지 데려가므로
       // 오류 필드가 화면 밖이어도 편집자가 바로 도달한다.
       // 필드를 특정할 수 없는 실패(DB·네트워크 등)는 기존대로 토스트.
-      if (result.field) {
+      // 그 필드를 이번 렌더에서 그리지 않았다면 붙일 자리가 없으므로 토스트로 내린다
+      // (hiddenFields 주석) — 필드에 걸고 끝내면 화면에 아무 단서도 남지 않는다.
+      if (result.field && !hiddenFields?.includes(result.field)) {
         form.setError(result.field, { type: "server", message: result.error });
         form.setFocus(result.field, { shouldSelect: true });
         return;
