@@ -6,12 +6,13 @@ import type { SiteSlug } from "@repo/content/schema";
 import { CATEGORY_ICONS } from "@/components/category-icons";
 import { GuardedLink } from "@/components/guarded-link";
 import { SiteSwitcher } from "@/components/site-switcher";
-import { CATEGORIES } from "@/lib/sites";
+import { siteCategories } from "@/lib/sites";
 import { cn } from "@/lib/utils";
 
 /**
  * 사이트 사이드바(§8) — topbar 혼합형 내비(SiteSwitcher+NavLinks)를 대체한다.
- * 헤드에 사이트 스위처, 아래 카테고리 3종(아티스트·릴리즈·투어)을 세로로 나열한다.
+ * 헤드에 사이트 스위처, 아래 그 사이트가 쓰는 카테고리(아티스트·릴리즈·투어 중
+ * SITE_CATEGORY_SEGMENTS가 허용하는 것만)를 세로로 나열한다.
  * active 판정은 카테고리 nav와 동형(현재 경로가 href와 같거나 그 하위). 데스크톱
  * 전용(모바일 스코프 종결) — 반응형 대응 없음, 고정 폭은 부모([site]/layout.tsx)의
  * grid 컬럼이 지정한다.
@@ -32,7 +33,7 @@ export function SiteSidebar({ site }: { site: SiteSlug }) {
       {/* 헤드(p-3 12px + SiteSwitcher 트리거 자체 px-3 12px = 24px)와 좌측
           기준선을 맞추려 px-3(12px) + GuardedLink 자체 px-3(12px) = 24px로 통일. */}
       <nav aria-label="사이트 섹션" className="flex flex-col gap-0.5 px-3 py-2">
-        {CATEGORIES.map((item) => {
+        {siteCategories(site).map((item) => {
           const href = `/${site}/${item.segment}`;
           const active = pathname === href || pathname.startsWith(`${href}/`);
           const Icon = CATEGORY_ICONS[item.segment];

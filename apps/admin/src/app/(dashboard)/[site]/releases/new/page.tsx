@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { adminListArtists } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
 
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
+import { rosterOptions } from "@/lib/roster-options";
 import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { ReleaseForm } from "../release-form";
 import { emptyReleaseFormValues } from "../schema";
@@ -30,7 +30,8 @@ export default async function NewReleasePage({
   if (!parsedSite.success) notFound();
   const siteSlug = parsedSite.data;
 
-  const artists = await adminListArtists(siteSlug);
+  // 아티스트 미노출 사이트에선 빈 배열 — 폼도 셀렉트를 렌더하지 않는다(rosterOptions 주석).
+  const artists = await rosterOptions(siteSlug);
 
   return (
     <div className="space-y-6">

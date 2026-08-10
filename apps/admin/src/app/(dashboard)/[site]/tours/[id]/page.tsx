@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { z } from "zod";
-import { adminGetTourById, adminListArtists } from "@repo/content/admin-queries";
+import { adminGetTourById } from "@repo/content/admin-queries";
 import { siteSlugSchema } from "@repo/content/schema";
 
 import { mediaUrl } from "@/lib/media";
 import { EntityBreadcrumb } from "@/components/entity-breadcrumb";
 import { DeleteEntityButton } from "@/components/delete-entity-button";
+import { rosterOptions } from "@/lib/roster-options";
 import { isSiteSlug, SITE_LABELS } from "@/lib/sites";
 import { TourForm } from "../tour-form";
 import { type TourFormValues } from "../schema";
@@ -39,7 +40,8 @@ export default async function EditTourPage({
 
   const [tour, artists] = await Promise.all([
     adminGetTourById(id),
-    adminListArtists(site),
+    // 아티스트 미노출 사이트에선 빈 배열(rosterOptions 주석).
+    rosterOptions(site),
   ]);
 
   // 다른 사이트 소속 투어를 이 사이트 라우트로 편집하지 못하게 소속 가드.
