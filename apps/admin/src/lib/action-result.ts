@@ -15,3 +15,11 @@ export type EntityActionResult<TField extends string = never> =
 export function toErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
+
+/**
+ * 낙관적 동시성 충돌(update 액션 공용) — 폼이 로드한 updated_at과 현재 행이 다르면
+ * 다른 탭·편집자가 먼저 저장한 것이다. last-write-wins로 조용히 덮어쓰는 대신
+ * 이 문구로 끊는다. 새로고침이 유일한 복구 경로라 문구에 못 박는다.
+ */
+export const CONCURRENT_EDIT_MESSAGE =
+  "저장하는 사이에 이 항목이 다른 곳에서 수정됐습니다. 페이지를 새로고침해 최신 내용을 확인한 뒤 변경사항을 다시 적용해주세요.";

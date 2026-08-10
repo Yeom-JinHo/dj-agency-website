@@ -98,6 +98,7 @@ export default async function EditReleasePage({
         site={siteSlug}
         releaseId={release.id}
         slug={release.slug}
+        updatedAt={release.updatedAt}
         defaultValues={defaultValues}
         artists={artists}
         initialArtworkUrl={mediaUrl(release.artworkPath)}

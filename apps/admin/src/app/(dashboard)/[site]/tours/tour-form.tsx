@@ -74,6 +74,8 @@ interface TourFormProps {
   tourId?: string;
   /** edit 모드: 기존 slug(불변, 읽기 전용 표시). */
   slug?: string;
+  /** edit 모드: 로드 시점의 updated_at — 서버 액션의 동시 편집 충돌 검사에 쓴다. */
+  updatedAt?: string;
   defaultValues: TourFormValues;
   /** edit 모드: 기존 event_date(ISO) — 클라이언트에서 datetime-local로 변환. */
   initialEventDateIso?: string;
@@ -87,6 +89,7 @@ export function TourForm({
   site,
   tourId,
   slug,
+  updatedAt,
   defaultValues,
   initialEventDateIso,
   artists,
@@ -145,6 +148,8 @@ export function TourForm({
       fd.set("payload", JSON.stringify(payload));
       if (poster.file) fd.set("posterImage", poster.file);
       if (poster.removed) fd.set("removePosterImage", "1");
+      // 로드 시점 updated_at — 그사이 다른 곳에서 저장됐으면 서버가 충돌로 끊는다.
+      if (updatedAt) fd.set("expectedUpdatedAt", updatedAt);
       return fd;
     },
     create: (fd) => createTour(site, fd),

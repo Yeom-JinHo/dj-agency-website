@@ -89,6 +89,7 @@ export default async function EditTourPage({
         site={site}
         tourId={tour.id}
         slug={tour.slug}
+        updatedAt={tour.updatedAt}
         defaultValues={defaultValues}
         initialEventDateIso={tour.eventDate}
         artists={artists}

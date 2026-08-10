@@ -10,7 +10,11 @@ import { assertSiteAccess } from "@/lib/auth";
 import { publishOrWarn } from "@/lib/publish";
 import { assertSiteCategory } from "@/lib/sites";
 import { slugify } from "@/lib/media";
-import { type EntityActionResult, toErrorMessage } from "@/lib/action-result";
+import {
+  CONCURRENT_EDIT_MESSAGE,
+  type EntityActionResult,
+  toErrorMessage,
+} from "@/lib/action-result";
 import {
   imageFile,
   imageRemoved,
@@ -37,6 +41,42 @@ async function assertArtistInSite(
     .eq("site_slug", site)
     .maybeSingle();
   return data ? null : "선택한 아티스트가 이 사이트 소속이 아닙니다.";
+}
+
+type Supabase = Awaited<ReturnType<typeof createServerSupabaseClient>>;
+
+/**
+ * 방금 올린 아트워크가 행에 연결되지 않았을 때만 지우는 보상 삭제.
+ *
+ * 고아 판정은 이 요청의 로드 시점 경로가 아니라 행의 "현재" 경로를 재조회해서 한다 —
+ * 두 탭이 같은 파일을 올리면 콘텐츠 해시가 같아 경로가 겹치는데, 로드 시점 기준으로
+ * 판정하면 진 쪽이 이긴 저장의 라이브 파일을 지우게 된다. 같은 이유로 create의 컬럼
+ * update 실패에도 재조회가 필요하다: 응답만 유실되고 서버에서 커밋됐다면 행이 이미
+ * 그 경로를 가리키므로, 무조건 지우면 고아가 아니라 깨진 참조(사이트에 404 이미지)가
+ * 남는다. 재조회에 실패하면 지우지 않는다 — 고아 잔존(removeImages 로그로 추적 가능)이
+ * 라이브 파일 유실보다 낫다.
+ */
+async function removeUploadedOrphans(
+  supabase: Supabase,
+  id: string,
+  uploadedPath: string | null | undefined,
+): Promise<void> {
+  if (!uploadedPath) return;
+  const { data: current, error } = await supabase
+    .from("releases")
+    .select("artwork_path")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) {
+    console.error(
+      `[admin] 고아 이미지 판정용 재조회 실패 — 정리 보류: ${uploadedPath}`,
+      error.message,
+    );
+    return;
+  }
+  // 행이 사라진 경우(current null: 삭제가 레이스를 이김)엔 업로드가 곧 고아다.
+  if (current?.artwork_path === uploadedPath) return;
+  await removeImages(supabase, [uploadedPath]);
 }
 
 export async function createRelease(
@@ -105,8 +145,10 @@ export async function createRelease(
 
     // 행 생성 이후 단계(이미지 업로드 → artwork 컬럼 update).
     // 여기서 실패해도 행은 이미 존재하므로 삭제하지 않고 편집 화면으로 안내(dead-end 회피).
+    // 업로드 결과는 catch에서도 보여야 한다(컬럼 update 실패 시 업로드된 파일 보상 삭제).
+    let artworkUpload: { path: string; placeholder: string } | null = null;
     try {
-      const artworkUpload = artwork
+      artworkUpload = artwork
         ? await uploadEntityImage(
             supabase,
             "release",
@@ -130,6 +172,10 @@ export async function createRelease(
         if (updateError) throw new Error(updateError.message);
       }
     } catch (postError) {
+      // 업로드까지 됐지만 컬럼 update가 실패한 파일은 어떤 행도 참조하지 않는 고아 —
+      // 편집 화면 재저장 시 같은 콘텐츠면 같은 해시 경로로 다시 올라가므로 지워도 안전.
+      // 단, 판정은 행의 현재 경로 재조회로 한다(응답만 유실된 커밋 보호, 헬퍼 주석 참고).
+      await removeUploadedOrphans(supabase, id, artworkUpload?.path);
       // 행은 저장됐으니 아트워크 없이라도 사이트에 반영(발행). 발행 경고는 아트워크 경고에 덧붙인다.
       const publishWarning = await publishOrWarn(publishTags, site);
       revalidatePath(`/${site}/releases`);
@@ -172,12 +218,23 @@ export async function updateRelease(
     // site_slug 스코프: 타 사이트 릴리즈를 이 site 컨텍스트로 조작하지 못하게(artist 패턴).
     const { data: existing, error: loadError } = await supabase
       .from("releases")
-      .select("slug, artwork_path")
+      .select("slug, artwork_path, updated_at")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
     if (loadError) return { ok: false, error: loadError.message };
     if (!existing) return { ok: false, error: "릴리즈를 찾을 수 없습니다." };
+
+    // 낙관적 동시성 1차 검사: 폼이 로드했던 updated_at과 현재 행이 다르면 그사이
+    // 다른 곳에서 저장된 것 — last-write-wins로 덮어쓰기 전에, 그리고 이미지 업로드
+    // 같은 부수효과가 시작되기 전에 끊는다. 값이 없으면(구 폼) 검사를 건너뛴다.
+    const expectedUpdatedAt = formData.get("expectedUpdatedAt");
+    if (
+      typeof expectedUpdatedAt === "string" &&
+      expectedUpdatedAt !== existing.updated_at
+    ) {
+      return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
+    }
 
     const artistError = await assertArtistInSite(
       supabase,
@@ -214,12 +271,24 @@ export async function updateRelease(
     }
 
     // site_slug·slug는 update 대상에서 제외(불변) — columns에 둘 다 없음.
-    const { error } = await supabase
+    // updated_at 매치 조건이 2차(레이스) 검사다: 위 1차 검사 후 이 update 사이에 다른
+    // 저장이 끼어들면 트리거가 updated_at을 바꿔 매치 0건이 된다 — select("id")로 실제
+    // 갱신 행 수를 확인해 0건을 충돌로 처리한다.
+    const { data: updated, error } = await supabase
       .from("releases")
       .update({ ...columns, ...imageColumns })
       .eq("id", id)
-      .eq("site_slug", site);
-    if (error) return { ok: false, error: error.message };
+      .eq("site_slug", site)
+      .eq("updated_at", existing.updated_at)
+      .select("id");
+    if (error) {
+      await removeUploadedOrphans(supabase, id, artworkUpload?.path);
+      return { ok: false, error: error.message };
+    }
+    if (!updated || updated.length === 0) {
+      await removeUploadedOrphans(supabase, id, artworkUpload?.path);
+      return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
+    }
 
     // 교체·제거된 이전 이미지 삭제(best-effort, DB 갱신 뒤라 실패해도 컬럼은 이미 비어 있다).
     // 새 경로와 동일하면(동일 콘텐츠 해시) 방금 올린 파일을 지우게 되므로 제외한다.

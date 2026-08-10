@@ -46,6 +46,8 @@ interface ArtistFormProps {
   artistId?: string;
   /** edit 모드: 기존 slug(불변, 읽기 전용 표시). */
   slug?: string;
+  /** edit 모드: 로드 시점의 updated_at — 서버 액션의 동시 편집 충돌 검사에 쓴다. */
+  updatedAt?: string;
   defaultValues: ArtistFormValues;
   initialProfileUrl?: string | null;
   initialLogoUrl?: string | null;
@@ -56,6 +58,7 @@ export function ArtistForm({
   site,
   artistId,
   slug,
+  updatedAt,
   defaultValues,
   initialProfileUrl = null,
   initialLogoUrl = null,
@@ -96,6 +99,8 @@ export function ArtistForm({
       if (profile.removed) fd.set("removeProfileImage", "1");
       if (logo.file) fd.set("logoImage", logo.file);
       if (logo.removed) fd.set("removeLogoImage", "1");
+      // 로드 시점 updated_at — 그사이 다른 곳에서 저장됐으면 서버가 충돌로 끊는다.
+      if (updatedAt) fd.set("expectedUpdatedAt", updatedAt);
       return fd;
     },
     create: (fd) => createArtist(site, fd),

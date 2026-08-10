@@ -60,6 +60,8 @@ interface ReleaseFormProps {
   releaseId?: string;
   /** edit 모드: 기존 slug(불변, 읽기 전용 표시). */
   slug?: string;
+  /** edit 모드: 로드 시점의 updated_at — 서버 액션의 동시 편집 충돌 검사에 쓴다. */
+  updatedAt?: string;
   defaultValues: ReleaseFormValues;
   /** primary artist select 옵션(같은 사이트 소속 로스터). 아티스트 미노출 사이트에선 빈 배열. */
   artists: { id: string; name: string }[];
@@ -71,6 +73,7 @@ export function ReleaseForm({
   site,
   releaseId,
   slug,
+  updatedAt,
   defaultValues,
   artists,
   initialArtworkUrl = null,
@@ -120,6 +123,8 @@ export function ReleaseForm({
       fd.set("payload", JSON.stringify(values));
       if (artwork.file) fd.set("artworkImage", artwork.file);
       if (artwork.removed) fd.set("removeArtworkImage", "1");
+      // 로드 시점 updated_at — 그사이 다른 곳에서 저장됐으면 서버가 충돌로 끊는다.
+      if (updatedAt) fd.set("expectedUpdatedAt", updatedAt);
       return fd;
     },
     create: (fd) => createRelease(site, fd),
