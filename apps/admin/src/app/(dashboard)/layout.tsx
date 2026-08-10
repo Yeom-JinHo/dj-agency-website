@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@repo/content/supabase/server";
@@ -7,6 +6,7 @@ import { createServerSupabaseClient } from "@repo/content/supabase/server";
 import adminLogo from "@/assets/admin-logo.webp";
 import { GuardedLink } from "@/components/guarded-link";
 import { SignOutButton } from "@/components/sign-out-button";
+import { getAdminSession } from "@/lib/auth";
 
 // 인증 세션(쿠키)에 의존하므로 정적 프리렌더 대상에서 제외한다 —
 // 빌드 타임에 서버 클라이언트를 호출하지 않는다.
@@ -23,29 +23,15 @@ async function signOut() {
 export default async function DashboardLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  // 인증(세션) 없으면 차단 — 미들웨어와 이중 방어.
-  if (!user) {
+  // 인증(세션) + 인가(editors 멤버십)를 한 번에 — 미들웨어와 이중 방어.
+  // 사이트 단위 권한(allowedSites)은 이 아래 화면들이 lib/auth에서 직접 읽는다
+  // (요청당 캐시되므로 중복 조회가 아니다): 대시보드는 카드 목록을 거기서 만들고,
+  // [site]/layout.tsx는 미부여 사이트를 notFound()로 끊는다.
+  const session = await getAdminSession();
+  if (!session) {
     redirect("/login");
   }
-
-  // 인가: editors 멤버십 확인(초대된 편집자만 접근). self-read RLS로 본인 행만 조회 가능.
-  // NOTE(통합): editors 테이블 타입은 feat/admin-p1-content 마이그레이션에 추가 중이라
-  // 아직 database.types에 없다. 반영되면 이 SupabaseClient 캐스팅을 제거하고
-  // supabase.from("editors")를 직접 타입 지원받게 정리할 것.
-  const { data: editor } = await (supabase as SupabaseClient)
-    .from("editors")
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!editor) {
-    redirect("/login");
-  }
+  const { user, isEditor } = session;
 
   return (
     <div className="flex min-h-svh flex-col">
@@ -96,7 +82,30 @@ export default async function DashboardLayout({
           다 받게 한다. 이전의 min-h-full(%)은 flex-1 아이템의 불확정 높이에서 해석되지
           않아 짧은 페이지(사이트 홈·빈 목록)에서 사이드바 배경이 콘텐츠 높이에 끊겼다. */}
       <main id="main" tabIndex={-1} className="flex flex-1 flex-col">
-        {children}
+        {/* editors에 없는 계정 — /login으로 되돌려보내면 세션이 살아 있어 다시 로그인해도
+            같은 자리로 돌아오고, 당사자는 자기 계정이 거부됐다는 사실조차 듣지 못했다.
+            화면을 잠그되 이유를 말해주고, 자기가 취할 수 있는 유일한 행동(다른 계정으로
+            로그인)은 헤더의 로그아웃이 이미 맡는다 — 대시보드 빈 상태와 같은 이유로
+            상자 안에 CTA를 겹쳐 두지 않는다. */}
+        {isEditor ? (
+          children
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+            <div className="space-y-1">
+              {/* 대시보드 빈 상태(EmptyState)가 아니라 not-found와 같은 어휘를 쓴다 —
+                  저 상자는 h1 아래 놓이는 전제라 여기서 쓰면 화면에 h1이 없어진다.
+                  이 화면은 페이지가 통째로 잠긴 상태라 404와 같은 계열이 맞다. */}
+              <h1 className="text-lg font-semibold">
+                admin 편집 권한이 없습니다
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                이 계정{user.email ? ` (${user.email})` : ""}은 편집자로 등록돼
+                있지 않습니다. 관리자에게 문의하거나, 우측 상단 로그아웃으로 다른
+                계정으로 로그인해주세요.
+              </p>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

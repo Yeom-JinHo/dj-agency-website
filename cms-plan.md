@@ -176,6 +176,8 @@ export const getArtist = (site: SiteSlug, slug: string) =>
 RLS 권한:
    anon (4개 사이트 읽기)        → SELECT 만 허용
    authenticated (admin)         → INSERT/UPDATE/DELETE 허용
+                                   단 editors 멤버십 + 대상 행의 site_slug 부여(editor_sites)
+                                   양쪽을 모두 만족할 때만 (마이그레이션 0002, §13)
    service_role                  → 서버 전용, 클라이언트 노출 금지
 ```
 
@@ -342,6 +344,10 @@ create index idx_tours_artist            on public.tours    (artist_id);
 create index idx_tours_event_date        on public.tours    (event_date desc);
 ```
 ### RLS & Storage
+
+> **갱신(마이그레이션 0002):** 아래 쓰기 정책은 `editors` 멤버십만 검사하던 초기 형태다.
+> 현재는 여기에 "대상 행의 `site_slug`가 그 편집자의 `editor_sites`에 있는가"가 결합돼 있다.
+> 정본은 `supabase/migrations/0002_editor_sites.sql` + §13 "사이트 단위 편집 권한".
 
 ```sql
 -- editors 화이트리스트 (P1 리뷰 반영으로 확정된 모델)
@@ -525,13 +531,7 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
   피처링 아티스트에 프로필 링크·교차검색이 필요해지면 전환.
 - **언어 추가**: `*_en`/`*_ko` 패턴에 컬럼 추가, 또는 `translations` 테이블로 정규화.
 - **Storage 파일 라이프사이클**: 엔티티 삭제 시 고아 이미지 정리(트리거/배치).
-- **Admin 권한 세분화** — **방향 확정: 공유 editors 모델 유지 + 사이트 단위 권한으로 확장.**
-  편집자가 늘어 사이트별 권한 구분이 필요해지면, `editors`는 "admin 접근 가능"의 공유
-  화이트리스트로 유지하고 `editor_sites(user_id, site_slug)` 조인 테이블을 추가한다.
-  RLS 쓰기 정책의 editors exists 검증에 "대상 행의 `site_slug`가 그 편집자의 `editor_sites`에
-  존재" 조건을 결합하면 스키마·admin 인가 구조 변경 없이 확장된다(소속 모델이라 조건이
-  단일 컬럼 비교로 단순). 역할(role) 클레임 방식은 채택하지 않음. 편집자 1명인 현재는
-  구현하지 않는다.
+- ~~**Admin 권한 세분화**~~ → **구현 완료(마이그레이션 0002).** §13 "사이트 단위 편집 권한" 참고.
 - **호스팅 이전 옵션**: Vercel 비용 이슈 시 Cloudflare Pages/Netlify로 사이트 이전(Supabase 유지).
 - **revalidate 방식 A(DB 웹훅) 승격**: admin 외 경로(Supabase Studio 수동 편집·SQL·벌크 임포트)의
   변경까지 자동 반영해야 할 때. Database Webhook + 오케스트레이터 Edge Function을 추가하며,
@@ -558,6 +558,56 @@ export async function publish(tags: string[], site: SiteSlug): Promise<PublishRe
   그 재검토 조건도 같은 맵의 주석에 둔다.
 - **초기 편집자 계정** → **본인 1명** (`o1086291943@gmail.com`).
   코드/시드에는 넣지 않고 Supabase Auth 콘솔에서 초대. 추가 편집자는 이후 콘솔에서.
+- **사이트 단위 편집 권한 (마이그레이션 0002)** → **`editors` 게이트 + `editor_sites` 허용 목록.**
+  `editors`는 "admin에 들어올 수 있다"의 공유 화이트리스트로 그대로 두고, "어느 사이트를
+  편집할 수 있다"를 `editor_sites(user_id, site_slug)`로 분리한다. 엔티티·Storage 쓰기 RLS는
+  두 조건을 모두 요구한다(`editors` 멤버십 AND 대상 행 `site_slug` 부여) — `editors`에서
+  빼는 것만으로 모든 권한이 즉시 죽어야 하기 때문. 소속 모델이라 조건은 단일 컬럼 비교.
+  **허용 목록(기본 거부)** — 새 사이트·새 편집자는 명시 부여 전까지 닫혀 있다. 거부 목록이면
+  차단을 잊는 쪽이 사고가 된다. 역할(role) 클레임 방식은 채택하지 않음.
+  0002는 기존 편집자에게 4개 사이트를 시드해 현행 동작을 보존한다. 권한 회수는 행 삭제로 한다:
+  `delete from public.editor_sites where user_id = '<uuid>' and site_slug = 'juntaro';`
+  **읽기는 나누지 않는다** — 콘텐츠는 공개 사이트가 서빙하는 공개 데이터고(anon select),
+  여기서 나누는 것은 편집 권한이다. admin UI는 부여된 사이트만 노출(대시보드 카드·사이트
+  스위처)하고 미부여 사이트는 404로 덮는다(403은 그 사이트의 존재를 확인해준다).
+  RLS 정책의 `auth.uid()`는 모두 `(select auth.uid())`로 감싼다 — 행마다 재평가되는 대신
+  InitPlan으로 한 번만 계산된다. 0001의 `editors_self_read`도 0002에서 같은 형태로 재생성해
+  정책 정본을 0002 하나로 모았다.
+
+  **배포 순서: 0002 적용 → admin 배포.** admin은 로그인 시 `editor_sites`를 조회하고
+  조회 실패를 throw로 올리므로(권한 없음으로 강등하지 않는다), 코드가 먼저 나가면 테이블
+  부재가 레이아웃에서 터져 admin 전 화면이 에러가 된다. 순서를 지키면 0002의 시드가 현행
+  권한을 그대로 보존하므로 무중단이다. 스테이징에 먼저 적용해 확인한다.
+
+  **운영 런북**
+  ```sql
+  -- 1) 신규 편집자 초대: Supabase Auth 콘솔에서 계정을 만든 뒤 user_id를 확인한다.
+  select id, email from auth.users where email = 'someone@example.com';
+
+  -- 2) admin 입장 허용(이것만으로는 아무 사이트도 편집할 수 없다 — 기본 거부).
+  insert into public.editors (user_id) values ('<uuid>') on conflict do nothing;
+
+  -- 3) 편집할 사이트 부여. 이 단계를 빠뜨리면 로그인은 되지만 대시보드가 빈 상태다.
+  insert into public.editor_sites (user_id, site_slug)
+  values ('<uuid>', 'payday-records'), ('<uuid>', 'juntaro')
+  on conflict do nothing;
+
+  -- 회수: 사이트 하나만 떼기
+  delete from public.editor_sites where user_id = '<uuid>' and site_slug = 'juntaro';
+  -- 회수: admin 전체 차단(editors에서 빼면 부여 행이 남아 있어도 모든 권한이 즉시 죽는다)
+  delete from public.editors where user_id = '<uuid>';
+
+  -- 부여 현황 확인
+  select u.email, es.site_slug from public.editor_sites es
+    join auth.users u on u.id = es.user_id order by u.email, es.site_slug;
+  ```
+  **새 사이트를 추가할 때는 `sites` INSERT와 같은 마이그레이션에 `editor_sites` 부여를
+  함께 넣는다** — 기본 거부라 기존 편집자에게 자동으로 열리지 않는다.
+
+  admin UI가 구분하는 상태는 셋이다: 미로그인(→ `/login`), 로그인했지만 `editors`에 없음
+  (→ 화면을 잠그고 이유를 안내, 헤더 로그아웃으로 다른 계정 전환), `editors`에 있으나 부여
+  0개(→ 대시보드 빈 상태). 비편집자를 `/login`으로 되돌려보내면 세션이 살아 있어 재로그인해도
+  같은 자리로 오고 거부 사실조차 전달되지 않아, 이 셋을 뭉개지 않는다.
 - **`platform_links` 목록** → **5개 확정**: `beatport`, `spotify`, `appleMusic`,
   `soundcloud`, `youtubeMusic`. (레포 사용 빈도와 일치. 컬럼 아닌 jsonb라 추가 용이.)
 - **발행 상태** → **즉시 공개.** draft/publish 상태·미리보기 미도입(편집자 1명). 저장→revalidate→라이브.

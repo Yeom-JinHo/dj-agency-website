@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { SITE_SLUGS } from "@repo/content/schema";
+import type { SiteSlug } from "@repo/content/schema";
 
 import {
   Select,
@@ -34,8 +34,11 @@ import { confirmLeaveUnsaved } from "@/lib/unsaved-guard";
  * 유지는 **대상 사이트가 그 카테고리를 쓸 때만**이다 — 사이트마다 노출 범위가 다르므로
  * (SITE_CATEGORY_SEGMENTS) juntaro 투어를 보다 celebrate로 옮기면 없는 카테고리로
  * 밀려 404가 된다. 그럴 땐 상세에서와 같이 사이트 홈으로 보낸다.
+ *
+ * 목록은 부여된 사이트만 받는다(`sites`) — 서버 레이아웃이 판정한 것을 그대로
+ * 그린다. 못 만지는 사이트를 골라 404로 튕기는 경로를 UI에서 없앤다.
  */
-export function SiteSwitcher() {
+export function SiteSwitcher({ sites }: { sites: readonly SiteSlug[] }) {
   const pathname = usePathname();
   const router = useRouter();
   const [, first = "", category = "", detail] = pathname.split("/");
@@ -61,7 +64,7 @@ export function SiteSwitcher() {
         <SelectValue placeholder="사이트 선택" />
       </SelectTrigger>
       <SelectContent>
-        {SITE_SLUGS.map((site) => (
+        {sites.map((site) => (
           <SelectItem key={site} value={site}>
             <Image
               src={SITE_ICONS[site]}

@@ -272,6 +272,28 @@ export interface Database {
           },
         ];
       };
+      /** 편집자 × 사이트 허용 목록(0002). 행이 없으면 그 사이트는 편집 불가. */
+      editor_sites: {
+        Row: { user_id: string; site_slug: string };
+        Insert: { user_id: string; site_slug: string };
+        Update: { user_id?: string; site_slug?: string };
+        Relationships: [
+          {
+            foreignKeyName: "editor_sites_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "editor_sites_site_slug_fkey";
+            columns: ["site_slug"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["slug"];
+          },
+        ];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };

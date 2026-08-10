@@ -6,6 +6,7 @@ import { siteSlugSchema, type SiteSlug } from "@repo/content/schema";
 import { contentTags } from "@repo/content/tags";
 import type { Database } from "@repo/content/supabase/types";
 
+import { assertSiteAccess } from "@/lib/auth";
 import { publishOrWarn } from "@/lib/publish";
 import { assertSiteCategory } from "@/lib/sites";
 import { slugify } from "@/lib/media";
@@ -28,6 +29,10 @@ export async function createArtist(
     const site = siteSlugSchema.parse(siteParam);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "artists");
+    // 인가는 RLS가 최종 판정하지만 여기서 먼저 끊는다 — 그래야 이미지 업로드·발행 같은
+    // 부수효과가 시작되지 않고, 사용자도 DB 오류 원문 대신 제대로 된 문구를 본다.
+    // (릴리즈·투어 액션도 같은 자리에서 같은 가드를 건다.)
+    await assertSiteAccess(site);
     const values = artistFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -145,6 +150,7 @@ export async function updateArtist(
     const site = siteSlugSchema.parse(siteParam);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "artists");
+    await assertSiteAccess(site);
     const values = artistFormSchema.parse(
       JSON.parse(String(formData.get("payload"))),
     );
@@ -251,6 +257,7 @@ export async function deleteArtist(
     const site = siteSlugSchema.parse(siteParam);
     // 라우트 가드와 같은 범위 검증 — 근거는 assertSiteCategory 주석.
     assertSiteCategory(site, "artists");
+    await assertSiteAccess(site);
     const supabase = await createServerSupabaseClient();
 
     // slug는 삭제된 상세 페이지 캐시 태그 조립에, 이미지 경로는 Storage 정리에 쓴다.
