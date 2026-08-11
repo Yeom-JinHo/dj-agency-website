@@ -131,7 +131,11 @@ export function ImageField({
             target="_blank"
             rel="noreferrer"
             aria-label={`${label} 원본을 새 탭에서 열기`}
-            className="bg-muted shrink-0 overflow-hidden rounded-md border"
+            /* disabled:opacity-50은 폼 컨트롤(input·button·select)에만 걸린다 —
+               이 링크는 컨트롤이 아니라 제출 중 fieldset이 잠겨도 혼자 또렷하게
+               남고 클릭도 그대로 먹었다. 잠긴 영역의 일부라는 걸 같은 어휘로
+               말한다(조상 fieldset:disabled를 직접 겨냥). */
+            className="bg-muted shrink-0 overflow-hidden rounded-md border [fieldset:disabled_&]:pointer-events-none [fieldset:disabled_&]:opacity-50"
           >
             <Image
               src={preview}
@@ -145,7 +149,7 @@ export function ImageField({
         ) : (
           /* 빈 자리도 미리보기와 같은 128px — 이미지를 고르거나 지울 때 블록
              높이가 바뀌면 아래 필드 전체가 위아래로 튄다. */
-          <div className="bg-muted flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+          <div className="bg-muted flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-md border [fieldset:disabled_&]:opacity-50">
             {/* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
                (흰 배경 위 4.73:1이 배경이 bg-muted #F5F5F5로 바뀌며 뒤집힌다).
                foreground 60%는 합성색 #686868 → 4.65:1로 통과하면서 본문 톤까지
