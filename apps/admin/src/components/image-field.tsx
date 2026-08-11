@@ -10,27 +10,23 @@ import {
   MAX_UPLOAD_BYTES,
   MAX_UPLOAD_MB,
 } from "@/lib/image-constraints";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 
 /**
- * 미리보기 치수. sm은 이미지가 폼 **첫 필드**로 오는 화면 전용이다 — 릴리즈
- * 아트워크가 그 경우로, md(208px)면 바로 아래 제목 필드가 접힘 밖으로 밀린다.
- * 이미지가 폼 하단에 있는 화면(artist 프로필·tour 포스터)은 그 비용이 없으므로
- * md를 유지한다: 미리보기는 저장 전 마지막 검증 게이트라 클수록 낫고, 세로 원본
- * (아티스트 1200×1800)은 sm에서 가로 85px까지 줄어 워터마크·보더 판독이 빠듯하다.
+ * 미리보기 박스의 한 변(px). 세 폼 모두 기본 정보 카드의 13rem 그리드 트랙에
+ * 이 컴포넌트를 세로로 세우므로 트랙 폭과 같은 값이어야 한다.
  *
- * box는 "이미지 없음" 자리이며 항상 미리보기 높이와 같은 정사각이다 — 높이가
- * 달라지면 이미지를 고르거나 지울 때 아래 필드 전체가 세로로 튄다. 가로는
- * 원본 비율에 따라 어차피 달라지지만, 그건 버튼 열만 좌우로 밀 뿐이다.
+ * 정사각 박스 + object-contain인 이유: 높이만 고정하고 폭을 원본 비율에 맡기면
+ * (종전 h-52 w-auto) 3:2 가로 원본이 312px, 16:9가 320px로 렌더돼 트랙을 넘고,
+ * 앵커의 overflow-hidden에 걸려 좌우가 잘린다 — 미리보기가 저장 전 마지막
+ * 검증 게이트라는 전제(크롭 금지)가 무너진다. 박스에 담으면 세로 원본은
+ * 139×208, 가로 원본은 208×139로 어느 쪽도 넘치지 않고 잘리지도 않는다.
+ *
+ * 빈 자리("이미지 없음")도 같은 정사각이다 — 크기가 다르면 이미지를 고르거나
+ * 지울 때 아래 컨트롤이 위아래로 튄다.
  */
-const PREVIEW_SIZES = {
-  sm: { image: "h-32", box: "size-32", px: 128 },
-  md: { image: "h-52", box: "size-52", px: 208 },
-} as const;
-
-export type ImagePreviewSize = keyof typeof PREVIEW_SIZES;
+const PREVIEW_PX = 208;
 
 /**
  * 이미지 입력 상태. file은 새로 올릴 파일, removed는 "기존 이미지를 지운다"는
@@ -48,9 +44,11 @@ export const EMPTY_IMAGE_FIELD: ImageFieldValue = { file: null, removed: false }
  * 올바른 파일이 선택되면 거둔다 — 안 그러면 잘못된 파일을 고를 때마다 쌓이고,
  * Toaster가 루트 레이아웃에 있어 저장 후 이동한 화면까지 따라온다.
  *
- * 모듈 상수 하나가 아니라 인스턴스별로 붙이는 이유: 아티스트 폼처럼 이미지 필드가
- * 둘(프로필·로고)인 화면에서 id를 공유하면, 로고에 올바른 파일을 고를 때 아직
- * 해소되지 않은 프로필의 거부 안내까지 함께 거둬간다.
+ * 모듈 상수 하나가 아니라 인스턴스별로 붙이는 이유: 한 화면에 이미지 필드가 둘 이상
+ * 놓이면 id를 공유하는 순간, 한쪽에 올바른 파일을 고를 때 아직 해소되지 않은 다른
+ * 쪽의 거부 안내까지 함께 거둬간다. (근거로 들던 아티스트 폼의 프로필·로고 두 필드는
+ * #319에서 로고를 감추며 사라졌다 — 지금 세 폼 모두 인스턴스가 하나씩이다. 규약은
+ * 유지한다: 필드가 다시 늘어날 때 되살리는 것보다 값이 싸다.)
  */
 const REJECT_TOAST_PREFIX = "image-field-reject";
 
@@ -69,16 +67,12 @@ export function ImageField({
   initialUrl,
   value,
   onChange,
-  previewSize = "md",
 }: {
   label: string;
   initialUrl: string | null;
   value: ImageFieldValue;
   onChange: (value: ImageFieldValue) => void;
-  /** 이미지가 폼 첫 필드로 오는 화면만 "sm"(PREVIEW_SIZES 주석). */
-  previewSize?: ImagePreviewSize;
 }) {
-  const size = PREVIEW_SIZES[previewSize];
   const inputId = useId();
   // 형식·용량 제한은 없으면 올바르게 고를 수 없는 규칙이라 input에 aria-describedby로
   // 묶는다. RHF 필드가 아니라 FormDescription을 쓸 수 없어 id를 직접 만든다.
@@ -140,13 +134,15 @@ export function ImageField({
   return (
     <div className="space-y-2">
       <Label htmlFor={inputId}>{label}</Label>
-      <div className="flex items-center gap-4">
+      {/* 세로 스택 — 세 폼 모두 기본 정보 카드의 13rem 트랙에 이 필드를 세운다.
+          가로 배치(이미지 옆에 버튼)는 그 폭에서 파일명이 서너 글자에 잘린다. */}
+      <div className="flex flex-col items-start gap-2">
         {preview ? (
           /* 미리보기는 저장 전 마지막 검증 게이트다. 정사각 cover 크롭은 세로
-             원본(아티스트 1200×1800)의 33%를 숨겨 워터마크·보더 같은 "내렸어야
+             원본(아티스트 2000×3000)의 33%를 숨겨 워터마크·보더 같은 "내렸어야
              할 사유"가 발행 후에야 보이는 경로를 만든다 — 원본 비율 그대로,
              크롭 없이 보여주고 클릭하면 원본을 새 탭으로 연다.
-             높이는 previewSize가 정한다(PREVIEW_SIZES 주석). */
+             박스 치수와 object-contain의 근거는 PREVIEW_PX 주석. */
           <a
             href={preview}
             target="_blank"
@@ -156,24 +152,19 @@ export function ImageField({
                이 링크는 컨트롤이 아니라 제출 중 fieldset이 잠겨도 혼자 또렷하게
                남고 클릭도 그대로 먹었다. 잠긴 영역의 일부라는 걸 같은 어휘로
                말한다(조상 fieldset:disabled를 직접 겨냥). */
-            className="bg-muted shrink-0 overflow-hidden rounded-md border [fieldset:disabled_&]:pointer-events-none [fieldset:disabled_&]:opacity-50"
+            className="bg-muted flex size-52 shrink-0 items-center justify-center overflow-hidden rounded-md border [fieldset:disabled_&]:pointer-events-none [fieldset:disabled_&]:opacity-50"
           >
             <Image
               src={preview}
               alt={label}
-              width={size.px}
-              height={size.px}
+              width={PREVIEW_PX}
+              height={PREVIEW_PX}
               unoptimized
-              className={cn("w-auto max-w-80 object-contain", size.image)}
+              className="size-full object-contain"
             />
           </a>
         ) : (
-          <div
-            className={cn(
-              "bg-muted flex shrink-0 items-center justify-center overflow-hidden rounded-md border [fieldset:disabled_&]:opacity-50",
-              size.box,
-            )}
-          >
+          <div className="bg-muted flex size-52 shrink-0 items-center justify-center overflow-hidden rounded-md border [fieldset:disabled_&]:opacity-50">
             {/* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
                (흰 배경 위 4.73:1이 배경이 bg-muted #F5F5F5로 바뀌며 뒤집힌다).
                foreground 60%는 합성색 #686868 → 4.65:1로 통과하면서 본문 톤까지
@@ -181,7 +172,8 @@ export function ImageField({
             <span className="text-foreground/60 text-xs">이미지 없음</span>
           </div>
         )}
-        <div className="min-w-0 flex-1 space-y-1">
+        {/* 주축이 세로라 flex-1은 높이를 늘린다 — 폭만 채운다. */}
+        <div className="w-full min-w-0 space-y-1">
           <div className="flex items-center gap-2">
             {/* 네이티브 파일 인풋은 스타일을 입혀도 "선택된 파일 없음" 문자열과 긴
                 빈 띠가 남아 폼 어휘에서 이질적이었다(designer 독립 리뷰). 인풋은
@@ -205,13 +197,6 @@ export function ImageField({
             >
               {preview ? "이미지 교체" : "이미지 선택"}
             </Button>
-            {/* 방금 고른 파일명 — 저장 전이라 썸네일만으로는 "바뀐 상태"임이
-                안 보일 수 있어 텍스트로도 남긴다. */}
-            {value.file ? (
-              <span className="text-muted-foreground min-w-0 truncate text-sm">
-                {value.file.name}
-              </span>
-            ) : null}
             {value.removed ? (
               <Button
                 type="button"
@@ -237,6 +222,14 @@ export function ImageField({
               </Button>
             ) : null}
           </div>
+          {/* 방금 고른 파일명 — 저장 전이라 썸네일만으로는 "바뀐 상태"임이 안 보일
+              수 있어 텍스트로도 남긴다. 버튼과 같은 행에 두면 208px 트랙에서 남는
+              폭이 ~48px이라 서너 글자에 잘려 목적을 잃는다 — 아래 줄로 내린다. */}
+          {value.file ? (
+            <span className="text-muted-foreground block truncate text-sm">
+              {value.file.name}
+            </span>
+          ) : null}
           <p id={hintId} className="text-muted-foreground text-xs">
             {ALLOWED_IMAGE_LABEL} · 최대 {MAX_UPLOAD_MB}MB
           </p>

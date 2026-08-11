@@ -158,19 +158,18 @@ export function TourForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-        aria-busy={submitting}
-      >
-        {/* max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
-            사이드바 도입 전 값(2xl)이 남기던 우측 여백을 회수한다. 긴 텍스트의 measure는
-            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다.
-            액션 바까지 이 폭 안에 있어야 sticky 바의 border-t가 폼과 같은 너비로 그어진다. */}
-        <div className="max-w-4xl min-w-0 space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+        {/* 폭(max-w-4xl)은 페이지가 소유한다 — 이유는 artist-form.tsx의 같은 자리 주석. */}
+        <div className="min-w-0 space-y-6">
         {/* 제출 중 입력 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. 저장·취소 버튼은
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
-            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
-        <fieldset disabled={submitting} className="min-w-0 space-y-6">
+            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고).
+            aria-busy를 form이 아니라 여기 두는 이유는 artist-form.tsx의 같은 자리 주석. */}
+        <fieldset
+          disabled={submitting}
+          aria-busy={submitting}
+          className="min-w-0 space-y-6"
+        >
         {/* 섹션 제목 text-lg + font-medium + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
             한 단 차이뿐이었다).
@@ -184,7 +183,10 @@ export function TourForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          {/* 이미지는 기본 정보의 우측 컬럼에 세운다(세 폼 공통 — 근거는
+              artist-form.tsx의 같은 자리 주석). */}
+          <CardContent className="grid grid-cols-[1fr_13rem] items-start gap-6">
+            <div className="min-w-0 space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -314,6 +316,14 @@ export function TourForm({
                 </FormItem>
               )}
             />
+            </div>
+
+            <ImageField
+              label="포스터"
+              initialUrl={initialPosterUrl}
+              value={poster}
+              onChange={setPoster}
+            />
           </CardContent>
         </Card>
 
@@ -440,21 +450,6 @@ export function TourForm({
                 />
               ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* 포스터 */}
-        <Card className="gap-4 py-4">
-          <CardHeader className="border-b">
-            <h2 className="text-lg font-medium">포스터</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageField
-              label="포스터 이미지"
-              initialUrl={initialPosterUrl}
-              value={poster}
-              onChange={setPoster}
-            />
           </CardContent>
         </Card>
 

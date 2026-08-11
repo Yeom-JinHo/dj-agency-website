@@ -7,6 +7,7 @@ import { PlusIcon, Trash2Icon } from "lucide-react";
 import { type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
+import { hasRosterProfileFields } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,6 +73,9 @@ export function ArtistForm({
 
   const works = useFieldArray({ control: form.control, name: "selectedWorks" });
 
+  /** 도시·대표 작업은 로스터를 쓰는 사이트에서만(lib/sites.ts 주석에 근거). */
+  const showRosterFields = hasRosterProfileFields(site);
+
   const nameValue = form.watch("name");
   const slugPreview = mode === "create" ? slugify(nameValue) : (slug ?? "");
   const slugFieldId = useId();
@@ -86,6 +90,11 @@ export function ArtistForm({
     createdMessage: "아티스트를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved: form.formState.isDirty || isImageFieldDirty(profile),
+    // 로스터 필드를 감춘 사이트에선 서버의 city·selectedWorks 오류를 붙일 자리가
+    // 없다 — 릴리즈·투어 폼과 같은 처방(useEntityFormSubmit hiddenFields 주석).
+    hiddenFields: showRosterFields
+      ? undefined
+      : (["city", "selectedWorks"] as const),
     buildFormData: (values: ArtistFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));
@@ -101,19 +110,27 @@ export function ArtistForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-        aria-busy={submitting}
-      >
-        {/* max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
-            사이드바 도입 전 값(2xl)이 남기던 우측 여백을 회수한다. 긴 텍스트의 measure는
-            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다.
-            액션 바까지 이 폭 안에 있어야 sticky 바의 border-t가 폼과 같은 너비로 그어진다. */}
-        <div className="max-w-4xl min-w-0 space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+        {/* 폭(max-w-4xl)은 페이지가 소유한다 — 폼이 자기 안에서 접으면 같은 페이지의
+            헤더(브레드크럼·제목·삭제 버튼)가 전폭으로 남아 우측 기준선이 갈라진다
+            (1440에서 240px, 1920에서 720px — 뷰포트 폭에 1:1 비례). 여기선 min-w-0만
+            책임진다. 액션 바가 이 div 안에 있어야 sticky 바의 border-t가 폼과 같은
+            너비로 그어지는 계약은 그대로다 — div째로 페이지 폭 안에 들어갈 뿐이다. */}
+        <div className="min-w-0 space-y-6">
         {/* 제출 중 입력 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. 저장·취소 버튼은
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
-            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
-        <fieldset disabled={submitting} className="min-w-0 space-y-6">
+            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고).
+
+            aria-busy도 form이 아니라 여기에 둔다 — form에 걸면 FormSubmitButton의
+            진행 안내 라이브 리전이 busy 컨테이너의 자손이 되어, ARIA 규칙상 갱신이
+            busy 해제까지 보류되고 그 시점의 내용은 빈 문자열이라 끝내 아무것도
+            발화되지 않는다(WCAG 4.1.3). 액션 바가 fieldset 밖이라 한 단만 내리면
+            리전이 busy 경계를 벗어난다. */}
+        <fieldset
+          disabled={submitting}
+          aria-busy={submitting}
+          className="min-w-0 space-y-6"
+        >
         {/* 섹션 제목 text-lg + font-medium + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
             한 단 차이뿐이었다).
@@ -127,7 +144,20 @@ export function ArtistForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          {/* 이미지는 기본 정보의 우측 컬럼에 세운다(세 폼 공통 규약).
+              종전엔 이미지가 마지막 카드라 문서의 78% 지점이었다 — 편집자가 이
+              화면을 여는 첫 목적("지금 누구를 편집 중인가")을 풀려면 폼 끝까지
+              스크롤해야 했다.
+
+              좌측이 아니라 우측인 이유: DOM 순서가 곧 탭·낭독 순서라 좌측이면
+              유일한 필수 필드(이름)보다 이미지 컨트롤 셋(원본 링크·교체·제거)이
+              먼저 온다. CSS order로 시각 순서만 뒤집으면 WCAG 1.3.2·2.4.3 위반이다.
+              우측이면 시각·DOM·탭 순서가 트릭 없이 일치한다.
+
+              트랙 13rem(208px)은 ImageField의 미리보기 박스와 같은 값이다
+              (PREVIEW_PX 주석). 고정폭이라 이미지 유무로 컬럼이 흔들리지 않는다. */}
+          <CardContent className="grid grid-cols-[1fr_13rem] items-start gap-6">
+            <div className="min-w-0 space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -173,9 +203,14 @@ export function ArtistForm({
               </p>
             </div>
 
-            {/* 닉네임·도시는 짧은 값인데 전체폭(≈1170px)을 차지해 폭이 값의 성격을
-                말하지 못했다 — 릴리즈 폼의 레이블·카탈로그 번호와 같은 2열 그리드. */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            {/* 닉네임·도시는 짧은 값인데 전체폭을 차지해 폭이 값의 성격을 말하지
+                못했다 — 릴리즈 폼의 레이블·발매일과 같은 2열 그리드. 도시를 감추는
+                사이트에서는 닉네임만 남으므로 2열을 풀어 짝 없는 칸을 만들지 않는다. */}
+            <div
+              className={
+                showRosterFields ? "grid gap-4 sm:grid-cols-2" : "grid gap-4"
+              }
+            >
               <FormField
                 control={form.control}
                 name="nickname"
@@ -190,6 +225,7 @@ export function ArtistForm({
                 )}
               />
 
+              {showRosterFields ? (
               <FormField
                 control={form.control}
                 name="city"
@@ -203,6 +239,7 @@ export function ArtistForm({
                   </FormItem>
                 )}
               />
+              ) : null}
             </div>
 
             <FormField
@@ -236,6 +273,14 @@ export function ArtistForm({
                   <FormMessage />
                 </FormItem>
               )}
+            />
+            </div>
+
+            <ImageField
+              label="프로필 이미지"
+              initialUrl={initialProfileUrl}
+              value={profile}
+              onChange={setProfile}
             />
           </CardContent>
         </Card>
@@ -276,7 +321,10 @@ export function ArtistForm({
 
         <SocialsFieldArray />
 
-        {/* Selected works (celebrate roster) */}
+        {/* 대표 작업은 로스터를 쓰는 사이트에서만 — 다른 사이트에선 저장해도 공개
+            화면이 읽지 않는데 카드·"추가" 버튼·탭 스톱만 남았고, "등록된 작업이
+            없습니다"가 *아직 안 채운 것*으로 오독됐다(lib/sites.ts 주석). */}
+        {showRosterFields ? (
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">대표 작업</h2>
@@ -372,23 +420,10 @@ export function ArtistForm({
             )}
           </CardContent>
         </Card>
+        ) : null}
 
-        {/* 이미지 */}
-        <Card className="gap-4 py-4">
-          <CardHeader className="border-b">
-            <h2 className="text-lg font-medium">이미지</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageField
-              label="프로필 이미지"
-              initialUrl={initialProfileUrl}
-              value={profile}
-              onChange={setProfile}
-            />
-            {/* 로고 이미지는 admin에서 수정·삭제하지 않기로 해 필드를 노출하지 않는다 —
-                기존 logo_image_path 값은 그대로 보존되고 사이트에도 계속 표시된다. */}
-          </CardContent>
-        </Card>
+        {/* 로고 이미지는 admin에서 수정·삭제하지 않기로 해 필드를 노출하지 않는다 —
+            기존 logo_image_path 값은 그대로 보존되고 사이트에도 계속 표시된다. */}
 
         </fieldset>
 

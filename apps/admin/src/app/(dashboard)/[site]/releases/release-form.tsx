@@ -133,19 +133,18 @@ export function ReleaseForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-        aria-busy={submitting}
-      >
-        {/* max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
-            사이드바 도입 전 값(2xl)이 남기던 우측 여백을 회수한다. 긴 텍스트의 measure는
-            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다.
-            액션 바까지 이 폭 안에 있어야 sticky 바의 border-t가 폼과 같은 너비로 그어진다. */}
-        <div className="max-w-4xl min-w-0 space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+        {/* 폭(max-w-4xl)은 페이지가 소유한다 — 이유는 artist-form.tsx의 같은 자리 주석. */}
+        <div className="min-w-0 space-y-6">
         {/* 제출 중 입력 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. 저장·취소 버튼은
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
-            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
-        <fieldset disabled={submitting} className="min-w-0 space-y-6">
+            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고).
+            aria-busy를 form이 아니라 여기 두는 이유는 artist-form.tsx의 같은 자리 주석. */}
+        <fieldset
+          disabled={submitting}
+          aria-busy={submitting}
+          className="min-w-0 space-y-6"
+        >
         {/* 섹션 제목 text-lg + font-medium + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
             한 단 차이뿐이었다).
@@ -159,21 +158,14 @@ export function ReleaseForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* 아트워크가 이 카드의 첫 필드다 — 릴리즈의 1차 식별자는 커버아트인데
-                별도 카드로 맨 아래(5번째)에 있어 스크롤 끝까지 가야 보였다.
-                카드를 없애고 기본 정보로 들여오면 카드 수도 5→4로 줄어든다.
-                라벨이 "아트워크 이미지"에서 "아트워크"로 짧아진 이유: 카드 제목이
-                사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
-            <ImageField
-              label="아트워크"
-              // 폼 첫 필드라 sm — md(208px)면 바로 아래 제목이 접힘 밖으로 밀린다.
-              previewSize="sm"
-              initialUrl={initialArtworkUrl}
-              value={artwork}
-              onChange={setArtwork}
-            />
-
+          {/* 이미지는 기본 정보의 우측 컬럼에 세운다(세 폼 공통 — artist-form.tsx의
+              같은 자리 주석에 근거를 적었다). 전체폭 첫 필드로 두던 종전 배치는
+              제목을 접힘 밖으로 밀어 미리보기를 128px까지 줄여야 했는데, 옆으로
+              비키면 그 대가 없이 208px 검증 게이트를 유지한다.
+              라벨이 "아트워크 이미지"가 아니라 "아트워크"인 이유: 카드 제목이
+              사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
+          <CardContent className="grid grid-cols-[1fr_13rem] items-start gap-6">
+            <div className="min-w-0 space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -368,6 +360,14 @@ export function ReleaseForm({
                   <FormMessage />
                 </FormItem>
               )}
+            />
+            </div>
+
+            <ImageField
+              label="아트워크"
+              initialUrl={initialArtworkUrl}
+              value={artwork}
+              onChange={setArtwork}
             />
           </CardContent>
         </Card>
