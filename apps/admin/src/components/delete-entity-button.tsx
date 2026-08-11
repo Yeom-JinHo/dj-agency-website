@@ -92,11 +92,18 @@ export function DeleteEntityButton({
         {/* 트리거는 ghost까지 낮춘다 — outline(빨간 테두리)로도 우상단에서 화면의
             가장 강한 유채색이라 시선을 저장보다 먼저 잡았다(designer 독립 리뷰).
             평시엔 muted로 가라앉고 hover에서만 destructive 의도를 드러낸다.
-            파괴 의사를 확정하는 다이얼로그 안의 확인 버튼만 filled를 유지한다. */}
+            파괴 의사를 확정하는 다이얼로그 안의 확인 버튼만 filled를 유지한다.
+
+            hover 색은 --destructive가 아니라 한 단 어두운 red다: --destructive를
+            destructive/10 틴트(흰 배경 합성 ≈#FDE5E6) 위에 얹으면 3.99:1로 AA
+            미달이다(평시 muted-foreground는 흰 배경에서 4.73:1로 통과). h-9 기본
+            크기의 14px 본문이라 대형 텍스트 예외도 없다. 틴트를 5%까지 낮춰도
+            필요 휘도에 못 미쳐(0.911 < 0.9406) 텍스트 쪽을 내리는 게 유일한 해다 —
+            이 값이면 같은 틴트 위에서 5.37:1이고, 위 2단 게이트 설계는 그대로다. */}
         <Button
           type="button"
           variant="ghost"
-          className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+          className="text-muted-foreground hover:bg-destructive/10 hover:text-[oklch(0.505_0.213_27.5)]"
         >
           삭제
         </Button>
