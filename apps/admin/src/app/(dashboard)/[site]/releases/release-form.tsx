@@ -423,8 +423,9 @@ export function ReleaseForm({
               한 카드 안에서도 서로 다른 묶음으로 읽힌다. */}
           <CardContent className="space-y-6">
             <div className="space-y-3">
-              {/* SocialsFieldArray의 block variant와 같은 처방(색으로 필드 라벨과 구분). */}
-              <h3 className="text-muted-foreground text-sm font-medium">
+              {/* SocialsFieldArray의 block variant와 같은 아이브로 처방 —
+                  두 블록 제목이 한 카드 안에 있어 어휘가 갈리면 안 된다. */}
+              <h3 className="text-muted-foreground text-xs font-semibold tracking-wide">
                 발매 플랫폼
               </h3>
               {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명

@@ -202,11 +202,16 @@ export function SocialsFieldArray({
   if (variant === "block") {
     return (
       <div className="space-y-3">
-        {/* 블록 제목은 카드 제목(h2)보다 한 단 아래다 — 색으로 필드 라벨(같은 크기,
-            foreground)과 갈라 놓는다. 크기를 더 줄이면 아래 컬럼 헤더(text-xs)와
-            같은 단이 되어 제목과 헤더가 구분되지 않는다. */}
+        {/* 블록 제목은 아이브로 처방(작게·굵게·자간 넓게)이다. text-sm muted로
+            두면 바로 아래 FormLabel(같은 크기·같은 두께, foreground)보다 흐려
+            통솔해야 할 라벨이 제목보다 세지는 역전이 생긴다. 크기를 한 단
+            내리면서 두께·자간을 올리면 "약한 라벨"이 아니라 "다른 종류의 것"으로
+            읽힌다. uppercase는 쓰지 않는다 — 제목이 한글이라 아무 효과가 없다.
+            같은 text-xs인 아래 컬럼 헤더와는 두께(600 vs 500)와 자간으로 갈린다. */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-muted-foreground text-sm font-medium">소셜</h3>
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-wide">
+            소셜
+          </h3>
           {addButton}
         </div>
         {rows}
