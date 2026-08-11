@@ -122,7 +122,10 @@ export function ImageField({
           /* 미리보기는 저장 전 마지막 검증 게이트다. 정사각 cover 크롭은 세로
              원본(아티스트 1200×1800)의 33%를 숨겨 워터마크·보더 같은 "내렸어야
              할 사유"가 발행 후에야 보이는 경로를 만든다 — 원본 비율 그대로,
-             크롭 없이 보여주고 클릭하면 원본을 새 탭으로 연다. */
+             크롭 없이 보여주고 클릭하면 원본을 새 탭으로 연다.
+             높이 h-32(128px): 릴리즈 아트워크가 폼 첫 필드로 올라오면서 208px은
+             제목 필드를 접힘 아래로 밀어냈다. 검증용으로는 128px이면 워터마크·
+             보더가 판독되고, 더 봐야 하면 클릭해 원본을 연다. */
           <a
             href={preview}
             target="_blank"
@@ -133,14 +136,16 @@ export function ImageField({
             <Image
               src={preview}
               alt={label}
-              width={208}
-              height={208}
+              width={128}
+              height={128}
               unoptimized
-              className="h-52 w-auto max-w-80 object-contain"
+              className="h-32 w-auto max-w-80 object-contain"
             />
           </a>
         ) : (
-          <div className="bg-muted flex size-28 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+          /* 빈 자리도 미리보기와 같은 128px — 이미지를 고르거나 지울 때 블록
+             높이가 바뀌면 아래 필드 전체가 위아래로 튄다. */
+          <div className="bg-muted flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-md border">
             {/* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
                (흰 배경 위 4.73:1이 배경이 bg-muted #F5F5F5로 바뀌며 뒤집힌다).
                foreground 60%는 합성색 #686868 → 4.65:1로 통과하면서 본문 톤까지
