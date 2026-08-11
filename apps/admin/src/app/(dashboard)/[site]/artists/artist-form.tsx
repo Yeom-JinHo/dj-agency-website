@@ -50,7 +50,6 @@ interface ArtistFormProps {
   updatedAt?: string;
   defaultValues: ArtistFormValues;
   initialProfileUrl?: string | null;
-  initialLogoUrl?: string | null;
 }
 
 export function ArtistForm({
@@ -61,11 +60,9 @@ export function ArtistForm({
   updatedAt,
   defaultValues,
   initialProfileUrl = null,
-  initialLogoUrl = null,
 }: ArtistFormProps) {
   const listHref = `/${site}/artists`;
   const [profile, setProfile] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
-  const [logo, setLogo] = useState<ImageFieldValue>(EMPTY_IMAGE_FIELD);
 
   const form = useForm<ArtistFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
@@ -88,17 +85,12 @@ export function ArtistForm({
     listHref,
     createdMessage: "아티스트를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
-    hasUnsaved:
-      form.formState.isDirty ||
-      isImageFieldDirty(profile) ||
-      isImageFieldDirty(logo),
+    hasUnsaved: form.formState.isDirty || isImageFieldDirty(profile),
     buildFormData: (values: ArtistFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));
       if (profile.file) fd.set("profileImage", profile.file);
       if (profile.removed) fd.set("removeProfileImage", "1");
-      if (logo.file) fd.set("logoImage", logo.file);
-      if (logo.removed) fd.set("removeLogoImage", "1");
       // 로드 시점 updated_at — 그사이 다른 곳에서 저장됐으면 서버가 충돌로 끊는다.
       if (updatedAt) fd.set("expectedUpdatedAt", updatedAt);
       return fd;
@@ -389,12 +381,9 @@ export function ArtistForm({
               value={profile}
               onChange={setProfile}
             />
-            <ImageField
-              label="로고 이미지"
-              initialUrl={initialLogoUrl}
-              value={logo}
-              onChange={setLogo}
-            />
+            {/* 로고 이미지는 폼에서 의도적으로 제외(운영 결정) — 수정·삭제 불가.
+                기존 logo_image_path 데이터와 공개 사이트 렌더는 그대로 유지되며,
+                서버 액션의 logoImage 처리는 재노출에 대비해 남겨둔다. */}
           </CardContent>
         </Card>
 
