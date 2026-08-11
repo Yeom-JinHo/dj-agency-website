@@ -15,7 +15,9 @@ export function FormLoadingSkeleton({
   leadingImage?: boolean;
 } = {}) {
   return (
-    <div className="space-y-6">
+    // 폭은 폼 라우트 페이지의 루트(max-w-4xl)와 같은 자리여야 한다 — 폼 블록에만 걸면
+    // 로드 직후 제목·설명 줄이 좁아지며 옆으로 튄다.
+    <div className="max-w-4xl min-w-0 space-y-6">
       {/* 실제 폼 헤더는 space-y-1이다 — 여기만 space-y-2면 제목/설명 간격이 4px 넓어
           로드 직후 설명 줄과 그 아래 전체가 위로 당겨진다. */}
       <div className="space-y-1">
@@ -35,8 +37,8 @@ export function FormLoadingSkeleton({
           <Skeleton className="h-4 w-80 max-w-full" />
         </div>
       </div>
-      {/* 폭은 세 폼의 fieldset(max-w-4xl)과 같은 값 — 다르면 로드 직후 폼이 옆으로 튄다. */}
-      <div className="max-w-4xl min-w-0 space-y-4">
+      {/* 폭 제약은 위 루트가 진다(실제 폼도 페이지 루트가 소유) — 여기선 min-w-0만. */}
+      <div className="min-w-0 space-y-4">
         {/* ImageField 첫 페인트 골격: 라벨 + (128px 정사각 자리 · 버튼 + 힌트 줄).
             치수는 ImageField와 같은 값이어야 한다(size-32 / size="sm" 버튼 h-8 /
             힌트 text-xs) — 다르면 로드 직후 폼 전체가 세로로 튄다. */}

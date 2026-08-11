@@ -105,11 +105,12 @@ export function ArtistForm({
         onSubmit={form.handleSubmit(onSubmit, onInvalid)}
         aria-busy={submitting}
       >
-        {/* max-w-4xl: 사이드바(16rem)+콘텐츠 패딩과 합쳐 1200px — 1366 노트북까지 들어가고
-            사이드바 도입 전 값(2xl)이 남기던 우측 여백을 회수한다. 긴 텍스트의 measure는
-            설명 카드의 2열 그리드가 잡는다(한 열 ≈55자). 스켈레톤도 같은 폭이어야 한다.
-            액션 바까지 이 폭 안에 있어야 sticky 바의 border-t가 폼과 같은 너비로 그어진다. */}
-        <div className="max-w-4xl min-w-0 space-y-6">
+        {/* 폭(max-w-4xl)은 페이지가 소유한다 — 폼이 자기 안에서 접으면 같은 페이지의
+            헤더(브레드크럼·제목·삭제 버튼)가 전폭으로 남아 우측 기준선이 갈라진다
+            (1440에서 240px, 1920에서 720px — 뷰포트 폭에 1:1 비례). 여기선 min-w-0만
+            책임진다. 액션 바가 이 div 안에 있어야 sticky 바의 border-t가 폼과 같은
+            너비로 그어지는 계약은 그대로다 — div째로 페이지 폭 안에 들어갈 뿐이다. */}
+        <div className="min-w-0 space-y-6">
         {/* 제출 중 입력 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. 저장·취소 버튼은
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
             키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
