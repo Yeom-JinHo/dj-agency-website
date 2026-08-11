@@ -49,38 +49,40 @@ const PLATFORM_DISPLAY: Record<(typeof SOCIAL_PLATFORMS)[number], string> = {
 };
 
 /**
- * socials 필드어레이 카드(artist·release 공용). control은 상위 <Form>(FormProvider)
+ * socials 필드어레이(artist·release 공용). control은 상위 <Form>(FormProvider)
  * 컨텍스트에서 받아 폼 전체 값 타입에 결합하지 않는다 — socials 부분만 알면 된다.
+ *
+ * variant는 이 섹션이 카드 자체인지, 다른 카드 안의 한 블록인지를 정한다.
+ * artist는 소셜이 독립 카드지만(`card`), release는 "링크" 카드 안에서 발매
+ * 플랫폼과 나란히 서야 해서(`block`) 카드 껍데기 없이 제목 한 줄만 쓴다.
+ * 필드어레이 인스턴스는 하나여야 하므로(같은 name에 useFieldArray를 두 번 걸면
+ * 두 목록이 어긋난다) 껍데기만 분기하고 본문은 공유한다.
  */
-export function SocialsFieldArray() {
+export function SocialsFieldArray({
+  variant = "card",
+}: {
+  variant?: "card" | "block";
+} = {}) {
   const { control } = useFormContext<SocialsFormValues>();
   const socials = useFieldArray({ control, name: "socials" });
 
-  return (
-    <Card className="gap-4 py-4">
-      {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
-          한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
-          한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
-          카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
-          한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
-      <CardHeader className="border-b">
-        <h2 className="text-lg font-semibold">소셜</h2>
-        <CardAction>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              socials.append({ platform: "instagram", url: "", label: "" })
-            }
-          >
-            <PlusIcon /> 추가
-          </Button>
-        </CardAction>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {/* 빈 카피는 "소셜이 없습니다" 대신 행의 실체(링크)로 말한다. */}
-        {socials.fields.length === 0 ? (
+  const addButton = (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={() =>
+        socials.append({ platform: "instagram", url: "", label: "" })
+      }
+    >
+      <PlusIcon /> 추가
+    </Button>
+  );
+
+  const rows = (
+    <>
+      {/* 빈 카피는 "소셜이 없습니다" 대신 행의 실체(링크)로 말한다. */}
+      {socials.fields.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             등록된 링크가 없습니다.
           </p>
@@ -194,7 +196,36 @@ export function SocialsFieldArray() {
             ))}
           </div>
         )}
-      </CardContent>
+    </>
+  );
+
+  if (variant === "block") {
+    return (
+      <div className="space-y-3">
+        {/* 블록 제목은 카드 제목(h2)보다 한 단 아래다 — 색으로 필드 라벨(같은 크기,
+            foreground)과 갈라 놓는다. 크기를 더 줄이면 아래 컬럼 헤더(text-xs)와
+            같은 단이 되어 제목과 헤더가 구분되지 않는다. */}
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-muted-foreground text-sm font-medium">소셜</h3>
+          {addButton}
+        </div>
+        {rows}
+      </div>
+    );
+  }
+
+  return (
+    <Card className="gap-4 py-4">
+      {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
+          한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
+          한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
+          카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
+          한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
+      <CardHeader className="border-b">
+        <h2 className="text-lg font-semibold">소셜</h2>
+        <CardAction>{addButton}</CardAction>
+      </CardHeader>
+      <CardContent className="space-y-3">{rows}</CardContent>
     </Card>
   );
 }

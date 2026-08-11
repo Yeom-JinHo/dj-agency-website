@@ -391,36 +391,50 @@ export function ReleaseForm({
           </CardContent>
         </Card>
 
-        {/* Platform links (5개 확정 키) */}
+        {/* 링크 — "플랫폼 링크"와 "소셜"이 별개 카드로 나란히 서 있었는데, 5개
+            확정 키(beatport·spotify·appleMusic·soundcloud·youtubeMusic)가
+            SOCIAL_PLATFORMS에도 전부 존재해 편집자는 Spotify 링크를 어느 카드에
+            넣어야 하는지 알 수 없었다(양쪽에 넣으면 사이트에 두 번 나온다).
+            한 카드 안의 두 블록으로 합치고, 앞 블록을 "발매 플랫폼"으로 불러
+            "이 릴리즈를 들을 수 있는 곳"과 "계정 링크"의 역할 차이를 이름으로
+            드러낸다. 스키마는 그대로다 — platform_links와 socials는 여전히 별개 컬럼. */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">플랫폼 링크</h2>
+            <h2 className="text-lg font-semibold">링크</h2>
           </CardHeader>
-          <CardContent>
-            {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명
-                카드와 폼 문법이 갈렸다. 설명 카드와 같은 2열 그리드로 통일한다. */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              {PLATFORM_LINK_KEYS.map((key) => (
-                <FormField
-                  key={key}
-                  control={form.control}
-                  name={`platformLinks.${key}`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{PLATFORM_LABELS[key]}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://…" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+          {/* 블록 사이는 space-y-6 — 필드 간격(space-y-4)보다 한 단 넓어야 두 블록이
+              한 카드 안에서도 서로 다른 묶음으로 읽힌다. */}
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              {/* SocialsFieldArray의 block variant와 같은 처방(색으로 필드 라벨과 구분). */}
+              <h3 className="text-muted-foreground text-sm font-medium">
+                발매 플랫폼
+              </h3>
+              {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명
+                  카드와 폼 문법이 갈렸다. 설명 카드와 같은 2열 그리드로 통일한다. */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {PLATFORM_LINK_KEYS.map((key) => (
+                  <FormField
+                    key={key}
+                    control={form.control}
+                    name={`platformLinks.${key}`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{PLATFORM_LABELS[key]}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://…" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
             </div>
+
+            <SocialsFieldArray variant="block" />
           </CardContent>
         </Card>
-
-        <SocialsFieldArray />
 
         {/* 이미지 */}
         <Card className="gap-4 py-4">
