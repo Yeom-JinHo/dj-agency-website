@@ -51,6 +51,12 @@ const columns: DataTableColumn<ArtistRow>[] = [
   {
     id: "name",
     header: "이름",
+    // 앵커 컬럼의 바닥 폭(릴리즈·투어 목록과 같은 w-96 = 384px).
+    // 스페이서 컬럼(data-table.tsx)이 잉여를 전부 가져가므로 이 컬럼은 더 이상 남는 폭을
+    // 흡수하지 않는다(실측 2560에서 1950px까지 늘어나 이름과 다음 컬럼이 1900px 떨어져 있었다).
+    // 대신 폭 미지정이면 내용 폭까지 좁아지는데, 이름과 slug 보조 줄은 둘 다 짧아 컬럼이
+    // 200px 아래로 내려간다 — 썸네일 80px 옆에서 행이 왼쪽 구석에 뭉친다. 상한이 아니라 바닥이다.
+    headClassName: "w-96",
     cellClassName: "font-medium",
     cell: (row) => row.name,
     // slug는 독립 컬럼(291px)이었는데, 실측에서 VFL 6/6행은 이름과 완전히 같았고
@@ -73,8 +79,12 @@ const columns: DataTableColumn<ArtistRow>[] = [
     //   대신 "자기 컬럼을 가질 만큼 중요한 값"이라는 잘못된 위계만 유지된다.
     // - 정렬 기준 상실은 감수한다: slug ≈ 이름의 소문자라 slug 정렬은 이름 정렬과
     //   사실상 같은 결과였다.
+    // w-fit: 블록 요소라 두면 상자가 셀 전폭까지 늘어난다(실측 2560에서 right=2319).
+    // 값 하나를 나르는 줄이 셀 전폭을 차지하면 드래그 선택 범위가 글자 밖까지 잡혀
+    // "이게 어디까지가 값인지"가 흐려진다. inline-block은 쓰지 않는다 — 앞의 <Link>가
+    // 인라인이라 같은 줄에 붙어버려 두 줄 구성 자체가 깨진다. 블록은 유지하고 상자만 줄인다.
     subCell: (row) => (
-      <div className="text-muted-foreground mt-0.5 font-mono text-xs font-normal">
+      <div className="text-muted-foreground mt-0.5 w-fit font-mono text-xs font-normal">
         {row.slug}
       </div>
     ),

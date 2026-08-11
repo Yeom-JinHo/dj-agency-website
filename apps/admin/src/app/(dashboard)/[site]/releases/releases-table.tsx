@@ -50,6 +50,12 @@ const columns: DataTableColumn<ReleaseRow>[] = [
   {
     id: "title",
     header: "제목",
+    // 앵커 컬럼의 바닥 폭(투어·아티스트 목록과 같은 w-96 = 384px).
+    // 스페이서 컬럼(data-table.tsx)이 잉여를 전부 가져가면서 폭 미지정 컬럼은 내용 폭까지
+    // 좁아진다. 제목을 그대로 두면 짧은 제목에서 컬럼이 120px 남짓으로 줄어 상한을 준
+    // 수정일(112px)과 대등해지고, 바로 앞 커밋에서 세운 "제목이 가장 넓다"가 무너진다.
+    // 상한이 아니라 바닥이라 긴 제목은 nowrap 셀이 그만큼 늘린다.
+    headClassName: "w-96",
     cellClassName: "font-medium",
     cell: (row) => row.title,
     sortValue: (row) => row.title,
