@@ -181,7 +181,10 @@ export function TourForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          {/* 이미지는 기본 정보의 우측 컬럼에 세운다(세 폼 공통 — 근거는
+              artist-form.tsx의 같은 자리 주석). */}
+          <CardContent className="grid grid-cols-[1fr_13rem] items-start gap-6">
+            <div className="min-w-0 space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -311,6 +314,14 @@ export function TourForm({
                 </FormItem>
               )}
             />
+            </div>
+
+            <ImageField
+              label="포스터"
+              initialUrl={initialPosterUrl}
+              value={poster}
+              onChange={setPoster}
+            />
           </CardContent>
         </Card>
 
@@ -437,21 +448,6 @@ export function TourForm({
                 />
               ))}
             </div>
-          </CardContent>
-        </Card>
-
-        {/* 포스터 */}
-        <Card className="gap-4 py-4">
-          <CardHeader className="border-b">
-            <h2 className="text-lg font-medium">포스터</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageField
-              label="포스터 이미지"
-              initialUrl={initialPosterUrl}
-              value={poster}
-              onChange={setPoster}
-            />
           </CardContent>
         </Card>
 

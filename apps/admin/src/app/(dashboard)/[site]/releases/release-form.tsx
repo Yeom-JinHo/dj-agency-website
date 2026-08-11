@@ -156,21 +156,14 @@ export function ReleaseForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* 아트워크가 이 카드의 첫 필드다 — 릴리즈의 1차 식별자는 커버아트인데
-                별도 카드로 맨 아래(5번째)에 있어 스크롤 끝까지 가야 보였다.
-                카드를 없애고 기본 정보로 들여오면 카드 수도 5→4로 줄어든다.
-                라벨이 "아트워크 이미지"에서 "아트워크"로 짧아진 이유: 카드 제목이
-                사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
-            <ImageField
-              label="아트워크"
-              // 폼 첫 필드라 sm — md(208px)면 바로 아래 제목이 접힘 밖으로 밀린다.
-              previewSize="sm"
-              initialUrl={initialArtworkUrl}
-              value={artwork}
-              onChange={setArtwork}
-            />
-
+          {/* 이미지는 기본 정보의 우측 컬럼에 세운다(세 폼 공통 — artist-form.tsx의
+              같은 자리 주석에 근거를 적었다). 전체폭 첫 필드로 두던 종전 배치는
+              제목을 접힘 밖으로 밀어 미리보기를 128px까지 줄여야 했는데, 옆으로
+              비키면 그 대가 없이 208px 검증 게이트를 유지한다.
+              라벨이 "아트워크 이미지"가 아니라 "아트워크"인 이유: 카드 제목이
+              사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
+          <CardContent className="grid grid-cols-[1fr_13rem] items-start gap-6">
+            <div className="min-w-0 space-y-4">
             <FormField
               control={form.control}
               name="title"
@@ -365,6 +358,14 @@ export function ReleaseForm({
                   <FormMessage />
                 </FormItem>
               )}
+            />
+            </div>
+
+            <ImageField
+              label="아트워크"
+              initialUrl={initialArtworkUrl}
+              value={artwork}
+              onChange={setArtwork}
             />
           </CardContent>
         </Card>

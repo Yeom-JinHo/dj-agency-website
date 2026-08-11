@@ -128,7 +128,20 @@ export function ArtistForm({
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
-          <CardContent className="space-y-4">
+          {/* 이미지는 기본 정보의 우측 컬럼에 세운다(세 폼 공통 규약).
+              종전엔 이미지가 마지막 카드라 문서의 78% 지점이었다 — 편집자가 이
+              화면을 여는 첫 목적("지금 누구를 편집 중인가")을 풀려면 폼 끝까지
+              스크롤해야 했다.
+
+              좌측이 아니라 우측인 이유: DOM 순서가 곧 탭·낭독 순서라 좌측이면
+              유일한 필수 필드(이름)보다 이미지 컨트롤 셋(원본 링크·교체·제거)이
+              먼저 온다. CSS order로 시각 순서만 뒤집으면 WCAG 1.3.2·2.4.3 위반이다.
+              우측이면 시각·DOM·탭 순서가 트릭 없이 일치한다.
+
+              트랙 13rem(208px)은 ImageField의 미리보기 박스와 같은 값이다
+              (PREVIEW_PX 주석). 고정폭이라 이미지 유무로 컬럼이 흔들리지 않는다. */}
+          <CardContent className="grid grid-cols-[1fr_13rem] items-start gap-6">
+            <div className="min-w-0 space-y-4">
             <FormField
               control={form.control}
               name="name"
@@ -237,6 +250,14 @@ export function ArtistForm({
                   <FormMessage />
                 </FormItem>
               )}
+            />
+            </div>
+
+            <ImageField
+              label="프로필 이미지"
+              initialUrl={initialProfileUrl}
+              value={profile}
+              onChange={setProfile}
             />
           </CardContent>
         </Card>
@@ -374,22 +395,8 @@ export function ArtistForm({
           </CardContent>
         </Card>
 
-        {/* 이미지 */}
-        <Card className="gap-4 py-4">
-          <CardHeader className="border-b">
-            <h2 className="text-lg font-medium">이미지</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageField
-              label="프로필 이미지"
-              initialUrl={initialProfileUrl}
-              value={profile}
-              onChange={setProfile}
-            />
-            {/* 로고 이미지는 admin에서 수정·삭제하지 않기로 해 필드를 노출하지 않는다 —
-                기존 logo_image_path 값은 그대로 보존되고 사이트에도 계속 표시된다. */}
-          </CardContent>
-        </Card>
+        {/* 로고 이미지는 admin에서 수정·삭제하지 않기로 해 필드를 노출하지 않는다 —
+            기존 logo_image_path 값은 그대로 보존되고 사이트에도 계속 표시된다. */}
 
         </fieldset>
 
