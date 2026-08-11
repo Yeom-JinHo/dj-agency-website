@@ -146,14 +146,17 @@ export function ReleaseForm({
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
             키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
         <fieldset disabled={submitting} className="min-w-0 space-y-6">
-        {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
+        {/* 섹션 제목 text-lg + muted 색 + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
-            한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
+            한 단 차이뿐이었다).
+            크기만으로는 h1(20px)과 2px 차이뿐이라 위계가 서지 않아 색을 함께
+            내린다 — foreground 색을 갖는 제목은 페이지 h1 하나뿐이다.
+            border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
             카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
             한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">기본 정보</h2>
+            <h2 className="text-muted-foreground text-lg font-semibold">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* 아트워크가 이 카드의 첫 필드다 — 릴리즈의 1차 식별자는 커버아트인데
@@ -369,7 +372,7 @@ export function ReleaseForm({
         {/* 설명 (en/ko × short/full) */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">설명</h2>
+            <h2 className="text-muted-foreground text-lg font-semibold">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -412,7 +415,7 @@ export function ReleaseForm({
             드러낸다. 스키마는 그대로다 — platform_links와 socials는 여전히 별개 컬럼. */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">링크</h2>
+            <h2 className="text-muted-foreground text-lg font-semibold">링크</h2>
           </CardHeader>
           {/* 블록 사이는 space-y-6 — 필드 간격(space-y-4)보다 한 단 넓어야 두 블록이
               한 카드 안에서도 서로 다른 묶음으로 읽힌다. */}
