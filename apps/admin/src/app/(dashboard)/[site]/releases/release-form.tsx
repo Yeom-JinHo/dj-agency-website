@@ -178,25 +178,36 @@ export function ReleaseForm({
               )}
             />
 
-            {/* slug는 RHF 필드가 아니라 제목에서 파생되는 읽기 전용 표시라 FormItem/FormLabel을 쓰지 않는다 —
-                FormLabel의 htmlFor는 FormControl이 부여하는 id를 가리키는데 여기엔 FormControl이 없어
-                라벨이 존재하지 않는 id를 가리키고 있었다(스크린리더가 이름 없는 필드로 읽음).
-                RHF 관여가 없으니 일반 Label + useId로 직접 연결한다. 마크업(grid gap-2)은 FormItem과 동일. */}
-            <div className="grid gap-2">
-              <Label htmlFor={slugFieldId}>Slug</Label>
-              <Input
-                id={slugFieldId}
-                value={slugPreview}
-                readOnly
-                aria-describedby={slugHintId}
-                className="bg-muted font-mono"
-              />
-              <p id={slugHintId} className="text-muted-foreground text-xs">
-                {mode === "create"
-                  ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
-                  : "slug는 생성 후 변경할 수 없습니다."}
+            {/* create에서만 입력 칸 형태다 — 제목을 치는 동안 값이 따라 바뀌는 걸
+                보여줘야 "이 제목이면 이 주소"를 저장 전에 판단할 수 있다.
+                RHF 필드가 아니라 FormItem/FormLabel을 쓰지 않는다: FormLabel의 htmlFor는
+                FormControl이 부여하는 id를 가리키는데 여기엔 FormControl이 없어 라벨이
+                존재하지 않는 id를 가리키게 된다(스크린리더가 이름 없는 필드로 읽음).
+                일반 Label + useId로 직접 연결한다. 마크업(grid gap-2)은 FormItem과 동일.
+
+                edit에서는 값이 이미 확정돼 다시는 바뀌지 않는다 — 입력 칸으로 두면
+                제목 바로 아래에서 full-width로 제목만큼 시선을 먹으면서 정작 손댈 수는
+                없다. 읽기용 메타 한 줄로 내린다(라벨·안내문도 그 줄에 흡수). */}
+            {mode === "create" ? (
+              <div className="grid gap-2">
+                <Label htmlFor={slugFieldId}>Slug</Label>
+                <Input
+                  id={slugFieldId}
+                  value={slugPreview}
+                  readOnly
+                  aria-describedby={slugHintId}
+                  className="bg-muted font-mono"
+                />
+                <p id={slugHintId} className="text-muted-foreground text-xs">
+                  제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다.
+                </p>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-xs">
+                Slug <span className="font-mono">{slugPreview}</span> · 생성 후
+                변경할 수 없습니다.
               </p>
-            </div>
+            )}
 
             {showArtistSelect && (
               <FormField
