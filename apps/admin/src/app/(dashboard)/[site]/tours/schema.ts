@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { tourStatusSchema, type TourStatus } from "@repo/content/schema";
 
-import { nullify } from "@/lib/form-normalize";
+import { nullify, urlOrEmpty } from "@/lib/form-normalize";
 
 /**
  * Tour 편집 폼 값. content의 원자 스키마(tourStatusSchema)를 재사용해 검증을
@@ -22,7 +22,8 @@ export const tourFormSchema = z.object({
   // datetime-local 또는 ISO(제출 직전 클라이언트가 ISO로 변환) — 둘 다 비어있지 않은 문자열.
   eventDate: z.string().trim().min(1, "공연 일시를 입력해주세요."),
   doorTime: z.string(),
-  ticketUrl: z.string(),
+  // 공개 사이트에서 href로 렌더될 값 — releases의 platform_links와 동일 검증.
+  ticketUrl: urlOrEmpty,
   descriptionEn: z.string(),
   descriptionKo: z.string(),
   status: tourStatusSchema,

@@ -6,13 +6,7 @@ import {
   type Social,
 } from "@repo/content/schema";
 
-import { nullify, normalizeSocials } from "@/lib/form-normalize";
-
-/** 빈 값은 허용하되, 값이 있으면 URL 형식을 강제(platform_links/socials와 동일 rigor). */
-const urlOrEmpty = z.string().refine(
-  (v) => v === "" || z.string().url().safeParse(v).success,
-  { message: "올바른 URL을 입력해주세요." },
-);
+import { nullify, normalizeSocials, urlOrEmpty } from "@/lib/form-normalize";
 
 /** platform_links 폼 표현: 5개 확정 키 모두 문자열(빈 값 허용). */
 const platformLinksFormSchema = z.object(
