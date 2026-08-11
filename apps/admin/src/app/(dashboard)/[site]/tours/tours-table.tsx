@@ -113,6 +113,34 @@ const columns: DataTableColumn<TourRow>[] = [
   {
     id: "venueCity",
     header: "장소",
+    // 실측(juntaro 8행 전수)에서 이 셀은 제목의 구분자만 바꾼 재탕이었다 —
+    // 제목 "LION — SEOUL" / 장소 "LION, SEOUL". 그런데도 컬럼을 지우지 않는다.
+    //
+    // 공개 사이트가 그리는 건 제목이 아니라 이쪽이기 때문이다. juntaro /tour는
+    // city를 거대한 헤드라인으로, country·venue를 캡션으로 렌더하고 title은 어디에도
+    // 쓰지 않는다(tour-list.tsx). 즉 제목은 admin 내부 라벨 겸 slug 소스일 뿐이고,
+    // 목록에서 "실제로 공개되는 위치"를 말하는 컬럼은 이것 하나다. 지우면 운영자가
+    // 목록에서 공개 화면의 주인공(도시)을 전혀 확인할 수 없게 된다.
+    //
+    // 중복도 구조가 강제한 게 아니다 — tourFormSchema.title은 자유 문자열이고
+    // venue/city는 별개 컬럼이라, 제목을 "SPRING TOUR 2026"으로 적는 순간 중복은
+    // 사라지고 이 컬럼만 위치를 말한다. 지금 겹치는 건 제목 작성 관습이지 필드의 결함이
+    // 아니라, 릴리즈 발매일이 비어 있는 것과 같은 부류(데이터 문제)로 다룬다.
+    //
+    // 그래서 남기되 값이 감당할 수 있는 폭까지만 준다. 표가 table-layout auto라
+    // 폭을 지정하지 않은 컬럼은 남는 공간을 내용 길이 비례로 나눠 갖고, 그 결과 이
+    // 컬럼이 326px(표 폭의 29%)로 제목(359px)과 거의 대등해져 "같은 값이 두 번" 하는
+    // 인상을 폭으로도 키우고 있었다. w-48(192px)은 "WATERGATE, BERLIN"급 실데이터에
+    // 여유가 있고, 더 긴 장소가 오면 셀이 nowrap이라 컬럼이 알아서 그만큼 늘어난다
+    // (상한이지 절단이 아니다).
+    //
+    // 기각한 안:
+    // - 컬럼 제거: 위와 같이 공개 위치 정보가 목록에서 사라진다.
+    // - 장소를 도시/국가로 쪼개 제목과 겹치지 않는 축을 만들기: 행 데이터(TourRow)가
+    //   venue+city를 서버에서 이미 합쳐 오고 country는 아예 싣지 않아 서버 페이지까지
+    //   함께 바꿔야 한다. 폭 문제와 별개 과제라 여기서는 손대지 않는다.
+    // - 제목 아래 보조 줄로 강등: 같은 값이 위아래로 붙어 중복이 더 도드라진다.
+    headClassName: "w-48",
     cellClassName: "text-muted-foreground",
     cell: (row) => row.venueCity || "—",
     sortValue: (row) => row.venueCity,
@@ -120,6 +148,10 @@ const columns: DataTableColumn<TourRow>[] = [
   {
     id: "eventDate",
     header: "일시",
+    // 값이 `2026-10-03 21:00` 고정 폭(약 141px)인데 286px를 쓰고 있었다. 장소에서
+    // 돌려받은 공간이 다시 여기로 흘러가면 옮겨 담기만 한 셈이라 함께 상한을 준다 —
+    // 남는 공간은 행의 앵커인 제목이 가져가는 게 맞다.
+    headClassName: "w-40",
     cellClassName: "text-muted-foreground tabular-nums",
     cell: (row) => row.eventDate,
     sortValue: (row) => row.eventDate,
