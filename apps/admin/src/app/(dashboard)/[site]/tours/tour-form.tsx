@@ -158,16 +158,18 @@ export function TourForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-        aria-busy={submitting}
-      >
+      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
         {/* 폭(max-w-4xl)은 페이지가 소유한다 — 이유는 artist-form.tsx의 같은 자리 주석. */}
         <div className="min-w-0 space-y-6">
         {/* 제출 중 입력 필드 잠금 — 서버 왕복 동안의 편집 경합을 막는다. 저장·취소 버튼은
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
-            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
-        <fieldset disabled={submitting} className="min-w-0 space-y-6">
+            키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고).
+            aria-busy를 form이 아니라 여기 두는 이유는 artist-form.tsx의 같은 자리 주석. */}
+        <fieldset
+          disabled={submitting}
+          aria-busy={submitting}
+          className="min-w-0 space-y-6"
+        >
         {/* 섹션 제목 text-lg + font-medium + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
             한 단 차이뿐이었다).
