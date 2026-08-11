@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { PLATFORM_LINK_KEYS, type SiteSlug } from "@repo/content/schema";
 
+import { socialsFormDefaults } from "@/lib/form-normalize";
 import { slugify } from "@/lib/media";
 import { hasSiteCategory } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
@@ -98,7 +99,13 @@ export function ReleaseForm({
   const form = useForm<ReleaseFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
     resolver: standardSchemaResolver(releaseFormSchema),
-    defaultValues,
+    // 선택 키(socials.label)를 ""로 펴서 넘긴다 — 근거는 lib/form-normalize.ts의
+    // socialsFormDefaults 주석(아티스트 폼과 같은 처방). platformLinks는 페이지가
+    // 이미 5개 키를 모두 채워 넘기고 있어 여기서 손댈 게 없다.
+    defaultValues: {
+      ...defaultValues,
+      socials: socialsFormDefaults(defaultValues.socials),
+    },
   });
 
   const titleValue = form.watch("title");

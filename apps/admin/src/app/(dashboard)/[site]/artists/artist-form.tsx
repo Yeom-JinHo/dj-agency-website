@@ -6,6 +6,7 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { type SiteSlug } from "@repo/content/schema";
 
+import { socialsFormDefaults } from "@/lib/form-normalize";
 import { slugify } from "@/lib/media";
 import { hasRosterProfileFields } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
@@ -68,7 +69,22 @@ export function ArtistForm({
   const form = useForm<ArtistFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
     resolver: standardSchemaResolver(artistFormSchema),
-    defaultValues,
+    // 선택 키(socials.label·selectedWorks.meta)를 ""로 펴서 넘긴다. 키가 없는 채로
+    // 들어오면 RHF가 컨트롤 등록 시 _formValues에만 그 키를 만들어(_defaultValues는
+    // 그대로) 키 개수가 어긋나고, 아무것도 입력하지 않은 편집 화면이 마운트 직후부터
+    // isDirty가 되어 미저장 경고가 상시 발동한다 — 전체 근거는
+    // lib/form-normalize.ts의 socialsFormDefaults 주석.
+    // selectedWorks는 이 폼에만 있는 필드라 헬퍼로 올리지 않고 여기서 편다.
+    // 렌더마다 새 객체지만 useForm은 첫 렌더의 defaultValues만 복제해 보관하므로
+    // (values prop을 쓰지 않는다) 비교·리셋에 영향이 없다.
+    defaultValues: {
+      ...defaultValues,
+      socials: socialsFormDefaults(defaultValues.socials),
+      selectedWorks: defaultValues.selectedWorks.map((work) => ({
+        ...work,
+        meta: work.meta ?? "",
+      })),
+    },
   });
 
   const works = useFieldArray({ control: form.control, name: "selectedWorks" });
