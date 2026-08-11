@@ -302,14 +302,32 @@ export function ReleaseForm({
                   <FormItem>
                     <FormLabel>정렬 순서</FormLabel>
                     <FormControl>
+                      {/* 빈 칸이 즉시 0으로 덮이면 "10"을 "2"로 고치려 지우는 순간
+                          칸에 0이 들어차 그 위에 타이핑한 값이 "02"가 된다
+                          (Number("") || 0). 빈 칸은 빈 채로 두고 숫자일 때만 RHF에
+                          흘린 뒤, 칸을 벗어날 때 0으로 정규화한다.
+                          비제어(defaultValue)인 이유: sortOrder는 number라 제어
+                          상태로는 빈 문자열을 담을 수 없고, 이 폼은 성공 시 화면을
+                          떠나므로 reset()으로 값을 되돌리는 경로가 없다. */}
                       <Input
                         type="number"
                         min={0}
                         className="w-32"
-                        value={field.value}
-                        onChange={(e) =>
-                          field.onChange(Number(e.target.value) || 0)
-                        }
+                        name={field.name}
+                        ref={field.ref}
+                        defaultValue={field.value}
+                        onChange={(e) => {
+                          if (e.target.value !== "") {
+                            field.onChange(Number(e.target.value));
+                          }
+                        }}
+                        onBlur={(e) => {
+                          if (e.target.value === "") {
+                            e.target.value = "0";
+                            field.onChange(0);
+                          }
+                          field.onBlur();
+                        }}
                       />
                     </FormControl>
                     <FormDescription className="text-xs">
