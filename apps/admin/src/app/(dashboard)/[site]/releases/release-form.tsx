@@ -95,6 +95,14 @@ export function ReleaseForm({
    */
   const showArtistSelect = hasSiteCategory(site, "artists");
 
+  /**
+   * 카탈로그 번호는 payday-records만 렌더한다 — 공개 앱에서 이 값을 읽는 곳이
+   * payday의 릴리즈 카드·플랫폼 모달("레이블 · 카탈로그번호" 메타 줄)뿐이라
+   * 다른 사이트에선 어디에도 노출되지 않는 막다른 입력이었다. 숨김 방식은
+   * showArtistSelect와 동일: 폼 값에서 빼지 않고 렌더만 막아 기존 값을 보존한다.
+   */
+  const showCatalogNo = site === "payday-records";
+
   const form = useForm<ReleaseFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
     resolver: standardSchemaResolver(releaseFormSchema),
@@ -260,22 +268,9 @@ export function ReleaseForm({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="featuredArtists"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>피처링 아티스트</FormLabel>
-                  <FormControl>
-                    <Input placeholder="콤마로 구분 (예: A, B, C)" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-xs">
-                    콤마로 구분해 여러 명을 입력할 수 있습니다.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* 피처링 아티스트(featuredArtists)는 어떤 사이트도 렌더하지 않는
+                콜라보 대비 스키마(v1)라 필드를 노출하지 않는다 — 소비처가 생기면
+                되살린다. 폼 값에는 남아 있어 기존 저장값은 그대로 보존된다. */}
 
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
@@ -291,19 +286,21 @@ export function ReleaseForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="catalogNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>카탈로그 번호</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {showCatalogNo && (
+                <FormField
+                  control={form.control}
+                  name="catalogNo"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>카탈로그 번호</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
