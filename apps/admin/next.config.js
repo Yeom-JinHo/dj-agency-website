@@ -20,4 +20,25 @@ export default createNextConfig({
       bodySizeLimit: "10mb",
     },
   },
+  // Next는 보안 응답 헤더를 기본으로 붙이지 않는다. 세션 쿠키가 httpOnly가 아니라서
+  // (@supabase/ssr 표준 동작 — 브라우저 클라이언트가 읽어야 함) 프레이밍 차단·스니핑
+  // 방지가 로그인된 편집자를 지키는 최소 방어선이다. 전체 CSP(script-src 등)는 Next
+  // 인라인 스크립트 때문에 nonce 배선이 필요해 frame-ancestors만 우선 적용한다.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains",
+          },
+        ],
+      },
+    ];
+  },
 });
