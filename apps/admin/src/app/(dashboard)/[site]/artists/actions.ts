@@ -235,26 +235,43 @@ export async function updateArtist(
 
     const profile = imageFile(formData, "profileImage");
     const logo = imageFile(formData, "logoImage");
-    const profileUpload = profile
-      ? await uploadEntityImage(
-          supabase,
-          "artist",
-          site,
-          existing.slug,
-          "profile",
-          profile,
-        )
-      : null;
-    const logoUpload = logo
-      ? await uploadEntityImage(
-          supabase,
-          "artist",
-          site,
-          existing.slug,
-          "logo",
-          logo,
-        )
-      : null;
+    // 이미지 유효성은 업로드 전에 검사 — 불량 입력이 부수효과를 만들지 않게(create와 동일).
+    if (profile) validateImageFile(profile);
+    if (logo) validateImageFile(logo);
+
+    // 업로드 결과는 catch에서도 보여야 한다 — profile만 성공하고 logo가 실패하면
+    // (순단·rate-limit) 성공분이 어떤 행도 참조하지 않는 고아로 남으므로, create의
+    // 실패 경로와 같은 헬퍼로 보상 삭제한 뒤 실패를 알린다.
+    let profileUpload: { path: string; placeholder: string } | null = null;
+    let logoUpload: { path: string; placeholder: string } | null = null;
+    try {
+      profileUpload = profile
+        ? await uploadEntityImage(
+            supabase,
+            "artist",
+            site,
+            existing.slug,
+            "profile",
+            profile,
+          )
+        : null;
+      logoUpload = logo
+        ? await uploadEntityImage(
+            supabase,
+            "artist",
+            site,
+            existing.slug,
+            "logo",
+            logo,
+          )
+        : null;
+    } catch (uploadError) {
+      await removeUploadedOrphans(supabase, id, [
+        profileUpload?.path,
+        logoUpload?.path,
+      ]);
+      return { ok: false, error: toErrorMessage(uploadError) };
+    }
 
     // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
     const removeProfile = !profile && imageRemoved(formData, "removeProfileImage");
