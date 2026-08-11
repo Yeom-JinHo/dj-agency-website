@@ -85,6 +85,26 @@ export function hasSiteCategory(
 }
 
 /**
+ * 아티스트의 로스터 전용 필드(`city`·`selectedWorks`)를 쓰는 사이트.
+ *
+ * 위 카테고리 맵이 "어느 사이트가 어느 **카테고리**를 쓰는가"라면 이건 한 단 아래,
+ * "같은 엔티티 안에서 어느 **필드**를 쓰는가"다. @repo/content의 artist 스키마가
+ * 이미 "`city`/`selectedWorks`는 celebrate roster용(다른 사이트는 비움)"이라
+ * 못 박았고 소비처도 그렇다 — celebrate만 로스터·모달에서 렌더하고, VFL 어댑터
+ * (content-adapters.ts)는 두 필드를 아예 매핑하지 않는다. 그래서 VFL 편집자에게
+ * "대표 작업"은 채워도 사이트에 안 나오는 칸이고, "등록된 작업이 없습니다"는
+ * *아직 안 채운 것*으로 오독된다.
+ *
+ * 감춰도 값은 지우지 않고 렌더만 막는다 — 이유는 release-form.tsx의 로스터
+ * 셀렉트 주석과 같다(RHF는 렌더되지 않은 defaultValues도 그대로 들고 있다).
+ */
+const ROSTER_PROFILE_FIELD_SITES: readonly SiteSlug[] = ["celebrate-agency"];
+
+export function hasRosterProfileFields(site: SiteSlug): boolean {
+  return ROSTER_PROFILE_FIELD_SITES.includes(site);
+}
+
+/**
  * 범위 밖 뮤테이션 차단(서버 액션용). 라우트 가드는 화면을 막을 뿐 Server Action은
  * 그 자체가 엔드포인트라 여전히 호출된다 — 배포 직전에 열어둔 탭이나 라우터 캐시에
  * 남은 숨김 라우트가 제출하면, 이제 admin이 보여주지 않는 사이트에 행이 생기거나

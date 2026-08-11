@@ -7,6 +7,7 @@ import { PlusIcon, Trash2Icon } from "lucide-react";
 import { type SiteSlug } from "@repo/content/schema";
 
 import { slugify } from "@/lib/media";
+import { hasRosterProfileFields } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,6 +73,9 @@ export function ArtistForm({
 
   const works = useFieldArray({ control: form.control, name: "selectedWorks" });
 
+  /** 도시·대표 작업은 로스터를 쓰는 사이트에서만(lib/sites.ts 주석에 근거). */
+  const showRosterFields = hasRosterProfileFields(site);
+
   const nameValue = form.watch("name");
   const slugPreview = mode === "create" ? slugify(nameValue) : (slug ?? "");
   const slugFieldId = useId();
@@ -86,6 +90,11 @@ export function ArtistForm({
     createdMessage: "아티스트를 만들었습니다.",
     // 파일 선택·제거는 RHF 밖 상태라 isDirty에 안 잡힌다 — 함께 미저장으로 취급.
     hasUnsaved: form.formState.isDirty || isImageFieldDirty(profile),
+    // 로스터 필드를 감춘 사이트에선 서버의 city·selectedWorks 오류를 붙일 자리가
+    // 없다 — 릴리즈·투어 폼과 같은 처방(useEntityFormSubmit hiddenFields 주석).
+    hiddenFields: showRosterFields
+      ? undefined
+      : (["city", "selectedWorks"] as const),
     buildFormData: (values: ArtistFormValues) => {
       const fd = new FormData();
       fd.set("payload", JSON.stringify(values));
@@ -187,9 +196,14 @@ export function ArtistForm({
               </p>
             </div>
 
-            {/* 닉네임·도시는 짧은 값인데 전체폭(≈1170px)을 차지해 폭이 값의 성격을
-                말하지 못했다 — 릴리즈 폼의 레이블·카탈로그 번호와 같은 2열 그리드. */}
-            <div className="grid gap-4 sm:grid-cols-2">
+            {/* 닉네임·도시는 짧은 값인데 전체폭을 차지해 폭이 값의 성격을 말하지
+                못했다 — 릴리즈 폼의 레이블·발매일과 같은 2열 그리드. 도시를 감추는
+                사이트에서는 닉네임만 남으므로 2열을 풀어 짝 없는 칸을 만들지 않는다. */}
+            <div
+              className={
+                showRosterFields ? "grid gap-4 sm:grid-cols-2" : "grid gap-4"
+              }
+            >
               <FormField
                 control={form.control}
                 name="nickname"
@@ -204,6 +218,7 @@ export function ArtistForm({
                 )}
               />
 
+              {showRosterFields ? (
               <FormField
                 control={form.control}
                 name="city"
@@ -217,6 +232,7 @@ export function ArtistForm({
                   </FormItem>
                 )}
               />
+              ) : null}
             </div>
 
             <FormField
@@ -298,7 +314,10 @@ export function ArtistForm({
 
         <SocialsFieldArray />
 
-        {/* Selected works (celebrate roster) */}
+        {/* 대표 작업은 로스터를 쓰는 사이트에서만 — 다른 사이트에선 저장해도 공개
+            화면이 읽지 않는데 카드·"추가" 버튼·탭 스톱만 남았고, "등록된 작업이
+            없습니다"가 *아직 안 채운 것*으로 오독됐다(lib/sites.ts 주석). */}
+        {showRosterFields ? (
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
             <h2 className="text-lg font-medium">대표 작업</h2>
@@ -394,6 +413,7 @@ export function ArtistForm({
             )}
           </CardContent>
         </Card>
+        ) : null}
 
         {/* 로고 이미지는 admin에서 수정·삭제하지 않기로 해 필드를 노출하지 않는다 —
             기존 logo_image_path 값은 그대로 보존되고 사이트에도 계속 표시된다. */}
