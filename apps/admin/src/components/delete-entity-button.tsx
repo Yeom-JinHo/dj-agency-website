@@ -52,16 +52,27 @@ export function DeleteEntityButton({
 
   async function onConfirm() {
     setDeleting(true);
-    const result = await onDelete();
+    // 액션 호출 자체의 실패(오프라인·게이트웨이 오류)는 reject로 온다 — 잡지 않으면
+    // deleting이 true로 남아 닫기까지 막힌 다이얼로그가 무피드백으로 굳는다
+    // (use-entity-form-submit의 reject 처리와 같은 규약).
+    const result = await onDelete().catch((error: unknown) => {
+      console.error("[admin] delete failed:", error);
+      return null;
+    });
 
-    if (!result.ok) {
+    if (!result || !result.ok) {
       setDeleting(false);
       // 실패는 자동으로 사라지면 안 된다 — 되돌릴 수 없는 작업의 결과이고, 4초 안에
       // 우하단으로 시선을 옮기지 못한 사용자는 삭제됐는지조차 알 수 없게 된다.
-      toast.error(result.error, {
-        id: DELETE_ERROR_TOAST,
-        duration: Infinity,
-      });
+      toast.error(
+        result
+          ? result.error
+          : "요청을 처리하지 못했습니다. 네트워크 상태를 확인해주세요.",
+        {
+          id: DELETE_ERROR_TOAST,
+          duration: Infinity,
+        },
+      );
       return;
     }
     // 재시도로 성공한 경우 앞선 실패 토스트를 거둔다 — 수동 해제라 그냥 두면
