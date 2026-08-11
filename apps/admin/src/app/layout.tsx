@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Analytics } from "@vercel/analytics/next";
 
 import { SmallViewportNotice } from "@/components/small-viewport-notice";
 import { Toaster } from "@/components/ui/sonner";
@@ -40,6 +41,7 @@ export default function RootLayout({
           <Toaster />
         </div>
         <SmallViewportNotice />
+        <Analytics />
       </body>
     </html>
   );
