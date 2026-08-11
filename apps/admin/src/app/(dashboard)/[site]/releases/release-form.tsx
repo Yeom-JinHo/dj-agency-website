@@ -146,16 +146,34 @@ export function ReleaseForm({
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
             키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
         <fieldset disabled={submitting} className="min-w-0 space-y-6">
-        {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
+        {/* 섹션 제목 text-lg + font-medium + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
-            한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
+            한 단 차이뿐이었다).
+            크기만으로는 h1과 2px 차이뿐이라 두께를 함께 내린다(600→500). 색을 muted로
+            내리는 안은 실화면에서 기각됐다 — 대비가 15.3:1에서 4.7:1로 떨어지면서
+            바로 아래 필드 라벨(foreground)보다 제목이 물러나 보였다.
+            border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
             카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
             한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">기본 정보</h2>
+            <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* 아트워크가 이 카드의 첫 필드다 — 릴리즈의 1차 식별자는 커버아트인데
+                별도 카드로 맨 아래(5번째)에 있어 스크롤 끝까지 가야 보였다.
+                카드를 없애고 기본 정보로 들여오면 카드 수도 5→4로 줄어든다.
+                라벨이 "아트워크 이미지"에서 "아트워크"로 짧아진 이유: 카드 제목이
+                사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
+            <ImageField
+              label="아트워크"
+              // 폼 첫 필드라 sm — md(208px)면 바로 아래 제목이 접힘 밖으로 밀린다.
+              previewSize="sm"
+              initialUrl={initialArtworkUrl}
+              value={artwork}
+              onChange={setArtwork}
+            />
+
             <FormField
               control={form.control}
               name="title"
@@ -178,25 +196,36 @@ export function ReleaseForm({
               )}
             />
 
-            {/* slug는 RHF 필드가 아니라 제목에서 파생되는 읽기 전용 표시라 FormItem/FormLabel을 쓰지 않는다 —
-                FormLabel의 htmlFor는 FormControl이 부여하는 id를 가리키는데 여기엔 FormControl이 없어
-                라벨이 존재하지 않는 id를 가리키고 있었다(스크린리더가 이름 없는 필드로 읽음).
-                RHF 관여가 없으니 일반 Label + useId로 직접 연결한다. 마크업(grid gap-2)은 FormItem과 동일. */}
-            <div className="grid gap-2">
-              <Label htmlFor={slugFieldId}>Slug</Label>
-              <Input
-                id={slugFieldId}
-                value={slugPreview}
-                readOnly
-                aria-describedby={slugHintId}
-                className="bg-muted font-mono"
-              />
-              <p id={slugHintId} className="text-muted-foreground text-xs">
-                {mode === "create"
-                  ? "제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다."
-                  : "slug는 생성 후 변경할 수 없습니다."}
+            {/* create에서만 입력 칸 형태다 — 제목을 치는 동안 값이 따라 바뀌는 걸
+                보여줘야 "이 제목이면 이 주소"를 저장 전에 판단할 수 있다.
+                RHF 필드가 아니라 FormItem/FormLabel을 쓰지 않는다: FormLabel의 htmlFor는
+                FormControl이 부여하는 id를 가리키는데 여기엔 FormControl이 없어 라벨이
+                존재하지 않는 id를 가리키게 된다(스크린리더가 이름 없는 필드로 읽음).
+                일반 Label + useId로 직접 연결한다. 마크업(grid gap-2)은 FormItem과 동일.
+
+                edit에서는 값이 이미 확정돼 다시는 바뀌지 않는다 — 입력 칸으로 두면
+                제목 바로 아래에서 full-width로 제목만큼 시선을 먹으면서 정작 손댈 수는
+                없다. 읽기용 메타 한 줄로 내린다(라벨·안내문도 그 줄에 흡수). */}
+            {mode === "create" ? (
+              <div className="grid gap-2">
+                <Label htmlFor={slugFieldId}>Slug</Label>
+                <Input
+                  id={slugFieldId}
+                  value={slugPreview}
+                  readOnly
+                  aria-describedby={slugHintId}
+                  className="bg-muted font-mono"
+                />
+                <p id={slugHintId} className="text-muted-foreground text-xs">
+                  제목에서 자동 생성됩니다. 생성 후 변경할 수 없습니다.
+                </p>
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-xs">
+                Slug <span className="font-mono">{slugPreview}</span> · 생성 후
+                변경할 수 없습니다.
               </p>
-            </div>
+            )}
 
             {showArtistSelect && (
               <FormField
@@ -263,8 +292,9 @@ export function ReleaseForm({
             {/* 피처링 아티스트(featuredArtists)·카탈로그 번호(catalogNo)는 어떤
                 사이트도 렌더하지 않아 필드를 노출하지 않는다 — 소비처가 생기면
                 되살린다. 폼 값에는 남아 있어 기존 저장값은 그대로 보존된다.
-                레이블이 2열 그리드에 홀로 남는 폭은 닉네임·도시와 같은 짧은 값
-                처방 그대로다. */}
+                레이블은 짧은 값이라 반폭 처방(닉네임·도시)을 그대로 두되, 같은
+                행에 발매일을 세워 2열을 채운다 — 필드 하나만 든 2열 그리드는
+                오른쪽 절반이 비어 "필드가 하나 빠졌다"로 읽혔다. */}
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
@@ -279,9 +309,6 @@ export function ReleaseForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="releaseDate"
@@ -295,38 +322,60 @@ export function ReleaseForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="sortOrder"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>정렬 순서</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        className="w-32"
-                        value={field.value}
-                        onChange={(e) =>
-                          field.onChange(Number(e.target.value) || 0)
-                        }
-                      />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      사이트 내 노출 순서(작을수록 먼저).
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
+
+            {/* 정렬 순서는 그리드 밖 단독 행이다 — 짝을 지을 필드가 남지 않은
+                상태에서 2열에 넣으면 다시 반쪽 빈칸이 생긴다. 그리드가 없으면
+                w-32는 "빈 셀의 왼쪽에 몰린 입력"이 아니라 그냥 짧은 입력으로 읽힌다. */}
+            <FormField
+              control={form.control}
+              name="sortOrder"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>정렬 순서</FormLabel>
+                  <FormControl>
+                    {/* 빈 칸이 즉시 0으로 덮이면 "10"을 "2"로 고치려 지우는 순간
+                        칸에 0이 들어차 그 위에 타이핑한 값이 "02"가 된다
+                        (Number("") || 0). 빈 칸은 빈 채로 두고 숫자일 때만 RHF에
+                        흘린 뒤, 칸을 벗어날 때 0으로 정규화한다.
+                        비제어(defaultValue)인 이유: sortOrder는 number라 제어
+                        상태로는 빈 문자열을 담을 수 없고, 이 폼은 성공 시 화면을
+                        떠나므로 reset()으로 값을 되돌리는 경로가 없다. */}
+                    <Input
+                      type="number"
+                      min={0}
+                      className="w-32"
+                      name={field.name}
+                      ref={field.ref}
+                      defaultValue={field.value}
+                      onChange={(e) => {
+                        if (e.target.value !== "") {
+                          field.onChange(Number(e.target.value));
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === "") {
+                          e.target.value = "0";
+                          field.onChange(0);
+                        }
+                        field.onBlur();
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    사이트 내 노출 순서(작을수록 먼저).
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
 
         {/* 설명 (en/ko × short/full) */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">설명</h2>
+            <h2 className="text-lg font-medium">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -360,49 +409,49 @@ export function ReleaseForm({
           </CardContent>
         </Card>
 
-        {/* Platform links (5개 확정 키) */}
+        {/* 링크 — "플랫폼 링크"와 "소셜"이 별개 카드로 나란히 서 있었는데, 5개
+            확정 키(beatport·spotify·appleMusic·soundcloud·youtubeMusic)가
+            SOCIAL_PLATFORMS에도 전부 존재해 편집자는 Spotify 링크를 어느 카드에
+            넣어야 하는지 알 수 없었다(양쪽에 넣으면 사이트에 두 번 나온다).
+            한 카드 안의 두 블록으로 합치고, 앞 블록을 "발매 플랫폼"으로 불러
+            "이 릴리즈를 들을 수 있는 곳"과 "계정 링크"의 역할 차이를 이름으로
+            드러낸다. 스키마는 그대로다 — platform_links와 socials는 여전히 별개 컬럼. */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">플랫폼 링크</h2>
+            <h2 className="text-lg font-medium">링크</h2>
           </CardHeader>
-          <CardContent>
-            {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명
-                카드와 폼 문법이 갈렸다. 설명 카드와 같은 2열 그리드로 통일한다. */}
-            <div className="grid gap-4 sm:grid-cols-2">
-              {PLATFORM_LINK_KEYS.map((key) => (
-                <FormField
-                  key={key}
-                  control={form.control}
-                  name={`platformLinks.${key}`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{PLATFORM_LABELS[key]}</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://…" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+          {/* 블록 사이는 space-y-6 — 필드 간격(space-y-4)보다 한 단 넓어야 두 블록이
+              한 카드 안에서도 서로 다른 묶음으로 읽힌다. */}
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              {/* SocialsFieldArray의 block variant와 같은 아이브로 처방 —
+                  두 블록 제목이 한 카드 안에 있어 어휘가 갈리면 안 된다. */}
+              <h3 className="text-muted-foreground text-xs font-semibold tracking-wide">
+                발매 플랫폼
+              </h3>
+              {/* 세로 라벨 2열 — 이 카드만 가로 라벨(w-28 좌측 열)이라 기본 정보·설명
+                  카드와 폼 문법이 갈렸다. 설명 카드와 같은 2열 그리드로 통일한다. */}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {PLATFORM_LINK_KEYS.map((key) => (
+                  <FormField
+                    key={key}
+                    control={form.control}
+                    name={`platformLinks.${key}`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{PLATFORM_LABELS[key]}</FormLabel>
+                        <FormControl>
+                          <Input placeholder="https://…" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+              </div>
             </div>
-          </CardContent>
-        </Card>
 
-        <SocialsFieldArray />
-
-        {/* 이미지 */}
-        <Card className="gap-4 py-4">
-          <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">아트워크</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageField
-              label="아트워크 이미지"
-              initialUrl={initialArtworkUrl}
-              value={artwork}
-              onChange={setArtwork}
-            />
+            <SocialsFieldArray variant="block" />
           </CardContent>
         </Card>
 

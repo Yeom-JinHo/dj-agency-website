@@ -114,14 +114,18 @@ export function ArtistForm({
             fieldset 밖이다: disabled가 되는 순간 브라우저가 blur시켜 Enter로 저장한
             키보드 사용자가 탭 위치를 잃는다(FormSubmitButton 주석 참고). */}
         <fieldset disabled={submitting} className="min-w-0 space-y-6">
-        {/* 섹션 제목 text-lg + 구분선 — 페이지 제목(text-2xl)과 필드 라벨(text-sm) 사이에
+        {/* 섹션 제목 text-lg + font-medium + 구분선 — 페이지 제목(text-xl)과 필드 라벨(text-sm) 사이에
             한 단씩 벌려야 카드가 이어지는 폼에서 섹션 경계가 잡힌다(text-base는 라벨과
-            한 단 차이뿐이었다). border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
+            한 단 차이뿐이었다).
+            크기만으로는 h1과 2px 차이뿐이라 두께를 함께 내린다(600→500). 색을 muted로
+            내리는 안은 실화면에서 기각됐다 — 대비가 15.3:1에서 4.7:1로 떨어지면서
+            바로 아래 필드 라벨(foreground)보다 제목이 물러나 보였다.
+            border-b는 CardHeader의 [.border-b]:pb-6 훅을 깨우는데,
             카드는 py-4 리듬이지만 pb-4로 덮으려면 !important가 필요하고(훅 선택자가 :is()로
             한 단 높다) 이 앱엔 그 선례가 없어 24px을 그대로 받아들인다. */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">기본 정보</h2>
+            <h2 className="text-lg font-medium">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -239,7 +243,7 @@ export function ArtistForm({
         {/* 설명 (en/ko × short/full) */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">설명</h2>
+            <h2 className="text-lg font-medium">설명</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -275,7 +279,7 @@ export function ArtistForm({
         {/* Selected works (celebrate roster) */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">대표 작업</h2>
+            <h2 className="text-lg font-medium">대표 작업</h2>
             <CardAction>
               <Button
                 type="button"
@@ -372,7 +376,7 @@ export function ArtistForm({
         {/* 이미지 */}
         <Card className="gap-4 py-4">
           <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">이미지</h2>
+            <h2 className="text-lg font-medium">이미지</h2>
           </CardHeader>
           <CardContent className="space-y-4">
             <ImageField
