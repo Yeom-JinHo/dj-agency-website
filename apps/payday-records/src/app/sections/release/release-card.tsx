@@ -56,9 +56,9 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
         <p className="text-muted-foreground truncate text-xs md:text-sm">
           {release.artist}
         </p>
-        {(release.label || release.catalogNo) && (
+        {release.label && (
           <p className="text-muted-foreground mt-1 truncate font-mono text-[10px] tracking-widest uppercase">
-            {[release.label, release.catalogNo].filter(Boolean).join(" · ")}
+            {release.label}
           </p>
         )}
       </div>

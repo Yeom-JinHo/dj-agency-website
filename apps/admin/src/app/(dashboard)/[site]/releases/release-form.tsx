@@ -260,23 +260,11 @@ export function ReleaseForm({
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="featuredArtists"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>피처링 아티스트</FormLabel>
-                  <FormControl>
-                    <Input placeholder="콤마로 구분 (예: A, B, C)" {...field} />
-                  </FormControl>
-                  <FormDescription className="text-xs">
-                    콤마로 구분해 여러 명을 입력할 수 있습니다.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            {/* 피처링 아티스트(featuredArtists)·카탈로그 번호(catalogNo)는 어떤
+                사이트도 렌더하지 않아 필드를 노출하지 않는다 — 소비처가 생기면
+                되살린다. 폼 값에는 남아 있어 기존 저장값은 그대로 보존된다.
+                레이블이 2열 그리드에 홀로 남는 폭은 닉네임·도시와 같은 짧은 값
+                처방 그대로다. */}
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
@@ -284,19 +272,6 @@ export function ReleaseForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>레이블</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="catalogNo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>카탈로그 번호</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>

@@ -104,10 +104,10 @@ export async function createArtist(
     const supabase = await createServerSupabaseClient();
 
     // 이미지 유효성은 행 생성 전에 검사 — 불량 입력이 행을 만들지 않게.
+    // 로고(logoImage)는 admin에서 다루지 않는 필드라 서버도 무시한다(artist-form.tsx
+    // 주석 참고) — 낡은 탭이나 임의 FormData가 보내와도 logo_image_path는 불변.
     const profile = imageFile(formData, "profileImage");
-    const logo = imageFile(formData, "logoImage");
     if (profile) validateImageFile(profile);
-    if (logo) validateImageFile(logo);
 
     // insert-first: slug 확보를 먼저 해 이름 중복(23505) 같은 흔한 실패에서 Storage
     // 고아를 막고 update 경로와 대칭이 되게 한다. site_slug는 라우트에서 자동.
@@ -134,7 +134,6 @@ export async function createArtist(
     // 여기서 실패해도 행은 이미 존재하므로 삭제하지 않고 편집 화면으로 안내(dead-end 회피).
     // 업로드 결과는 catch에서도 보여야 한다(컬럼 update 실패 시 업로드된 파일 보상 삭제).
     let profileUpload: { path: string; placeholder: string } | null = null;
-    let logoUpload: { path: string; placeholder: string } | null = null;
     try {
       profileUpload = profile
         ? await uploadEntityImage(
@@ -146,20 +145,13 @@ export async function createArtist(
             profile,
           )
         : null;
-      logoUpload = logo
-        ? await uploadEntityImage(supabase, "artist", site, slug, "logo", logo)
-        : null;
 
-      if (profileUpload || logoUpload) {
+      if (profileUpload) {
         const imageColumns: Database["public"]["Tables"]["artists"]["Update"] =
-          {};
-        if (profileUpload) {
-          imageColumns.image_path = profileUpload.path;
-          imageColumns.image_placeholder = profileUpload.placeholder;
-        }
-        if (logoUpload) {
-          imageColumns.logo_image_path = logoUpload.path;
-        }
+          {
+            image_path: profileUpload.path,
+            image_placeholder: profileUpload.placeholder,
+          };
         const { error: updateError } = await supabase
           .from("artists")
           .update(imageColumns)
@@ -170,10 +162,7 @@ export async function createArtist(
       // 업로드까지 됐지만 컬럼 update가 실패한 파일은 어떤 행도 참조하지 않는 고아 —
       // 편집 화면 재저장 시 같은 콘텐츠면 같은 해시 경로로 다시 올라가므로 지워도 안전.
       // 단, 판정은 행의 현재 경로 재조회로 한다(응답만 유실된 커밋 보호, 헬퍼 주석 참고).
-      await removeUploadedOrphans(supabase, id, [
-        profileUpload?.path,
-        logoUpload?.path,
-      ]);
+      await removeUploadedOrphans(supabase, id, [profileUpload?.path]);
       // 행은 저장됐으니 이미지 없이라도 사이트에 반영(발행). 발행 경고는 이미지 경고에 덧붙인다.
       const publishWarning = await publishOrWarn(publishTags, site);
       revalidatePath(`/${site}/artists`);
@@ -215,7 +204,7 @@ export async function updateArtist(
     // slug·site_slug는 불변(§13) — 기존 행에서 slug를 읽어 이미지 경로 조립·교체 삭제에 사용.
     const { data: existing, error: loadError } = await supabase
       .from("artists")
-      .select("slug, image_path, logo_image_path, updated_at")
+      .select("slug, image_path, updated_at")
       .eq("id", id)
       .eq("site_slug", site)
       .maybeSingle();
@@ -233,8 +222,10 @@ export async function updateArtist(
       return { ok: false, error: CONCURRENT_EDIT_MESSAGE };
     }
 
+    // 로고(logoImage/removeLogoImage)는 admin에서 다루지 않는 필드라 서버도 무시한다
+    // (artist-form.tsx 주석 참고) — 낡은 탭이나 임의 FormData가 보내와도
+    // logo_image_path는 불변이고, Storage의 로고 파일도 삭제되지 않는다.
     const profile = imageFile(formData, "profileImage");
-    const logo = imageFile(formData, "logoImage");
     const profileUpload = profile
       ? await uploadEntityImage(
           supabase,
@@ -245,20 +236,9 @@ export async function updateArtist(
           profile,
         )
       : null;
-    const logoUpload = logo
-      ? await uploadEntityImage(
-          supabase,
-          "artist",
-          site,
-          existing.slug,
-          "logo",
-          logo,
-        )
-      : null;
 
     // 새 파일 없이 제거만 요청한 경우(폼의 "제거" 버튼) — 컬럼을 비운다.
     const removeProfile = !profile && imageRemoved(formData, "removeProfileImage");
-    const removeLogo = !logo && imageRemoved(formData, "removeLogoImage");
 
     // 새 파일이 온 이미지 컬럼만 갱신, 없으면 기존값 유지. site_slug·slug는 컬럼에서 제외(불변).
     const imageColumns: Database["public"]["Tables"]["artists"]["Update"] = {};
@@ -269,15 +249,10 @@ export async function updateArtist(
       imageColumns.image_path = null;
       imageColumns.image_placeholder = null;
     }
-    if (logoUpload) {
-      imageColumns.logo_image_path = logoUpload.path;
-    } else if (removeLogo) {
-      imageColumns.logo_image_path = null;
-    }
 
     // update가 적용되지 못했을 때 방금 올린 새 이미지는 보상 삭제 대상이다(판정 규칙은
     // removeUploadedOrphans 주석 참고 — create의 실패 경로와 같은 헬퍼를 쓴다).
-    const uploadedPaths = [profileUpload?.path, logoUpload?.path];
+    const uploadedPaths = [profileUpload?.path];
 
     // updated_at 매치 조건이 2차(레이스) 검사다: 위 1차 검사 후 이 update 사이에 다른
     // 저장이 끼어들면 트리거가 updated_at을 바꿔 매치 0건이 된다 — select("id")로 실제
@@ -305,11 +280,7 @@ export async function updateArtist(
       removeProfile
         ? existing.image_path
         : null;
-    const oldLogoPath =
-      (logoUpload && existing.logo_image_path !== logoUpload.path) || removeLogo
-        ? existing.logo_image_path
-        : null;
-    await removeImages(supabase, [oldProfilePath, oldLogoPath]);
+    await removeImages(supabase, [oldProfilePath]);
 
     // 아티스트명 변경이 릴리즈·투어 표시에 반영되도록 교차 엔티티 태그도 무효화(§13 🔴).
     const publishWarning = await publishOrWarn(

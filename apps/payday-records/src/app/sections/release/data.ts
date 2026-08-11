@@ -14,12 +14,12 @@ import type { Release } from "@/types/release";
 export async function getReleaseItems(): Promise<Release[]> {
   const releases = await getReleases("payday-records");
   return releases.map((release) => ({
+    slug: release.slug,
     title: release.title,
     artist: release.artistCredit ?? "",
     artwork: mediaUrl(release.artworkPath) ?? undefined,
     artworkPlaceholder: release.artworkPlaceholder ?? undefined,
     label: release.label ?? undefined,
-    catalogNo: release.catalogNo ?? undefined,
     links: release.platformLinks,
   }));
 }

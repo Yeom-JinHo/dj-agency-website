@@ -123,7 +123,6 @@ export default async function EditArtistPage({
         updatedAt={artist.updatedAt}
         defaultValues={defaultValues}
         initialProfileUrl={mediaUrl(artist.imagePath)}
-        initialLogoUrl={mediaUrl(artist.logoImagePath)}
       />
     </div>
   );

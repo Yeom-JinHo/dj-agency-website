@@ -6,6 +6,8 @@ export type ReleasePlatform =
   | "youtubeMusic";
 
 export interface Release {
+  /** 사이트 내 유니크(도메인 Release.slug) — 목록 렌더의 React key로 쓴다. */
+  slug: string;
   title: string;
   artist: string;
   label?: string;
@@ -15,7 +17,6 @@ export interface Release {
   artwork?: string;
   /** blurDataURL(placeholder). CMS가 업로드 시 생성 — 없으면 blur 생략. */
   artworkPlaceholder?: string;
-  catalogNo?: string;
   // 값이 있는 플랫폼만 모달에 노출됩니다.
   links: Partial<Record<ReleasePlatform, string>>;
 }
