@@ -263,8 +263,9 @@ export function ReleaseForm({
             {/* 피처링 아티스트(featuredArtists)·카탈로그 번호(catalogNo)는 어떤
                 사이트도 렌더하지 않아 필드를 노출하지 않는다 — 소비처가 생기면
                 되살린다. 폼 값에는 남아 있어 기존 저장값은 그대로 보존된다.
-                레이블이 2열 그리드에 홀로 남는 폭은 닉네임·도시와 같은 짧은 값
-                처방 그대로다. */}
+                레이블은 짧은 값이라 반폭 처방(닉네임·도시)을 그대로 두되, 같은
+                행에 발매일을 세워 2열을 채운다 — 필드 하나만 든 2열 그리드는
+                오른쪽 절반이 비어 "필드가 하나 빠졌다"로 읽혔다. */}
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
@@ -279,9 +280,6 @@ export function ReleaseForm({
                   </FormItem>
                 )}
               />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
                 name="releaseDate"
@@ -295,49 +293,53 @@ export function ReleaseForm({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="sortOrder"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>정렬 순서</FormLabel>
-                    <FormControl>
-                      {/* 빈 칸이 즉시 0으로 덮이면 "10"을 "2"로 고치려 지우는 순간
-                          칸에 0이 들어차 그 위에 타이핑한 값이 "02"가 된다
-                          (Number("") || 0). 빈 칸은 빈 채로 두고 숫자일 때만 RHF에
-                          흘린 뒤, 칸을 벗어날 때 0으로 정규화한다.
-                          비제어(defaultValue)인 이유: sortOrder는 number라 제어
-                          상태로는 빈 문자열을 담을 수 없고, 이 폼은 성공 시 화면을
-                          떠나므로 reset()으로 값을 되돌리는 경로가 없다. */}
-                      <Input
-                        type="number"
-                        min={0}
-                        className="w-32"
-                        name={field.name}
-                        ref={field.ref}
-                        defaultValue={field.value}
-                        onChange={(e) => {
-                          if (e.target.value !== "") {
-                            field.onChange(Number(e.target.value));
-                          }
-                        }}
-                        onBlur={(e) => {
-                          if (e.target.value === "") {
-                            e.target.value = "0";
-                            field.onChange(0);
-                          }
-                          field.onBlur();
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription className="text-xs">
-                      사이트 내 노출 순서(작을수록 먼저).
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
+
+            {/* 정렬 순서는 그리드 밖 단독 행이다 — 짝을 지을 필드가 남지 않은
+                상태에서 2열에 넣으면 다시 반쪽 빈칸이 생긴다. 그리드가 없으면
+                w-32는 "빈 셀의 왼쪽에 몰린 입력"이 아니라 그냥 짧은 입력으로 읽힌다. */}
+            <FormField
+              control={form.control}
+              name="sortOrder"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>정렬 순서</FormLabel>
+                  <FormControl>
+                    {/* 빈 칸이 즉시 0으로 덮이면 "10"을 "2"로 고치려 지우는 순간
+                        칸에 0이 들어차 그 위에 타이핑한 값이 "02"가 된다
+                        (Number("") || 0). 빈 칸은 빈 채로 두고 숫자일 때만 RHF에
+                        흘린 뒤, 칸을 벗어날 때 0으로 정규화한다.
+                        비제어(defaultValue)인 이유: sortOrder는 number라 제어
+                        상태로는 빈 문자열을 담을 수 없고, 이 폼은 성공 시 화면을
+                        떠나므로 reset()으로 값을 되돌리는 경로가 없다. */}
+                    <Input
+                      type="number"
+                      min={0}
+                      className="w-32"
+                      name={field.name}
+                      ref={field.ref}
+                      defaultValue={field.value}
+                      onChange={(e) => {
+                        if (e.target.value !== "") {
+                          field.onChange(Number(e.target.value));
+                        }
+                      }}
+                      onBlur={(e) => {
+                        if (e.target.value === "") {
+                          e.target.value = "0";
+                          field.onChange(0);
+                        }
+                        field.onBlur();
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    사이트 내 노출 순서(작을수록 먼저).
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
 
