@@ -53,15 +53,33 @@ const columns: DataTableColumn<ArtistRow>[] = [
     header: "이름",
     cellClassName: "font-medium",
     cell: (row) => row.name,
+    // slug는 독립 컬럼(291px)이었는데, 실측에서 VFL 6/6행은 이름과 완전히 같았고
+    // (`Sielo`/`Sielo`) celebrate 38/38행은 소문자로 바꾼 것뿐이었다(`SAM`/`sam`).
+    // 대부분의 행에서 옆칸과 구분되지 않는 값이 표 폭의 1/4을 쓰고 있었다.
+    //
+    // 그렇다고 지우지는 않는다 — slug는 생성 후 바꿀 수 없는 키이자 VFL 공개 주소
+    // (/artist/{slug})라, 목록에서 "이 아티스트가 어느 주소로 나가는가"를 확인할 유일한
+    // 자리다. 그래서 컬럼에서 이름 셀의 보조 줄로 강등한다. 가로는 한 칸을 통째로
+    // 돌려주고, 세로는 공짜다 — 이 목록의 행 높이는 80px 썸네일이 이미 정해놨고 이름은
+    // 그 안에서 한 줄만 쓰고 있었다. 이름과 slug가 위아래로 붙으면 "이름 → 주소" 대응도
+    // 좌우로 떨어져 있을 때보다 오히려 읽기 쉽다.
+    //
+    // 검색은 그대로 slug를 포함하므로 placeholder("이름·slug로 검색")도 손대지 않는다 —
+    // 값이 여전히 화면에 보이고 여전히 검색된다.
+    //
+    // 기각한 안:
+    // - 컬럼 제거: 공개 주소를 목록에서 확인할 수단이 사라진다(상세 폼에만 남는다).
+    // - 폭만 축소: 값이 이름의 복사본처럼 보이는 문제는 폭을 줄여도 그대로 남고,
+    //   대신 "자기 컬럼을 가질 만큼 중요한 값"이라는 잘못된 위계만 유지된다.
+    // - 정렬 기준 상실은 감수한다: slug ≈ 이름의 소문자라 slug 정렬은 이름 정렬과
+    //   사실상 같은 결과였다.
+    subCell: (row) => (
+      <div className="text-muted-foreground mt-0.5 font-mono text-xs font-normal">
+        {row.slug}
+      </div>
+    ),
     sortValue: (row) => row.name,
     linked: true,
-  },
-  {
-    id: "slug",
-    header: "Slug",
-    cellClassName: "text-muted-foreground font-mono",
-    cell: (row) => row.slug,
-    sortValue: (row) => row.slug,
   },
   {
     id: "sortOrder",
@@ -74,6 +92,11 @@ const columns: DataTableColumn<ArtistRow>[] = [
   {
     id: "updatedAt",
     header: "수정일",
+    // slug 컬럼이 돌려준 291px가 여기로 흘러가면 옮겨 담기만 한 셈이다. 표가
+    // table-layout auto라 폭을 지정하지 않은 컬럼끼리 남는 공간을 나눠 갖는데,
+    // 값은 formatDate가 만드는 `2026-10-03` 고정 폭이라 더 필요할 이유가 없다.
+    // 릴리즈 목록의 같은 컬럼과 같은 w-28(112px)로 묶어 두 목록의 날짜 폭을 맞춘다.
+    headClassName: "w-28",
     cellClassName: "text-muted-foreground tabular-nums",
     cell: (row) => row.updatedAt,
     sortValue: (row) => row.updatedAt,

@@ -45,6 +45,20 @@ export type DataTableColumn<T> = {
   cell: (row: T) => ReactNode;
   sortValue?: (row: T) => string | number;
   linked?: boolean;
+  /**
+   * 같은 셀 안, 주 값 아래에 붙는 보조 줄(선택). 자기 컬럼을 가질 만큼 자주 보지는
+   * 않지만 목록에서 사라지면 곤란한 부속 식별자(아티스트 slug 등)를 위한 자리다 —
+   * 컬럼으로 두면 가로 폭을 온전히 한 칸 먹는데, 썸네일이 행 높이를 이미 결정해
+   * 놓아서 세로로는 공짜다.
+   *
+   * `linked` 컬럼에서도 이 줄만은 <Link> 바깥에 그린다. 두 가지가 걸려 있다 —
+   * (1) 링크 안에 넣으면 링크의 접근 가능한 이름이 "Sielo sielo"처럼 같은 말을 두 번
+   * 읽는 문구가 되고, (2) 브라우저는 <a> 안의 텍스트를 드래그하면 텍스트 선택이 아니라
+   * 링크 드래그를 시작해 복사가 막힌다. 행 전체 덮개 링크를 걷어낸 이유가 정확히
+   * "slug·날짜를 드래그 복사할 수 없다"였으므로(아래 handleRowClick 주석) 같은 실수를
+   * 보조 줄로 되돌리지 않는다. 링크 밖이어도 행 클릭 이동은 그대로 동작한다.
+   */
+  subCell?: (row: T) => ReactNode;
 };
 
 const SORT_DIRS = ["asc", "desc"] as const;
@@ -410,6 +424,8 @@ export function DataTable<T extends { id: string }>({
                       ) : (
                         column.cell(row)
                       )}
+                      {/* 보조 줄은 링크 밖(같은 셀 안)에 둔다 — 이유는 DataTableColumn.subCell 주석. */}
+                      {column.subCell?.(row)}
                     </TableCell>
                   ))}
                 </TableRow>
