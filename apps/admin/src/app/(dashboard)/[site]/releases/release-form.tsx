@@ -156,6 +156,18 @@ export function ReleaseForm({
             <h2 className="text-lg font-semibold">기본 정보</h2>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* 아트워크가 이 카드의 첫 필드다 — 릴리즈의 1차 식별자는 커버아트인데
+                별도 카드로 맨 아래(5번째)에 있어 스크롤 끝까지 가야 보였다.
+                카드를 없애고 기본 정보로 들여오면 카드 수도 5→4로 줄어든다.
+                라벨이 "아트워크 이미지"에서 "아트워크"로 짧아진 이유: 카드 제목이
+                사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
+            <ImageField
+              label="아트워크"
+              initialUrl={initialArtworkUrl}
+              value={artwork}
+              onChange={setArtwork}
+            />
+
             <FormField
               control={form.control}
               name="title"
@@ -433,21 +445,6 @@ export function ReleaseForm({
             </div>
 
             <SocialsFieldArray variant="block" />
-          </CardContent>
-        </Card>
-
-        {/* 이미지 */}
-        <Card className="gap-4 py-4">
-          <CardHeader className="border-b">
-            <h2 className="text-lg font-semibold">아트워크</h2>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ImageField
-              label="아트워크 이미지"
-              initialUrl={initialArtworkUrl}
-              value={artwork}
-              onChange={setArtwork}
-            />
           </CardContent>
         </Card>
 
