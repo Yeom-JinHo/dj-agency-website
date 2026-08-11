@@ -10,8 +10,27 @@ import {
   MAX_UPLOAD_BYTES,
   MAX_UPLOAD_MB,
 } from "@/lib/image-constraints";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+
+/**
+ * 미리보기 치수. sm은 이미지가 폼 **첫 필드**로 오는 화면 전용이다 — 릴리즈
+ * 아트워크가 그 경우로, md(208px)면 바로 아래 제목 필드가 접힘 밖으로 밀린다.
+ * 이미지가 폼 하단에 있는 화면(artist 프로필·tour 포스터)은 그 비용이 없으므로
+ * md를 유지한다: 미리보기는 저장 전 마지막 검증 게이트라 클수록 낫고, 세로 원본
+ * (아티스트 1200×1800)은 sm에서 가로 85px까지 줄어 워터마크·보더 판독이 빠듯하다.
+ *
+ * box는 "이미지 없음" 자리이며 항상 미리보기 높이와 같은 정사각이다 — 높이가
+ * 달라지면 이미지를 고르거나 지울 때 아래 필드 전체가 세로로 튄다. 가로는
+ * 원본 비율에 따라 어차피 달라지지만, 그건 버튼 열만 좌우로 밀 뿐이다.
+ */
+const PREVIEW_SIZES = {
+  sm: { image: "h-32", box: "size-32", px: 128 },
+  md: { image: "h-52", box: "size-52", px: 208 },
+} as const;
+
+export type ImagePreviewSize = keyof typeof PREVIEW_SIZES;
 
 /**
  * 이미지 입력 상태. file은 새로 올릴 파일, removed는 "기존 이미지를 지운다"는
@@ -50,12 +69,16 @@ export function ImageField({
   initialUrl,
   value,
   onChange,
+  previewSize = "md",
 }: {
   label: string;
   initialUrl: string | null;
   value: ImageFieldValue;
   onChange: (value: ImageFieldValue) => void;
+  /** 이미지가 폼 첫 필드로 오는 화면만 "sm"(PREVIEW_SIZES 주석). */
+  previewSize?: ImagePreviewSize;
 }) {
+  const size = PREVIEW_SIZES[previewSize];
   const inputId = useId();
   // 형식·용량 제한은 없으면 올바르게 고를 수 없는 규칙이라 input에 aria-describedby로
   // 묶는다. RHF 필드가 아니라 FormDescription을 쓸 수 없어 id를 직접 만든다.
@@ -123,9 +146,7 @@ export function ImageField({
              원본(아티스트 1200×1800)의 33%를 숨겨 워터마크·보더 같은 "내렸어야
              할 사유"가 발행 후에야 보이는 경로를 만든다 — 원본 비율 그대로,
              크롭 없이 보여주고 클릭하면 원본을 새 탭으로 연다.
-             높이 h-32(128px): 릴리즈 아트워크가 폼 첫 필드로 올라오면서 208px은
-             제목 필드를 접힘 아래로 밀어냈다. 검증용으로는 128px이면 워터마크·
-             보더가 판독되고, 더 봐야 하면 클릭해 원본을 연다. */
+             높이는 previewSize가 정한다(PREVIEW_SIZES 주석). */
           <a
             href={preview}
             target="_blank"
@@ -140,16 +161,19 @@ export function ImageField({
             <Image
               src={preview}
               alt={label}
-              width={128}
-              height={128}
+              width={size.px}
+              height={size.px}
               unoptimized
-              className="h-32 w-auto max-w-80 object-contain"
+              className={cn("w-auto max-w-80 object-contain", size.image)}
             />
           </a>
         ) : (
-          /* 빈 자리도 미리보기와 같은 128px — 이미지를 고르거나 지울 때 블록
-             높이가 바뀌면 아래 필드 전체가 위아래로 튄다. */
-          <div className="bg-muted flex size-32 shrink-0 items-center justify-center overflow-hidden rounded-md border [fieldset:disabled_&]:opacity-50">
+          <div
+            className={cn(
+              "bg-muted flex shrink-0 items-center justify-center overflow-hidden rounded-md border [fieldset:disabled_&]:opacity-50",
+              size.box,
+            )}
+          >
             {/* muted 판 위에서는 text-muted-foreground(#737373)가 4.34:1로 AA 미달이다
                (흰 배경 위 4.73:1이 배경이 bg-muted #F5F5F5로 바뀌며 뒤집힌다).
                foreground 60%는 합성색 #686868 → 4.65:1로 통과하면서 본문 톤까지

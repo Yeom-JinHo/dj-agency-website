@@ -166,6 +166,8 @@ export function ReleaseForm({
                 사라져 이 라벨이 유일한 이름인데, 이미지 필드에서 "이미지"는 잉여어다. */}
             <ImageField
               label="아트워크"
+              // 폼 첫 필드라 sm — md(208px)면 바로 아래 제목이 접힘 밖으로 밀린다.
+              previewSize="sm"
               initialUrl={initialArtworkUrl}
               value={artwork}
               onChange={setArtwork}
