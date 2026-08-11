@@ -101,9 +101,9 @@ function PlatformModal({ release, onClose }: PlatformModalProps) {
             <p className="mt-0.5 truncate text-sm text-white/60">
               {release.artist}
             </p>
-            {(release.label || release.catalogNo) && (
+            {release.label && (
               <p className="mt-1.5 truncate font-mono text-[10px] tracking-widest text-white/50 uppercase">
-                {[release.label, release.catalogNo].filter(Boolean).join(" · ")}
+                {release.label}
               </p>
             )}
           </div>

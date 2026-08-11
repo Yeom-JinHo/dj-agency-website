@@ -49,7 +49,7 @@ function Release({ releases }: { releases: ReleaseItem[] }) {
         <div className="mt-12 flex w-full max-w-[1200px] flex-wrap justify-center gap-8 md:gap-14">
           {releases.map((release, index) => (
             <BlurFade
-              key={release.catalogNo ?? release.title}
+              key={release.slug}
               inView
               duration={0.6}
               delay={index * 0.08}
