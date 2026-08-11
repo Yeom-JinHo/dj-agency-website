@@ -69,15 +69,14 @@ const columns: DataTableColumn<TourRow>[] = [
   {
     id: "title",
     header: "제목",
-    // 앵커 컬럼의 바닥 폭. 스페이서 컬럼(data-table.tsx)이 잉여를 전부 가져가면서
-    // 폭을 지정하지 않은 컬럼은 내용 폭까지 좁아지는데, 제목만 그대로 두면
-    // "VENT — TOKYO" 같은 짧은 제목에서 컬럼이 글자에 달라붙어 옆 칸과 16px(셀 패딩)
-    // 간격으로 맞붙고, 릴리즈 쪽에서는 제목이 날짜 컬럼보다 좁아져 "가장 중요한 컬럼이
-    // 가장 넓다"가 다시 깨진다. 세 목록 모두 같은 w-96(384px)을 바닥으로 준다 —
-    // 목록마다 앵커 폭이 다르면 사이트를 옮길 때마다 행의 리듬이 바뀐다.
-    // 상한이 아니라 바닥이라, 더 긴 제목이 오면 nowrap 셀이 컬럼을 그만큼 늘린다.
+    // 앵커 컬럼의 확정 폭(릴리즈·아티스트 목록과 같은 w-96 = 384px). table-fixed라 이 값이
+    // 그대로 서고 잉여는 스페이서가 가져간다(data-table.tsx).
+    // 384px 근거: 실측에서 제목 최장값("WATERGATE — BERLIN")이 146px로 절반 넘게 남는다.
+    // 여유를 이만큼 두는 건 제목이 자유 입력이고 DB에 시드 밖의 행이 있어서다 —
+    // 잘림이 먼저 생기는 컬럼이 하필 행의 앵커면 목록 자체가 못 쓰게 된다.
     headClassName: "w-96",
-    cellClassName: "font-medium",
+    // 넘치면 꼬리를 접는다(사유는 data-table.tsx의 table-fixed 주석).
+    cellClassName: "font-medium overflow-hidden text-ellipsis",
     // 지난 공연은 제목의 '색'만 muted로 내린다(굵기 font-medium은 그대로).
     // 뱃지만으로는 스캔이 안 됐다 — 상태 컬럼은 제목에서 약 986px 떨어져 있어 '지남'과
     // '예정'을 가르려면 우측 끝까지 시선을 옮겨 글자를 읽어야 했다. 판별 신호를 시선이
@@ -114,7 +113,14 @@ const columns: DataTableColumn<TourRow>[] = [
   {
     id: "artist",
     header: "아티스트",
-    cellClassName: "text-muted-foreground",
+    // table-fixed에서는 폭 미지정 컬럼이 스페이서와 잔여를 반씩 나눠 갖는다 — 모든 데이터
+    // 컬럼에 폭을 준다. w-40(160)으로 릴리즈의 같은 컬럼(w-64)보다 좁게 두는 이유는 값의
+    // 성격이 다르기 때문이다: 투어의 아티스트는 로스터 FK 이름 하나(짧다)이고, 릴리즈 쪽은
+    // 자유 입력 크레딧("Take Note, Juntaro & LOOZBONE")이라 길다.
+    // 현재 이 열을 켜는 사이트는 없지만(아래 showArtist), 켜졌을 때 1440에서도 가로 스크롤이
+    // 생기지 않으려면 이 폭이어야 한다 — 나머지 컬럼 합 936 + 160 = 1096 ≤ 1134.
+    headClassName: "w-40",
+    cellClassName: "text-muted-foreground overflow-hidden text-ellipsis",
     cell: (row) => row.artist ?? "—",
     sortValue: (row) => row.artist ?? "",
   },
@@ -135,12 +141,9 @@ const columns: DataTableColumn<TourRow>[] = [
     // 사라지고 이 컬럼만 위치를 말한다. 지금 겹치는 건 제목 작성 관습이지 필드의 결함이
     // 아니라, 릴리즈 발매일이 비어 있는 것과 같은 부류(데이터 문제)로 다룬다.
     //
-    // 그래서 남기되 값이 감당할 수 있는 폭까지만 준다. 표가 table-layout auto라
-    // 폭을 지정하지 않은 컬럼은 남는 공간을 내용 길이 비례로 나눠 갖고, 그 결과 이
-    // 컬럼이 326px(표 폭의 29%)로 제목(359px)과 거의 대등해져 "같은 값이 두 번" 하는
-    // 인상을 폭으로도 키우고 있었다. w-48(192px)은 "WATERGATE, BERLIN"급 실데이터에
-    // 여유가 있고, 더 긴 장소가 오면 셀이 nowrap이라 컬럼이 알아서 그만큼 늘어난다
-    // (상한이지 절단이 아니다).
+    // 그래서 남기되 값이 감당할 수 있는 폭까지만 준다. 예전에는 폭을 지정하지 않아
+    // 남는 공간을 내용 길이 비례로 나눠 갖았고, 그 결과 이 컬럼이 326px(표 폭의 29%)로
+    // 제목(359px)과 거의 대등해져 "같은 값이 두 번" 하는 인상을 폭으로도 키우고 있었다.
     //
     // 기각한 안:
     // - 컬럼 제거: 위와 같이 공개 위치 정보가 목록에서 사라진다.
@@ -148,18 +151,23 @@ const columns: DataTableColumn<TourRow>[] = [
     //   venue+city를 서버에서 이미 합쳐 오고 country는 아예 싣지 않아 서버 페이지까지
     //   함께 바꿔야 한다. 폭 문제와 별개 과제라 여기서는 손대지 않는다.
     // - 제목 아래 보조 줄로 강등: 같은 값이 위아래로 붙어 중복이 더 도드라진다.
+    // w-48(192px)은 실측 최장값 "CLAIRE, AMSTERDAM"(138px)에 여유가 있다. table-fixed로
+    // 바뀌면서 이 값은 상한이 아니라 확정 폭이 됐으므로 넘치면 꼬리를 접는다
+    // (사유는 data-table.tsx의 table-fixed 주석).
     headClassName: "w-48",
-    cellClassName: "text-muted-foreground",
+    cellClassName: "text-muted-foreground overflow-hidden text-ellipsis",
     cell: (row) => row.venueCity || "—",
     sortValue: (row) => row.venueCity,
   },
   {
     id: "eventDate",
     header: "일시",
-    // 값이 `2026-10-03 21:00` 고정 폭(약 141px)인데 286px를 쓰고 있었다. 장소에서
-    // 돌려받은 공간이 다시 여기로 흘러가면 옮겨 담기만 한 셈이라 함께 상한을 준다 —
-    // 남는 공간은 행의 앵커인 제목이 가져가는 게 맞다.
-    headClassName: "w-40",
+    // 값이 `2026-10-03 21:00` 고정 폭(약 150px)인데 286px를 쓰고 있었다.
+    // w-40(160) → w-44(176): table-fixed에서 확정 폭이 되면서 여유가 10px뿐이라
+    // 폰트 폴백(한글 없는 값이지만 Geist 미로드 시)만으로도 넘칠 수 있었다.
+    // 여기에 ellipsis를 걸지 않는 이유는 값이 서버에서 만든 고정 서식이라 길이가
+    // 데이터에 따라 변하지 않기 때문이다 — 잘릴 일이 없는 컬럼에 잘림 처방을 붙이지 않는다.
+    headClassName: "w-44",
     cellClassName: "text-muted-foreground tabular-nums",
     cell: (row) => row.eventDate,
     sortValue: (row) => row.eventDate,
@@ -167,6 +175,10 @@ const columns: DataTableColumn<TourRow>[] = [
   {
     id: "status",
     header: "상태",
+    // table-fixed에서는 폭 미지정 컬럼이 스페이서와 잔여를 반씩 나눠 가므로 여기에도 폭을 준다.
+    // w-32(128): 지난 매진 공연이 '종료'+'매진' 두 뱃지를 나란히 다는 최대 조합이고 실측 108px다.
+    // 뱃지는 자유 입력이 아니라 정해진 라벨 집합이라 ellipsis는 걸지 않는다.
+    headClassName: "w-32",
     cell: (row) => {
       const status = STATUS_BADGE[row.status];
       // 지난 공연에 '예정'은 이미 사실이 아니므로 '종료'가 그 자리를 대신하고,
