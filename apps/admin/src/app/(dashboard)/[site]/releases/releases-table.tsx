@@ -31,11 +31,20 @@ const columns: DataTableColumn<ReleaseRow>[] = [
     cell: (row) => (
       <div className="bg-muted flex size-16 items-center justify-center overflow-hidden rounded-md">
         {row.thumb ? (
+          /* width/height는 렌더 크기(64)가 아니라 그 2배인 128이다. 종전 64는
+             DPR 2 화면에서 실제로 64px 소스가 내려와(실측 naturalWidth 64) 아트워크가
+             1배율로 무르게 떴다 — 아티스트 목록이 80px 박스에 128px 소스를 받아
+             또렷한 것과 나란히 놓이면 릴리즈만 흐린 게 눈에 띈다. 썸네일의 역할이
+             "잘못 올린 이미지가 발행 전에 잡히는 검증 게이트"인데 1배율은 그 목적을
+             깎는다(원본은 1400×1400이라 소스가 모자란 게 아니었다).
+             렌더 크기는 바깥 박스의 size-16이 잡으므로 이 값을 올려도 레이아웃은
+             그대로다. srcset 후보 선택이 관측상 1x로 떨어지는 경우가 있어, 1x
+             후보 자체를 128로 만들어 어느 쪽이 선택되든 2배율이 보장되게 한다. */
           <Image
             src={row.thumb}
             alt=""
-            width={64}
-            height={64}
+            width={128}
+            height={128}
             className="size-full object-cover"
           />
         ) : (
