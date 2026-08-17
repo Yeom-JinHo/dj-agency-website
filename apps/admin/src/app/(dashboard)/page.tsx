@@ -132,7 +132,23 @@ export default async function DashboardPage() {
                 height={32}
                 className="ring-border size-8 shrink-0 rounded-md ring-1"
               />
-              <div className="min-w-0">
+              {/* 텍스트 블록만 세로로 펴서 위·아래 두 끝에 건다(self-stretch + justify-between).
+                  그리드 행 stretch로 한 행의 카드 높이는 이미 가장 긴 카드에 맞춰 균일한데,
+                  이 블록이 items-center로 가운데 정렬돼 있어 짧은 제목의 카드에서는 블록이
+                  통째로 아래로 내려앉았다 — 4열에서 "Vague Frequency Labs"만 2줄로 감기는
+                  탓에 제목 top이 182(VFL) vs 194(나머지 셋), 메타 줄이 232 vs 220으로
+                  갈라졌다. 아이콘은 넷 다 같은 y에 정렬돼 있어 어긋남이 더 도드라졌다.
+                  이제 제목 첫 줄은 콘텐츠 상단, 메타 줄은 콘텐츠 하단에 물려 한 행의 카드가
+                  두 기준선을 공유한다. 남는 높이는 이름과 카운트 사이로 가는데, 그 자리가
+                  같은 카드 안에서 위계가 가장 먼 두 줄 사이라 벌어져도 짝이 깨지지 않는다.
+                  아이콘·chevron은 items-center 그대로 둔다 — 2줄 제목 옆에서 위로 붙으면
+                  32px 마크가 카드 상단에 매달린 것처럼 읽힌다.
+                  기각: (1) truncate/nowrap/글자 축소 — 사이트 이름은 온전히 읽혀야 한다.
+                  (2) 제목에 2줄분 min-h 예약 — 픽셀 결과는 같지만 line-height에 묶인
+                      매직 넘버가 생기고, 아무도 감기지 않는 폭(1열 모바일, 넓은 2열)에서도
+                      빈 줄을 강제한다. justify-between은 남는 높이가 있을 때만 벌어진다.
+                  (3) Link 자체를 items-start로 — 위 아이콘·chevron 이유로 기각. */}
+              <div className="flex min-w-0 flex-col justify-between self-stretch">
                 <h2 className="text-base font-medium">{SITE_LABELS[site]}</h2>
                 {/* 카드 하나가 그 사이트의 카테고리(최대 3개)를 한 줄로 요약하므로 라벨이
                     없으면 "3 · 5 · 2"가 되어 무엇의 수인지 알 수 없다. 사이트 홈은 카드마다
