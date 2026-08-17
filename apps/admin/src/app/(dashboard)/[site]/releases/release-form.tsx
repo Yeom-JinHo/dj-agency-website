@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { PLATFORM_LINK_KEYS, type SiteSlug } from "@repo/content/schema";
 
+import { socialsFormDefaults } from "@/lib/form-normalize";
 import { slugify } from "@/lib/media";
 import { hasSiteCategory } from "@/lib/sites";
 import { useEntityFormSubmit } from "@/lib/use-entity-form-submit";
@@ -98,7 +99,13 @@ export function ReleaseForm({
   const form = useForm<ReleaseFormValues>({
     // login/page.tsx와 동일: zodResolver 대신 standardSchemaResolver(zod v4 브랜드 충돌 회피).
     resolver: standardSchemaResolver(releaseFormSchema),
-    defaultValues,
+    // 선택 키(socials.label)를 ""로 펴서 넘긴다 — 근거는 lib/form-normalize.ts의
+    // socialsFormDefaults 주석(아티스트 폼과 같은 처방). platformLinks는 페이지가
+    // 이미 5개 키를 모두 채워 넘기고 있어 여기서 손댈 게 없다.
+    defaultValues: {
+      ...defaultValues,
+      socials: socialsFormDefaults(defaultValues.socials),
+    },
   });
 
   const titleValue = form.watch("title");
@@ -308,7 +315,19 @@ export function ReleaseForm({
                   <FormItem>
                     <FormLabel>발매일</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} className="w-48" />
+                      {/* 폭 제한 없이 셀을 채운다. w-48(192px)은 299px 셀 안에서
+                          우측에 76px 빈칸을 남겨, 같은 행의 레이블 입력과 우측
+                          기준선이 어긋나고 "필드가 덜 그려졌다"로 읽혔다.
+                          네이티브 달력 아이콘이 셀 우측 끝으로 밀리는 건 어색하지
+                          않다 — 값은 좌측, 조작 어포던스는 우측 끝이라는 문법을 이
+                          폼이 이미 쓰고 있다(주요 아티스트·상태 셀렉트의 w-full
+                          트리거 + 우측 셰브론). 투어 폼의 공연 일시
+                          (datetime-local)도 같은 2열 그리드에서 폭 제한 없이 셀을
+                          채우므로, max-w-*로 어중간하게 묶으면 앱 안의 날짜 입력
+                          두 개가 서로 다른 규칙을 갖게 된다.
+                          sortOrder의 w-32는 그대로 둔다 — 그쪽은 그리드 밖 단독
+                          행이라 좁혀도 빈 셀이 생기지 않는다(아래 주석). */}
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
