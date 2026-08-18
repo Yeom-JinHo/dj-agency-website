@@ -1,6 +1,5 @@
 import { createMetadata } from "@/utils/index";
 import { getWorldMapData } from "@/utils/world-map-data";
-import About from "../sections/about/about";
 import MediaGridWork from "../sections/mediaGrid/MediaGridWork";
 import MusicList from "../sections/musicList/MusicList";
 import Hero from "../sections/hero/hero";
@@ -42,8 +41,9 @@ export default function Home() {
         }}
       />
       <main className="flex-1">
+        {/* Home About is absorbed into the hero's second-screen zoom stage —
+            no standalone section here; the hero is followed straight by Media. */}
         <Hero mapData={mapData} />
-        <About />
         <MediaGridWork />
         <MusicList />
       </main>
