@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Anton, IBM_Plex_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import { JsonLd } from "@repo/ui/common/JsonLd";
 
 import { Header } from "@/components/header";
@@ -51,7 +50,6 @@ export default function RootLayout({
         <Header />
         {children}
         <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

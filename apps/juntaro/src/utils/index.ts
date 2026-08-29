@@ -4,9 +4,9 @@ import type { AppMetaConfig } from "@repo/utils/metadata";
 import { createMetadataFactory } from "@repo/utils/metadata";
 import { getAppUrls } from "@repo/utils/app-urls";
 
-// 실도메인 미확정(2026-08-29 결정). env가 비어 있으면 localhost 폴백으로 빌드는 되지만
-// 검색 노출은 막아야 하므로 아래 `indexable`이 layout의 robots를 noindex로 잠근다.
-export const indexable = Boolean(process.env.NEXT_PUBLIC_JUNTARO_URL);
+// 실도메인 미확정(2026-08-29 결정). 검색 노출 스위치 — true로 바꾸면 robots·sitemap·
+// 페이지 robots 메타가 한꺼번에 열린다. NEXT_PUBLIC_JUNTARO_URL도 함께 설정할 것.
+export const indexable: boolean = false;
 
 export const meta: AppMetaConfig = {
   author: {
