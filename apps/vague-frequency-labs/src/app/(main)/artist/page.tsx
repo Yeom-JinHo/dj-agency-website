@@ -39,11 +39,7 @@ const jsonLd: WithContext<CollectionPage> = {
   name: title,
   description,
   url: `${meta.site.url}/artist`,
-  isPartOf: {
-    "@type": "WebSite",
-    name: meta.site.title,
-    url: meta.site.url,
-  },
+  isPartOf: { "@id": `${meta.site.url}/#website` },
   // TODO:
   // hasPart: [...project.getPages()].map((project) => ({
   //   "@type": "SoftwareApplication",

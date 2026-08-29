@@ -10,6 +10,7 @@ const sameAs = contact.socials
 export const organization: WithContext<Organization> = {
   "@context": "https://schema.org",
   "@type": "Organization",
+  "@id": `${meta.site.url}/#organization`,
   name: meta.site.title,
   description: meta.site.description,
   url: meta.site.url,
@@ -17,24 +18,24 @@ export const organization: WithContext<Organization> = {
   sameAs,
   founder: {
     "@type": "Person",
-    name: "Vague Frequency Laboratory Team",
+    name: "Sam Hong",
   },
   foundingDate: "2025",
   knowsAbout: [
     "Electronic Music",
-    "Experimental Music",
+    "Tech House",
+    "Bass House",
     "Music Production",
     "Sound Design",
-    "Audio Engineering",
-    "Ambient Music",
-    "IDM",
   ],
 };
 
 export const website: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${meta.site.url}/#website`,
   name: meta.site.title,
   description: meta.site.description,
   url: meta.site.url,
+  publisher: { "@id": `${meta.site.url}/#organization` },
 };

@@ -1,3 +1,4 @@
+import type { MusicGroup, WithContext } from "schema-dts";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,6 +8,7 @@ import { toArtistProfile, VFL_SITE } from "@/utils/content-adapters";
 import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import { Icon } from "@repo/ui/common/Icon";
+import { JsonLd } from "@repo/ui/common/JsonLd";
 import { createMetadata } from "@/utils/index";
 
 import { cn } from "@repo/ui";
@@ -67,9 +69,31 @@ export default async function ProjectPage(props0: {
   );
   if (!domainArtist) notFound();
   const artist = toArtistProfile(domainArtist);
+  const artistUrl = `${meta.site.url}/artist/${encodeURIComponent(artist.slug)}`;
+
+  // 루트 Organization(@id)에 memberOf로 연결. sameAs는 CMS socials 그대로 —
+  // 스트리밍/소셜 프로필 URL이 엔티티 disambiguation의 핵심 신호.
+  // 빈 값은 undefined로 두면 JSON.stringify가 키를 생략한다.
+  const jsonLd: WithContext<MusicGroup> = {
+    "@context": "https://schema.org",
+    "@type": "MusicGroup",
+    "@id": `${artistUrl}#artist`,
+    name: artist.name,
+    alternateName:
+      artist.nickname !== artist.name ? artist.nickname : undefined,
+    description: artist.shortDescription || undefined,
+    image: artist.image || undefined,
+    url: artistUrl,
+    genre: ["Tech House", "Bass House"],
+    sameAs: artist.socials?.length
+      ? artist.socials.map((s) => s.href)
+      : undefined,
+    memberOf: { "@id": `${meta.site.url}/#organization` },
+  };
 
   return (
     <main className="my-16 flex-1">
+      <JsonLd items={jsonLd} />
       <section
         className="relative flex min-h-[calc(50dvh)] items-center justify-center"
         id="hero"
