@@ -21,7 +21,7 @@ function About() {
           Payday Records is an independent music label crafting a sound that
           moves between deep house, melodic techno, and the textures in
           between. We release records, curate playlists, and bring artists
-          to the floor.
+          to the floor. Founded in Seoul in 2025.
         </TextReveal>
       </div>
     </section>

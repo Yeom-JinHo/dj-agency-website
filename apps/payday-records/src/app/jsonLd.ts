@@ -1,14 +1,10 @@
 import type { Organization, WebSite, WithContext } from "schema-dts";
 
 import { metadata as meta } from "@/app/config";
-import { contact } from "@/app/sections/contact/config";
 
-// sameAs should list the entity's own profile pages, so content URLs such as
-// a YouTube video are excluded. Confirming the official Payday Records brand
-// accounts (vs. the associated v.f.labs / artist pages) remains a follow-up.
-const sameAs = contact.socials
-  .map((social) => social.href)
-  .filter((href) => !/youtube\.com\/watch/.test(href));
+// sameAs는 이 엔티티(Payday Records) 자신의 프로필만 나열한다. 푸터의
+// contact.socials는 v.f.labs·아티스트 계정을 섞어 쓰므로 여기서 파생하지 않는다.
+const sameAs = ["https://www.instagram.com/paydayrecordsofc/"];
 
 export const organization: WithContext<Organization> = {
   "@context": "https://schema.org",
