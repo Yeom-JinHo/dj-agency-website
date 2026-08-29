@@ -18,14 +18,14 @@ function WorkCard({
 }>) {
   // 카드가 각자 자기 진입을 감지 — 컨테이너 공유 관찰자는 모바일 1열
   // 스택(컨테이너 높이 ≫ 뷰포트)에서 리빌이 화면 밖에서 끝나버린다.
-  const ref = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
   return (
-    <a
+    // 케이스 스터디 페이지 발행 전까지 비링크(href="#" 가짜 링크 제거 — 로드맵 1.7).
+    <article
       ref={ref}
-      href="#"
-      className={`group relative cursor-pointer ${
+      className={`group relative ${
         reveal
           ? inView
             ? "animate-hero-fade-in [animation-duration:500ms]"
@@ -55,7 +55,7 @@ function WorkCard({
           {work.date}
         </div>
       </div>
-    </a>
+    </article>
   );
 }
 
