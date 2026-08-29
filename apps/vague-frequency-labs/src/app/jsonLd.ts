@@ -33,6 +33,7 @@ export const organization: WithContext<Organization> = {
 export const website: WithContext<WebSite> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
+  "@id": `${meta.site.url}/#website`,
   name: meta.site.title,
   description: meta.site.description,
   url: meta.site.url,

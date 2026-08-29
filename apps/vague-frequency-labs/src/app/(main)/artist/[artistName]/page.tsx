@@ -78,12 +78,15 @@ export default async function ProjectPage(props0: {
     "@type": "MusicGroup",
     "@id": `${artistUrl}#artist`,
     name: artist.name,
-    ...(artist.nickname !== artist.name && { alternateName: artist.nickname }),
+    ...(artist.nickname &&
+      artist.nickname !== artist.name && { alternateName: artist.nickname }),
     ...(artist.shortDescription && { description: artist.shortDescription }),
     ...(artist.image && { image: artist.image }),
     url: artistUrl,
     genre: ["Tech House", "Bass House"],
-    sameAs: artist.socials?.map((s) => s.href) ?? [],
+    ...(artist.socials?.length && {
+      sameAs: artist.socials.map((s) => s.href),
+    }),
     memberOf: { "@id": `${meta.site.url}/#organization` },
   };
 
