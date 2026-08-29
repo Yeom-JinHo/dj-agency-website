@@ -24,7 +24,7 @@ export function Footer({ className }: FooterProps) {
             <a
               href={href}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="me noopener noreferrer"
               aria-label={`Juntaro on ${name}`}
               style={{ "--jt-social-hover": brandColor } as CSSProperties}
               // p-1로 히트 영역을 16→24px(WCAG 2.5.8)로 키우고, -m-1로 상쇄해 시각 위치·간격은 불변.

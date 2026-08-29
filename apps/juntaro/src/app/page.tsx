@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
+
 import { Footer } from "@/components/footer";
 import { Hero } from "@/components/hero";
+import { createMetadata } from "@/utils";
+
+export const metadata: Metadata = createMetadata({
+  alternates: { canonical: "/" },
+  openGraph: { url: "/" },
+});
 
 export default function Home() {
   return (
