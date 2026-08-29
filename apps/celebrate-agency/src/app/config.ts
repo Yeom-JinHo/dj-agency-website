@@ -8,10 +8,13 @@ const metadata: Metadata = {
   },
   site: {
     title: "Celebrate Agency",
-    description: "Talent · Production · Direction. Seoul, Korea.",
+    description:
+      "Celebrate Agency is a Seoul-based DJ booking and talent agency — roster, production and creative direction for clubs, festivals and brands.",
     url: "https://celebrate-agency.com",
     keywords: [
       "Celebrate Agency",
+      "DJ booking agency",
+      "DJ agency Seoul",
       "Talent",
       "Production",
       "Direction",
