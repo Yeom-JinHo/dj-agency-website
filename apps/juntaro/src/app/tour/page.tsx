@@ -6,10 +6,19 @@ import type { Tour } from "@repo/content/schema";
 import { Footer } from "@/components/footer";
 import { TourList } from "@/components/tour-list";
 import type { TourRow } from "@/components/tour-list";
+import { createMetadata } from "@/utils";
 
-export const metadata: Metadata = {
-  title: "Tour — Juntaro",
-};
+const title = "Tour";
+const description = "Upcoming and past Juntaro DJ dates, venues and cities.";
+
+// openGraph를 페이지에서 선언하지 않으면 레이아웃의 og:title/og:url을 그대로 상속한다.
+export const metadata: Metadata = createMetadata({
+  title,
+  description,
+  alternates: { canonical: "/tour" },
+  openGraph: { url: "/tour", title, description },
+  twitter: { title, description },
+});
 
 /**
  * event_date(timestamptz)를 KST 고정으로 표시 문자열로 파생한다. 시드가 넣은 임의

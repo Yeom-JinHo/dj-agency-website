@@ -47,7 +47,7 @@ Each app consumes `@repo/ui` via `workspace:*`. App `src/` typically contains `a
 
 See `.env.example`. All `.env*` files are gitignored.
 
-- **Cross-site URLs** (root `.env`): `NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL`, `NEXT_PUBLIC_PAYDAY_RECORDS_URL`, `NEXT_PUBLIC_CELEBRATE_AGENCY_URL` — used for inter-app links. Consumed by `packages/utils/src/app-urls.ts`; falls back to `http://localhost:{port}` when unset. `juntaro` is not a cross-site link target and is intentionally excluded from `app-urls.ts`.
+- **Cross-site URLs** (root `.env`): `NEXT_PUBLIC_VAGUE_FREQUENCY_LABS_URL`, `NEXT_PUBLIC_PAYDAY_RECORDS_URL`, `NEXT_PUBLIC_CELEBRATE_AGENCY_URL` — used for inter-app links. Consumed by `packages/utils/src/app-urls.ts`; falls back to `http://localhost:{port}` when unset. `NEXT_PUBLIC_JUNTARO_URL` is also read there (`getAppUrls().juntaro`) — juntaro uses it for its own `metadataBase`, not as a cross-site link target.
 - **VFL Maps** (`apps/vague-frequency-labs/.env.example`): `NEXT_PUBLIC_NAVER_CLIENT_ID` (NCP Maps, used by the contact page `KoreaCinematic`). Falls back to a Naver Map search link when the key is unset, the script fails to load, or it times out after 5s. Register deploy domains in the NCP console's domain allowlist.
 
 ## Assets

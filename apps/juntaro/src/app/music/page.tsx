@@ -10,10 +10,20 @@ import type { IconName } from "@repo/ui/common/Icon";
 import { Footer } from "@/components/footer";
 import { DeviceTiltScope } from "@/components/music/DeviceTiltScope";
 import { MusicCard } from "@/components/music/MusicCard";
+import { createMetadata } from "@/utils";
 
-export const metadata: Metadata = {
-  title: "Music — Juntaro",
-};
+const title = "Music";
+const description =
+  "Releases by Juntaro — tech house tracks on Spotify, Apple Music and Beatport.";
+
+// openGraph를 페이지에서 선언하지 않으면 레이아웃의 og:title/og:url을 그대로 상속한다.
+export const metadata: Metadata = createMetadata({
+  title,
+  description,
+  alternates: { canonical: "/music" },
+  openGraph: { url: "/music", title, description },
+  twitter: { title, description },
+});
 
 /**
  * platform_links(5키) → 트랙 모달 링크 행. 기존 consts/tracks.ts의 trackLinks()가
