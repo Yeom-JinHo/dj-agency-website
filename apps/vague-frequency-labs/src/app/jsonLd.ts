@@ -18,7 +18,7 @@ export const organization: WithContext<Organization> = {
   sameAs,
   founder: {
     "@type": "Person",
-    name: "Sam",
+    name: "Sam Hong",
   },
   foundingDate: "2025",
   knowsAbout: [

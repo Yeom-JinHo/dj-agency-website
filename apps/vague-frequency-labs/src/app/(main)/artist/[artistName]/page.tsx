@@ -73,20 +73,21 @@ export default async function ProjectPage(props0: {
 
   // 루트 Organization(@id)에 memberOf로 연결. sameAs는 CMS socials 그대로 —
   // 스트리밍/소셜 프로필 URL이 엔티티 disambiguation의 핵심 신호.
+  // 빈 값은 undefined로 두면 JSON.stringify가 키를 생략한다.
   const jsonLd: WithContext<MusicGroup> = {
     "@context": "https://schema.org",
     "@type": "MusicGroup",
     "@id": `${artistUrl}#artist`,
     name: artist.name,
-    ...(artist.nickname &&
-      artist.nickname !== artist.name && { alternateName: artist.nickname }),
-    ...(artist.shortDescription && { description: artist.shortDescription }),
-    ...(artist.image && { image: artist.image }),
+    alternateName:
+      artist.nickname !== artist.name ? artist.nickname : undefined,
+    description: artist.shortDescription || undefined,
+    image: artist.image || undefined,
     url: artistUrl,
     genre: ["Tech House", "Bass House"],
-    ...(artist.socials?.length && {
-      sameAs: artist.socials.map((s) => s.href),
-    }),
+    sameAs: artist.socials?.length
+      ? artist.socials.map((s) => s.href)
+      : undefined,
     memberOf: { "@id": `${meta.site.url}/#organization` },
   };
 
