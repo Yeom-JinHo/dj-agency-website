@@ -1,29 +1,28 @@
-import type { ReactElement } from "react";
-import { createMetadata } from "@/utils/index";
+import { setRequestLocale } from "next-intl/server";
+import { localizedMetadata } from "@/utils/index";
 import ContactContent from "./ContactContent";
 
-const title = "Contact & Booking";
-const description =
-  "Contact Vague Frequency Laboratory for bookings, releases, and collaborations with our Seoul-based independent electronic music label and its artists.";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return localizedMetadata({
+    locale,
+    path: "/contact",
+    namespace: "contact",
+    keywords: ["Booking", "Contact", "Collaboration", "Music Label", "Seoul"],
+  });
+}
 
-export const metadata = createMetadata({
-  title,
-  description,
-  keywords: ["Booking", "Contact", "Collaboration", "Music Label", "Seoul"],
-  openGraph: {
-    url: "/contact",
-    title,
-    description,
-  },
-  twitter: {
-    title,
-    description,
-  },
-  alternates: {
-    canonical: "/contact",
-  },
-});
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
 
-export default function ContactPage(): ReactElement {
   return <ContactContent />;
 }

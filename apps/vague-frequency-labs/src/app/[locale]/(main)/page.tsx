@@ -1,4 +1,5 @@
-import { createMetadata } from "@/utils/index";
+import { setRequestLocale } from "next-intl/server";
+import { localizedMetadata } from "@/utils/index";
 import { getWorldMapData } from "@/utils/world-map-data";
 import About from "@/app/sections/about/about";
 import MediaGridWork from "@/app/sections/mediaGrid/MediaGridWork";
@@ -7,25 +8,35 @@ import Hero from "@/app/sections/hero/hero";
 import Loader from "./loader";
 import { LoaderProvider } from "./loader-context";
 
-const description =
-  "Vague Frequency Laboratory is an independent Seoul electronic music label spotlighting experimental tech house and bass house artists, releases, and live sets.";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  return localizedMetadata({
+    locale,
+    path: "/",
+    namespace: "home",
+    keywords: [
+      "Tech House",
+      "Bass House",
+      "Electronic Music",
+      "Music Label",
+      "Seoul",
+      "DJ",
+    ],
+  });
+}
 
-export const metadata = createMetadata({
-  description,
-  keywords: ["Tech House", "Bass House", "Electronic Music", "Music Label", "Seoul", "DJ"],
-  openGraph: {
-    url: "/",
-    description,
-  },
-  twitter: {
-    description,
-  },
-  alternates: {
-    canonical: "/",
-  },
-});
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
 
-export default function Home() {
   // Shared with the loader via React cache(); the dotted-map build runs once.
   // Loader가 같은 pointsFlat 배열 참조를 넘기므로 Flight가 참조 dedupe —
   // 홈 payload에 좌표는 1회만 직렬화된다 (복사본을 만들면 배가되니 주의).

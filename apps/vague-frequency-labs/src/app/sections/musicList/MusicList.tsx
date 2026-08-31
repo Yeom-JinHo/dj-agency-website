@@ -1,5 +1,5 @@
 import type { MusicInfo } from "@/types/music";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { getReleases } from "@repo/content/queries";
 import { toMusicInfos, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";

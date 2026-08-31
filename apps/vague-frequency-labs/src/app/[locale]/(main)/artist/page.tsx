@@ -1,6 +1,7 @@
 import type { CollectionPage, WithContext } from "schema-dts";
 import React, { ReactElement } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { metadata as meta } from "@/app/config";
 import { getArtists } from "@repo/content/queries";
 import { toArtistProfile, VFL_SITE } from "@/utils/content-adapters";
@@ -8,50 +9,47 @@ import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
 import { JsonLd } from "@repo/ui/common/JsonLd";
-import { createMetadata } from "@/utils/index";
+import { canonicalPath, localizedMetadata } from "@/utils/index";
 
 import ArtistSimpleCard from "@/app/sections/artistProfiles/ArtistSimpleCard";
 
-const title = "Artists";
-const description =
-  "Meet the Vague Frequency Laboratory roster — tech house and bass house artists and DJs shaping experimental electronic music from Seoul.";
+type Props = { params: Promise<{ locale: string }> };
 
-export const metadata = createMetadata({
-  title,
-  description,
-  openGraph: {
-    url: "/artist",
-    title,
-    description,
-  },
-  twitter: {
-    title,
-    description,
-  },
-  alternates: {
-    canonical: "/artist",
-  },
-});
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  return localizedMetadata({
+    locale,
+    path: "/artist",
+    namespace: "artist",
+  });
+}
 
-const jsonLd: WithContext<CollectionPage> = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
-  name: title,
-  description,
-  url: `${meta.site.url}/artist`,
-  isPartOf: { "@id": `${meta.site.url}/#website` },
-  // TODO:
-  // hasPart: [...project.getPages()].map((project) => ({
-  //   "@type": "SoftwareApplication",
-  //   name: project.data.title,
-  //   description: project.data.description,
-  //   url: project.url,
-  //   applicationCategory: "WebApplication",
-  // })),
-};
-
-export default async function ArtistPage(): Promise<ReactElement> {
+export default async function ArtistPage({
+  params,
+}: Props): Promise<ReactElement> {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: "Metadata.artist" });
   const artists = (await getArtists(VFL_SITE)).map(toArtistProfile);
+
+  const jsonLd: WithContext<CollectionPage> = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${meta.site.url}/artist#collection`,
+    name: t("title"),
+    description: t("description"),
+    url: `${meta.site.url}${canonicalPath("/artist", locale)}`,
+    inLanguage: locale,
+    isPartOf: { "@id": `${meta.site.url}/#website` },
+    // TODO:
+    // hasPart: [...project.getPages()].map((project) => ({
+    //   "@type": "SoftwareApplication",
+    //   name: project.data.title,
+    //   description: project.data.description,
+    //   url: project.url,
+    //   applicationCategory: "WebApplication",
+    // })),
+  };
 
   return (
     <main className="my-16 flex-1">

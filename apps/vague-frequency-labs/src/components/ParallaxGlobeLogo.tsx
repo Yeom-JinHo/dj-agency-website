@@ -2,6 +2,7 @@
 
 import type { ReactElement } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import Globe from "./Globe";
 import { COMPANY_SHORT_NAME } from "@/consts/company";
 
@@ -9,6 +10,8 @@ import TextReveal from "@repo/ui/common/TextReveal";
 import SectionHeading from "@/components/SectionHeading";
 
 export default function ParallaxGlobeLogo(): ReactElement {
+  // Story 본문은 홈 About 섹션과 같은 About.body(en/ko), Partner는 About.partner.
+  const t = useTranslations("About");
   return (
     <div className="relative w-full">
       <div className="flex flex-col items-center pt-4">
@@ -27,9 +30,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
               as="p"
               className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
             >
-              Vague Frequency Laboratory의 소개 Vague Frequency Laboratory Vague
-              Frequency Laboratory Vague Frequency LaboratoryVague Frequency
-              Laboratory Vague Frequency LaboratoryVague Frequency Laboratory
+              {t("body")}
             </TextReveal>
           </div>
         </div>
@@ -40,9 +41,7 @@ export default function ParallaxGlobeLogo(): ReactElement {
               as="p"
               className="max-w-[700px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed [overflow-wrap:anywhere]"
             >
-              Vague Frequency Laboratory의 소개 Vague Frequency Laboratory Vague
-              Frequency Laboratory Vague Frequency LaboratoryVague Frequency
-              Laboratory Vague Frequency LaboratoryVague Frequency Laboratory
+              {t("partner")}
             </TextReveal>
           </div>
         </div>
