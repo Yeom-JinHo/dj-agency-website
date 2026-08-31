@@ -15,7 +15,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ReactScan } from "@repo/ui/common/ReactScan";
 
 const pretendard = localFont({
-  src: "../../public/fonts/PretendardStdVariable.woff2",
+  src: "../../../public/fonts/PretendardStdVariable.woff2",
   display: "swap",
   variable: "--font-pretendard",
   weight: "45 920",

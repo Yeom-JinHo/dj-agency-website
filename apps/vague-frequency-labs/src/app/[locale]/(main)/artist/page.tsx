@@ -10,7 +10,7 @@ import SectionHeading from "@/components/SectionHeading";
 import { JsonLd } from "@repo/ui/common/JsonLd";
 import { createMetadata } from "@/utils/index";
 
-import ArtistSimpleCard from "../../sections/artistProfiles/ArtistSimpleCard";
+import ArtistSimpleCard from "@/app/sections/artistProfiles/ArtistSimpleCard";
 
 const title = "Artists";
 const description =

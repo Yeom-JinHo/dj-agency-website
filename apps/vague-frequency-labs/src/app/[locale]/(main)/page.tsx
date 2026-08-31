@@ -1,9 +1,9 @@
 import { createMetadata } from "@/utils/index";
 import { getWorldMapData } from "@/utils/world-map-data";
-import About from "../sections/about/about";
-import MediaGridWork from "../sections/mediaGrid/MediaGridWork";
-import MusicList from "../sections/musicList/MusicList";
-import Hero from "../sections/hero/hero";
+import About from "@/app/sections/about/about";
+import MediaGridWork from "@/app/sections/mediaGrid/MediaGridWork";
+import MusicList from "@/app/sections/musicList/MusicList";
+import Hero from "@/app/sections/hero/hero";
 import Loader from "./loader";
 import { LoaderProvider } from "./loader-context";
 

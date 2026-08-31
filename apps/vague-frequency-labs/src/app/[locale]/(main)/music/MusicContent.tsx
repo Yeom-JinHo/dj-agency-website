@@ -5,7 +5,7 @@ import { toMusicInfos, VFL_SITE } from "@/utils/content-adapters";
 import { BlurFade } from "@repo/ui/common/BlurFade";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
-import MusicInfoCard from "../../sections/musicList/MusicInfoCard";
+import MusicInfoCard from "@/app/sections/musicList/MusicInfoCard";
 
 export default async function MusicContent(): Promise<ReactElement> {
   const releases = toMusicInfos(await getReleases(VFL_SITE));
