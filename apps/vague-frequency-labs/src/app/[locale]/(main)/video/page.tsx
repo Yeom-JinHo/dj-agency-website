@@ -1,36 +1,37 @@
 import type { ReactElement } from "react";
 import React from "react";
+import { setRequestLocale } from "next-intl/server";
 import { getReleases } from "@repo/content/queries";
 import { toMusicInfos, VFL_SITE } from "@/utils/content-adapters";
 import FancyLine from "@repo/ui/common/FancyLine";
 import SectionHeading from "@/components/SectionHeading";
-import { createMetadata } from "@/utils/index";
+import { localizedMetadata } from "@/utils/index";
 
 import YoutubeCard from "./components/YoutubeCard";
 
-const title = "Videos & Live Sets";
-const description =
-  "Watch live sets, DJ mixes, and performances from Vague Frequency Laboratory artists — experimental tech house and electronic music from Seoul.";
+type Props = { params: Promise<{ locale: string }> };
 
-export const metadata = createMetadata({
-  title,
-  description,
-  keywords: ["Live Sets", "DJ Mix", "Performance", "Electronic Music", "Seoul"],
-  openGraph: {
-    url: "/video",
-    title,
-    description,
-  },
-  twitter: {
-    title,
-    description,
-  },
-  alternates: {
-    canonical: "/video",
-  },
-});
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  return localizedMetadata({
+    locale,
+    path: "/video",
+    namespace: "video",
+    keywords: [
+      "Live Sets",
+      "DJ Mix",
+      "Performance",
+      "Electronic Music",
+      "Seoul",
+    ],
+  });
+}
 
-export default async function VideoPage(): Promise<ReactElement> {
+export default async function VideoPage({
+  params,
+}: Props): Promise<ReactElement> {
+  const { locale } = await params;
+  setRequestLocale(locale);
   const releases = toMusicInfos(await getReleases(VFL_SITE));
   // 카드 수만 결정(내용은 인덱스 기반 하드코딩). 라이브 파리티로 5회 반복.
   const musicInfos = Array.from({ length: 5 }, () => releases).flat();

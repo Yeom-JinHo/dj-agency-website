@@ -2,6 +2,7 @@ import type { MusicGroup, WithContext } from "schema-dts";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { setRequestLocale } from "next-intl/server";
 import { metadata as meta } from "@/app/config";
 import { getArtistBySlug } from "@repo/content/queries";
 import { toArtistProfile, VFL_SITE } from "@/utils/content-adapters";
@@ -9,7 +10,13 @@ import FancyLine from "@repo/ui/common/FancyLine";
 import TextReveal from "@repo/ui/common/TextReveal";
 import { Icon } from "@repo/ui/common/Icon";
 import { JsonLd } from "@repo/ui/common/JsonLd";
-import { createMetadata } from "@/utils/index";
+import {
+  createMetadata,
+  localeAlternates,
+  localeUrl,
+  ogLocales,
+} from "@/utils/index";
+import { isProfileUrl } from "@/app/jsonLd";
 
 import { cn } from "@repo/ui";
 import { buttonVariants } from "@repo/ui/common/Button";
@@ -21,16 +28,16 @@ import SectionHeading from "@/components/SectionHeading";
 export const dynamicParams = true;
 
 export async function generateMetadata(props: {
-  params: Promise<{ artistName: string }>;
+  params: Promise<{ locale: string; artistName: string }>;
 }) {
   const params = await props.params;
-  const { artistName } = params;
+  const { locale, artistName } = params;
   const domainArtist = await getArtistBySlug(
     VFL_SITE,
-    decodeURIComponent(artistName),
+    decodeURIComponent(artistName)
   );
   if (!domainArtist) notFound();
-  const artist = toArtistProfile(domainArtist);
+  const artist = toArtistProfile(domainArtist, locale);
 
   // 1200×630 고정 선언은 세로 원본과 안 맞는 거짓 치수였다(PR #244에서 제거).
   // CMS 전환 후 치수 메타데이터가 없으므로 선언 자체를 생략한다 — 거짓 치수보다
@@ -46,30 +53,39 @@ export async function generateMetadata(props: {
     description: artist.shortDescription,
     openGraph: {
       type: "article",
+      url: localeUrl(`/artist/${encodeURIComponent(artist.slug)}`, locale),
       images: [cardImage],
       authors: meta.author.name,
+      ...ogLocales(locale),
     },
     twitter: {
       images: [cardImage],
     },
-    alternates: {
-      canonical: `/artist/${encodeURIComponent(artist.slug)}`,
-    },
+    alternates: localeAlternates(
+      `/artist/${encodeURIComponent(artist.slug)}`,
+      locale
+    ),
   }) satisfies Metadata;
 }
 
 export default async function ProjectPage(props0: {
-  params: Promise<{ artistName: string }>;
+  params: Promise<{ locale: string; artistName: string }>;
 }) {
   const params = await props0.params;
-  const { artistName } = params;
+  const { locale, artistName } = params;
+  setRequestLocale(locale);
   const domainArtist = await getArtistBySlug(
     VFL_SITE,
-    decodeURIComponent(artistName),
+    decodeURIComponent(artistName)
   );
   if (!domainArtist) notFound();
-  const artist = toArtistProfile(domainArtist);
-  const artistUrl = `${meta.site.url}/artist/${encodeURIComponent(artist.slug)}`;
+  const artist = toArtistProfile(domainArtist, locale);
+  const artistPath = `/artist/${encodeURIComponent(artist.slug)}`;
+  const artistUrl = `${meta.site.url}${localeUrl(artistPath, locale)}`;
+  // @id는 locale 불변(영어 canonical) — Organization/WebSite와 같은 원칙. en/ko가
+  // 같은 아티스트를 서로 다른 엔티티로 선언하지 않게 한다. url만 locale별.
+  const artistId = `${meta.site.url}${artistPath}#artist`;
+  const sameAs = artist.socials?.map((s) => s.href).filter(isProfileUrl);
 
   // 루트 Organization(@id)에 memberOf로 연결. sameAs는 CMS socials 그대로 —
   // 스트리밍/소셜 프로필 URL이 엔티티 disambiguation의 핵심 신호.
@@ -77,7 +93,7 @@ export default async function ProjectPage(props0: {
   const jsonLd: WithContext<MusicGroup> = {
     "@context": "https://schema.org",
     "@type": "MusicGroup",
-    "@id": `${artistUrl}#artist`,
+    "@id": artistId,
     name: artist.name,
     alternateName:
       artist.nickname !== artist.name ? artist.nickname : undefined,
@@ -85,9 +101,7 @@ export default async function ProjectPage(props0: {
     image: artist.image || undefined,
     url: artistUrl,
     genre: ["Tech House", "Bass House"],
-    sameAs: artist.socials?.length
-      ? artist.socials.map((s) => s.href)
-      : undefined,
+    sameAs: sameAs?.length ? sameAs : undefined,
     memberOf: { "@id": `${meta.site.url}/#organization` },
   };
 

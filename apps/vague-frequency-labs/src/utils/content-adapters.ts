@@ -56,19 +56,19 @@ function toSocial(platform: SocialPlatform, href: string): Socials {
 }
 
 /**
- * en/ko 설명을 라이브 파리티로 결합한다: 둘 다 있으면 빈 줄로 이어붙이고(en + "\n\n" + ko),
- * 하나만 있으면 그것만. 원본은 EN·KO 혼합 단일 문자열이었고 시드가 en/ko로 분리했다.
+ * locale에 맞는 설명을 고른다 — 요청 locale이 비어 있으면 반대 언어로 폴백.
+ * (i18n 이전엔 en + "\n\n" + ko를 한 문자열로 이어붙였다.)
  */
-function combineDescription(
+function pickDescription(
   en: string | null,
   ko: string | null,
+  locale: string,
 ): string {
-  if (en && ko) return `${en}\n\n${ko}`;
-  return en ?? ko ?? "";
+  return (locale === "ko" ? (ko ?? en) : (en ?? ko)) ?? "";
 }
 
 /** 도메인 Artist → 기존 ArtistProfile props. 이미지는 mediaUrl로 Storage 공개 URL 조립. */
-export function toArtistProfile(artist: Artist): ArtistProfile {
+export function toArtistProfile(artist: Artist, locale: string): ArtistProfile {
   return {
     slug: artist.slug,
     name: artist.name as ArtistName,
@@ -76,11 +76,15 @@ export function toArtistProfile(artist: Artist): ArtistProfile {
     imagePlaceholder: artist.imagePlaceholder ?? "",
     logoImage: mediaUrl(artist.logoImagePath) ?? "",
     nickname: (artist.nickname ?? artist.name) as ArtistName,
-    shortDescription:
-      artist.shortDescriptionEn ?? artist.shortDescriptionKo ?? "",
-    fullDescription: combineDescription(
+    shortDescription: pickDescription(
+      artist.shortDescriptionEn,
+      artist.shortDescriptionKo,
+      locale,
+    ),
+    fullDescription: pickDescription(
       artist.fullDescriptionEn,
       artist.fullDescriptionKo,
+      locale,
     ),
     socials: artist.socials.map((s) => toSocial(s.platform, s.url)),
   };
@@ -114,12 +118,11 @@ export function toMusicInfo(release: Release): MusicInfo {
     label: release.label ?? undefined,
     image: mediaUrl(release.artworkPath) ?? "",
     imagePlaceholder: release.artworkPlaceholder ?? "",
+    // 릴리즈 설명은 locale과 무관하게 영어 고정(결정) — ko는 en 부재 시 폴백.
     shortDescription:
       release.shortDescriptionEn ?? release.shortDescriptionKo ?? "",
-    fullDescription: combineDescription(
-      release.fullDescriptionEn,
-      release.fullDescriptionKo,
-    ),
+    fullDescription:
+      release.fullDescriptionEn ?? release.fullDescriptionKo ?? "",
     socials,
   };
 }
