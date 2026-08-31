@@ -37,7 +37,7 @@ export async function generateMetadata(props: {
     decodeURIComponent(artistName)
   );
   if (!domainArtist) notFound();
-  const artist = toArtistProfile(domainArtist);
+  const artist = toArtistProfile(domainArtist, locale);
 
   // 1200×630 고정 선언은 세로 원본과 안 맞는 거짓 치수였다(PR #244에서 제거).
   // CMS 전환 후 치수 메타데이터가 없으므로 선언 자체를 생략한다 — 거짓 치수보다
@@ -79,7 +79,7 @@ export default async function ProjectPage(props0: {
     decodeURIComponent(artistName)
   );
   if (!domainArtist) notFound();
-  const artist = toArtistProfile(domainArtist);
+  const artist = toArtistProfile(domainArtist, locale);
   const artistPath = `/artist/${encodeURIComponent(artist.slug)}`;
   const artistUrl = `${meta.site.url}${localeUrl(artistPath, locale)}`;
   // @id는 locale 불변(영어 canonical) — Organization/WebSite와 같은 원칙. en/ko가

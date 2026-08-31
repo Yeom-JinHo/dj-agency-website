@@ -30,7 +30,9 @@ export default async function ArtistPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "Metadata.artist" });
-  const artists = (await getArtists(VFL_SITE)).map(toArtistProfile);
+  const artists = (await getArtists(VFL_SITE)).map((artist) =>
+    toArtistProfile(artist, locale)
+  );
 
   const jsonLd: WithContext<CollectionPage> = {
     "@context": "https://schema.org",
