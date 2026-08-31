@@ -14,6 +14,8 @@ interface HighlightTextProps {
   imageSrc: StaticImageData;
   isMobile: boolean;
   onHover: (text: string) => void;
+  /** 자기 앱 클릭 시 이동할 홈 경로 (locale prefix 앱용). */
+  homeHref: string;
 }
 
 
@@ -26,6 +28,7 @@ export function HighlightText({
   imageSrc,
   isMobile,
   onHover,
+  homeHref,
 }: HighlightTextProps) {
   const router = useRouter();
   const pendingRef = useRef(false);
@@ -43,7 +46,7 @@ export function HighlightText({
     pendingRef.current = true;
     onHover(label);
     if (isSelf) {
-      router.push("/");
+      router.push(homeHref);
     } else {
       window.location.href = targetUrl;
     }

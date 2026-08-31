@@ -14,9 +14,16 @@ interface IntroProps {
   appUrls: Record<AppId, string>;
   /** not-found 컨텍스트에서만 노출되는 절제된 한 줄 힌트. 정상 /intro에서는 넘기지 않는다. */
   notice?: string;
+  /** 자기 앱 클릭 시 이동할 홈 경로. 기본 "/" — locale prefix 라우팅 앱만 넘긴다. */
+  homeHref?: string;
 }
 
-export function Intro({ currentApp, appUrls, notice }: IntroProps) {
+export function Intro({
+  currentApp,
+  appUrls,
+  notice,
+  homeHref = "/",
+}: IntroProps) {
   const isMobile = useMobile();
   const [hoveredText, setHoveredText] = useState("");
 
@@ -97,6 +104,7 @@ export function Intro({ currentApp, appUrls, notice }: IntroProps) {
           imageSrc={entry.image}
           isMobile={isMobile}
           onHover={setHoveredText}
+          homeHref={homeHref}
         >
           {entry.label}
         </HighlightText>
