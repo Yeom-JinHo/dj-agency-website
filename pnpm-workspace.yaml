@@ -4,7 +4,7 @@ packages:
 
 catalog:
   # Runtime
-  next: 16.2.12
+  next: 16.3.3
   react: ^19.2.8
   react-dom: ^19.2.8
   "@vercel/analytics": ^2.0.1
