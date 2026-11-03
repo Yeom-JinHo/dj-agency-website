@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { IconDots } from "@tabler/icons-react";
 
+import { haptic } from "@repo/ui/haptics";
+
 import type { Release } from "@/types/release";
 
 type ReleaseCardProps = {
@@ -12,7 +14,10 @@ function ReleaseCard({ release, onOpen }: ReleaseCardProps) {
   return (
     <button
       type="button"
-      onClick={onOpen}
+      onClick={() => {
+        haptic("tap");
+        onOpen();
+      }}
       className="group block w-[calc(50vw-2.5rem)] max-w-[200px] cursor-pointer text-left md:w-[340px] md:max-w-none"
       aria-haspopup="dialog"
       aria-label={`Open platform links for ${release.title} by ${release.artist}`}

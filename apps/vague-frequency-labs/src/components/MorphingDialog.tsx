@@ -33,6 +33,7 @@ import { createPortal } from "react-dom";
 
 import { cn } from "@repo/ui";
 import { Icon } from "@repo/ui/common/Icon";
+import { haptic } from "@repo/ui/haptics";
 
 const MotionImage = motion(Image);
 
@@ -151,6 +152,7 @@ function MorphingDialogTrigger({
     useMorphingDialog();
 
   const handleClick = useCallback(() => {
+    if (!isOpen) haptic("tap");
     setIsOpen(!isOpen);
   }, [isOpen, setIsOpen]);
 

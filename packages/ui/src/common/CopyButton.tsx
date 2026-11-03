@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 import { useClipboard } from "../hooks/useClipboard";
 import { useReducedMotionSafe } from "../hooks/useReducedMotionSafe";
+import { haptic } from "../haptics";
 
 import { cn } from "../index";
 
@@ -23,7 +24,10 @@ export default function CopyButton({
   return (
     <button
       type="button"
-      onClick={() => copy(text)}
+      onClick={() => {
+        haptic("success");
+        copy(text);
+      }}
       aria-label={copied ? "Copied to clipboard" : "Copy to clipboard"}
       className={cn(
         "relative inline-flex h-9 min-w-[88px] items-center justify-center gap-1.5 rounded-md px-2.5 text-white/55 transition-colors duration-200 hover:text-white focus-visible:text-white focus-visible:outline-none active:scale-95 motion-reduce:active:scale-100",

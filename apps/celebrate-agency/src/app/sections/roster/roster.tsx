@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 
+import { haptic } from "@repo/ui/haptics";
+
 import { SectionHead } from "@/components/SectionHead";
 import { TapeCorners } from "@/components/Tape";
 import { ARTIST_ROLE_LABEL } from "@/consts/artists";
@@ -40,6 +42,7 @@ export default function Roster({ artists }: { artists: Artist[] }) {
   activeIndexRef.current = activeIndex;
 
   const open = useCallback((index: number) => {
+    haptic("tap");
     setClosing(false);
     setActiveIndex(index);
   }, []);
@@ -83,8 +86,14 @@ export default function Roster({ artists }: { artists: Artist[] }) {
       ),
     [artists.length]
   );
-  const onPrev = useCallback(() => step(-1), [step]);
-  const onNext = useCallback(() => step(1), [step]);
+  const onPrev = useCallback(() => {
+    haptic("tap");
+    step(-1);
+  }, [step]);
+  const onNext = useCallback(() => {
+    haptic("tap");
+    step(1);
+  }, [step]);
 
   // open이 stable이라 카드 목록은 artists가 바뀌지 않는 한 1번만 생성된다.
   // 엘리먼트 동일성 bailout으로 모달 open/close/step마다 카드 전체

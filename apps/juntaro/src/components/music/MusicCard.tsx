@@ -6,6 +6,7 @@ import Image from "next/image";
 import { AnimatePresence } from "motion/react";
 
 import { cn } from "@repo/ui";
+import { haptic } from "@repo/ui/haptics";
 
 import useHoverTilt from "@/hooks/useHoverTilt";
 
@@ -39,6 +40,7 @@ export function MusicCard({ track, cardClassName, priority = false }: MusicCardP
         ref={triggerRef}
         type="button"
         onClick={() => {
+          haptic("tap");
           // 모달이 열리면 mouseleave가 발화하지 않아 마지막 틸트 각도로 얼어붙는다.
           tilt.reset();
           setIsOpen(true);

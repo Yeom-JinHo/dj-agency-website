@@ -1,6 +1,8 @@
 import type { RefObject } from "react";
 import { useEffect, useState } from "react";
 
+import { haptic } from "@repo/ui/haptics";
+
 /**
  * 모바일 디바이스 틸트(자이로) 엔진.
  *
@@ -166,6 +168,8 @@ function useDeviceTilt(rootRef: RefObject<HTMLElement | null>): TiltPermission {
             if (disposed) return;
             if (res === "granted") {
               persistGranted();
+              // Promise 콜백이라 제스처 컨텍스트 밖이다. iOS는 무시하고 Android에서만 진동한다.
+              haptic("success");
               startListening();
               setPermission("granted");
             } else {

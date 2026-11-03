@@ -1,6 +1,8 @@
 import type { RefObject } from "react";
 import { useEffect, useState } from "react";
 
+import { haptic } from "@repo/ui/haptics";
+
 /**
  * 모바일 디바이스 틸트(자이로) 엔진 — 그리드 공유판.
  *
@@ -201,6 +203,8 @@ function useDeviceTiltGrid(
             if (disposed) return;
             if (res === "granted") {
               persistGranted();
+              // useDeviceTilt와 동일.
+              haptic("success");
               startListening();
               setPermission("granted");
             } else {
