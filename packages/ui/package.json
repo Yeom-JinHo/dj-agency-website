@@ -10,7 +10,8 @@
     "./features/intro": "./src/features/intro/index.ts",
     "./common/*": "./src/common/*.tsx",
     "./*": "./src/*.tsx",
-    "./hooks/useReducedMotionSafe": "./src/hooks/useReducedMotionSafe.ts"
+    "./hooks/useReducedMotionSafe": "./src/hooks/useReducedMotionSafe.ts",
+    "./haptics": "./src/haptics.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -35,7 +36,8 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-icons": "^5.5.0",
-    "tailwind-merge": "catalog:"
+    "tailwind-merge": "catalog:",
+    "web-haptics": "catalog:"
   },
   "peerDependencies": {
     "next": "catalog:"

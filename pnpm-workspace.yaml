@@ -13,6 +13,7 @@ catalog:
   tailwind-merge: ^3.6.0
   motion: ^12.23.24
   atropos: ^2.0.2
+  web-haptics: ^0.0.6
   class-variance-authority: ^0.7.1
   "@tabler/icons-react": ^3.35.0
 
